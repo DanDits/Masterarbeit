@@ -1,6 +1,7 @@
 import math
 from functools import lru_cache
-
+# TODO reorganize file, move the polynomial chaos table called "distributions" here to "chaos_distributions", add
+# TODO distributions related values to "distributions", here keep the polynomial related stuff
 
 def _make_distribution(name, is_continuous, gpc_basis_polynomial_name, support):
     return {"name": name,
@@ -9,17 +10,16 @@ def _make_distribution(name, is_continuous, gpc_basis_polynomial_name, support):
             "support": support}
 
 
-support_R = "R"
-support_HalfR = "HalfR"
-support_Interval = "Interval"
 support_Naturals = "Naturals"
 support_NaturalsFinite = "NaturalsFinite"
 
+interval_left = 1
+interval_right = 2
 distributions = {name: _make_distribution(name, *params) for (name, *params) in
-                 [("Gaussian", True, "Hermite", support_R),
-                  ("Gamma", True, "Laguerre", support_HalfR),
-                  ("Beta", True, "Jacobi", support_Interval),
-                  ("Uniform", True, "Legendre", support_Interval),
+                 [("Gaussian", True, "Hermite", [-math.inf, math.inf]),
+                  ("Gamma", True, "Laguerre", [0, math.inf]),
+                  ("Beta", True, "Jacobi", [interval_left, interval_right]),
+                  ("Uniform", True, "Legendre", [-1, 1]),
                   ("Poisson", False, "Charlier", support_Naturals),
                   ("Binomial", False, "Krawtchouk", support_NaturalsFinite),
                   ("Negative Binomial", False, "Meixner", support_Naturals),
@@ -69,8 +69,13 @@ distributions["Gaussian"][attribute_polybasis] = _poly_basis_recursive((lambda x
 
 # Uniform - additional attributes,
 # interval assumed to be [-1,1], recursion p_n(x)=x(2n-1)/n * p_(n-1)(x)-(n-1)/n*p_(n-2)(x)
-distributions["Uniform"][attribute_weight] = lambda x: 0.5
+distributions["Uniform"][attribute_weight] = lambda x: 0.5 if -1 <= x <= 1 else 0.
 distributions["Uniform"][attribute_polybasis_normalization_gamma] = lambda n: 2 / (2 * n + 1)
 distributions["Uniform"][attribute_polybasis] = _poly_basis_recursive((lambda x: 1, lambda x: x),  # TODO more polys
                                                                       (lambda n, x: (2. * n - 1) / n * x,
                                                                            lambda n, x: (1. - n) / n))
+
+# Gamma - additional attributes,
+# assume special case of Exponential distribution (so parameters=(1,lambda=1))
+lamb = 1.
+distributions["Gamma"][attribute_weight] = lambda x: lamb * math.exp(-lamb * x) if x >= 0 else 0.
