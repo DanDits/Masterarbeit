@@ -28,7 +28,7 @@ def _poly_function_basis_recursive(polys_start, recursion_factors):
         elif n >= len(polys_start):
             return lambda x: sum(f_a(n, x) * poly(n - 1 - i)(x) for i, f_a in enumerate(recursion_factors))
         else:
-            raise ValueError("Illegal degree " + n + " for polynomial basis function.")
+            raise ValueError("Illegal degree n={} for polynomial basis function.".format(n))
 
     return poly
 
@@ -52,11 +52,11 @@ def _poly_basis_recursive(polys_start_coeff, recursive_poly_functions):
             coeff = array([0.])
             for i, func in recursive_poly_functions:
                 if i < 0 or i >= n:
-                    raise ValueError("Can't apply on not yet calculated polynomial! ", i)
+                    raise ValueError("Can't apply on not yet calculated polynomial! i={}, n={}".format(i, n))
                 coeff = npoly.polyadd(coeff, func(n, poly_coeff(n - i - 1)))
             return coeff
         else:
-            raise ValueError("Illegal degree n=", n, "for polynomial coefficients.")
+            raise ValueError("Illegal degree n={} for polynomial coefficients.".format(n))
 
     @lru_cache(maxsize=None)
     def poly(n):

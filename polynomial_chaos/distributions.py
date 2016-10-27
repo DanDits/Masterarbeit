@@ -20,11 +20,14 @@ def make_inverse_uniform(left_bound, right_bound):
 
 
 class Distribution:
-    def __init__(self, name, weight, inverse_distribution=None):
+    def __init__(self, name, weight, inverse_distribution=None, show_name=None):
         self.name = name
+        self.show_name = name if show_name is None else show_name
         self.weight = weight
         self.inverse_distribution = inverse_distribution
 
+    def __repr__(self):
+        return self.show_name
 
 gaussian = Distribution("Gaussian",
                         lambda x: math.exp(-x * x / 2.) / math.sqrt(2. * math.pi),
@@ -45,4 +48,5 @@ def make_exponential(lamb=1.):
     # is special case of Gamma distribution (so parameters=(1,lambda=1))
     return Distribution("Gamma",
                         lambda x: lamb * math.exp(-lamb * x) if x >= 0 else 0.,
-                        make_inverse_exponential(lamb))
+                        make_inverse_exponential(lamb),
+                        "Exponential({})".format(lamb))

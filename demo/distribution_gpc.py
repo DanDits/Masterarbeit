@@ -1,4 +1,3 @@
-import numpy.random as rnd
 import scipy.integrate
 import numpy as np
 import matplotlib.pyplot as plt
@@ -17,7 +16,7 @@ hermite_normalization = gaussian_hermite_chaos[chaos.attribute_normalization_gam
 
 # Setup parameters
 approx_expo = True
-approx_order_P = 7
+approx_order_P = 3
 
 dimension_M = approx_order_P + 1  # In one dimensional setting (N=1) it holds M=P+1
 to_approximate = expo if approx_expo else uniform
@@ -60,9 +59,9 @@ output_distribution /= (samples_count * output_resolution)
 t += 0.5 * output_resolution  # to adjust that samples are from all the interval [L, L+resolution] set t in the middle
 
 # Plotting of the demo approximation
-
-plt.plot(t, np.vectorize(to_approximate.weight)(t), label="Exact " + to_approximate.name)
-plt.plot(t, output_distribution, label="Approximation of order " + str(approx_order_P))
+plt.title("gPC approximation of a distribution by hermite polynomials")
+plt.plot(t, np.vectorize(to_approximate.weight)(t), label="Exact " + str(to_approximate) + " distribution")
+plt.plot(t, output_distribution, label="Hermite approximation of order " + str(approx_order_P))
 plt.legend()
 # plt.axis([-6, 14, 0, 1])
 plt.show()
