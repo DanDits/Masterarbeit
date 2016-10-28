@@ -2,43 +2,41 @@ import math
 import polynomial_chaos.poly as poly
 import polynomial_chaos.distributions as distr
 
-attribute_normalization_gamma = "normalization_gamma"
+chaos = []
 
 
-# TODO make this not a dict but a class
-def _make_poly_chaos_distribution(poly_name, poly_basis, distribution_name, distribution):
-    return {"poly_name": poly_name,
-            "poly_basis": poly_basis,
-            "distribution_name": distribution_name,
-            "distribution": distribution}
+class PolyChaosDistribution:
+    def __init__(self, poly_name, poly_basis, distribution, normalization_gamma):
+        self.poly_name = poly_name
+        self.poly_basis = poly_basis
+        self.distribution = distribution
+        self.normalization_gamma = normalization_gamma
+        chaos.append(self)
 
+hermiteChaos = PolyChaosDistribution("Hermite", poly.hermite_basis(),
+                                     distr.gaussian, lambda n: math.factorial(n))
+legendreChaos = PolyChaosDistribution("Legendre", poly.legendre_basis(),
+                                      distr.make_uniform(-1, 1), lambda n: 2 / (2 * n + 1))
 
-chaos = [_make_poly_chaos_distribution(*params) for params in
-         [("Hermite", poly.hermite_basis(), "Gaussian", distr.gaussian),
-          # ("Gamma", True, "Laguerre", [0, math.inf]),
-          # ("Beta", True, "Jacobi", [interval_left, interval_right]),
-          ("Legendre", poly.legendre_basis(), "Uniform", distr.make_uniform(-1, 1)),
-          # ("Poisson", False, "Charlier", support_Naturals),
-          # ("Binomial", False, "Krawtchouk", support_NaturalsFinite),
-          # ("Negative Binomial", False, "Meixner", support_Naturals),
-          # ("Hypergeometric", False, "Hahn", support_NaturalsFinite)
-          ]
-         ]
+# Other chaos pairs, not implemented:
+# ("Gamma", "Laguerre", [0, math.inf]),
+# ("Beta","Jacobi", [a, b]),
+# ("Poisson", "Charlier", support_Naturals),
+# ("Binomial", "Krawtchouk", support_NaturalsFinite),
+# ("Negative Binomial", "Meixner", support_Naturals),
+# ("Hypergeometric", "Hahn", support_NaturalsFinite)
 
 
 def get_chaos_by_poly(poly_name):
     for curr in chaos:
-        if curr["poly_name"] == poly_name:
+        if curr.poly_name == poly_name:
             return curr
     raise ValueError("No polynomial chaos distribution for polynomial name", poly_name)
 
 
 def get_chaos_by_distribution(distribution_name):
     for curr in chaos:
-        if curr["distribution_name"] == distribution_name:
+        if curr.distribution.name == distribution_name:
             return curr
     raise ValueError("No polynomial chaos distribution for distribution name", distribution_name)
 
-
-get_chaos_by_distribution("Gaussian")[attribute_normalization_gamma] = lambda n: math.factorial(n)
-get_chaos_by_distribution("Uniform")[attribute_normalization_gamma] = lambda n: 2 / (2 * n + 1)
