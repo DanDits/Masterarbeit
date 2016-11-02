@@ -1,10 +1,7 @@
 import numpy as np
 import math
 from numpy.fft import ifft, fft, fftn, ifftn
-import matplotlib.pyplot as plt
-from itertools import zip_longest, repeat
-from matplotlib import animation
-from scipy.integrate import quad
+from itertools import zip_longest
 
 
 def pseudospectral_factor(interval, grid_points, power):
@@ -66,7 +63,7 @@ def heat_solution(intervals, grid_points_list, t0, u0, alpha, wanted_times):
     return xs, times, solutions
 
 
-# u_tt(t,x) = alpha * u_xx(t,x), u(t0,x)=u0(x), u_t(t0,x)=u0_t(x), alpha > 0
+# u_tt(t,x) = (alpha ** 2) * u_xx(t,x), u(t0,x)=u0(x), u_t(t0,x)=u0_t(x), alpha > 0
 def wave_solution(intervals, grid_points_list, t0, u0, u0t, alpha, wanted_times):
     assert alpha > 0.
 
@@ -77,13 +74,15 @@ def wave_solution(intervals, grid_points_list, t0, u0, u0t, alpha, wanted_times)
     y0 = u0(xxs)
     y0_ = fftn(y0)  # starting condition in fourier space and evaluated at grid
     y0t_ = fftn(u0t(xxs))
-    if abs(y0t_[0]) > 1e-9:
-        print("Warning! Start velocity for wave solver not periodic, solution will be incorrect.")
+    if len(y0t_.shape) == 1 and abs(y0t_[0]) > 1e-9:
+        print("Warning! Start velocity for wave solver not possible, solution will be incorrect.")
         pass
     sum_ks = sum(k for k in ks)
     c1_ = y0_
-    temp_ks = np.where(sum_ks != 0, sum_ks, math.inf)  # replace ks 0 with inf to ensure c2_ is zero at those points
+    # replace ks' 0 with inf to ensure c2_ is zero at those points and we do not divide by zero
+    temp_ks = np.where(sum_ks != 0, sum_ks, math.inf)
     c2_ = y0t_ / temp_ks
+    c2_ *= 1 / alpha
 
     times = list(filter(lambda time_check: time_check >= t0, wanted_times))
     solutions = []
@@ -94,146 +93,8 @@ def wave_solution(intervals, grid_points_list, t0, u0, u0t, alpha, wanted_times)
 
         # solution at time t with starting value y0_ and y0t_, all in fourier space
 
-        u_hat_ = c1_ * np.cosh(sum_ks * t) + c2_ * np.sinh(sum_ks * t)
+        u_hat_ = c1_ * np.cosh(alpha * sum_ks * t) + c2_ * np.sinh(alpha * sum_ks * t)
 
         y = ifftn(u_hat_)
         solutions.append(y)
     return xs, times, solutions
-
-
-def animate_1d(x, ys, animate_times, pause):
-    fig = plt.figure()
-    ax = plt.axes(xlim=(min(x), max(x)), ylim=(min(np.amin(vals.real) for vals in ys),
-                                               max(np.amax(vals.real) for vals in ys)))
-    line, = ax.plot([], [], lw=2)
-    time_text = ax.text(0.02, 0.95, '', transform=ax.transAxes)
-
-    # initialization function: plot the background of each frame
-    def init():
-        line.set_data([], [])
-        time_text.set_text('')
-        return line, time_text
-
-    # animation function.  This is called sequentially
-    def animate(i):
-        line.set_data(x, ys[i].real)
-        time_text.set_text("Solution at time=" + str(animate_times[i]))
-        return line, time_text
-
-    # call the animator.  blit=True means only re-draw the parts that have changed.
-
-    # because else the object will not get creates and nothing will show! ...
-    # noinspection PyUnusedLocal
-    anim = animation.FuncAnimation(fig, animate, init_func=init,
-                                   frames=len(animate_times), interval=pause, blit=True)
-    plt.show()
-
-
-if __name__ == "__main__":
-    test_derivative = False
-    test_heat = True
-    test_wave = False
-    do_animate = True
-
-    if test_wave:
-        grid_n = 128  # power of 2 for best performance of fft
-        wave_speed = 1  # > 0
-        wave_speed_sq = wave_speed ** 2
-        dimension = 1  # plotting only supported for one or two dimensional, higher dimension will require lower grid_n
-        domain = list(repeat([-math.pi, math.pi], dimension))  # intervals with periodic boundary conditions, so a torus
-        show_times = np.arange(0, 30, 0.1)  # times to evaluate solution for and plot it
-        #show_times = [0, 1, 5, 10]
-
-        def start_position(xs, delta=0):
-            return np.sin(sum(x for x in xs) + delta)
-
-        def start_velocity(xs):  # Needs to be periodic! (so zeroth fourier coefficient must be zero!)
-            return np.cos(sum(x for x in xs)) + np.sin(sum(x for x in xs))
-            # return np.ones(shape=sum(x for x in xs).shape)
-            # return sum(np.zeros(shape=x.shape) for x in xs)
-
-        def reference_1d(xs, t):
-            # this is the d'Alembert reference solution if the indefinite integral of the start_velocity is known
-
-            def start_velocity_integral(inner_xs, delta):
-                sum_x = sum(x for x in inner_xs)
-                # return np.sin(sum_x + delta)  # for start_velocity=cos(sum_x)
-                return (sum_x + delta + np.sin(sum_x + delta) * np.cos(sum_x + delta)) / 2  # for start_velocity = cos^2
-            return (start_position(xs, wave_speed * t) / 2
-                    + start_position(xs, -wave_speed * t) / 2
-                    + (start_velocity_integral(xs, wave_speed * t)
-                       - start_velocity_integral(xs, -wave_speed * t)) / (2 * wave_speed))
-
-
-        x_result, t_result, y_result = wave_solution(domain, [grid_n],
-                                                     0, start_position, start_velocity, wave_speed_sq, show_times)
-        if len(x_result) == 1:  # 1D plots
-            if do_animate:
-                animate_1d(x_result[0], y_result, show_times, 100)  # pause between frames in ms
-            else:
-                # all times in one figure
-
-                plt.plot(*x_result, reference_1d(x_result, t_result[1]) + 0.05,
-                         label="Reference solution at time=" + str(t_result[1]))
-                plt.plot(*x_result, reference_1d(x_result, t_result[2]) + 0.05,
-                         label="Reference solution at time=" + str(t_result[2]))
-                for time, sol in zip(t_result, y_result):
-                    plt.plot(*x_result, sol.real, label="Solution at time=" + str(time))
-                plt.legend()
-                plt.title("Wave equation solution by pseudospectral spatial method and exact time solution\nwith N="
-                          + str(grid_n) + " grid points")
-                plt.show()
-        # TODO test and visualize wave solution in 2D
-    if test_heat:
-        grid_n = 128  # power of 2 for best performance of fft
-        thermal_diffusivity = 0.1  # > 0
-        dimension = 2  # plotting only supported for one or two dimensional, higher dimension will require lower grid_n
-        domain = list(repeat([-math.pi, math.pi], dimension))  # intervals with periodic boundary conditions, so a torus
-        show_times = np.arange(0, 20, 0.1)  # times to evaluate solution for and plot it
-
-        # starting condition for homogeneous heat equation with periodic boundary equation in given domain
-        def start_condition(xs):
-            return -np.sin(sum(x ** 2 for x in xs))
-            # return 1 / np.cosh(10 * sum(x for x in xs) / math.pi) ** 2
-            # return np.where(-1 < x, np.where(x > 1, np.ones(shape=x.shape), 0), 1)  # discontinuous block in 1D
-
-
-        x_result, t_result, y_result = heat_solution(domain, [grid_n],
-                                                     0, start_condition, thermal_diffusivity, show_times)
-
-        if len(x_result) == 1:  # 1D plots
-            if do_animate:
-                animate_1d(x_result[0], y_result, show_times, 100)  # pause between frames in ms
-            else:
-                # all times in one figure
-                for time, sol in zip(t_result, y_result):
-                    plt.plot(*x_result, sol, label="Solution at time=" + str(time))
-                plt.legend()
-                plt.title("Heat equation solution by pseudospectral spatial method and exact time solution\nwith N="
-                          + str(grid_n) + " grid points")
-                plt.show()
-        elif len(x_result) == 2:  # 2D plots
-            # one figure per time
-            for time, sol in zip(t_result, y_result):
-                plt.figure()
-                plt.pcolormesh(*x_result, sol, vmin=-1, vmax=1)  # fix color bar range over different figures
-                plt.colorbar()
-                plt.show()
-
-    if test_derivative:
-        bound = [-1, 1]
-
-
-        def testfun_solution(eks):  # second derivative of testfun
-            var = math.pi * (eks + 1)
-            return math.pi ** 2 * (np.cos(var) ** 2 * (np.sin(var) + 3) - np.sin(var) - 1) * np.exp(np.sin(var))
-
-
-        def testfun(x):
-            return np.sin(math.pi * (x + 1)) * np.exp(np.sin(math.pi * (x + 1)))
-
-        result_x, result_y = spectral_derivative(bound, 512, testfun, 2)
-        x_highres = np.linspace(bound[0], bound[1], endpoint=False, num=512)  # higher resolution
-        plt.plot(result_x, result_y, x_highres, testfun_solution(x_highres))
-        plt.legend(["Pseudospectral solution", "Original solution"])
-        plt.show()
