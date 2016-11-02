@@ -4,6 +4,7 @@ from numpy.fft import ifft, fft, fftn, ifftn
 import matplotlib.pyplot as plt
 from itertools import zip_longest, repeat
 from matplotlib import animation
+from scipy.integrate import quad
 
 
 def pseudospectral_factor(interval, grid_points, power):
@@ -15,11 +16,7 @@ def pseudospectral_factor(interval, grid_points, power):
 
     scale = 2 * math.pi / (bound_right - bound_left)
     # the ordering of this numpy array is defined by the ordering of python's fft's result (see its documentation)
-    kxx = (scale * np.append(np.arange(0, grid_points / 2 + 1), np.arange(- grid_points / 2 + 1, 0))) ** power
-    if power % 4 == 2:  # for power in [2,6,10,...] avoid introducing complex numbers
-        kxx *= -1
-    elif power % 4 != 0:  # for power in [0,4,8,...] the factor would just be 1
-        kxx *= 1j ** power
+    kxx = (1j * scale * np.append(np.arange(0, grid_points / 2 + 1), np.arange(- grid_points / 2 + 1, 0))) ** power
 
     # h = (bound_right - bound_left) / (N - 1)  # spatial step size
     x = np.linspace(interval[0], interval[1], endpoint=False, num=grid_points)
@@ -74,12 +71,19 @@ def wave_solution(intervals, grid_points_list, t0, u0, u0t, alpha, wanted_times)
     assert alpha > 0.
 
     # plural 's' means a list, so list of x coordinates, list of meshgrid coordinates, list of fourier coefficients
-    xs, xxs, ks = pseudospectral_factor_multi(intervals, grid_points_list, 2)
+    xs, xxs, ks = pseudospectral_factor_multi(intervals, grid_points_list, 1)
 
     # variables ending in underscore note that the values are considered to be in fourier space
     y0 = u0(xxs)
     y0_ = fftn(y0)  # starting condition in fourier space and evaluated at grid
     y0t_ = fftn(u0t(xxs))
+    if abs(y0t_[0]) > 1e-9:
+        print("Warning! Start velocity for wave solver not periodic, solution will be incorrect.")
+        pass
+    sum_ks = sum(k for k in ks)
+    c1_ = y0_
+    temp_ks = np.where(sum_ks != 0, sum_ks, math.inf)  # replace ks 0 with inf to ensure c2_ is zero at those points
+    c2_ = y0t_ / temp_ks
 
     times = list(filter(lambda time_check: time_check >= t0, wanted_times))
     solutions = []
@@ -89,13 +93,8 @@ def wave_solution(intervals, grid_points_list, t0, u0, u0t, alpha, wanted_times)
         # here we are in the position to know the exact solution for this linear ordinary differential equation!
 
         # solution at time t with starting value y0_ and y0t_, all in fourier space
-        sum_ks = sum(k for k in ks)
-        c1_ = y0_
-        # will produce a warning currently because of dividing by zero at some points, c2_ should be zero there
-        # noinspection PyTypeChecker
-        c2_ = np.nan_to_num(y0t_ / (-1j * sum_ks))  # for the very few points where k is zero set c2_ to zero
 
-        u_hat_ = c1_ * np.cosh(-1j * sum_ks * t) + c2_ * np.sinh(-1j * sum_ks * t)
+        u_hat_ = c1_ * np.cosh(sum_ks * t) + c2_ * np.sinh(sum_ks * t)
 
         y = ifftn(u_hat_)
         solutions.append(y)
@@ -104,8 +103,8 @@ def wave_solution(intervals, grid_points_list, t0, u0, u0t, alpha, wanted_times)
 
 def animate_1d(x, ys, animate_times, pause):
     fig = plt.figure()
-    print(type(x), type(np.amin(ys[0])))
-    ax = plt.axes(xlim=(min(x), max(x)), ylim=(min(np.amin(vals) for vals in ys), max(np.amax(vals) for vals in ys)))
+    ax = plt.axes(xlim=(min(x), max(x)), ylim=(min(np.amin(vals.real) for vals in ys),
+                                               max(np.amax(vals.real) for vals in ys)))
     line, = ax.plot([], [], lw=2)
     time_text = ax.text(0.02, 0.95, '', transform=ax.transAxes)
 
@@ -132,28 +131,38 @@ def animate_1d(x, ys, animate_times, pause):
 
 if __name__ == "__main__":
     test_derivative = False
-    test_heat = False
-    test_wave = True
+    test_heat = True
+    test_wave = False
     do_animate = True
 
     if test_wave:
         grid_n = 128  # power of 2 for best performance of fft
-        wave_speed_sq = 1  # > 0
+        wave_speed = 1  # > 0
+        wave_speed_sq = wave_speed ** 2
         dimension = 1  # plotting only supported for one or two dimensional, higher dimension will require lower grid_n
         domain = list(repeat([-math.pi, math.pi], dimension))  # intervals with periodic boundary conditions, so a torus
         show_times = np.arange(0, 30, 0.1)  # times to evaluate solution for and plot it
+        #show_times = [0, 1, 5, 10]
 
-        def start_position(xs):
-            return np.sin(sum(x for x in xs))
+        def start_position(xs, delta=0):
+            return np.sin(sum(x for x in xs) + delta)
 
-        def start_velocity(xs):
-            return np.cos(sum(x for x in xs)) ** 2
-            # return sum(x for x in xs)
+        def start_velocity(xs):  # Needs to be periodic! (so zeroth fourier coefficient must be zero!)
+            return np.cos(sum(x for x in xs)) + np.sin(sum(x for x in xs))
+            # return np.ones(shape=sum(x for x in xs).shape)
             # return sum(np.zeros(shape=x.shape) for x in xs)
 
-        def reference(xs, t):
-            # for start_velocity zero and start_position sinus, this is the d'Alembert reference solution
-            return np.sin(sum(x for x in xs) - t) / 2 + np.sin(sum(x for x in xs) + t) / 2
+        def reference_1d(xs, t):
+            # this is the d'Alembert reference solution if the indefinite integral of the start_velocity is known
+
+            def start_velocity_integral(inner_xs, delta):
+                sum_x = sum(x for x in inner_xs)
+                # return np.sin(sum_x + delta)  # for start_velocity=cos(sum_x)
+                return (sum_x + delta + np.sin(sum_x + delta) * np.cos(sum_x + delta)) / 2  # for start_velocity = cos^2
+            return (start_position(xs, wave_speed * t) / 2
+                    + start_position(xs, -wave_speed * t) / 2
+                    + (start_velocity_integral(xs, wave_speed * t)
+                       - start_velocity_integral(xs, -wave_speed * t)) / (2 * wave_speed))
 
 
         x_result, t_result, y_result = wave_solution(domain, [grid_n],
@@ -164,26 +173,28 @@ if __name__ == "__main__":
             else:
                 # all times in one figure
 
-                # plt.plot(*x_result, reference(x_result, t_result[1]),
-                #         label="Reference solution at time=" + str(t_result[1]))
+                plt.plot(*x_result, reference_1d(x_result, t_result[1]) + 0.05,
+                         label="Reference solution at time=" + str(t_result[1]))
+                plt.plot(*x_result, reference_1d(x_result, t_result[2]) + 0.05,
+                         label="Reference solution at time=" + str(t_result[2]))
                 for time, sol in zip(t_result, y_result):
                     plt.plot(*x_result, sol.real, label="Solution at time=" + str(time))
                 plt.legend()
                 plt.title("Wave equation solution by pseudospectral spatial method and exact time solution\nwith N="
-                          + str(grid_n) + " gridpoints")
+                          + str(grid_n) + " grid points")
                 plt.show()
         # TODO test and visualize wave solution in 2D
     if test_heat:
         grid_n = 128  # power of 2 for best performance of fft
         thermal_diffusivity = 0.1  # > 0
-        dimension = 1  # plotting only supported for one or two dimensional, higher dimension will require lower grid_n
+        dimension = 2  # plotting only supported for one or two dimensional, higher dimension will require lower grid_n
         domain = list(repeat([-math.pi, math.pi], dimension))  # intervals with periodic boundary conditions, so a torus
         show_times = np.arange(0, 20, 0.1)  # times to evaluate solution for and plot it
 
         # starting condition for homogeneous heat equation with periodic boundary equation in given domain
         def start_condition(xs):
-            # return -np.sin(sum(x for x in xs))
-            return 1 / np.cosh(10 * sum(x for x in xs) / math.pi) ** 2
+            return -np.sin(sum(x ** 2 for x in xs))
+            # return 1 / np.cosh(10 * sum(x for x in xs) / math.pi) ** 2
             # return np.where(-1 < x, np.where(x > 1, np.ones(shape=x.shape), 0), 1)  # discontinuous block in 1D
 
 
