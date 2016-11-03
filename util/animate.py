@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation
-from mpl_toolkits.mplot3d import axes3d
+# noinspection PyUnresolvedReferences
+from mpl_toolkits.mplot3d import axes3d  # implicitly required for projection='3d' call...
 from matplotlib import cm
 
 

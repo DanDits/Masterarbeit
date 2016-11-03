@@ -4,6 +4,11 @@ from numpy.fft import ifft, fft, fftn, ifftn
 from itertools import zip_longest
 
 
+def error_l2(approx_y, solution_y):
+    assert len(approx_y) == len(solution_y)
+    return np.sqrt(np.sum(np.abs(approx_y - solution_y) ** 2)) / len(approx_y)
+
+
 def pseudospectral_factor(interval, grid_points, power):
     bound_left = interval[0]  # left border of interval
     bound_right = interval[1]  # right border of interval
