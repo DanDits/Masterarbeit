@@ -63,11 +63,11 @@ def animate_2d(x1, x2, ys, animate_times, pause):
     plt.show()
 
 
-# TODO teste mal mayavi.soureforge.net
+# better version may be possible using mayavi (see http://docs.enthought.com/mayavi/mayavi/mlab_animating.html)
 def animate_2d_surface(x1, x2, ys, animate_times, pause):
     x1, x2 = np.meshgrid(x1, x2)
     fig = plt.figure()
-    ax = fig.gca(projection='3d')
+    ax = fig.gca(projection='3d')  # implicitly requires import! (from mpl_toolkits.mplot3d import axes3d)
 
     ax.plot_surface(x1, x2, ys[0].real, cmap=cm.coolwarm)
     ax.set_zlim(-2, 2)

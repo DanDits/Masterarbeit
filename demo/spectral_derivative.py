@@ -1,6 +1,6 @@
 from math import pi
 import numpy as np
-from pseudospectral.solver import spectral_derivative
+from diff_equation.pseudospectral_solver import spectral_derivative
 import matplotlib.pyplot as plt
 
 bound = [-1, 1]

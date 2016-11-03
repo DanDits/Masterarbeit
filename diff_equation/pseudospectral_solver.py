@@ -68,9 +68,9 @@ def heat_solution(intervals, grid_points_list, t0, u0, alpha, wanted_times):
     return xs, times, solutions
 
 
-# u_tt(t,x) = (alpha ** 2) * u_xx(t,x), u(t0,x)=u0(x), u_t(t0,x)=u0_t(x), alpha > 0
-def wave_solution(intervals, grid_points_list, t0, u0, u0t, alpha, wanted_times):
-    assert alpha > 0.
+# u_tt(t,x) = (wave_speed ** 2) * u_xx(t,x), u(t0,x)=u0(x), u_t(t0,x)=u0_t(x), wave_speed > 0
+def wave_solution(intervals, grid_points_list, t0, u0, u0t, wave_speed, wanted_times):
+    assert wave_speed > 0.
 
     # plural 's' means a list, so list of x coordinates, list of meshgrid coordinates, list of fourier coefficients
     xs, xxs, ks = pseudospectral_factor_multi(intervals, grid_points_list, 1)
@@ -85,9 +85,9 @@ def wave_solution(intervals, grid_points_list, t0, u0, u0t, alpha, wanted_times)
     sum_ks = sum(k for k in ks)
     c1_ = y0_
     # replace ks' 0 with inf to ensure c2_ is zero at those points and we do not divide by zero
-    temp_ks = np.where(sum_ks != 0, sum_ks, math.inf)
+    temp_ks = np.where(sum_ks != 0, sum_ks, math.inf)  # TODO is this even correct to divide by sum of factors?? calc for 2d again by hand!
     c2_ = y0t_ / temp_ks
-    c2_ *= 1 / alpha
+    c2_ *= 1 / wave_speed
 
     times = list(filter(lambda time_check: time_check >= t0, wanted_times))
     solutions = []
@@ -98,7 +98,7 @@ def wave_solution(intervals, grid_points_list, t0, u0, u0t, alpha, wanted_times)
 
         # solution at time t with starting value y0_ and y0t_, all in fourier space
 
-        u_hat_ = c1_ * np.cosh(alpha * sum_ks * t) + c2_ * np.sinh(alpha * sum_ks * t)
+        u_hat_ = c1_ * np.cosh(wave_speed * sum_ks * t) + c2_ * np.sinh(wave_speed * sum_ks * t)
 
         y = ifftn(u_hat_)
         solutions.append(y)

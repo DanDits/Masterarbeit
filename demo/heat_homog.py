@@ -2,7 +2,7 @@ from math import pi
 from itertools import repeat
 import numpy as np
 import matplotlib.pyplot as plt
-from pseudospectral.solver import heat_solution
+from diff_equation.pseudospectral_solver import heat_solution
 from util.animate import animate_1d, animate_2d
 
 
