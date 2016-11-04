@@ -8,20 +8,22 @@ from util.animate import animate_1d, animate_2d_surface
 # ----- USER CONFIGS -------------------
 
 # basic config
-show_errors = False
+show_errors = True
 plot_references = True  # when not animating, plot in same figure
 do_animate = True
-grid_n = 256  # power of 2 for best performance of fft, 2^15 for 1d already takes some time
-param_1 = 2  # parameter that can be used for start position and reference solutions
-wave_speed = 1 / param_1  # > 0
+grid_n = 128  # power of 2 for best performance of fft, 2^15 for 1d already takes some time
+param_1, param_2 = 1, 4  # parameters that can be used for start position and reference solutions
+wave_speed = 1  # > 0
 dimension = 2  # plotting only supported for one or two dimensional; higher dimension will require lower grid_n
 domain = list(repeat([-pi, pi], dimension))  # intervals with periodic boundary conditions, so a ring in 1d, torus in 2d
 show_times = np.arange(0, 30, 0.1)  # times to evaluate solution for and plot it
 
 
 def start_position(xs, delta=0):
-    return np.sin(np.sqrt(sum((x + delta) ** 2 for x in xs)))  # not periodic!
-    # return np.sin(param_1 * (sum(x for x in xs) + delta))
+    sum_x = sum(x for x in xs)
+    # return np.sin(sum_x + delta)  # sp1
+    # return np.sin(np.sqrt(sum((x + delta) ** 2 for x in xs)))  # not periodic!
+    return np.sin(param_1 * (xs[0] + delta)) + np.sin(param_2 * (xs[1] + delta))  # sp2
     # return 1 / np.cosh((sum(x + delta for x in xs)) * 10) ** 2
     # return np.sin(param_1 * (sum(x for x in xs) + delta)) * np.cos(param_1 * (sum(x for x in xs) + delta))
 
@@ -30,8 +32,8 @@ def start_velocity(xs):  # zeroth fourier coefficient must be zero! (so for exam
     sum_x = sum(x for x in xs)
     # return np.cos(sum_x) + np.sin(sum_x)
     # return np.cos(sum_x)
-    # return np.zeros(shape=sum_x.shape)
-    return np.cos(param_1 * sum_x) ** 2 - np.sin(param_1 * sum_x) ** 2
+    return np.zeros(shape=sum_x.shape)  # sv3
+    # return np.cos(param_1 * sum_x) ** 2 - np.sin(param_1 * sum_x) ** 2
 
 
 def start_velocity_integral(inner_xs, delta):
@@ -49,12 +51,16 @@ def reference_1d_dalembert(xs, t):
                - start_velocity_integral(xs, -wave_speed * t)) / (2 * wave_speed))
 
 
-def reference_1d(xs, t):
+def reference(normal_xs, t):
+    xs = np.meshgrid(*normal_xs, sparse=True)
     # either use dalembert for 1d and if integral of start velocity is known
     # return reference_1d_dalembert(xs, t)
 
     # or give reference solution directly
-    return np.sin(param_1 * sum(x for x in xs) + t) * np.cos(param_1 * sum(x for x in xs) + t)
+    sum_x = sum(x for x in xs)
+    # return np.sin(param_1 * sum_x + t) * np.cos(param_1 * sum_x + t)
+    # return 0.5 * (np.sin(sum_x + t) + np.sin(sum_x - t))  # sp1 sv3
+    return 0.5 * (np.sin(xs[0] + t) + np.sin(xs[0] - t) + np.sin(param_2 * (xs[1] + t)) + np.sin(param_2 * (xs[1] - t)))  # sp2, sv3
 
 """ # Interesting config: difference to d'alemberts solution after some time when wave hits boundary
 show_errors = True
@@ -75,8 +81,8 @@ reference_1d = lambda xs, t: reference_1d_dalembert(xs, t)"""
 x_result, t_result, y_result = wave_solution(domain, [grid_n],
                                              0, start_position, start_velocity, wave_speed, show_times)
 
-if dimension == 1 and show_errors:
-    errors = [error_l2(y, reference_1d(x_result, t)) for t, y in zip(t_result, y_result)]
+if show_errors:
+    errors = [error_l2(y, reference(x_result, t)) for t, y in zip(t_result, y_result)]
     plt.figure()
     plt.plot(t_result, errors, label="Errors in discrete L2 norm")
     plt.xlabel("Time")
@@ -91,7 +97,7 @@ if dimension == 1:
         for time, sol, color in zip(t_result, y_result, cycle(['r', 'b', 'g', 'k', 'm', 'c', 'y'])):
             plt.plot(*x_result, sol.real, '.', color=color, label="Solution at time=" + str(time))
             if plot_references:
-                plt.plot(*x_result, reference_1d(x_result, time), color=color,
+                plt.plot(*x_result, reference(x_result, time), color=color,
                          label="Reference solution at time=" + str(time))
         plt.legend()
         plt.title("Wave equation solution by pseudospectral spatial method and exact time solution\nwith N="

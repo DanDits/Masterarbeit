@@ -75,11 +75,10 @@ def animate_2d_surface(x1, x2, ys, animate_times, pause):
     # animation function.  This is called sequentially
     def animate(i):
         ax.clear()
-        surf = ax.plot_surface(x1, x2, ys[i].real, cmap=cm.coolwarm)
+        surf = ax.plot_surface(x1, x2, ys[i].real, cmap=cm.coolwarm, linewidth=0)
         ax.set_zlim(-2, 2)
 
-        time_text = ax.text(0.02, 0.95, 0.02, '', transform=ax.transAxes)
-        time_text.set_text("Solution at time=" + str(animate_times[i]))
+        time_text = ax.text(0.02, 0.95, 0.02, "Solution at time=" + str(animate_times[i]), transform=ax.transAxes)
         return time_text, surf
 
     # because else the object will not get creates and nothing will show! ...

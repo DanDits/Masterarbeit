@@ -4,9 +4,9 @@ from numpy.fft import ifft, fft, fftn, ifftn
 from itertools import zip_longest
 
 
-def error_l2(approx_y, solution_y):
-    assert len(approx_y) == len(solution_y)
-    return np.sqrt(np.sum(np.abs(approx_y - solution_y) ** 2)) / len(approx_y)
+def error_l2(approx_y, solution_y, show=False):
+    assert approx_y.shape == solution_y.shape
+    return np.sqrt(np.sum(np.abs(approx_y - solution_y) ** 2)) / approx_y.size
 
 
 def pseudospectral_factor(interval, grid_points, power):
@@ -20,8 +20,7 @@ def pseudospectral_factor(interval, grid_points, power):
     # the ordering of this numpy array is defined by the ordering of python's fft's result (see its documentation)
     kxx = (1j * scale * np.append(np.arange(0, grid_points / 2 + 1), np.arange(- grid_points / 2 + 1, 0))) ** power
 
-    # h = (bound_right - bound_left) / (N - 1)  # spatial step size
-    x = np.linspace(interval[0], interval[1], endpoint=False, num=grid_points)
+    x = np.linspace(interval[0], interval[1], endpoint=True, num=grid_points)
     return x, kxx
 
 
@@ -73,7 +72,7 @@ def wave_solution(intervals, grid_points_list, t0, u0, u0t, wave_speed, wanted_t
     assert wave_speed > 0.
 
     # plural 's' means a list, so list of x coordinates, list of meshgrid coordinates, list of fourier coefficients
-    xs, xxs, ks = pseudospectral_factor_multi(intervals, grid_points_list, 1)
+    xs, xxs, ks = pseudospectral_factor_multi(intervals, grid_points_list, 2)
 
     # variables ending in underscore note that the values are considered to be in fourier space
     y0 = u0(xxs)
@@ -81,14 +80,20 @@ def wave_solution(intervals, grid_points_list, t0, u0, u0t, wave_speed, wanted_t
     y0t_ = fftn(u0t(xxs))
     if len(y0t_.shape) == 1 and abs(y0t_[0]) > 1e-9:
         print("Warning! Start velocity for wave solver not possible, solution will be incorrect.")
-        pass
-    sum_ks = sum(k for k in ks)
+
+    # as the pseudospectral factors of order 2 are negative, negate sum!
+    # numbers are real (+0j) anyways, but that that saves some calculation and storage time
+    norm2_ks = np.sqrt(-sum(k for k in ks).real)
+
+    # calculate factors c1_ and c2_
+    zero_index = (0,) * len(norm2_ks.shape)  # top left corner of norm2_ks contains a zero, temporarily replace it!
     c1_ = y0_
-    # replace ks' 0 with inf to ensure c2_ is zero at those points and we do not divide by zero
-    temp_ks = np.where(sum_ks != 0, sum_ks, math.inf)  # TODO is this even correct to divide by sum of factors?? calc for 2d again by hand!
-    c2_ = y0t_ / temp_ks
+    norm2_ks[zero_index] = np.inf  # this makes sure that c2_[zero_index] is 0 and no warning is triggered
+    c2_ = y0t_ / norm2_ks
+    norm2_ks[zero_index] = 0  # revert temporal change
     c2_ *= 1 / wave_speed
 
+    # for each wanted time that is actually in the future, calculate a solution
     times = list(filter(lambda time_check: time_check >= t0, wanted_times))
     solutions = []
     for t in times:
@@ -98,7 +103,7 @@ def wave_solution(intervals, grid_points_list, t0, u0, u0t, wave_speed, wanted_t
 
         # solution at time t with starting value y0_ and y0t_, all in fourier space
 
-        u_hat_ = c1_ * np.cosh(wave_speed * sum_ks * t) + c2_ * np.sinh(wave_speed * sum_ks * t)
+        u_hat_ = c1_ * np.cos(wave_speed * norm2_ks * t) + c2_ * np.sin(wave_speed * norm2_ks * t)
 
         y = ifftn(u_hat_)
         solutions.append(y)
