@@ -13,9 +13,10 @@ show_errors = True
 plot_references = True  # when not animating, plot in same figure
 do_animate = True
 grid_n = 128  # amount of grid points per dimension
-dimension = 1  # plotting only supported for one or two dimensional
+dimension = 2  # plotting only supported for one or two dimensional
 domain = list(repeat([-pi, pi], dimension))  # intervals with periodic boundary conditions, so a ring in 1d, torus in 2d
-show_times = np.arange(0, 120, 0.1)  # times to evaluate solution for and plot it
+anim_pause = 100  # in ms
+show_times = np.arange(0, 30, anim_pause / 1000)  # times to evaluate solution for and plot it
 # show_times = [0, 1, 2, 3]
 
 
@@ -32,14 +33,14 @@ def start_velocity(xs):
 
 
 def beta(xs):
-    return sum(x ** 2 for x in xs)  # b1
+    return sum(xs) ** 2  # b1
     # return np.ones(shape=sum(xs).shape)  # b2
 
 
 def reference(normal_xs, t):
     xs = np.meshgrid(*normal_xs, sparse=True)
-    return np.sin(sum(xs) * (t + 1))  # for sp1, sv1, b1
-    # return np.cos(sum(xs) + t)  # for sp2, sv2, b2
+    return np.sin(sum(xs) * (t + 1))  # for sp1, sv1, b1 in any dimension
+    # return np.cos(sum(xs) + t)  # for sp2, sv2, b2 in 1d
 
 
 x_result, t_result, y_result = linhyp_solution(domain, [grid_n],
@@ -52,6 +53,7 @@ if show_errors:
     plt.plot(t_result, errors, label="Errors in discrete L2 norm")
     plt.xlabel("Time")
     plt.ylabel("Error")
+    plt.show()
 
 if dimension == 1:
     if do_animate:
@@ -66,4 +68,5 @@ if dimension == 1:
                          label="Reference solution at time=" + str(time))
         plt.legend()
         plt.show()
-
+if dimension == 2:
+    animate_2d_surface(*x_result, y_result, show_times, anim_pause)

@@ -67,25 +67,31 @@ def heat_solution(intervals, grid_points_list, t0, u0, alpha, wanted_times):
 def wave_solution(intervals, grid_points_list, t0, u0, u0t, wave_speed, wanted_times):
     assert wave_speed > 0.
 
+    # calculations only depending on interval and grid points
+
     # plural 's' means a list, so list of x coordinates, list of meshgrid coordinates, list of fourier coefficients
     xs, xxs, ks = pseudospectral_factor_multi(intervals, grid_points_list, 2)
+
+    # as the pseudospectral factors of order 2 are negative integers, negate sum!
+    # numbers are real (+0j) anyways, but using '.real' saves some calculation time and storage space
+    norm2_ks = np.sqrt(-sum(ks).real)
+
+    # pre calculations depending on starting values, wave speed,...
 
     # variables ending in underscore note that the values are considered to be in fourier space
     y0 = u0(xxs)
     y0_ = fftn(y0)  # starting condition in fourier space and evaluated at grid
     y0t_ = fftn(u0t(xxs))
-    if len(y0t_.shape) == 1 and abs(y0t_[0]) > 1e-9:
-        print("Warning! Start velocity for wave solver not possible, solution will be incorrect.")
-
-    # as the pseudospectral factors of order 2 are negative, negate sum!
-    # numbers are real (+0j) anyways, but that that saves some calculation and storage time
-    norm2_ks = np.sqrt(-sum(ks).real)
 
     # calculate factors c1_ and c2_
     c1_ = y0_
 
     zero_index = (0,) * len(norm2_ks.shape)  # top left corner of norm2_ks contains a zero, temporarily replace it!
     assert norm2_ks[zero_index] == 0
+    if abs(y0t_[zero_index]) > 1e-9:
+        print("Warning! Start velocity for wave solver not possible, solution will be incorrect: "
+              + "0th fourier coefficient not zero but", y0t_[zero_index])
+
     norm2_ks[zero_index] = np.inf  # this makes sure that c2_[zero_index] is 0 and no warning is triggered
     c2_ = y0t_ / norm2_ks
     norm2_ks[zero_index] = 0  # revert temporal change

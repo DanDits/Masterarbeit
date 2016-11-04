@@ -17,7 +17,8 @@ param_1, param_2 = 4, 1  # parameters that can be used for start position and re
 wave_speed = 1 / 2  # > 0
 dimension = 2  # plotting only supported for one or two dimensional; higher dimension will require lower grid_n
 domain = list(repeat([-pi, pi], dimension))  # intervals with periodic boundary conditions, so a ring in 1d, torus in 2d
-show_times = np.arange(0, 30, 0.1)  # times to evaluate solution for and plot it
+anim_pause = 100  # in ms
+show_times = np.arange(0, 30, anim_pause / 1000)  # times to evaluate solution for and plot it
 
 
 def start_position(xs, delta=0):
@@ -107,5 +108,5 @@ if dimension == 1:
                   + str(grid_n) + " grid points")
         plt.show()
 elif dimension == 2:
-    animate_2d_surface(*x_result, y_result, show_times, 100)
+    animate_2d_surface(*x_result, y_result, show_times, anim_pause)
 
