@@ -8,7 +8,7 @@ from util.animate import animate_1d, animate_2d
 
 do_animate = True
 grid_n = 128  # power of 2 for best performance of fft
-thermal_diffusivity = 0.1  # > 0
+thermal_diffusivity = 0.5  # > 0
 dimension = 2  # plotting only supported for one or two dimensional, higher dimension will require lower grid_n
 domain = list(repeat([-pi, pi], dimension))  # intervals with periodic boundary conditions, so a torus
 show_times = np.arange(0, 20, 0.1)  # times to evaluate solution for and plot it
@@ -17,7 +17,7 @@ show_times = np.arange(0, 20, 0.1)  # times to evaluate solution for and plot it
 # starting condition for homogeneous heat equation with periodic boundary equation in given domain
 def start_condition(xs):
     return np.sin(np.sqrt(sum(x ** 2 for x in xs))) ** 2
-    # return 1 / np.cosh(10 * sum(x for x in xs) / math.pi) ** 2
+    # return 1 / np.cosh(10 * sum(xs) / math.pi) ** 2
     # return np.where(-1 < x, np.where(x > 1, np.ones(shape=x.shape), 0), 1)  # discontinuous block in 1D
 
 

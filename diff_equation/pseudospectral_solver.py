@@ -4,11 +4,6 @@ from numpy.fft import ifft, fft, fftn, ifftn
 from itertools import zip_longest
 
 
-def error_l2(approx_y, solution_y, show=False):
-    assert approx_y.shape == solution_y.shape
-    return np.sqrt(np.sum(np.abs(approx_y - solution_y) ** 2)) / approx_y.size
-
-
 def pseudospectral_factor(interval, grid_points, power):
     bound_left = interval[0]  # left border of interval
     bound_right = interval[1]  # right border of interval
@@ -20,7 +15,8 @@ def pseudospectral_factor(interval, grid_points, power):
     # the ordering of this numpy array is defined by the ordering of python's fft's result (see its documentation)
     kxx = (1j * scale * np.append(np.arange(0, grid_points / 2 + 1), np.arange(- grid_points / 2 + 1, 0))) ** power
 
-    x = np.linspace(interval[0], interval[1], endpoint=True, num=grid_points)
+    # important not to include endpoint, else solution will be slightly incorrect (not totally sure why, fft involved..)
+    x = np.linspace(interval[0], interval[1], endpoint=False, num=grid_points)
     return x, kxx
 
 
@@ -60,7 +56,7 @@ def heat_solution(intervals, grid_points_list, t0, u0, alpha, wanted_times):
         # here we are in the position to know the exact solution!
 
         # solution at time t with starting value y0_, all in fourier space
-        u_hat_ = y0_ * np.exp(alpha * sum(k for k in ks) * t)
+        u_hat_ = y0_ * np.exp(alpha * sum(ks) * t)
 
         y = ifftn(u_hat_).real
         solutions.append(y)
@@ -83,11 +79,13 @@ def wave_solution(intervals, grid_points_list, t0, u0, u0t, wave_speed, wanted_t
 
     # as the pseudospectral factors of order 2 are negative, negate sum!
     # numbers are real (+0j) anyways, but that that saves some calculation and storage time
-    norm2_ks = np.sqrt(-sum(k for k in ks).real)
+    norm2_ks = np.sqrt(-sum(ks).real)
 
     # calculate factors c1_ and c2_
-    zero_index = (0,) * len(norm2_ks.shape)  # top left corner of norm2_ks contains a zero, temporarily replace it!
     c1_ = y0_
+
+    zero_index = (0,) * len(norm2_ks.shape)  # top left corner of norm2_ks contains a zero, temporarily replace it!
+    assert norm2_ks[zero_index] == 0
     norm2_ks[zero_index] = np.inf  # this makes sure that c2_[zero_index] is 0 and no warning is triggered
     c2_ = y0t_ / norm2_ks
     norm2_ks[zero_index] = 0  # revert temporal change

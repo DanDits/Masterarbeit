@@ -69,13 +69,13 @@ def animate_2d_surface(x1, x2, ys, animate_times, pause):
     fig = plt.figure()
     ax = fig.gca(projection='3d')  # implicitly requires import! (from mpl_toolkits.mplot3d import axes3d)
 
-    ax.plot_surface(x1, x2, ys[0].real, cmap=cm.coolwarm)
+    ax.plot_surface(x1, x2, ys[0].real, cmap=cm.PuBu, linewidth=0)
     ax.set_zlim(-2, 2)
 
     # animation function.  This is called sequentially
     def animate(i):
         ax.clear()
-        surf = ax.plot_surface(x1, x2, ys[i].real, cmap=cm.coolwarm, linewidth=0)
+        surf = ax.plot_surface(x1, x2, ys[i].real, cmap=cm.PuBu, linewidth=0, alpha=1.)
         ax.set_zlim(-2, 2)
 
         time_text = ax.text(0.02, 0.95, 0.02, "Solution at time=" + str(animate_times[i]), transform=ax.transAxes)

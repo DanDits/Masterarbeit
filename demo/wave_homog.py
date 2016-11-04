@@ -2,7 +2,8 @@ from math import pi
 from itertools import repeat, cycle
 import numpy as np
 import matplotlib.pyplot as plt
-from diff_equation.pseudospectral_solver import wave_solution, error_l2
+from diff_equation.pseudospectral_solver import wave_solution
+from util.analysis import error_l2
 from util.animate import animate_1d, animate_2d_surface
 
 # ----- USER CONFIGS -------------------
@@ -12,35 +13,33 @@ show_errors = True
 plot_references = True  # when not animating, plot in same figure
 do_animate = True
 grid_n = 128  # power of 2 for best performance of fft, 2^15 for 1d already takes some time
-param_1, param_2 = 1, 4  # parameters that can be used for start position and reference solutions
-wave_speed = 1  # > 0
+param_1, param_2 = 4, 1  # parameters that can be used for start position and reference solutions, natural  numbers
+wave_speed = 1 / 2  # > 0
 dimension = 2  # plotting only supported for one or two dimensional; higher dimension will require lower grid_n
 domain = list(repeat([-pi, pi], dimension))  # intervals with periodic boundary conditions, so a ring in 1d, torus in 2d
 show_times = np.arange(0, 30, 0.1)  # times to evaluate solution for and plot it
 
 
 def start_position(xs, delta=0):
-    sum_x = sum(x for x in xs)
-    # return np.sin(sum_x + delta)  # sp1
+    # return np.sin(sum(xs) + delta)  # sp1
     # return np.sin(np.sqrt(sum((x + delta) ** 2 for x in xs)))  # not periodic!
     return np.sin(param_1 * (xs[0] + delta)) + np.sin(param_2 * (xs[1] + delta))  # sp2
     # return 1 / np.cosh((sum(x + delta for x in xs)) * 10) ** 2
-    # return np.sin(param_1 * (sum(x for x in xs) + delta)) * np.cos(param_1 * (sum(x for x in xs) + delta))
+    # return np.sin(param_1 * (sum(xs) + delta)) * np.cos(param_1 * (sum(xs) + delta))
 
 
 def start_velocity(xs):  # zeroth fourier coefficient must be zero! (so for example periodic function)
-    sum_x = sum(x for x in xs)
-    # return np.cos(sum_x) + np.sin(sum_x)
-    # return np.cos(sum_x)
-    return np.zeros(shape=sum_x.shape)  # sv3
-    # return np.cos(param_1 * sum_x) ** 2 - np.sin(param_1 * sum_x) ** 2
+    # return np.cos(sum(xs))  # sv1
+    return np.cos(xs[0]) + 0 * np.cos(xs[1])  # sv2
+    # return np.zeros(shape=sum(xs).shape)  # sv3
+    # return np.cos(param_1 * sum(xs)) ** 2 - np.sin(param_1 * sum(xs)) ** 2
 
 
-def start_velocity_integral(inner_xs, delta):
-    sum_x = sum(x for x in inner_xs)
-    return np.zeros(shape=sum_x.shape)
-    # return np.sin(sum_x + delta)  # for start_velocity=cos(sum_x)
-    # return (sum_x + delta + np.sin(sum_x + delta) * np.cos(sum_x + delta)) / 2  # for start_velocity = cos^2
+def start_velocity_integral(xs, delta):
+    # return np.sin(sum(xs) + delta)  # svi1
+    return np.sin(xs[0] + delta)  # svi2
+    # return np.zeros(shape=sum(xs).shape)  # svi3
+    # return (sum(xs) + delta + np.sin(sum(xs) + delta) * np.cos(sum(xs) + delta)) / 2  # for start_velocity = cos^2
 
 
 def reference_1d_dalembert(xs, t):
@@ -57,12 +56,14 @@ def reference(normal_xs, t):
     # return reference_1d_dalembert(xs, t)
 
     # or give reference solution directly
-    sum_x = sum(x for x in xs)
-    # return np.sin(param_1 * sum_x + t) * np.cos(param_1 * sum_x + t)
-    # return 0.5 * (np.sin(sum_x + t) + np.sin(sum_x - t))  # sp1 sv3
-    return 0.5 * (np.sin(xs[0] + t) + np.sin(xs[0] - t) + np.sin(param_2 * (xs[1] + t)) + np.sin(param_2 * (xs[1] - t)))  # sp2, sv3
+    # return np.sin(param_1 * sum(xs) + t) * np.cos(param_1 * sum(xs) + t)
+    # return 0.5 * (np.sin(sum(xs) + t) + np.sin(sum(xs) - t))  # sp1 sv3
+    return ((start_velocity_integral(xs, wave_speed * t)
+            - start_velocity_integral(xs, -wave_speed * t)) / (2 * wave_speed)
+            + 0.5 * (np.sin(param_1 * (xs[0] + wave_speed * t)) + np.sin(param_1 * (xs[0] - wave_speed * t))
+            + np.sin(param_2 * (xs[1] + wave_speed * t)) + np.sin(param_2 * (xs[1] - wave_speed * t))))  # sp2, sv3
 
-""" # Interesting config: difference to d'alemberts solution after some time when wave hits boundary
+"""# Interesting config: difference to d'alemberts solution after some time when wave hits boundary
 show_errors = True
 plot_references = True
 do_animate = False
@@ -72,9 +73,11 @@ dimension = 1
 domain = list(repeat([-pi, pi], dimension))
 show_times = [0, 0.5, 1, 2, 3, 5, 10]
 start_position = lambda xs, delta=0: 1 / np.cosh((sum(x + delta for x in xs)) * 10) ** 2
-start_velocity = lambda xs: np.zeros(shape=sum(x for x in xs).shape)
-start_velocity_integral = lambda xs, delta: np.zeros(shape=sum(x for x in xs).shape)
-reference_1d = lambda xs, t: reference_1d_dalembert(xs, t)"""
+# start_velocity = lambda xs: np.zeros(shape=sum(xs).shape)
+# start_velocity_integral = lambda xs, delta: np.zeros(shape=sum(xs).shape)
+start_velocity = lambda xs: np.cos(sum(xs))
+start_velocity_integral = lambda xs, delta: np.sin(sum(xs) + delta)
+reference = lambda xs, t: reference_1d_dalembert(xs, t)"""
 
 # --- CALCULATION AND VISUALIZATION -------------
 

@@ -13,7 +13,7 @@ def linhyp_solution(intervals, grid_points_list, t0, u0, u0t, beta, wanted_times
 
     beta_sqrt = np.sqrt(beta(xxs))
     c1 = u0(xxs)
-    c2 = u0t(xxs) / beta_sqrt
+    c2 = np.nan_to_num(u0t(xxs) / beta_sqrt)  # just ignore where beta is zero as sin(beta) will also be zero
 
     times = list(filter(lambda time_check: time_check >= t0, wanted_times))
     solutions = []
