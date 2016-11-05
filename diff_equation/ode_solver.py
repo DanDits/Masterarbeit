@@ -12,8 +12,10 @@ def linhyp_solution(intervals, grid_points_list, t0, u0, u0t, beta, wanted_times
     xxs = np.meshgrid(*xs, sparse=True)
 
     beta_sqrt = np.sqrt(beta(xxs))
-    c1 = u0(xxs)
-    c2 = np.nan_to_num(u0t(xxs) / beta_sqrt)  # just ignore where beta is zero as sin(beta) will also be zero
+    y0 = u0(xxs) if callable(u0) else u0
+    c1 = y0
+    y0t = u0t(xxs) if callable(u0t) else u0t
+    c2 = np.nan_to_num(y0t / beta_sqrt)  # just ignore where beta is zero as sin(beta) will also be zero
 
     times = list(filter(lambda time_check: time_check >= t0, wanted_times))
     solutions = []

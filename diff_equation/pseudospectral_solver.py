@@ -79,9 +79,11 @@ def wave_solution(intervals, grid_points_list, t0, u0, u0t, wave_speed, wanted_t
     # pre calculations depending on starting values, wave speed,...
 
     # variables ending in underscore note that the values are considered to be in fourier space
-    y0 = u0(xxs)
+    # we accept u0 and u0t to be callable functions and evaluate them ourselves or as already evaluated discrete values
+    y0 = u0(xxs) if callable(u0) else u0
     y0_ = fftn(y0)  # starting condition in fourier space and evaluated at grid
-    y0t_ = fftn(u0t(xxs))
+    y0t = u0t(xxs) if callable(u0t) else u0t
+    y0t_ = fftn(y0t)
 
     # calculate factors c1_ and c2_
     c1_ = y0_
