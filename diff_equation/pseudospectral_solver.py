@@ -15,7 +15,8 @@ def pseudospectral_factor(interval, grid_points, power):
     # the ordering of this numpy array is defined by the ordering of python's fft's result (see its documentation)
     kxx = (1j * scale * np.append(np.arange(0, grid_points / 2 + 1), np.arange(- grid_points / 2 + 1, 0))) ** power
 
-    # important not to include endpoint, else solution will be slightly incorrect (not totally sure why, fft involved..)
+    # important not to include endpoint, else solution will be slightly incorrect because
+    # the point -pi is equivalent to pi and appears twice, which will make the fourier coefficients wrong
     x = np.linspace(interval[0], interval[1], endpoint=False, num=grid_points)
     return x, kxx
 
@@ -90,7 +91,10 @@ def wave_solution(intervals, grid_points_list, t0, u0, u0t, wave_speed, wanted_t
 
     zero_index = (0,) * len(norm2_ks.shape)  # top left corner of norm2_ks contains a zero, temporarily replace it!
     assert norm2_ks[zero_index] == 0
-    if abs(y0t_[zero_index]) > 1e-9:
+    if abs(y0t_[zero_index]) > norm2_ks.size * 1e-9:  # as the fourier coefficients are unscaled
+        # the zeroth fourier coefficient is the (unscaled) discrete integral over the function (multiplied by 1=e^(i*0))
+        # and since the pseudospectral method conserves the energy we require the starting energy to be zero
+        # so positive and negative parts sum away (is there a better explanation?)
         print("Warning! Start velocity for wave solver not possible, solution will be incorrect: "
               + "0th fourier coefficient not zero but", y0t_[zero_index])
 
@@ -109,7 +113,7 @@ def wave_solution(intervals, grid_points_list, t0, u0, u0t, wave_speed, wanted_t
 
         # solution at time t with starting value y0_ and y0t_, all in fourier space
 
-        u_hat_ = c1_ * np.cos(wave_speed * norm2_ks * t) + c2_ * np.sin(wave_speed * norm2_ks * t)
+        u_hat_ = c1_ * np.cos(wave_speed * norm2_ks * (t - t0)) + c2_ * np.sin(wave_speed * norm2_ks * (t - t0))
 
         y = ifftn(u_hat_)
         solutions.append(y)

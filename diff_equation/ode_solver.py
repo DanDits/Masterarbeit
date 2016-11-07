@@ -10,7 +10,6 @@ def linhyp_solution(intervals, grid_points_list, t0, u0, u0t, beta, wanted_times
         x = np.linspace(interval[0], interval[1], endpoint=False, num=grid_points)
         xs.append(x)
     xxs = np.meshgrid(*xs, sparse=True)
-
     beta_sqrt = np.sqrt(beta(xxs))
     y0 = u0(xxs) if callable(u0) else u0
     c1 = y0
@@ -20,7 +19,7 @@ def linhyp_solution(intervals, grid_points_list, t0, u0, u0t, beta, wanted_times
     times = list(filter(lambda time_check: time_check >= t0, wanted_times))
     solutions = []
     for time in times:
-        y = c1 * np.cos(beta_sqrt * time) + c2 * np.sin(beta_sqrt * time)
+        y = c1 * np.cos(beta_sqrt * (time - t0)) + c2 * np.sin(beta_sqrt * (time - t0))
         solutions.append(y)
 
     return xs, times, solutions

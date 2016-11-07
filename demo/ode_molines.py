@@ -36,8 +36,13 @@ trial_onezero = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
                       lambda xs: np.cos(sum(xs)),
                       lambda xs, t: np.cos(sum(xs)) * np.sin(t))\
                 .set_config("beta", lambda xs: np.ones(shape=sum(xs).shape))
+param_g1 = 2  # some parameter greater than one
+trial_4 = Trial(lambda xs: np.sin(sum(xs)),
+                lambda xs: param_g1 * np.cos(sum(xs)),
+                lambda xs, t: np.sin(sum(xs) + param_g1 * t)) \
+    .set_config("beta", lambda xs: param_g1 ** 2)
 
-trial = trial_onezero
+trial = trial_4
 
 x_result, t_result, y_result = linhyp_solution(domain, [grid_n],
                                                0, trial.start_position, trial.start_velocity, trial.config["beta"],

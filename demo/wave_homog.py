@@ -15,7 +15,7 @@ do_animate = True
 grid_n = 128  # power of 2 for best performance of fft, 2^15 for 1d already takes some time
 param_1, param_2 = 4, 1  # parameters that can be used for start position and reference solutions, natural  numbers
 wave_speed = 1 / 2  # > 0
-dimension = 2  # plotting only supported for one or two dimensional; higher dimension will require lower grid_n
+dimension = 1  # plotting only supported for one or two dimensional; higher dimension will require lower grid_n
 domain = list(repeat([-pi, pi], dimension))  # intervals with periodic boundary conditions, so a ring in 1d, torus in 2d
 anim_pause = 100  # in ms
 show_times = np.arange(0, 30, anim_pause / 1000)  # times to evaluate solution for and plot it
@@ -24,23 +24,23 @@ show_times = np.arange(0, 30, anim_pause / 1000)  # times to evaluate solution f
 
 
 def start_position(xs, delta=0):
-    # return np.sin(sum(xs) + delta)  # sp1
+    return np.sin(sum(xs) + delta)  # sp1
     # return np.sin(np.sqrt(sum((x + delta) ** 2 for x in xs)))  # not periodic!
-    return np.sin(param_1 * (xs[0] + delta)) + np.sin(param_2 * (xs[1] + delta))  # sp2
+    #return np.sin(param_1 * (xs[0] + delta)) + np.sin(param_2 * (xs[1] + delta))  # sp2
     # return 1 / np.cosh((sum(x + delta for x in xs)) * 10) ** 2
     # return np.sin(param_1 * (sum(xs) + delta)) * np.cos(param_1 * (sum(xs) + delta))
 
 
 def start_velocity(xs):  # zeroth fourier coefficient must be zero! (so for example periodic function)
-    # return np.cos(sum(xs))  # sv1
-    return np.cos(xs[0]) + 0 * np.cos(xs[1])  # sv2
+    return np.cos(sum(xs))  # sv1
+    # return np.cos(xs[0]) + 0 * np.cos(xs[1])  # sv2
     # return np.zeros(shape=sum(xs).shape)  # sv3
     # return np.cos(param_1 * sum(xs)) ** 2 - np.sin(param_1 * sum(xs)) ** 2
 
 
 def start_velocity_integral(xs, delta):
-    # return np.sin(sum(xs) + delta)  # svi1
-    return np.sin(xs[0] + delta)  # svi2
+    return np.sin(sum(xs) + delta)  # svi1
+    # return np.sin(xs[0] + delta)  # svi2
     # return np.zeros(shape=sum(xs).shape)  # svi3
     # return (sum(xs) + delta + np.sin(sum(xs) + delta) * np.cos(sum(xs) + delta)) / 2  # for start_velocity = cos^2
 
@@ -56,15 +56,15 @@ def reference_1d_dalembert(xs, t):
 def reference(normal_xs, t):
     xs = np.meshgrid(*normal_xs, sparse=True)
     # either use dalembert for 1d and if integral of start velocity is known
-    # return reference_1d_dalembert(xs, t)
+    return reference_1d_dalembert(xs, t)
 
     # or give reference solution directly
     # return np.sin(param_1 * sum(xs) + t) * np.cos(param_1 * sum(xs) + t)
     # return 0.5 * (np.sin(sum(xs) + t) + np.sin(sum(xs) - t))  # sp1 sv3
-    return ((start_velocity_integral(xs, wave_speed * t)
-            - start_velocity_integral(xs, -wave_speed * t)) / (2 * wave_speed)
-            + 0.5 * (np.sin(param_1 * (xs[0] + wave_speed * t)) + np.sin(param_1 * (xs[0] - wave_speed * t))
-            + np.sin(param_2 * (xs[1] + wave_speed * t)) + np.sin(param_2 * (xs[1] - wave_speed * t))))  # sp2, sv3
+    #return ((start_velocity_integral(xs, wave_speed * t)
+    #        - start_velocity_integral(xs, -wave_speed * t)) / (2 * wave_speed)
+    #        + 0.5 * (np.sin(param_1 * (xs[0] + wave_speed * t)) + np.sin(param_1 * (xs[0] - wave_speed * t))
+    #        + np.sin(param_2 * (xs[1] + wave_speed * t)) + np.sin(param_2 * (xs[1] - wave_speed * t))))  # sp2, sv3
 
 """# Interesting config: difference to d'alemberts solution after some time when wave hits boundary
 show_errors = True
