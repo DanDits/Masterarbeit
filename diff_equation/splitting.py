@@ -4,6 +4,8 @@ import numpy as np
 from itertools import repeat
 from math import pi
 import matplotlib.pyplot as plt
+from util.trial import Trial
+
 
 # Klein Gordon equation: u_tt=alpha*u_xx -beta(x)*u, alpha>0, beta(x)>0
 
@@ -28,38 +30,75 @@ def klein_gordon_strang_step(intervals, grid_points_list, t0, u0, u0t, alpha, be
     x_result, _, (v, v_t1) = wave_solution(intervals, grid_points_list,
                                            t0, u0, u0t, wave_speed, [t0 + dt / 2, t1])
     xxs = np.meshgrid(*x_result, sparse=True)
+    u0 = (u0(xxs) if callable(u0) else u0)
+
     # use central difference to get a second order estimate of the time derivative of v
-    v_t = (v_t1 - u0(xxs)) / dt
+    v_t = (v_t1 - u0) / dt
 
     # Step 2 of strang splitting: Solve hyperbolic linear part for full time step, also get at 2*full time step
     _, _, (w_t1, w_t2) = linhyp_solution(intervals, grid_points_list,
                                          t0, v, v_t, beta, [t1, t1 + dt])
     # use central difference to get a second order estimate of the time derivative of w
-    w_t = (w_t2 - u0(xxs)) / (2 * dt)  # TODO is it even correct to use u0 as previous value for this?
+    w_t = (w_t2 - u0) / (2 * dt)  # TODO is it even correct to use u0 as previous value for this?
 
     # Step 3 of strang splitting: Solve wave equation for half of time step
-    _, _, (u_t1,) = wave_solution(intervals, grid_points_list,
-                                  t0 + dt / 2, w_t1, w_t, wave_speed, [t1])
-    return x_result, [t1], [u_t1]
+    _, _, (u_t1, u_t15) = wave_solution(intervals, grid_points_list,
+                                  t0 + dt / 2, w_t1, w_t, wave_speed, [t1, t1 + dt / 2])
+    # use central difference to get a second order estimate of the time derivative of u at t1
+    ut_t1 = (u_t15 - w_t1) / dt  # TODO is ist even correct to use w_t1 as previous value for this?
+    return x_result, u_t1, ut_t1
+
 
 if __name__ == "__main__":
     dimension = 1
     grid_size_N = 128
     domain = list(repeat([-pi, pi], dimension))
-    test_alpha = 1
-    test_beta = lambda xs: 1.5 + np.sin(sum(xs))
-    time_step_size = 0.5
+    time_step_size = 0.001
     start_time = 0
-    start_position = lambda xs: np.sin(sum(xs))
-    start_velocity = lambda xs: np.cos(sum(xs))
+    show_errors = True
+
+    param_g1 = 2  # some parameter greater than one
+    trial_1 = Trial(lambda xs: np.sin(sum(xs)),
+                    lambda xs: param_g1 * np.cos(sum(xs)),
+                    lambda xs, t: np.sin(sum(xs) + param_g1 * t)) \
+        .set_config("beta", lambda xs: param_g1 ** 2 - 1) \
+        .set_config("alpha", 1)
+
+    trial_2 = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
+                    lambda xs: 2*np.exp(-np.cos(sum(xs))),
+                    lambda xs, t: np.sin(2*t)*np.exp(-np.cos(sum(xs)))) \
+        .set_config("beta", lambda xs: 4 + np.cos(sum(xs)) - np.sin(sum(xs)) ** 2) \
+        .set_config("alpha", 1)
+
+    trial = trial_2
 
     plt.figure()
-    for n in range(1):
-        xs, _, (solution,) = klein_gordon_strang_step(domain, [grid_size_N],
-                                                      start_time, start_position, start_velocity,
-                                                      test_alpha, test_beta, start_time + (n + 1) * time_step_size)
-        if n == 0:
-            plt.plot(xs[0], start_position(xs), label="Start position")
-        plt.plot(xs[0], solution, label="Solution at {}".format((n + 1) * time_step_size))
+    times = [start_time + (n + 1) * time_step_size for n in range(1)]
+    x_mesh = None
+    solutions = []
+    current_time = start_time
+    current_start = trial.start_position
+    current_velocity = trial.start_velocity
+    for i, time in enumerate(times):
+        x_result, solution, solution_velocity = klein_gordon_strang_step(domain, [grid_size_N],
+                                                            current_time, current_start, current_velocity,
+                                                            trial.config["alpha"], trial.config["beta"],
+                                                            time)
+        solutions.append(solution)
+        if i == 0:
+            x_mesh = np.meshgrid(*x_result, sparse=True)
+            plt.plot(x_result[0], trial.start_position(x_mesh), label="Start position")
+        plt.plot(x_result[0], solution, label="Solution at {}".format(time))
+        current_time = time
+        current_start = solution
+        current_velocity = solution_velocity
     plt.legend()
+
+    if show_errors:
+        errors = [trial.error(x_mesh, t, y) for t, y in zip(times, solutions)]
+        plt.figure()
+        plt.plot(times, errors, label="Errors in discrete L2 norm")
+        plt.xlabel("Time")
+        plt.ylabel("Error")
+
     plt.show()

@@ -20,6 +20,8 @@ domain = list(repeat([-pi, pi], dimension))  # intervals with periodic boundary 
 anim_pause = 100  # in ms
 show_times = np.arange(0, 30, anim_pause / 1000)  # times to evaluate solution for and plot it
 
+# TODO instead of this mess, use Trial class to bundle trials
+
 
 def start_position(xs, delta=0):
     # return np.sin(sum(xs) + delta)  # sp1
