@@ -58,15 +58,22 @@ def klein_gordon_strang_step(intervals, grid_points_list, t0, u0, u0t, alpha, be
     return x_result, u_t1, ut_t1
 
 
-def klein_gordon_simple_step(intervals, grid_points_list, t0, u0, u0t, alpha, beta, t1):
+def klein_gordon_lie_trotter_step(intervals, grid_points_list, t0, u0, u0t, alpha, beta, t1, initial_call=False):
     assert t1 > t0
-    assert alpha > 0.
-    wave_speed = np.sqrt(alpha)
+    assert alpha > 0
+    if initial_call:
+        # due to the splitting into two operators and having a second order time derivative u_tt=...
+        # there is a factor 1/2 introduced. Currently we only need to apply it once initially, I guess because
+        # we forgot to add it at the second splitting step and therefore it cancels out with further calls and result
+        # stays correct. # TODO Need yet to figure out how this works out for strang splitting
+        u0t_half = lambda *params: 0.5 * u0t(*params) if callable(u0t) else 0.5 * u0t
+    else:
+        u0t_half = u0t
+    wave_speed = np.sqrt(0.5 * alpha)
     dt = t1 - t0
-    print("Klein gordon simple step1, alpha=", alpha, "dt=", dt)
 
     x_result, _, (v_t1, v_t2) = wave_solution(intervals, grid_points_list,
-                                           t0, u0, u0t, wave_speed, [t1, t1 + dt])
+                                           t0, u0, u0t_half, wave_speed, [t1, t1 + dt])
     xxs = np.meshgrid(*x_result, sparse=True)
     u0 = (u0(xxs) if callable(u0) else u0)
 
@@ -74,9 +81,12 @@ def klein_gordon_simple_step(intervals, grid_points_list, t0, u0, u0t, alpha, be
     vt = (v_t2 - u0) / (2 * dt)
 
     if beta != 0:
-        print("Klein gordon simple step2, alpha=", alpha, "dt=", dt)
-        _, _, (w_t1, w_t2) = linhyp_solution(intervals, grid_points_list,
-                                             t0, v_t1, vt, beta, [t1, t1 + dt])
+        beta_half = lambda *params: 0.5 * beta(*params)
+        x_result, _, (w_t1, w_t2) = linhyp_solution(intervals, grid_points_list,
+                                             t0, v_t1, vt, beta_half, [t1, t1 + dt])
+        xxs = np.meshgrid(*x_result, sparse=True)
+        if callable(v_t1):
+            v_t1 = v_t1(xxs)
         # use central difference to get a second order estimate of the time derivative of w
         wt = (w_t2 - v_t1) / (2 * dt)
     else:
@@ -85,10 +95,10 @@ def klein_gordon_simple_step(intervals, grid_points_list, t0, u0, u0t, alpha, be
 
 if __name__ == "__main__":
     dimension = 1
-    grid_size_N = 128
+    grid_size_N = 512
     domain = list(repeat([-pi, pi], dimension))
-    time_step_size = 0.05
-    steps = 7
+    time_step_size = 0.01
+    steps = 10
     start_time = 0
     show_errors = True
     show_reference = True
@@ -116,12 +126,12 @@ if __name__ == "__main__":
         .set_config("beta", lambda xs: -(alpha_g0 ** 2) * (param_n1 ** 2) + param_3 ** 2) \
         .set_config("alpha", alpha_g0)
 
-    trial_wave = Trial(lambda xs: np.sin(sum(xs)),
-                       lambda xs: -np.sin(sum(xs)),
-                       lambda xs, t: 0.5 * (np.sin(sum(xs) + t) + np.sin(sum(xs) - t)
-                                            + np.cos(sum(xs) + t) - np.cos(sum(xs) - t))) \
-        .set_config("beta", 0) \
-        .set_config("alpha", 1)  # wave speed squared
+    param_g1 = 2  # some parameter greater than one
+    trial_4 = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
+                    lambda xs: param_g1 * np.sin(sum(xs)),
+                    lambda xs, t: np.sin(sum(xs)) * np.sin(param_g1 * t)) \
+        .set_config("beta", lambda xs: param_g1 ** 2 - 1) \
+        .set_config("alpha", 1)
 
     trial = trial_1
 
@@ -133,10 +143,10 @@ if __name__ == "__main__":
     current_start = trial.start_position
     current_velocity = trial.start_velocity
     for i, (time, color) in enumerate(zip(times, cycle(['r', 'b', 'g', 'k', 'm', 'c', 'y']))):
-        x_result, solution, solution_velocity = klein_gordon_simple_step(domain, [grid_size_N],
+        x_result, solution, solution_velocity = klein_gordon_lie_trotter_step(domain, [grid_size_N],
                                                                          current_time, current_start, current_velocity,
                                                                          trial.config["alpha"], trial.config["beta"],
-                                                                         time)
+                                                                         time, initial_call=(i == 0))
         solutions.append(solution)
         if i == 0:
             x_mesh = np.meshgrid(*x_result, sparse=True)

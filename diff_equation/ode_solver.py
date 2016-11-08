@@ -1,6 +1,7 @@
 import numpy as np
 from itertools import zip_longest
 
+# Splitting resources: https://www.math.ntnu.no/~holden/operatorsplitting/
 
 # calculates the solution of the linear hyperbolic differential equation at grid points in intervals
 # u_tt(t,x)=-beta(x)u(t,x), beta(x)>0 for all x
