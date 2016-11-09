@@ -20,6 +20,11 @@ from itertools import cycle
 # TODO how to get v_t and w_t? We want second order!? central differences (so also calculate v(t0+dt,x),...)?
 # TODO instead of solving wave twice, is it faster and equally accurate to solve linhyp twice?
 
+def get_derivative(previous_derivative, previous_value, current_value, next_value, time_step_size):
+    # Use Taylor expansion of the first derivative f'(x)=f'(x-h)+h*f''(x-h)
+    # and then use forward differences of second order to estimate f''(x-h)=(f(x+h)-2f(x)+f(x-h))/(h*h)
+    return previous_derivative + (previous_value + next_value - 2 * current_value) / time_step_size
+
 
 def klein_gordon_strang_step(intervals, grid_points_list, t0, u0, u0t, alpha, beta, t1, initial_call=False):
     assert t1 > t0
@@ -45,6 +50,7 @@ def klein_gordon_strang_step(intervals, grid_points_list, t0, u0, u0t, alpha, be
     v_t = (v_t1 - u0) / dt
     #v_t = (v - u0) / (dt / 2)  # backward difference alternative
     #v_t = (v_t1 - v) / (dt / 2)  # forward difference alternative
+    #v_t = get_derivative(u0t_half, )
 
     beta_half = lambda *params: 0.5 * beta(*params)
     # Step 2 of strang splitting: Solve hyperbolic linear part for full time step, also get at 2*full time step
