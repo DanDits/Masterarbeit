@@ -34,7 +34,7 @@ class Splitting:
         self.timed_solutions = []
         assert len(step_fractions) == len(configs)
 
-    def progress(self, end_time, time_step_size, save_solution_step):
+    def progress(self, end_time, time_step_size, save_solution_step=1):
         # zeroth config is assumed to be properly initialized with starting values and solver
         assert len(self.solver_configs[0].timed_solutions) == 0  # without any solutions yet
         save_solution_counter = save_solution_step
@@ -100,11 +100,11 @@ if __name__ == "__main__":
     dimension = 1
     grid_size_N = 512
     domain = list(repeat([-pi, pi], dimension))
-    delta_time = 0.01
+    delta_time = 0.001
     save_every_x_solution = 1
-    plot_every_x_solution = 100
+    plot_solutions_count = 5
     start_time = 0.
-    stop_time = 5.
+    stop_time = 4
     show_errors = True
     show_reference = True
 
@@ -115,10 +115,11 @@ if __name__ == "__main__":
         .set_config("beta", lambda xs: param_g1 ** 2 - 1) \
         .set_config("alpha", 1)
 
-    # TODO not a valid trial as the start velocity's zeroth fourier coefficient is not zero
+    # still invalid example since the time derivatives 0th fourier is now only zero at the start (t=0), but only there
+    offset = 15.9098530420256905490264393 / (2 * pi)  # is (normalized) integral from -pi to pi over exp(-cos(x))
     trial_2 = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
-                    lambda xs: 2 * np.exp(-np.cos(sum(xs))),
-                    lambda xs, t: np.sin(2 * t) * np.exp(-np.cos(sum(xs)))) \
+                    lambda xs: 2 * np.exp(-np.cos(sum(xs))) - offset,
+                    lambda xs, t: np.sin(2 * t) * np.exp(-np.cos(sum(xs))) - offset * t) \
         .set_config("beta", lambda xs: 4 + np.cos(sum(xs)) + np.sin(sum(xs)) ** 2) \
         .set_config("alpha", 1)
 
@@ -138,11 +139,7 @@ if __name__ == "__main__":
         .set_config("beta", lambda xs: param_g1 ** 2 - 1) \
         .set_config("alpha", 1)
 
-    # TODO try other calculation of time derivative in the splitting using the old velocity
-    # trial_3 strang ziemlich gut nach 100 Schritten mit dt=0.01 mit: b,b,c slightly worse for c,b,b, not so great for b,b,b
-    # trial 1 strang bad for anything but c,c,c
-    # trial 4 (gut, gleich mit lie) für c,c,c, für alles andere schlecht
-    trial = trial_3
+    trial = trial_4
 
     plt.figure()
 
@@ -156,6 +153,8 @@ if __name__ == "__main__":
     xs_mesh = lie_splitting.get_xs_mesh()
 
     plot_counter = 0
+    plot_every_x_solution = ((stop_time - start_time) / delta_time) / plot_solutions_count
+    plt.plot(*xs, trial.start_position(xs_mesh), label="Start position")
     for (t, solution_lie), (_, solution_strang), color in zip(lie_splitting.timed_solutions,
                                                               strang_splitting.timed_solutions,
                                                               cycle(['r', 'b', 'g', 'k', 'm', 'c', 'y'])):
@@ -167,7 +166,7 @@ if __name__ == "__main__":
             if show_reference:
                 plt.plot(*xs, trial.reference(xs_mesh, t), color=color, label="Reference at {}".format(t))
     plt.legend()
-
+    plt.title("Splitting methods for Klein Gordon equation, dt={}".format(delta_time))
     if show_errors:
         errors_lie = [trial.error(xs_mesh, t, y) for t, y in lie_splitting.timed_solutions]
         errors_strang = [trial.error(xs_mesh, t, y) for t, y in strang_splitting.timed_solutions]
