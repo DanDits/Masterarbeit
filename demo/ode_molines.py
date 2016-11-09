@@ -2,7 +2,7 @@ from math import pi
 from itertools import repeat, cycle
 import numpy as np
 import matplotlib.pyplot as plt
-from diff_equation.ode_solver import linhyp_solution
+from diff_equation.ode_solver import linhyp_solution, make_linhyp_config
 from util.animate import animate_1d, animate_2d_surface
 from util.trial import Trial
 
@@ -44,31 +44,30 @@ trial_4 = Trial(lambda xs: np.sin(sum(xs)),
 
 trial = trial_4
 
-x_result, t_result, y_result = linhyp_solution(domain, [grid_n],
-                                               0, trial.start_position, trial.start_velocity, trial.config["beta"],
-                                               show_times)
-x_mesh = np.meshgrid(*x_result, sparse=True)
+linhyp_config = make_linhyp_config(domain, [grid_n], trial.config["beta"])
+linhyp_solution(linhyp_config, 0, trial.start_position, trial.start_velocity, show_times)
+
 
 if show_errors:
-    errors = [trial.error(x_mesh, t, y) for t, y in zip(t_result, y_result)]
+    errors = [trial.error(linhyp_config.xs_mesh, t, y) for t, y in linhyp_config.timed_solutions]
     plt.figure()
-    plt.plot(t_result, errors, label="Errors in discrete L2 norm")
+    plt.plot(linhyp_config.times(), errors, label="Errors in discrete L2 norm")
     plt.xlabel("Time")
     plt.ylabel("Error")
     plt.show()
 
 if dimension == 1:
     if do_animate:
-        animate_1d(x_result[0], y_result, show_times, 100)  # pause between frames in ms
+        animate_1d(linhyp_config.xs[0], linhyp_config.solutions(), show_times, 100)  # pause between frames in ms
     else:
         # all times in one figure
         plt.figure()
-        for time, sol, color in zip(t_result, y_result, cycle(['r', 'b', 'g', 'k', 'm', 'c', 'y'])):
-            plt.plot(*x_result, sol.real, '.', color=color, label="Solution at time=" + str(time))
+        for (time, sol), color in zip(linhyp_config.timed_solutions, cycle(['r', 'b', 'g', 'k', 'm', 'c', 'y'])):
+            plt.plot(*linhyp_config.xs, sol.real, '.', color=color, label="Solution at time=" + str(time))
             if plot_references:
-                plt.plot(*x_result, trial.reference(x_mesh, time), color=color,
+                plt.plot(*linhyp_config.xs, trial.reference(linhyp_config.xs_mesh, time), color=color,
                          label="Reference solution at time=" + str(time))
         plt.legend()
         plt.show()
 if dimension == 2:
-    animate_2d_surface(*x_result, y_result, show_times, anim_pause)
+    animate_2d_surface(*linhyp_config.xs, linhyp_config.solutions(), show_times, anim_pause)

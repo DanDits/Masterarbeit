@@ -75,19 +75,16 @@ def wave_solution(config, t0, u0, u0t, wanted_times):
     config.norm2_factors[config.zero_index] = 0  # revert temporal change
     c2_ *= 1 / config.wave_speed
 
-    # for each wanted time that is actually in the future, calculate a solution
-    times = list(filter(lambda time_check: time_check >= t0, wanted_times))
-    solutions = []
-    for t in times:
+    def solution_at(time):
         # for all j solve (d/dt)^2 u_hat(j; t) = -j*j*u_hat(j; t) and starting conditions u_hat(j;0)=y0_(j),
         # (d/dt)u_hat(j;0)=y0t_(j)
         # here we are in the position to know the exact solution for this linear ordinary differential equation!
 
         # solution at time t with starting value y0_ and y0t_, all in fourier space
 
-        u_hat_ = c1_ * np.cos(config.wave_speed * config.norm2_factors * (t - t0)) \
-                 + c2_ * np.sin(config.wave_speed * config.norm2_factors * (t - t0))
+        u_hat_ = c1_ * np.cos(config.wave_speed * config.norm2_factors * (time - t0)) \
+                 + c2_ * np.sin(config.wave_speed * config.norm2_factors * (time - t0))
 
-        y = ifftn(u_hat_)
-        solutions.append(y)
-    return config.xs, times, solutions
+        return ifftn(u_hat_)
+    config.solve(wanted_times, solution_at)
+    return config

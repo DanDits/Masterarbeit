@@ -1,29 +1,29 @@
 import numpy as np
-from itertools import zip_longest
+from diff_equation.solver_config import SolverConfig
 
 # Splitting resources: https://www.math.ntnu.no/~holden/operatorsplitting/
 
+
 # calculates the solution of the linear hyperbolic differential equation at grid points in intervals
 # u_tt(t,x)=-beta(x)u(t,x), beta(x)>0 for all x
-def linhyp_solution(intervals, grid_points_list, t0, u0, u0t, beta, wanted_times):
-    xs = []
-    for interval, grid_points in zip_longest(intervals, grid_points_list, fillvalue=grid_points_list[-1]):
-        x = np.linspace(interval[0], interval[1], endpoint=False, num=grid_points)
-        xs.append(x)
-    xxs = np.meshgrid(*xs, sparse=True)
-    beta_sqrt = np.sqrt(beta(xxs))
-    y0 = u0(xxs) if callable(u0) else u0
-    c1 = y0
-    y0t = u0t(xxs) if callable(u0t) else u0t
-    c2 = np.nan_to_num(y0t / beta_sqrt)  # just ignore where beta is zero as sin(beta) will also be zero
+def make_linhyp_config(intervals, grid_points_list, beta):
+    config = SolverConfig(intervals, grid_points_list)
+    config.beta_sqrt = np.sqrt(beta(config.xs_mesh))
+    return config
 
-    times = list(filter(lambda time_check: time_check >= t0, wanted_times))
-    solutions = []
-    for time in times:
-        y = c1 * np.cos(beta_sqrt * (time - t0)) + c2 * np.sin(beta_sqrt * (time - t0))
-        solutions.append(y)
 
-    return xs, times, solutions
+def linhyp_solution(config, t0, u0, u0t, wanted_times):
+    config.init_initial_values(t0, u0, u0t)
+
+    c1 = config.start_position
+    # just ignore where beta is zero as sin(beta) will also be  zero
+    c2 = np.nan_to_num(config.start_velocity / config.beta_sqrt)
+
+    def solution_at(time):
+        return c1 * np.cos(config.beta_sqrt * (time - t0)) + c2 * np.sin(config.beta_sqrt * (time - t0))
+    config.solve(wanted_times, solution_at)
+
+    return config
 
 
 """ This is not required for our case, but for quick lookup on general ode case this is the framework for solving:

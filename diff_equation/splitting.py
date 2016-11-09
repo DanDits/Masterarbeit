@@ -1,4 +1,4 @@
-from diff_equation.pseudospectral_solver import wave_solution
+from diff_equation.pseudospectral_solver import make_wave_config, wave_solution
 from diff_equation.ode_solver import linhyp_solution
 import numpy as np
 from itertools import repeat
@@ -159,6 +159,7 @@ if __name__ == "__main__":
     current_start_lie, current_start_strang = trial.start_position, trial.start_position
     current_velocity_lie, current_velocity_strang = trial.start_velocity, trial.start_velocity
     color_it = cycle(['r', 'b', 'g', 'k', 'm', 'c', 'y'])
+    wave_config = make_wave_config(domain, [grid_size_N], np.sqrt(trial.config["alpha"]))
     for i, time in enumerate(times):
         print("Time:", time)
         x_result, solution, solution_velocity = klein_gordon_lie_trotter_step(domain, [grid_size_N],

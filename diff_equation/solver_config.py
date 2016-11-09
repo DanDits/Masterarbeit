@@ -32,6 +32,7 @@ class SolverConfig:
         return self.pseudospectral_factors_mesh
 
     def init_initial_values(self, start_time, start_position, start_velocity):
+        self.timed_solutions = []
         self.start_time = start_time
         # we accept starting values to be callable functions
         # and evaluate them ourselves, making a promise to only keep them evaluated for easier arithmetic manipulation
@@ -55,3 +56,13 @@ class SolverConfig:
             x = np.linspace(interval[0], interval[1], endpoint=False, num=grid_points)
             xs.append(x)
         return xs, np.meshgrid(*xs, sparse=True)
+
+    def solve(self, wanted_times, solver):
+        for time in filter(lambda time_check: time_check >= self.start_time, wanted_times):
+            self.timed_solutions.append((time, solver(time)))
+
+    def times(self):
+        return [time for time, _ in self.timed_solutions]
+
+    def solutions(self):
+        return [solution for _, solution in self.timed_solutions]

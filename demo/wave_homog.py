@@ -85,30 +85,30 @@ reference = lambda xs, t: reference_1d_dalembert(xs, t)"""
 # --- CALCULATION AND VISUALIZATION -------------
 
 wave_config = make_wave_config(domain, [grid_n], wave_speed)
-x_result, t_result, y_result = wave_solution(wave_config, 0, start_position, start_velocity, show_times)
+wave_solution(wave_config, 0, start_position, start_velocity, show_times)
 
 if show_errors:
-    errors = [error_l2(y, reference(x_result, t)) for t, y in zip(t_result, y_result)]
+    errors = [error_l2(y, reference(wave_config.xs, t)) for t, y in wave_config.timed_solutions]
     plt.figure()
-    plt.plot(t_result, errors, label="Errors in discrete L2 norm")
+    plt.plot(wave_config.times(), errors, label="Errors in discrete L2 norm")
     plt.xlabel("Time")
     plt.ylabel("Error")
 
 if dimension == 1:
     if do_animate:
-        animate_1d(x_result[0], y_result, show_times, 100)  # pause between frames in ms
+        animate_1d(wave_config.xs[0], wave_config.solutions(), show_times, 100)  # pause between frames in ms
     else:
         # all times in one figure
         plt.figure()
-        for time, sol, color in zip(t_result, y_result, cycle(['r', 'b', 'g', 'k', 'm', 'c', 'y'])):
-            plt.plot(*x_result, sol.real, '.', color=color, label="Solution at time=" + str(time))
+        for (time, sol), color in zip(wave_config.timed_solutions, cycle(['r', 'b', 'g', 'k', 'm', 'c', 'y'])):
+            plt.plot(*wave_config.xs, sol.real, '.', color=color, label="Solution at time=" + str(time))
             if plot_references:
-                plt.plot(*x_result, reference(x_result, time), color=color,
+                plt.plot(*wave_config.xs, reference(wave_config.xs, time), color=color,
                          label="Reference solution at time=" + str(time))
         plt.legend()
         plt.title("Wave equation solution by pseudospectral spatial method and exact time solution\nwith N="
                   + str(grid_n) + " grid points")
         plt.show()
 elif dimension == 2:
-    animate_2d_surface(*x_result, y_result, show_times, anim_pause)
+    animate_2d_surface(*wave_config.xs, wave_config.solutions(), show_times, anim_pause)
 
