@@ -25,26 +25,26 @@ show_times = np.arange(0, 30, anim_pause / 1000)  # times to evaluate solution f
 trial_sq = Trial(lambda xs: np.sin(sum(xs)),  # start position
                  lambda xs: sum(xs) * np.cos(sum(xs)),  # start velocity
                  lambda xs, t: np.sin(sum(xs) * (t + 1)))\
-                .set_config("beta", lambda xs: sum(xs) ** 2)
+                .add_parameters("beta", lambda xs: sum(xs) ** 2)
 
 trial_one = Trial(lambda xs: np.cos(sum(xs)),
                   lambda xs: -np.sin(sum(xs)),
                   lambda xs, t: np.cos(sum(xs) + t))\
-            .set_config("beta", lambda xs: np.ones(shape=sum(xs).shape))
+            .add_parameters("beta", lambda xs: np.ones(shape=sum(xs).shape))
 
 trial_onezero = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
                       lambda xs: np.cos(sum(xs)),
                       lambda xs, t: np.cos(sum(xs)) * np.sin(t))\
-                .set_config("beta", lambda xs: np.ones(shape=sum(xs).shape))
+                .add_parameters("beta", lambda xs: np.ones(shape=sum(xs).shape))
 param_g1 = 2  # some parameter greater than one
 trial_4 = Trial(lambda xs: np.sin(sum(xs)),
                 lambda xs: param_g1 * np.cos(sum(xs)),
                 lambda xs, t: np.sin(sum(xs) + param_g1 * t)) \
-    .set_config("beta", lambda xs: param_g1 ** 2)
+    .add_parameters("beta", lambda xs: param_g1 ** 2)
 
 trial = trial_4
 
-linhyp_config = make_linhyp_config(domain, [grid_n], trial.config["beta"])
+linhyp_config = make_linhyp_config(domain, [grid_n], trial.param["beta"])
 init_linhyp_solver(linhyp_config, 0, trial.start_position, trial.start_velocity)
 linhyp_config.solve(show_times)
 
