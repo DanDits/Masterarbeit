@@ -52,7 +52,7 @@ def make_wave_config(intervals, grid_points_list, wave_speed):
     return config
 
 
-def wave_solution(config, t0, u0, u0t, wanted_times):
+def init_wave_solver(config, t0, u0, u0t):
     # pre calculations depending on starting values, wave speed,...
 
     config.init_initial_values(t0, u0, u0t)
@@ -86,5 +86,4 @@ def wave_solution(config, t0, u0, u0t, wanted_times):
                  + c2_ * np.sin(config.wave_speed * config.norm2_factors * (time - t0))
 
         return ifftn(u_hat_)
-    config.solve(wanted_times, solution_at)
-    return config
+    config.solver = solution_at

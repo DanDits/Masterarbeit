@@ -1,11 +1,11 @@
-from diff_equation.pseudospectral_solver import make_wave_config, wave_solution
-from diff_equation.ode_solver import linhyp_solution
+from diff_equation.pseudospectral_solver import make_wave_config, init_wave_solver
+from diff_equation.ode_solver import init_linhyp_solver, make_linhyp_config
 import numpy as np
 from itertools import repeat
 from math import pi
 import matplotlib.pyplot as plt
 from util.trial import Trial
-from itertools import cycle
+from itertools import cycle, islice
 
 
 # Klein Gordon equation: u_tt=alpha*u_xx -beta(x)*u, alpha>0, beta(x)>0
@@ -26,92 +26,85 @@ def get_derivative(previous_derivative, previous_value, current_value, next_valu
     return previous_derivative + (previous_value + next_value - 2 * current_value) / time_step_size
 
 
-def klein_gordon_strang_step(intervals, grid_points_list, t0, u0, u0t, alpha, beta, t1, initial_call=False):
-    assert t1 > t0
-    assert alpha > 0.
-    if initial_call:
-        # due to the splitting into two operators and having a second order time derivative u_tt=...
-        # there is a factor 1/2 introduced. Currently we only need to apply it once initially.
-        # it cancels out with further calls and result stays correct.
-        u0t_half = lambda *params: 0.5 * u0t(*params) if callable(u0t) else 0.5 * u0t
-    else:
-        u0t_half = u0t
-    #  TODO Need yet to figure out how second order splitting (factors 0.5) works out for strang splitting
-    wave_speed = np.sqrt(0.5 * alpha)
-    dt = t1 - t0
+class Splitting:
+    def __init__(self, configs, step_fractions, config_initializers):
+        self.solver_configs = configs
+        self.solver_step_fractions = step_fractions
+        self.config_initializers = config_initializers
+        self.timed_solutions = []
+        assert len(step_fractions) == len(configs)
 
-    # Step 1 of strang splitting: Solve wave equation for half of time step, also get at full time step
-    x_result, _, (v, v_t1) = wave_solution(intervals, grid_points_list,
-                                           t0, u0, u0t_half, wave_speed, [t0 + dt / 2, t1])
-    xxs = np.meshgrid(*x_result, sparse=True)
-    u0 = (u0(xxs) if callable(u0) else u0)
+    def progress(self, end_time, time_step_size, save_solution_step):
+        # zeroth config is assumed to be properly initialized with starting values and solver
+        assert len(self.solver_configs[0].timed_solutions) == 0  # without any solutions yet
+        save_solution_counter = save_solution_step
+        for counter, step_fraction, config, \
+            next_config, next_initializer in zip(cycle(range(len(self.solver_configs))),
+                                                 cycle(self.solver_step_fractions),
+                                                 cycle(self.solver_configs),
+                                                 islice(cycle(self.solver_configs), 1, None),
+                                                 islice(cycle(self.config_initializers), 1, None)):
+            time = config.start_time
+            config.solve([time + time_step_size * step_fraction, time + 2 * time_step_size * step_fraction])
 
-    # use central difference to get a second order estimate of the time derivative of v
-    v_t = (v_t1 - u0) / dt
-    #v_t = (v - u0) / (dt / 2)  # backward difference alternative
-    #v_t = (v_t1 - v) / (dt / 2)  # forward difference alternative
-    #v_t = get_derivative(u0t_half, )
+            next_position = config.timed_solutions[0][1]
+            next_velocity = get_derivative(config.start_velocity, config.start_position,
+                                           next_position, config.timed_solutions[1][1],
+                                           time_step_size * step_fraction)
+            splitting_step_completed = counter == len(self.solver_configs) - 1
+            if splitting_step_completed:
+                time += time_step_size  # when one splitting step is complete, progress time (for book keeping)
+                save_solution_counter -= 1
+                if save_solution_counter <= 0:
+                    save_solution_counter = save_solution_step
+                    self.timed_solutions.append((time, next_position))
+            next_initializer(next_config, time, next_position, next_velocity)
+            if splitting_step_completed and time >= end_time:
+                break
 
-    beta_half = lambda *params: 0.5 * beta(*params)
-    # Step 2 of strang splitting: Solve hyperbolic linear part for full time step, also get at 2*full time step
-    _, _, (w_t1, w_t2) = linhyp_solution(intervals, grid_points_list,
-                                         t0, v, v_t, beta_half, [t1, t1 + dt])
-    # use central difference to get a second order estimate of the time derivative of w
-    w_t = (w_t2 - v) / (2 * dt)
-    # use backward difference to get an estimate of the time derivative of w
-    w_t = (w_t1 - v) / dt  # better for trial_3, but way worse for trial_1
-    w_t = (w_t2 - w_t1) / dt  # forward difference alternative
+    def get_xs(self):
+        return self.solver_configs[0].xs
 
-    # Step 3 of strang splitting: Solve wave equation for half of time step
-    _, _, (u_t1, u_t15) = wave_solution(intervals, grid_points_list,
-                                        t0 + dt / 2, w_t1, w_t, wave_speed, [t1, t1 + dt / 2])
-    # use central difference to get a second order estimate of the time derivative of u at t1
-    ut_t1 = (u_t15 - w_t1) / dt
-    #ut_t1 = (u_t1 - w_t1) / (dt / 2)  # backward difference alternative
-    ut_t1 = (u_t15 - u_t1) / (dt / 2)  # forward difference alternative
-    return x_result, u_t1, ut_t1
+    def get_xs_mesh(self):
+        return self.solver_configs[0].xs_mesh
+
+    def times(self):
+        return [time for time, _ in self.timed_solutions]
 
 
-def klein_gordon_lie_trotter_step(intervals, grid_points_list, t0, u0, u0t, alpha, beta, t1, initial_call=False):
-    assert t1 > t0
-    assert alpha > 0
-    if initial_call:
-        # due to the splitting into two operators and having a second order time derivative u_tt=...
-        # there is a factor 1/2 introduced. Currently we only need to apply it once initially.
-        # it cancels out with further calls and result stays correct.
-        u0t_half = lambda *params: 0.5 * u0t(*params) if callable(u0t) else 0.5 * u0t
-    else:
-        u0t_half = u0t
-    wave_speed = np.sqrt(0.5 * alpha)
-    dt = t1 - t0
+def make_lie_trotter_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
+    # due to the second order time derivative alpha and beta are getting multiplied by 1/2
+    wave_config = make_wave_config(intervals, grid_points_list, np.sqrt(0.5 * alpha))
+    linhyp_config = make_linhyp_config(intervals, grid_points_list, lambda *params: 0.5 * beta(*params))
 
-    x_result, _, (v_t1, v_t2) = wave_solution(intervals, grid_points_list,
-                                           t0, u0, u0t_half, wave_speed, [t1, t1 + dt])
-    xxs = np.meshgrid(*x_result, sparse=True)
-    u0 = (u0(xxs) if callable(u0) else u0)
+    init_wave_solver(wave_config, t0, u0, u0t)
 
-    # use central difference to get a second order estimate of the time derivative of v
-    vt = (v_t2 - u0) / (2 * dt)
+    # due to the splitting into two operators and having a second order time derivative u_tt=...
+    # there is a factor 1/2 introduced. We only need to apply it once initially
+    # as it cancels out with further calls.
+    wave_config.start_velocity *= 0.5
+    return Splitting([wave_config, linhyp_config], [1., 1.], [init_wave_solver, init_linhyp_solver])
 
-    beta_half = lambda *params: 0.5 * beta(*params)
-    x_result, _, (w_t1, w_t2) = linhyp_solution(intervals, grid_points_list,
-                                         t0, v_t1, vt, beta_half, [t1, t1 + dt])
-    xxs = np.meshgrid(*x_result, sparse=True)
-    if callable(v_t1):
-        v_t1 = v_t1(xxs)
-    # use central difference to get a second order estimate of the time derivative of w
-    wt = (w_t2 - v_t1) / (2 * dt)
 
-    return x_result, w_t1, wt
+def make_strang_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
+    # see lie_trotter splitting for an explanation of the 1/2 factors appearing
+    wave_config = make_wave_config(intervals, grid_points_list, np.sqrt(0.5 * alpha))
+    linhyp_config = make_linhyp_config(intervals, grid_points_list, lambda *params: 0.5 * beta(*params))
+
+    init_wave_solver(wave_config, t0, u0, u0t)
+    wave_config.start_velocity *= 0.5
+    return Splitting([wave_config, linhyp_config, wave_config], [0.5, 1., 0.5],
+                     [init_wave_solver, init_linhyp_solver, init_wave_solver])
 
 if __name__ == "__main__":
     dimension = 1
     grid_size_N = 512
     domain = list(repeat([-pi, pi], dimension))
-    time_step_size = 0.01
-    steps = 100
-    plot_gap = steps / 5  # gaps between solutions to plot, use 0 to plot every solution
-    start_time = 0
+    delta_time = 0.01
+    save_every_x_solution = 1
+    plot_every_x_solution = 100
+    start_time = 0.
+    stop_time = 5.
     show_errors = True
     show_reference = True
 
@@ -135,7 +128,7 @@ if __name__ == "__main__":
                     lambda xs: param_2 * param_3 * np.cos(param_n1 * sum(xs)),
                     lambda xs, t: np.cos(param_n1 * sum(xs)) * (param_1 * np.cos(param_3 * t)
                                                                 + param_2 * np.sin(param_3 * t))) \
-        .set_config("beta", lambda xs: -(alpha_g0 ** 2) * (param_n1 ** 2) + param_3 ** 2) \
+        .set_config("beta", lambda xs: -alpha_g0 * (param_n1 ** 2) + param_3 ** 2) \
         .set_config("alpha", alpha_g0)
 
     param_g1 = 2  # some parameter greater than one
@@ -152,55 +145,35 @@ if __name__ == "__main__":
     trial = trial_3
 
     plt.figure()
-    times = [start_time + (n + 1) * time_step_size for n in range(steps)]
-    x_mesh = None
-    solutions_lie, solutions_strang = [], []
-    current_time = start_time
-    current_start_lie, current_start_strang = trial.start_position, trial.start_position
-    current_velocity_lie, current_velocity_strang = trial.start_velocity, trial.start_velocity
-    color_it = cycle(['r', 'b', 'g', 'k', 'm', 'c', 'y'])
-    wave_config = make_wave_config(domain, [grid_size_N], np.sqrt(trial.config["alpha"]))
-    for i, time in enumerate(times):
-        print("Time:", time)
-        x_result, solution, solution_velocity = klein_gordon_lie_trotter_step(domain, [grid_size_N],
-                                                                         current_time, current_start_lie,
-                                                                              current_velocity_lie,
-                                                                         trial.config["alpha"], trial.config["beta"],
-                                                                         time, initial_call=(i == 0))
-        solutions_lie.append(solution)
 
-        if i == 0:
-            x_mesh = np.meshgrid(*x_result, sparse=True)
-            plt.plot(x_result[0], trial.start_position(x_mesh), label="Start position")
+    lie_splitting = make_lie_trotter_splitting(domain, [grid_size_N], start_time, trial.start_position,
+                                               trial.start_velocity, trial.config["alpha"], trial.config["beta"])
+    lie_splitting.progress(stop_time, delta_time, save_every_x_solution)
+    strang_splitting = make_strang_splitting(domain, [grid_size_N], start_time, trial.start_position,
+                                             trial.start_velocity, trial.config["alpha"], trial.config["beta"])
+    strang_splitting.progress(stop_time, delta_time, save_every_x_solution)
+    xs = lie_splitting.get_xs()
+    xs_mesh = lie_splitting.get_xs_mesh()
 
-        current_start_lie = solution
-        current_velocity_lie = solution_velocity
-
-        x_result, solution, solution_velocity = klein_gordon_strang_step(domain, [grid_size_N],
-                                                                         current_time, current_start_strang,
-                                                                              current_velocity_strang,
-                                                                         trial.config["alpha"], trial.config["beta"],
-                                                                         time, initial_call=(i == 0))
-        solutions_strang.append(solution)
-
-        current_start_strang = solution
-        current_velocity_strang = solution_velocity
-        current_time = time
-
-        if i % (plot_gap + 1) == 0:
-            color = next(color_it)
-            plt.plot(x_result[0], solutions_strang[-1], "+", color=color, label="Strang solution at {}".format(time))
-            plt.plot(x_result[0], solutions_lie[-1], "o", color=color, label="Lie solution at {}".format(time))
+    plot_counter = 0
+    for (t, solution_lie), (_, solution_strang), color in zip(lie_splitting.timed_solutions,
+                                                              strang_splitting.timed_solutions,
+                                                              cycle(['r', 'b', 'g', 'k', 'm', 'c', 'y'])):
+        plot_counter += 1
+        if plot_counter == plot_every_x_solution:
+            plot_counter = 0
+            plt.plot(*xs, solution_lie, "o", color=color, label="Lie solution at {}".format(t))
+            plt.plot(*xs, solution_strang, "+", color=color, label="Strang solution at {}".format(t))
             if show_reference:
-                plt.plot(x_result[0], trial.reference(x_mesh, time), color=color, label="Reference at {}".format(time))
+                plt.plot(*xs, trial.reference(xs_mesh, t), color=color, label="Reference at {}".format(t))
     plt.legend()
 
     if show_errors:
-        errors_lie = [trial.error(x_mesh, t, y) for t, y in zip(times, solutions_lie)]
-        errors_strang = [trial.error(x_mesh, t, y) for t, y in zip(times, solutions_strang)]
+        errors_lie = [trial.error(xs_mesh, t, y) for t, y in lie_splitting.timed_solutions]
+        errors_strang = [trial.error(xs_mesh, t, y) for t, y in strang_splitting.timed_solutions]
         plt.figure()
-        plt.plot(times, errors_lie, label="Errors of lie in discrete L2 norm")
-        plt.plot(times, errors_strang, label="Errors of strang in discrete L2 norm")
+        plt.plot(lie_splitting.times(), errors_lie, label="Errors of lie in discrete L2 norm")
+        plt.plot(strang_splitting.times(), errors_strang, label="Errors of strang in discrete L2 norm")
         plt.xlabel("Time")
         plt.ylabel("Error")
         plt.yscale('log')

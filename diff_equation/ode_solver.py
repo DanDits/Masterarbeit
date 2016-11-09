@@ -12,7 +12,7 @@ def make_linhyp_config(intervals, grid_points_list, beta):
     return config
 
 
-def linhyp_solution(config, t0, u0, u0t, wanted_times):
+def init_linhyp_solver(config, t0, u0, u0t):
     config.init_initial_values(t0, u0, u0t)
 
     c1 = config.start_position
@@ -21,9 +21,7 @@ def linhyp_solution(config, t0, u0, u0t, wanted_times):
 
     def solution_at(time):
         return c1 * np.cos(config.beta_sqrt * (time - t0)) + c2 * np.sin(config.beta_sqrt * (time - t0))
-    config.solve(wanted_times, solution_at)
-
-    return config
+    config.solver = solution_at
 
 
 """ This is not required for our case, but for quick lookup on general ode case this is the framework for solving:

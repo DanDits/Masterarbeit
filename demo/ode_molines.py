@@ -2,7 +2,7 @@ from math import pi
 from itertools import repeat, cycle
 import numpy as np
 import matplotlib.pyplot as plt
-from diff_equation.ode_solver import linhyp_solution, make_linhyp_config
+from diff_equation.ode_solver import init_linhyp_solver, make_linhyp_config
 from util.animate import animate_1d, animate_2d_surface
 from util.trial import Trial
 
@@ -45,8 +45,8 @@ trial_4 = Trial(lambda xs: np.sin(sum(xs)),
 trial = trial_4
 
 linhyp_config = make_linhyp_config(domain, [grid_n], trial.config["beta"])
-linhyp_solution(linhyp_config, 0, trial.start_position, trial.start_velocity, show_times)
-
+init_linhyp_solver(linhyp_config, 0, trial.start_position, trial.start_velocity)
+linhyp_config.solve(show_times)
 
 if show_errors:
     errors = [trial.error(linhyp_config.xs_mesh, t, y) for t, y in linhyp_config.timed_solutions]

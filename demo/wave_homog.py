@@ -2,7 +2,7 @@ from math import pi
 from itertools import repeat, cycle
 import numpy as np
 import matplotlib.pyplot as plt
-from diff_equation.pseudospectral_solver import make_wave_config, wave_solution
+from diff_equation.pseudospectral_solver import make_wave_config, init_wave_solver
 from util.analysis import error_l2
 from util.animate import animate_1d, animate_2d_surface
 
@@ -85,7 +85,8 @@ reference = lambda xs, t: reference_1d_dalembert(xs, t)"""
 # --- CALCULATION AND VISUALIZATION -------------
 
 wave_config = make_wave_config(domain, [grid_n], wave_speed)
-wave_solution(wave_config, 0, start_position, start_velocity, show_times)
+init_wave_solver(wave_config, 0, start_position, start_velocity)
+wave_config.solve(show_times)
 
 if show_errors:
     errors = [error_l2(y, reference(wave_config.xs, t)) for t, y in wave_config.timed_solutions]

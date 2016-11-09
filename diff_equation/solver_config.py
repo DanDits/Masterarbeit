@@ -14,6 +14,7 @@ class SolverConfig:
         if pseudospectral_power:
             self.init_pseudospectral_factors(pseudospectral_power)
         self.start_time = None
+        self.solver = None
         self.start_position, self.start_velocity = None, None
         self.timed_solutions = []
 
@@ -57,9 +58,11 @@ class SolverConfig:
             xs.append(x)
         return xs, np.meshgrid(*xs, sparse=True)
 
-    def solve(self, wanted_times, solver):
+    def solve(self, wanted_times):
+        if self.solver is None:
+            raise ValueError("Solver not yet initialized!")
         for time in filter(lambda time_check: time_check >= self.start_time, wanted_times):
-            self.timed_solutions.append((time, solver(time)))
+            self.timed_solutions.append((time, self.solver(time)))
 
     def times(self):
         return [time for time, _ in self.timed_solutions]
