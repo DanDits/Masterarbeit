@@ -13,10 +13,18 @@ from itertools import cycle, islice
 # with these as starting values solve linear hyperbolic ode with mol to w(t0+dt,x), calculate w_t(t0+dt,x)
 # using these as starting values finally solve wave equation again to u(t0+dt,x)
 
-def get_derivative(previous_derivative, previous_value, current_value, next_value, time_step_size):
+def get_derivative(previous_derivative, previous_value, current_value, next_value, after_next_value, time_step_size):
     # Use Taylor expansion of the first derivative f'(x)=f'(x-h)+h*f''(x-h)
-    # and then use forward differences of second order to estimate f''(x-h)=(f(x+h)-2f(x)+f(x-h))/(h*h)
-    return previous_derivative + (previous_value + next_value - 2 * current_value) / time_step_size
+    # see https://en.wikipedia.org/wiki/Finite_difference_coefficient for possible coefficients
+
+    # forward differences of first order to estimate f''(x-h)=(f(x-h)-2f(x)+f(x+h))/(h*h)
+    # good performance, but is only of first order, so even strang splitting will be of first order!
+    #  previous_derivative + (previous_value + next_value - 2 * current_value) / time_step_size
+    return previous_derivative + (previous_value - 2 * current_value + next_value) / time_step_size
+    # forward differences of second order to estimate f''(x-h)=...
+    #return previous_derivative + (2 * previous_value - 5 * current_value + 4 * next_value - 1 * after_next_value) \
+    #                             / time_step_size
+    #return (next_value - previous_value) / (2 * time_step_size)  # central difference, bad performance
 
 
 class Splitting:
@@ -30,11 +38,13 @@ class Splitting:
 
     @staticmethod
     def sub_step(config, time, time_step_size, step_fraction):
-        config.solve([time + time_step_size * step_fraction, time + 2 * time_step_size * step_fraction])
+        config.solve([time + 1 * time_step_size * step_fraction,
+                      time + 2 * time_step_size * step_fraction,
+                      time + 3 * time_step_size * step_fraction])
 
         next_position = config.timed_solutions[0][1]
         next_velocity = get_derivative(config.start_velocity, config.start_position,
-                                       next_position, config.timed_solutions[1][1],
+                                       next_position, config.timed_solutions[1][1], config.timed_solutions[2][1],
                                        time_step_size * step_fraction)
         return next_position, next_velocity
 
@@ -69,6 +79,9 @@ class Splitting:
 
     def get_xs_mesh(self):
         return self.solver_configs[0].xs_mesh
+
+    def solutions(self):
+        return [solution for _, solution in self.timed_solutions]
 
     def times(self):
         return [time for time, _ in self.timed_solutions]
