@@ -2,6 +2,7 @@ import numpy as np
 from diff_equation.solver_config import SolverConfig
 
 
+# TODO we could refactor this and the wave solver into a subclass of SolverConfig some time
 # calculates the solution of the linear hyperbolic differential equation at grid points in intervals
 # u_tt(t,x)=-beta(x)u(t,x), beta(x)>0 for all x
 def make_linhyp_config(intervals, grid_points_list, beta):
@@ -10,7 +11,6 @@ def make_linhyp_config(intervals, grid_points_list, beta):
     return config
 
 
-# TODO we could refactor this and the wave solver into a subclass of SolverConfig some time
 def init_linhyp_solver(config, t0, u0, u0t):
     config.init_initial_values(t0, u0, u0t)
 
