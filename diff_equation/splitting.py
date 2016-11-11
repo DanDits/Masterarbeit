@@ -13,20 +13,27 @@ from itertools import cycle, islice
 # with these as starting values solve linear hyperbolic ode with mol to w(t0+dt,x), calculate w_t(t0+dt,x)
 # using these as starting values finally solve wave equation again to u(t0+dt,x)
 
-def get_derivative(previous_derivative, previous_value, current_value, next_value, after_next_value, time_step_size):
+def get_derivative(start_position, start_velocity, next_position, after_next_position, after2_next_position,
+                   prev_position, time_step_size):
     # Use Taylor expansion of the first derivative f'(x)=f'(x-h)+h*f''(x-h)
     # see https://en.wikipedia.org/wiki/Finite_difference_coefficient for possible coefficients
 
     # forward differences of first order to estimate f''(x-h)=(f(x-h)-2f(x)+f(x+h))/(h*h)
-    # good performance, but is only of first order, so even strang splitting will be of first order!
-    #  previous_derivative + (previous_value + next_value - 2 * current_value) / time_step_size
-    return previous_derivative + (previous_value - 2 * current_value + next_value) / time_step_size
-    # TODO the second order estimate produces worse results thatn the first order. but we want strang to be second order
-    # TODO maybe allow solution calculation backward in time and use central difference?
-    # forward differences of second order to estimate f''(x-h)=...
-    # return previous_derivative + (2 * previous_value - 5 * current_value + 4 * next_value - 1 * after_next_value) \
-    #                             / time_step_size
-    # return (next_value - previous_value) / (2 * time_step_size)  # central difference, bad performance
+    # best but not optimal performance, but is only of first order, so even strang splitting will be of first order!
+    return start_velocity + (start_position - 2 * next_position + after_next_position) / time_step_size
+    # TODO the second order estimate produces worse results than the first order. but we want strang to be second order
+    # forward differences of second order to estimate f''(x-h)=..., unstable for bigger time steps, else first order ok
+    # return start_velocity + (2 * start_position - 5 * next_position + 4 * after_next_position
+    #                         - 1 * after2_next_position) / time_step_size
+
+    # directly using central differences to estimate f'(x) of first order
+    # return (after_next_position - start_position) / (2 * time_step_size)  # bad performance
+
+    # central differences of second order to estimate f''(x-h)=.., good first order, unstable for bigger time step..
+    # return start_velocity + (prev_position - 2 * start_position + next_position) / time_step_size  # good first order
+
+    # directly using forward differences to estimate f'(x) of second order
+    # return (-3/2 * start_position + 2 * next_position - 1/2 * after_next_position) / time_step_size # bad!
 
 
 class Splitting:
@@ -41,11 +48,12 @@ class Splitting:
     def sub_step(config, time, time_step_size, step_fraction):
         config.solve([time + 1 * time_step_size * step_fraction,
                       time + 2 * time_step_size * step_fraction,
-                      time + 3 * time_step_size * step_fraction])
-
-        next_position = config.timed_solutions[0][1]
-        next_velocity = get_derivative(config.start_velocity, config.start_position,
-                                       next_position, config.timed_solutions[1][1], config.timed_solutions[2][1],
+                      time + 3 * time_step_size * step_fraction,
+                      time - 1 * time_step_size * step_fraction])
+        positions = config.solutions()
+        next_position = positions[0]
+        next_velocity = get_derivative(config.start_position, config.start_velocity,
+                                       next_position, positions[1], positions[2], positions[3],
                                        time_step_size * step_fraction)
         return next_position, next_velocity
 

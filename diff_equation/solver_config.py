@@ -61,7 +61,7 @@ class SolverConfig:
     def solve(self, wanted_times):
         if self.solver is None:
             raise ValueError("Solver not yet initialized!")
-        for time in filter(lambda time_check: time_check >= self.start_time, wanted_times):
+        for time in wanted_times:
             self.timed_solutions.append((time, self.solver(time)))
 
     def times(self):

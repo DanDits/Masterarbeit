@@ -14,7 +14,7 @@ from util.trial import Trial
 dimension = 1
 grid_size_N = 128 if dimension >= 2 else 512
 domain = list(repeat([-pi, pi], dimension))
-delta_time = 0.01
+delta_time = 0.001
 save_every_x_solution = 1
 plot_solutions_count = 5
 start_time = 0.
@@ -24,7 +24,7 @@ show_reference = True
 do_animate = False
 
 param_g1 = 3  # some parameter greater than one
-alpha_1 = 2  # smaller than param_g1 ** 2 / dimension to ensure beta>0
+alpha_1 = 0.2  # smaller than param_g1 ** 2 / dimension to ensure beta>0
 trial_1 = Trial(lambda xs: np.sin(sum(xs)),
                 lambda xs: param_g1 * np.cos(sum(xs)),
                 lambda xs, t: np.sin(sum(xs) + param_g1 * t)) \
@@ -59,7 +59,7 @@ trial_4 = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
     .add_parameters("beta", lambda xs: param_g2 ** 2 - len(xs) * alpha_4,
                     "alpha", alpha_4)
 
-trial = trial_3
+trial = trial_2
 
 measure_start = time.time()
 lie_splitting = make_klein_gordon_lie_trotter_splitting(domain, [grid_size_N], start_time, trial.start_position,
