@@ -3,7 +3,7 @@ from itertools import repeat, cycle
 from math import pi
 import matplotlib.pyplot as plt
 import time
-from util.animate import animate_1d
+from util.animate import animate_1d, animate_2d_surface
 
 from diff_equation.splitting import make_klein_gordon_lie_trotter_splitting, make_klein_gordon_strang_splitting, \
     make_klein_gordon_fast_strang_splitting, \
@@ -12,7 +12,7 @@ from diff_equation.splitting import make_klein_gordon_lie_trotter_splitting, mak
 from util.trial import Trial
 
 dimension = 1
-grid_size_N = 512
+grid_size_N = 128 if dimension >= 2 else 512
 domain = list(repeat([-pi, pi], dimension))
 delta_time = 0.01
 save_every_x_solution = 1
@@ -23,23 +23,25 @@ show_errors = True
 show_reference = True
 do_animate = False
 
-# TODO find a trial for two dimensional case
 param_g1 = 3  # some parameter greater than one
+alpha_1 = 2  # smaller than param_g1 ** 2 / dimension to ensure beta>0
 trial_1 = Trial(lambda xs: np.sin(sum(xs)),
                 lambda xs: param_g1 * np.cos(sum(xs)),
                 lambda xs, t: np.sin(sum(xs) + param_g1 * t)) \
-    .add_parameters("beta", lambda xs: param_g1 ** 2 - 1,
-                    "alpha", 1)
+    .add_parameters("beta", lambda xs: param_g1 ** 2 - len(xs) * alpha_1,
+                    "alpha", alpha_1)
 
 alpha_small = 1. / 4.  # smaller than 1/3 to ensure beta>0
 trial_2 = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
                 lambda xs: np.exp(np.cos(sum(xs)) ** 2) * np.cos(sum(xs)),
                 lambda xs, t: np.sin(t) * np.exp(np.cos(sum(xs)) ** 2) * np.cos(sum(xs))) \
-    .add_parameters("beta", lambda xs: 1 + alpha_small * (-1 + 4 * np.sin(sum(xs)) ** 2 - 2 * np.cos(sum(xs)) ** 2
-                                                          + 4 * np.sin(sum(xs)) ** 2 * np.cos(sum(xs)) ** 2
-                                                          + 2 * np.sin(sum(xs)) ** 2),
+    .add_parameters("beta", lambda xs: 1 + len(xs) * alpha_small *
+                                           (-1 + 4 * np.sin(sum(xs)) ** 2 - 2 * np.cos(sum(xs)) ** 2
+                                            + 4 * np.sin(sum(xs)) ** 2 * np.cos(sum(xs)) ** 2
+                                            + 2 * np.sin(sum(xs)) ** 2),
                     "alpha", alpha_small)
 
+# probably needs to be adapted for higher dimensional case
 param_1, param_2, param_n1, param_3, alpha_g0 = 0.3, 0.5, 2, 1.2, 0.3
 assert param_n1 * alpha_g0 < param_3  # to ensure beta > 0
 trial_3 = Trial(lambda xs: param_1 * np.cos(param_n1 * sum(xs)),
@@ -50,14 +52,14 @@ trial_3 = Trial(lambda xs: param_1 * np.cos(param_n1 * sum(xs)),
                     "alpha", alpha_g0)
 
 param_g2 = 2  # some parameter greater than one
+alpha_4 = 0.5  # smaller than param_g2 ** 2 / dimension to ensure beta>0
 trial_4 = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
                 lambda xs: param_g2 * np.sin(sum(xs)),
                 lambda xs, t: np.sin(sum(xs)) * np.sin(param_g2 * t)) \
-    .add_parameters("beta", lambda xs: param_g2 ** 2 - 1,
-                    "alpha", 1)
+    .add_parameters("beta", lambda xs: param_g2 ** 2 - len(xs) * alpha_4,
+                    "alpha", alpha_4)
 
-trial = trial_1
-
+trial = trial_3
 
 measure_start = time.time()
 lie_splitting = make_klein_gordon_lie_trotter_splitting(domain, [grid_size_N], start_time, trial.start_position,
@@ -115,6 +117,8 @@ if dimension == 1:
                     plt.plot(*xs, trial.reference(xs_mesh, t), color=color, label="Reference at {}".format(t))
         plt.legend()
         plt.title("Splitting methods for Klein Gordon equation, dt={}".format(delta_time))
+elif dimension == 2:
+    animate_2d_surface(xs[0], xs[1], strang_splitting.solutions(), strang_splitting.times(), 100)
 
 if show_errors:
     errors_lie = [trial.error(xs_mesh, t, y) for t, y in lie_splitting.timed_solutions]

@@ -21,6 +21,7 @@ def get_derivative(previous_derivative, previous_value, current_value, next_valu
     # good performance, but is only of first order, so even strang splitting will be of first order!
     #  previous_derivative + (previous_value + next_value - 2 * current_value) / time_step_size
     return previous_derivative + (previous_value - 2 * current_value + next_value) / time_step_size
+    # TODO the second order estimate produces worse results thatn the first order. but we want strang to be second order
     # forward differences of second order to estimate f''(x-h)=...
     #return previous_derivative + (2 * previous_value - 5 * current_value + 4 * next_value - 1 * after_next_value) \
     #                             / time_step_size

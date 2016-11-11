@@ -25,6 +25,9 @@ class Trial:
             self.param[key] = value
         return self
 
+    def has_parameter(self, key):
+        return key in self.param
+
     def error(self, xs, t, approximation):
         if self.reference is None:
             return
