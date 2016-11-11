@@ -2,7 +2,7 @@ from math import pi
 from itertools import repeat, cycle
 import numpy as np
 import matplotlib.pyplot as plt
-from diff_equation.pseudospectral_solver import make_wave_config, init_wave_solver
+from diff_equation.pseudospectral_solver import WaveSolverConfig
 from util.analysis import error_l2
 from util.animate import animate_1d, animate_2d_surface
 from util.trial import Trial
@@ -79,8 +79,8 @@ def has_reference(ref_trial, dim):
 
 trial = trial_1
 
-wave_config = make_wave_config(domain, [grid_n], trial.param["wave_speed"])
-init_wave_solver(wave_config, 0, trial.start_position, trial.start_velocity)
+wave_config = WaveSolverConfig(domain, [grid_n], trial.param["wave_speed"])
+wave_config.init_solver(0, trial.start_position, trial.start_velocity)
 
 if trial.has_parameter("show_times"):
     show_times = trial.param["show_times"]
