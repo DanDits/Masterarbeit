@@ -14,14 +14,40 @@ from itertools import cycle, islice
 # using these as starting values finally solve wave equation again to u(t0+dt,x)
 
 def get_derivative(start_position, start_velocity, next_position, after_next_position, after2_next_position,
-                   prev_position, time_step_size):
+                   after3_next_positon, prev_position, time_step_size):
     # Use Taylor expansion of the first derivative f'(x)=f'(x-h)+h*f''(x-h)
     # see https://en.wikipedia.org/wiki/Finite_difference_coefficient for possible coefficients
 
     # forward differences of first order to estimate f''(x-h)=(f(x-h)-2f(x)+f(x+h))/(h*h)
     # best but not optimal performance, but is only of first order, so even strang splitting will be of first order!
-    return start_velocity + (start_position - 2 * next_position + after_next_position) / time_step_size
+    #return start_velocity + (start_position - 2 * next_position + after_next_position) / time_step_size
     # TODO the second order estimate produces worse results than the first order. but we want strang to be second order
+
+    # also approximate f'''(x-h) by first order forward differences, M3-, looks pretty good,
+    # TODO I don't understand the -
+    #return (start_velocity + (start_position - 2 * next_position + after_next_position) / time_step_size
+    #        - (-start_position + 3 * next_position - 3 * after_next_position + 1 * after2_next_position)
+    #        / (time_step_size * 2))
+
+    # MM3+, exactly same results as M3-
+    #return (start_velocity + (2 * start_position - 5 * next_position + 4 * after_next_position - 1 * after2_next_position) / time_step_size
+    #        + (-start_position + 3 * next_position - 3 * after_next_position + 1 * after2_next_position)
+    #        / (time_step_size * 2))
+
+    # MMM3+, exactly same results as M3-
+    return (start_velocity + (35/12 * start_position - 26/3 * next_position + 19/2 * after_next_position
+                              -14/3 * after2_next_position + 11/12 * after3_next_positon) / time_step_size
+            + (-start_position + 3 * next_position - 3 * after_next_position + 1 * after2_next_position)
+            / (time_step_size * 2))
+
+    # MMMM3+, exactly same results as M3-
+    #return (start_velocity + (35/12 * start_position - 26/3 * next_position + 19/2 * after_next_position
+    #                          -14/3 * after2_next_position + 11/12 * after3_next_positon) / time_step_size
+    #        + (-5/2 * start_position + 9 * next_position - 12 * after_next_position + 7 * after2_next_position
+    #           -3/2 * after3_next_positon)
+    #        / (time_step_size * 2))
+
+
     # forward differences of second order to estimate f''(x-h)=..., unstable for bigger time steps, else first order ok
     # return start_velocity + (2 * start_position - 5 * next_position + 4 * after_next_position
     #                         - 1 * after2_next_position) / time_step_size
@@ -49,11 +75,12 @@ class Splitting:
         config.solve([time + 1 * time_step_size * step_fraction,
                       time + 2 * time_step_size * step_fraction,
                       time + 3 * time_step_size * step_fraction,
+                      time + 4 * time_step_size * step_fraction,
                       time - 1 * time_step_size * step_fraction])
         positions = config.solutions()
         next_position = positions[0]
         next_velocity = get_derivative(config.start_position, config.start_velocity,
-                                       next_position, positions[1], positions[2], positions[3],
+                                       next_position, positions[1], positions[2], positions[3], positions[4],
                                        time_step_size * step_fraction)
         return next_position, next_velocity
 

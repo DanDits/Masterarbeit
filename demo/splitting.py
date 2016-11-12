@@ -59,7 +59,7 @@ trial_4 = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
     .add_parameters("beta", lambda xs: param_g2 ** 2 - len(xs) * alpha_4,
                     "alpha", alpha_4)
 
-trial = trial_2
+trial = trial_4
 
 measure_start = time.time()
 lie_splitting = make_klein_gordon_lie_trotter_splitting(domain, [grid_size_N], start_time, trial.start_position,
