@@ -14,7 +14,7 @@ from util.trial import Trial
 dimension = 1
 grid_size_N = 128 if dimension >= 2 else 512
 domain = list(repeat([-pi, pi], dimension))
-delta_time = 0.001
+delta_time = 0.0001
 save_every_x_solution = 1
 plot_solutions_count = 5
 start_time = 0.
@@ -59,7 +59,20 @@ trial_4 = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
     .add_parameters("beta", lambda xs: param_g2 ** 2 - len(xs) * alpha_4,
                     "alpha", alpha_4)
 
-trial = trial_4
+y = 2  # bigger than 1; gets unstable very quickly (after about 1.0)
+trial_5 = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
+                lambda xs: np.sin(sum(xs)),
+                lambda xs, t: np.sin(sum(xs)) * np.sin(t / y) * y) \
+    .add_parameters("beta", lambda xs: (1 - 1 / y) / y,
+                    "alpha", 1 / y ** 2)
+y = 3  # bigger than one
+trial_6 = Trial(lambda xs: 2 * np.sin(sum(xs)),
+                lambda xs: np.zeros(shape=sum(xs).shape),
+                lambda xs, t: np.sin(sum(xs) + t * y) + np.sin(sum(xs) - t * y)) \
+    .add_parameters("beta", lambda xs: y ** 2 - y,  # y^2 - alpha(y)
+                    "alpha", y)
+
+trial = trial_6
 
 measure_start = time.time()
 lie_splitting = make_klein_gordon_lie_trotter_splitting(domain, [grid_size_N], start_time, trial.start_position,
