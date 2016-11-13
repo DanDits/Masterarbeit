@@ -7,16 +7,16 @@ import matplotlib.pyplot as plt
 
 from util.analysis import error_l2
 
-uniform = [distributions.make_uniform(2, 3)]
+distribs = [distributions.make_uniform(2, 3)]
 dimension = 1
 grid_size_N = 128 if dimension >= 2 else 512
 domain = list(repeat([-np.pi, np.pi], dimension))
 delta_time = 0.001
 start_time = 0.
 stop_time = 1.
-simulations_count = 1000
+simulations_count = 10000
 
-trial = StochasticTrial(uniform,
+trial = StochasticTrial(distribs,
                         lambda xs, ys: 2 * np.sin(sum(xs)),
                         lambda xs, ys: np.zeros(shape=sum(xs).shape),
                         lambda xs, t, ys: np.sin(sum(xs) + t * ys[0]) + np.sin(sum(xs) - t * ys[0])) \
@@ -31,7 +31,7 @@ expectancy = None
 errors = []
 for i in range(simulations_count):
     if i % 100 == 0:
-        print("Simulation", i)
+        print("Simulation", i)  # about one minute for 100 simulations with lie trotter, 512, 0.001, [0,1]
     trial.randomize()
 
     lie_splitting = make_klein_gordon_lie_trotter_splitting(domain, [grid_size_N], start_time, trial.start_position,
@@ -65,4 +65,3 @@ plt.yscale('log')
 plt.show()
 
 # TODO how to enforce constraints for alpha, beta>0 ? implicitly? discard if invalid?
-# TODO do we find an example where start pos and vel do not depend on random variable (like in the thesis description)
