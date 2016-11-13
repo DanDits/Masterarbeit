@@ -67,8 +67,8 @@ def reference(ref_trial, xs, t):
     if ref_trial.reference:
         return ref_trial.reference(xs, t)
     elif ref_trial.has_parameter("vel_integral") and len(xs) == 1:
-        return reference_1d_dalembert(ref_trial.start_position, ref_trial.param["vel_integral"],
-                                      ref_trial.param["wave_speed"], xs, t)
+        return reference_1d_dalembert(ref_trial.start_position, ref_trial.vel_integral,
+                                      ref_trial.wave_speed, xs, t)
 
 
 def has_reference(ref_trial, dim):
@@ -77,15 +77,15 @@ def has_reference(ref_trial, dim):
 
 # --- CALCULATION AND VISUALIZATION -------------
 
-trial = trial_1
+trial = trial_fancy
 
-wave_config = WaveSolverConfig(domain, [grid_n], trial.param["wave_speed"])
+wave_config = WaveSolverConfig(domain, [grid_n], trial.wave_speed)
 wave_config.init_solver(0, trial.start_position, trial.start_velocity)
 
 if trial.has_parameter("show_times"):
-    show_times = trial.param["show_times"]
+    show_times = trial.show_times
 if trial.has_parameter("do_animate"):
-    do_animate = trial.param["do_animate"]
+    do_animate = trial.do_animate
 wave_config.solve(show_times)
 
 if show_errors and has_reference(trial, dimension):

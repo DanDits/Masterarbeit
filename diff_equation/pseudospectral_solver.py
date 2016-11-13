@@ -51,6 +51,9 @@ class WaveSolverConfig(SolverConfig):
         self.zero_index = (0,) * len(self.norm2_factors.shape)
         assert self.norm2_factors[self.zero_index] == 0
 
+    def start_momentum(self):
+        return (self.wave_speed ** 2) * ifftn(sum(self.pseudospectral_factors_mesh) * fftn(self.start_position))
+
     def init_solver(self, t0, u0, u0t):
         # pre calculations depending on starting values, wave speed,...
 

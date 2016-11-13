@@ -14,7 +14,7 @@ from util.trial import Trial
 dimension = 1
 grid_size_N = 128 if dimension >= 2 else 512
 domain = list(repeat([-pi, pi], dimension))
-delta_time = 0.0001
+delta_time = 0.001
 save_every_x_solution = 1
 plot_solutions_count = 5
 start_time = 0.
@@ -29,7 +29,7 @@ trial_1 = Trial(lambda xs: np.sin(sum(xs)),
                 lambda xs: param_g1 * np.cos(sum(xs)),
                 lambda xs, t: np.sin(sum(xs) + param_g1 * t)) \
     .add_parameters("beta", lambda xs: param_g1 ** 2 - len(xs) * alpha_1,
-                    "alpha", alpha_1)
+                    "alpha", lambda: alpha_1)
 
 alpha_small = 1. / 4.  # smaller than 1/3 to ensure beta>0
 trial_2 = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
@@ -39,7 +39,7 @@ trial_2 = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
                                            (-1 + 4 * np.sin(sum(xs)) ** 2 - 2 * np.cos(sum(xs)) ** 2
                                             + 4 * np.sin(sum(xs)) ** 2 * np.cos(sum(xs)) ** 2
                                             + 2 * np.sin(sum(xs)) ** 2),
-                    "alpha", alpha_small)
+                    "alpha", lambda: alpha_small)
 
 # probably needs to be adapted for higher dimensional case
 param_1, param_2, param_n1, param_3, alpha_g0 = 0.3, 0.5, 2, 1.2, 0.3
@@ -49,7 +49,7 @@ trial_3 = Trial(lambda xs: param_1 * np.cos(param_n1 * sum(xs)),
                 lambda xs, t: np.cos(param_n1 * sum(xs)) * (param_1 * np.cos(param_3 * t)
                                                             + param_2 * np.sin(param_3 * t))) \
     .add_parameters("beta", lambda xs: -alpha_g0 * (param_n1 ** 2) + param_3 ** 2,
-                    "alpha", alpha_g0)
+                    "alpha", lambda: alpha_g0)
 
 param_g2 = 2  # some parameter greater than one
 alpha_4 = 0.5  # smaller than param_g2 ** 2 / dimension to ensure beta>0
@@ -57,37 +57,37 @@ trial_4 = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
                 lambda xs: param_g2 * np.sin(sum(xs)),
                 lambda xs, t: np.sin(sum(xs)) * np.sin(param_g2 * t)) \
     .add_parameters("beta", lambda xs: param_g2 ** 2 - len(xs) * alpha_4,
-                    "alpha", alpha_4)
+                    "alpha", lambda: alpha_4)
 
 y = 2  # bigger than 1; gets unstable very quickly (after about 1.0)
 trial_5 = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
                 lambda xs: np.sin(sum(xs)),
                 lambda xs, t: np.sin(sum(xs)) * np.sin(t / y) * y) \
     .add_parameters("beta", lambda xs: (1 - 1 / y) / y,
-                    "alpha", 1 / y ** 2)
+                    "alpha", lambda: 1 / y ** 2)
 y = 3  # bigger than one
 trial_6 = Trial(lambda xs: 2 * np.sin(sum(xs)),
                 lambda xs: np.zeros(shape=sum(xs).shape),
                 lambda xs, t: np.sin(sum(xs) + t * y) + np.sin(sum(xs) - t * y)) \
     .add_parameters("beta", lambda xs: y ** 2 - y,  # y^2 - alpha(y)
-                    "alpha", y)
+                    "alpha", lambda: y)
 
-trial = trial_6
+trial = trial_4
 
 measure_start = time.time()
 lie_splitting = make_klein_gordon_lie_trotter_splitting(domain, [grid_size_N], start_time, trial.start_position,
-                                                        trial.start_velocity, trial.param["alpha"], trial.param["beta"])
+                                                        trial.start_velocity, trial.alpha, trial.beta)
 lie_splitting.progress(stop_time, delta_time, save_every_x_solution)
 print("Lie took", (time.time() - measure_start))
 measure_start = time.time()
 strang_splitting = make_klein_gordon_strang_splitting(domain, [grid_size_N], start_time, trial.start_position,
-                                                      trial.start_velocity, trial.param["alpha"], trial.param["beta"])
+                                                      trial.start_velocity, trial.alpha, trial.beta)
 strang_splitting.progress(stop_time, delta_time, save_every_x_solution)
 print("Strang took", (time.time() - measure_start))
 measure_start = time.time()
 fast_strang_splitting = make_klein_gordon_fast_strang_splitting(domain, [grid_size_N], start_time,
                                                                 trial.start_position, trial.start_velocity,
-                                                                trial.param["alpha"], trial.param["beta"],
+                                                                trial.alpha, trial.beta,
                                                                 delta_time)
 fast_strang_splitting.progress(stop_time, delta_time)  # intermediate solutions discarded at the end anyways
 print("Fast strang took", (time.time() - measure_start))
@@ -95,13 +95,13 @@ print("Fast strang took", (time.time() - measure_start))
 lie_reversed_splitting = make_klein_gordon_lie_trotter_reversed_splitting(domain, [grid_size_N], start_time,
                                                                           trial.start_position,
                                                                           trial.start_velocity,
-                                                                          trial.param["alpha"], trial.param["beta"])
+                                                                          trial.alpha, trial.beta)
 lie_reversed_splitting.progress(stop_time, delta_time, save_every_x_solution)
 
 strang_reversed_splitting = make_klein_gordon_strang_reversed_splitting(domain, [grid_size_N], start_time,
                                                                         trial.start_position,
                                                                         trial.start_velocity,
-                                                                        trial.param["alpha"], trial.param["beta"])
+                                                                        trial.alpha, trial.beta)
 strang_reversed_splitting.progress(stop_time, delta_time, save_every_x_solution)
 
 xs = lie_splitting.get_xs()

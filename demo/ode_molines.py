@@ -44,7 +44,7 @@ trial_4 = Trial(lambda xs: np.sin(sum(xs)),
 
 trial = trial_sq
 
-linhyp_config = LinhypSolverConfig(domain, [grid_n], trial.param["beta"])
+linhyp_config = LinhypSolverConfig(domain, [grid_n], trial.beta)
 linhyp_config.init_solver(0, trial.start_position, trial.start_velocity)
 linhyp_config.solve(show_times)
 

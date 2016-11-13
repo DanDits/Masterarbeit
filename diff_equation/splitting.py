@@ -4,7 +4,7 @@ import numpy as np
 from itertools import cycle, islice
 
 
-# Klein Gordon equation: u_tt=alpha*u_xx -beta(x)*u, alpha>0, beta(x)>0
+# Klein Gordon equation: u_tt=alpha()*u_xx -beta(x)*u, alpha()>0, beta(x)>0
 
 
 # Strang splitting:
@@ -12,11 +12,19 @@ from itertools import cycle, islice
 # solve wave equation to v(t0+dt/2,x), calculate v_t(t0+dt/2,x)
 # with these as starting values solve linear hyperbolic ode with mol to w(t0+dt,x), calculate w_t(t0+dt,x)
 # using these as starting values finally solve wave equation again to u(t0+dt,x)
+from util.analysis import error_l2
 
-def get_derivative(start_position, start_velocity, next_position, after_next_position, after2_next_position,
+
+def get_derivative(start_position, start_velocity, start_momentum, next_position, after_next_position, after2_next_position,
                    after3_next_positon, prev_position, time_step_size):
     # Use Taylor expansion of the first derivative f'(x)=f'(x-h)+h*f''(x-h)
     # see https://en.wikipedia.org/wiki/Finite_difference_coefficient for possible coefficients
+    # unstable for dt = 0.01
+    return (start_velocity + time_step_size * start_momentum
+            + (-start_position + 3 * next_position - 3 * after_next_position + 1 * after2_next_position)
+            / (time_step_size * 2)  # same results as M3-
+            )  # + (start_position - 4 * next_position + 6 * after_next_position - 4 * after2_next_position
+               # + after3_next_positon) / (time_step_size * 6))  # doesnt really change anything
 
     # forward differences of first order to estimate f''(x-h)=(f(x-h)-2f(x)+f(x+h))/(h*h)
     # best but not optimal performance, but is only of first order, so even strang splitting will be of first order!
@@ -79,7 +87,7 @@ class Splitting:
                       time - 1 * time_step_size * step_fraction])
         positions = config.solutions()
         next_position = positions[0]
-        next_velocity = get_derivative(config.start_position, config.start_velocity,
+        next_velocity = get_derivative(config.start_position, config.start_velocity, config.start_momentum(),
                                        next_position, positions[1], positions[2], positions[3], positions[4],
                                        time_step_size * step_fraction)
         return next_position, next_velocity
@@ -124,7 +132,7 @@ class Splitting:
 
 def make_klein_gordon_lie_trotter_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
     # due to the second order time derivative alpha and beta are getting multiplied by 1/2
-    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(0.5 * alpha))
+    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(0.5 * alpha()))
     linhyp_config = LinhypSolverConfig(intervals, grid_points_list, lambda *params: 0.5 * beta(*params))
 
     wave_config.init_solver(t0, u0, u0t)
@@ -137,7 +145,7 @@ def make_klein_gordon_lie_trotter_splitting(intervals, grid_points_list, t0, u0,
 
 
 def make_klein_gordon_lie_trotter_reversed_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
-    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(0.5 * alpha))
+    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(0.5 * alpha()))
     linhyp_config = LinhypSolverConfig(intervals, grid_points_list, lambda *params: 0.5 * beta(*params))
 
     linhyp_config.init_solver(t0, u0, u0t)
@@ -148,7 +156,7 @@ def make_klein_gordon_lie_trotter_reversed_splitting(intervals, grid_points_list
 
 def make_klein_gordon_strang_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
     # see lie_trotter splitting for an explanation of the 1/2 factors appearing
-    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(0.5 * alpha))
+    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(0.5 * alpha()))
     linhyp_config = LinhypSolverConfig(intervals, grid_points_list, lambda *params: 0.5 * beta(*params))
 
     wave_config.init_solver(t0, u0, u0t)
@@ -157,7 +165,7 @@ def make_klein_gordon_strang_splitting(intervals, grid_points_list, t0, u0, u0t,
 
 
 def make_klein_gordon_strang_reversed_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
-    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(0.5 * alpha))
+    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(0.5 * alpha()))
     linhyp_config = LinhypSolverConfig(intervals, grid_points_list, lambda *params: 0.5 * beta(*params))
 
     linhyp_config.init_solver(t0, u0, u0t)
@@ -171,7 +179,7 @@ def make_klein_gordon_strang_reversed_splitting(intervals, grid_points_list, t0,
 def make_klein_gordon_fast_strang_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta, time_step_size):
     # instead of doing: (wave/2 -> linhyp -> wave/2) -> (wave/2 -> linhyp -> wave/2) -> ...
     # we do: wave/2 -> linhyp -> (wave -> linhyp) -> (wave -> linhyp) -> ... -> wave/2
-    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(0.5 * alpha))
+    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(0.5 * alpha()))
     linhyp_config = LinhypSolverConfig(intervals, grid_points_list, lambda *params: 0.5 * beta(*params))
 
     wave_config.init_solver(t0, u0, u0t)

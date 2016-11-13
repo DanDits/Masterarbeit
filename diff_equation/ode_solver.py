@@ -8,7 +8,11 @@ class LinhypSolverConfig(SolverConfig):
 
     def __init__(self, intervals, grid_points_list, beta):
         super().__init__(intervals, grid_points_list)
-        self.beta_sqrt = np.sqrt(beta(self.xs_mesh))
+        self.beta = beta(self.xs_mesh)
+        self.beta_sqrt = np.sqrt(self.beta)
+
+    def start_momentum(self):
+        return -self.beta * self.start_position
 
     def init_solver(self, t0, u0, u0t):
         self.init_initial_values(t0, u0, u0t)

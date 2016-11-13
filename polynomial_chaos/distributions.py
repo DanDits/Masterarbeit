@@ -1,4 +1,6 @@
 import math
+from functools import partial
+import random
 
 
 # See "The Wiener--Askey Polynomial Chaos for Stochastic Differential Equations"
@@ -20,17 +22,22 @@ def make_inverse_uniform(left_bound, right_bound):
 
 
 class Distribution:
-    def __init__(self, name, weight, inverse_distribution=None, show_name=None):
+    def __init__(self, name, weight, sample_generator, inverse_distribution=None, show_name=None):
         self.name = name
+        self.sample_generator = sample_generator
         self.show_name = name if show_name is None else show_name
         self.weight = weight
         self.inverse_distribution = inverse_distribution
+
+    def generate(self):
+        return self.sample_generator()
 
     def __repr__(self):
         return self.show_name
 
 gaussian = Distribution("Gaussian",
                         lambda x: math.exp(-x * x / 2.) / math.sqrt(2. * math.pi),
+                        partial(random.gauss, 0, 1),
                         inverse_gaussian)
 
 
@@ -39,6 +46,7 @@ def make_uniform(left_bound, right_bound):
         raise ValueError("Left bound must be smaller than right bound:", left_bound, right_bound)
     return Distribution("Uniform",
                         lambda x: 1. / (right_bound - left_bound) if left_bound <= x <= right_bound else 0.,
+                        partial(random.uniform, left_bound, right_bound),
                         make_inverse_uniform(left_bound, right_bound))
 
 
@@ -48,5 +56,6 @@ def make_exponential(lamb=1.):
     # is special case of Gamma distribution (so parameters=(1,lambda=1))
     return Distribution("Gamma",
                         lambda x: lamb * math.exp(-lamb * x) if x >= 0 else 0.,
+                        partial(random.expovariate, lamb),
                         make_inverse_exponential(lamb),
                         "Exponential({})".format(lamb))
