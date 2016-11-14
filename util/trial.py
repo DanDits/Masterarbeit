@@ -12,7 +12,6 @@ class Trial:
         self.start_velocity = start_velocity
         self.reference = reference
         self.error_function = error_l2
-        self._param = {}
 
     def add_parameters(self, *key_values):
         """
@@ -27,7 +26,7 @@ class Trial:
         return self
 
     def has_parameter(self, key):
-        return key in self._param
+        return hasattr(self, key)
 
     def error(self, xs, t, approximation):
         if self.reference is None:

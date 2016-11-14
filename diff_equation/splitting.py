@@ -1,4 +1,4 @@
-from diff_equation.pseudospectral_solver import WaveSolverConfig
+from diff_equation.pseudospectral_solver import WaveSolverConfig, KleinGordonMomentConfig, VelocityConfig
 from diff_equation.ode_solver import LinhypSolverConfig
 import numpy as np
 from itertools import cycle, islice
@@ -71,15 +71,16 @@ def get_derivative(start_position, start_velocity, start_momentum, next_position
 
 
 class Splitting:
-    def __init__(self, configs, step_fractions, on_end_callback=None):
+    def __init__(self, configs, step_fractions, name=None, on_end_callback=None):
         self.solver_configs = configs
+        self.name = name
         self.solver_step_fractions = step_fractions
         self.timed_solutions = []
         self.on_end_callback = on_end_callback
         assert len(step_fractions) == len(configs)
 
-    @staticmethod
-    def sub_step(config, time, time_step_size, step_fraction):
+    @classmethod
+    def sub_step(cls, config, time, time_step_size, step_fraction):
         config.solve([time + 1 * time_step_size * step_fraction,
                       time + 2 * time_step_size * step_fraction,
                       time + 3 * time_step_size * step_fraction,
@@ -102,7 +103,7 @@ class Splitting:
                        cycle(self.solver_configs),
                        islice(cycle(self.solver_configs), 1, None)):
             time = config.start_time
-            next_position, next_velocity = Splitting.sub_step(config, time, time_step_size, step_fraction)
+            next_position, next_velocity = self.sub_step(config, time, time_step_size, step_fraction)
 
             splitting_step_completed = counter == len(self.solver_configs) - 1
             if splitting_step_completed:
@@ -130,6 +131,21 @@ class Splitting:
         return [time for time, _ in self.timed_solutions]
 
 
+class LeapfrogSplitting(Splitting):
+
+    @classmethod
+    def sub_step(cls, config, time, time_step_size, step_fraction):
+        config.solve([time + time_step_size * step_fraction])
+        solution = config.solutions()[-1]
+        next_position = solution
+        next_velocity = config.start_velocity
+        if isinstance(config, KleinGordonMomentConfig):
+            # the calculated solution is not a position, but a velocity!
+            next_position = config.start_position
+            next_velocity = solution
+        return next_position, next_velocity
+
+
 def make_klein_gordon_lie_trotter_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
     # due to the second order time derivative alpha and beta are getting multiplied by 1/2
     wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(0.5 * alpha()))
@@ -141,7 +157,25 @@ def make_klein_gordon_lie_trotter_splitting(intervals, grid_points_list, t0, u0,
     # there is a factor 1/2 introduced. We only need to apply it once initially
     # as it cancels out with further calls.
     wave_config.start_velocity *= 0.5
-    return Splitting([wave_config, linhyp_config], [1., 1.])
+    return Splitting([wave_config, linhyp_config], [1., 1.], name="Lie")
+
+
+def make_klein_gordon_leapfrog_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
+    moment_config = KleinGordonMomentConfig(intervals, grid_points_list, alpha, beta)
+    velocity_config = VelocityConfig(intervals, grid_points_list)
+
+    velocity_config.init_solver(t0, u0, u0t)
+    return LeapfrogSplitting([velocity_config, moment_config, velocity_config], [0.5, 1., 0.5],
+                             name="Leapfrog")
+
+
+def make_klein_gordon_leapfrog_reversed_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
+    moment_config = KleinGordonMomentConfig(intervals, grid_points_list, alpha, beta)
+    velocity_config = VelocityConfig(intervals, grid_points_list)
+
+    moment_config.init_solver(t0, u0, u0t)
+    return LeapfrogSplitting([moment_config, velocity_config, moment_config], [0.5, 1., 0.5],
+                             name="RLeapfrog")
 
 
 def make_klein_gordon_lie_trotter_reversed_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
@@ -151,7 +185,7 @@ def make_klein_gordon_lie_trotter_reversed_splitting(intervals, grid_points_list
     linhyp_config.init_solver(t0, u0, u0t)
     linhyp_config.start_velocity *= 0.5
 
-    return Splitting([linhyp_config, wave_config], [1., 1.])
+    return Splitting([linhyp_config, wave_config], [1., 1.], name="RLie")
 
 
 def make_klein_gordon_strang_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
@@ -161,7 +195,7 @@ def make_klein_gordon_strang_splitting(intervals, grid_points_list, t0, u0, u0t,
 
     wave_config.init_solver(t0, u0, u0t)
     wave_config.start_velocity *= 0.5
-    return Splitting([wave_config, linhyp_config, wave_config], [0.5, 1., 0.5])
+    return Splitting([wave_config, linhyp_config, wave_config], [0.5, 1., 0.5], name="Strang")
 
 
 def make_klein_gordon_strang_reversed_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
@@ -171,7 +205,7 @@ def make_klein_gordon_strang_reversed_splitting(intervals, grid_points_list, t0,
     linhyp_config.init_solver(t0, u0, u0t)
     linhyp_config.start_velocity *= 0.5
 
-    return Splitting([linhyp_config, wave_config, linhyp_config], [0.5, 1., 0.5])
+    return Splitting([linhyp_config, wave_config, linhyp_config], [0.5, 1., 0.5], name="RStrang")
 
 
 # this is as fast as lie splitting and (theoretically) equivalent to strang, but has the drawback that
@@ -199,5 +233,5 @@ def make_klein_gordon_fast_strang_splitting(intervals, grid_points_list, t0, u0,
         last_position, _ = Splitting.sub_step(wave_config, wave_config.start_time, time_step_size, 0.5)
         splitting.timed_solutions = [(wave_config.start_time, last_position)]
 
-    splitting = Splitting([wave_config, linhyp_config], [1., 1.], on_end_callback=on_progress_end)
+    splitting = Splitting([wave_config, linhyp_config], [1., 1.], name="FStrang", on_end_callback=on_progress_end)
     return splitting

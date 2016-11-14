@@ -35,6 +35,33 @@ def heat_solution(intervals, grid_points_list, t0, u0, alpha, wanted_times):
     return config.xs, times, solutions
 
 
+class VelocityConfig(SolverConfig):
+    def init_solver(self, t0, u0, u0t):
+        self.init_initial_values(t0, u0, u0t)
+        self.solver = lambda time: self.start_position + (time - self.start_time) * self.start_velocity
+
+
+class KleinGordonMomentConfig(SolverConfig):
+
+    def __init__(self, intervals, grid_points_list, alpha, beta):
+        super().__init__(intervals, grid_points_list, pseudospectral_power=2)
+        self.pseudospectral_mesh_sum = sum(self.pseudospectral_factors_mesh)
+        self.moment = None
+        self.alpha = alpha()
+        self.beta = beta(self.xs_mesh)
+
+    def init_solver(self, t0, u0, u0t):
+        self.init_initial_values(t0, u0, u0t)
+        uxx = ifftn(self.pseudospectral_mesh_sum * fftn(self.start_position))
+        # saves the moment alpha*u_xx -beta(x)u at the given start time to estimate a new velocity
+        self.moment = (self.alpha * uxx - self.beta * self.start_position)
+
+        def solution_at(time):
+            # Careful. Returns a velocity, not a position!
+            return self.start_velocity + self.moment * (time - self.start_time)
+        self.solver = solution_at
+
+
 # u_tt(t,x) = (wave_speed ** 2) * u_xx(t,x), u(t0,x)=u0(x), u_t(t0,x)=u0_t(x), wave_speed > 0
 class WaveSolverConfig(SolverConfig):
 
