@@ -62,6 +62,66 @@ class KleinGordonMomentConfig(SolverConfig):
         self.solver = solution_at
 
 
+class OffsetWaveSolverConfig(SolverConfig):
+    def __init__(self, intervals, grid_points_list, wave_speed, offset):
+        super().__init__(intervals, grid_points_list, pseudospectral_power=2)
+        assert wave_speed > 0.
+        assert offset > 0.
+        self.wave_speed = wave_speed
+        self.c = np.sqrt(offset) / wave_speed
+        self.offset = offset
+
+        # as the pseudospectral factors of order 2 are negative integers, negate sum!
+        # numbers are real (+0j) anyways, but using '.real' saves some calculation time and storage space
+        # in literature sometimes referred to as "japanese symbol"...
+        self.japan = np.sqrt(-sum(self.pseudospectral_factors_mesh).real + self.c ** 2)
+
+    def init_solver(self, t0, u0, u0t):
+
+        self.init_initial_values(t0, u0, u0t)
+        # variables ending in underscore note that the values are considered to be in fourier space
+
+        y0_ = fftn(self.start_position)  # starting condition in fourier space and evaluated at grid
+        y0t_ = fftn(self.start_velocity)
+
+        v_start_ = y0_ - (1j / self.japan) * (y0t_ * self.c / (self.wave_speed ** 2))
+
+        def solution_at(time):
+            v_hat_ = np.exp(1j * self.japan * (time - self.start_time)) * v_start_
+
+            v = ifftn(v_hat_)
+            return (v + np.conj(v)) / 2
+
+        self.solver = solution_at
+
+
+class OffsetLinhypSolver(SolverConfig):
+    def __init__(self, intervals, grid_points_list, wave_speed, offset):
+        super().__init__(intervals, grid_points_list, pseudospectral_power=2)
+        assert wave_speed > 0.
+        assert offset > 0.
+        self.wave_speed = wave_speed
+        self.c = np.sqrt(offset) / wave_speed
+        self.offset = offset
+
+        # as the pseudospectral factors of order 2 are negative integers, negate sum!
+        # numbers are real (+0j) anyways, but using '.real' saves some calculation time and storage space
+        # in literature sometimes referred to as "japanese symbol"...
+        self.japan = np.sqrt(-sum(self.pseudospectral_factors_mesh).real + self.c ** 2)
+
+    def init_solver(self, t0, u0, u0t):
+
+        self.init_initial_values(t0, u0, u0t)
+        v_start = self.start_velocity - (1j / self.japan) * (self.start_velocity * self.c / (self.wave_speed ** 2))
+        v_ascend = 1  # TODO
+
+        def solution_at(time):
+            v = v_start + (time - self.start_time) * v_ascend
+            return (v + np.conj(v)) / 2  # TODO refactor to let solver return derivatives of solution at time too! do this here
+
+        self.solver = solution_at
+
+
 # u_tt(t,x) = (wave_speed ** 2) * u_xx(t,x), u(t0,x)=u0(x), u_t(t0,x)=u0_t(x), wave_speed > 0
 class WaveSolverConfig(SolverConfig):
 

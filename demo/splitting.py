@@ -16,14 +16,14 @@ from util.trial import Trial
 dimension = 1
 grid_size_N = 128 if dimension >= 2 else 512
 domain = list(repeat([-pi, pi], dimension))
-delta_time = 0.008
+delta_time = 0.001
 save_every_x_solution = 1
 plot_solutions_count = 5
 start_time = 0.
 stop_time = 4
 show_errors = True
 show_reference = True
-do_animate = False
+do_animate = True
 
 param_g1 = 3  # some parameter greater than one
 alpha_1 = 0.2  # smaller than param_g1 ** 2 / dimension to ensure beta>0
@@ -73,13 +73,36 @@ trial_6 = Trial(lambda xs: 2 * np.sin(sum(xs)),
                 lambda xs, t: np.sin(sum(xs) + t * y_6) + np.sin(sum(xs) - t * y_6)) \
     .add_parameters("beta", lambda xs: y_6 ** 2 - y_6,  # y^2 - alpha(y)
                     "alpha", lambda: y_6)
-
-trial = trial_5
+trial_frog = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
+                lambda xs: 2 * np.exp(-np.cos(sum(xs))),
+                lambda xs, t: np.sin(2 * t) * np.exp(-np.cos(sum(xs)))) \
+    .add_parameters("beta", lambda xs: 4 + np.cos(sum(xs)) + np.sin(sum(xs)) ** 2,
+                    "alpha", lambda: 1,
+                    "frog_only", True)
+y_frog_2 = 3  # > 2
+trial_frog2 = Trial(lambda xs: 1 / (np.sin(sum(xs)) + y_frog_2),
+                    lambda xs: np.zeros(shape=sum(xs).shape),
+                    lambda xs, t: np.cos(t) / (np.sin(sum(xs)) + y_frog_2)) \
+    .add_parameters("beta", lambda xs: 1 + (y_frog_2 - 2) * (np.sin(sum(xs)) / (np.sin(sum(xs)) + y_frog_2)
+                                                             + 2 * np.cos(sum(xs)) ** 2
+                                                             / (np.sin(sum(xs)) + y_frog_2) ** 2),
+                    "alpha", lambda: y_frog_2 - 2,
+                    "frog_only", True)
+trial_frog3 = Trial(lambda xs: np.sin(sum(xs)),
+                    lambda xs: np.sin(sum(xs)) ** 2) \
+    .add_parameters("beta", lambda xs: 2 + np.sin(sum(xs) + 1),
+                    "alpha", lambda: 1 + 0.5 + 3 * 0.5,
+                    "frog_only", True)
+trial = trial_frog3
 
 splitting_factories = [make_klein_gordon_lie_trotter_splitting, make_klein_gordon_lie_trotter_reversed_splitting,
                        make_klein_gordon_strang_splitting, make_klein_gordon_strang_reversed_splitting,
                        partial(make_klein_gordon_fast_strang_splitting, time_step_size=delta_time),
                        make_klein_gordon_leapfrog_splitting, make_klein_gordon_leapfrog_reversed_splitting]
+if trial.has_parameter("frog_only"):
+    splitting_factories = [make_klein_gordon_leapfrog_splitting, make_klein_gordon_leapfrog_reversed_splitting]
+
+
 splittings = [factory(domain, [grid_size_N], start_time, trial.start_position,
                       trial.start_velocity, trial.alpha, trial.beta)
               for factory in splitting_factories]
