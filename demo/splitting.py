@@ -12,7 +12,7 @@ from diff_equation.splitting import make_klein_gordon_lie_trotter_splitting, mak
     make_klein_gordon_fast_strang_splitting, \
     make_klein_gordon_lie_trotter_reversed_splitting, \
     make_klein_gordon_strang_reversed_splitting, make_klein_gordon_leapfrog_splitting, \
-    make_klein_gordon_leapfrog_reversed_splitting
+    make_klein_gordon_leapfrog_reversed_splitting, make_klein_gordon_strang_offset_reversed_splitting
 from util.trial import Trial
 
 dimension = 1
@@ -33,7 +33,8 @@ trial_1 = Trial(lambda xs: np.sin(sum(xs)),
                 lambda xs: param_g1 * np.cos(sum(xs)),
                 lambda xs, t: np.sin(sum(xs) + param_g1 * t)) \
     .add_parameters("beta", lambda xs: param_g1 ** 2 - len(xs) * alpha_1,
-                    "alpha", lambda: alpha_1)
+                    "alpha", lambda: alpha_1,
+                    "offset", (param_g1 ** 2 - dimension * alpha_1) / 2)
 
 alpha_small = 1. / 4.  # smaller than 1/3 to ensure beta>0
 trial_2 = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
@@ -80,7 +81,8 @@ trial_frog = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
                    lambda xs, t: np.sin(2 * t) * np.exp(-np.cos(sum(xs)))) \
     .add_parameters("beta", lambda xs: 4 + np.cos(sum(xs)) + np.sin(sum(xs)) ** 2,
                     "alpha", lambda: 1,
-                    "frog_only", True)
+                    "frog_only", True,
+                    "offset", 1)
 y_frog_2 = 3  # > 2
 trial_frog2 = Trial(lambda xs: 1 / (np.sin(sum(xs)) + y_frog_2),
                     lambda xs: np.zeros(shape=sum(xs).shape),
@@ -89,13 +91,15 @@ trial_frog2 = Trial(lambda xs: 1 / (np.sin(sum(xs)) + y_frog_2),
                                                              + 2 * np.cos(sum(xs)) ** 2
                                                              / (np.sin(sum(xs)) + y_frog_2) ** 2),
                     "alpha", lambda: y_frog_2 - 2,
-                    "frog_only", True)
+                    "frog_only", True,
+                    "offset", 0.2)
 trial_frog3 = Trial(lambda xs: np.sin(sum(xs)),
                     lambda xs: np.sin(sum(xs)) ** 2) \
     .add_parameters("beta", lambda xs: 2 + np.sin(sum(xs) + 1),
                     "alpha", lambda: 1 + 0.5 + 3 * 0.5,
-                    "frog_only", True)
-trial = trial_3
+                    "frog_only", True,
+                    "offset", 1)
+trial = trial_frog2
 
 
 offset_wave_solver = None
@@ -113,6 +117,8 @@ splitting_factories = [make_klein_gordon_lie_trotter_splitting, make_klein_gordo
                        make_klein_gordon_leapfrog_splitting, make_klein_gordon_leapfrog_reversed_splitting]
 if trial.has_parameter("frog_only"):
     splitting_factories = [make_klein_gordon_leapfrog_splitting, make_klein_gordon_leapfrog_reversed_splitting]
+if trial.has_parameter("offset"):
+    splitting_factories.append(partial(make_klein_gordon_strang_offset_reversed_splitting, offset=trial.offset))
 
 splittings = [factory(domain, [grid_size_N], start_time, trial.start_position,
                       trial.start_velocity, trial.alpha, trial.beta)

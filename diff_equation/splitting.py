@@ -1,4 +1,5 @@
-from diff_equation.pseudospectral_solver import WaveSolverConfig, KleinGordonMomentConfig, VelocityConfig
+from diff_equation.pseudospectral_solver import WaveSolverConfig, KleinGordonMomentConfig, VelocityConfig, \
+    OffsetWaveSolverConfig
 from diff_equation.ode_solver import LinhypSolverConfig
 import numpy as np
 from itertools import cycle, islice
@@ -71,6 +72,15 @@ class Splitting:
 
     def times(self):
         return [time for time, _ in self.timed_positions]
+
+
+def make_klein_gordon_strang_offset_reversed_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta, offset):
+    linhyp_config = LinhypSolverConfig(intervals, grid_points_list, lambda *params: 0.5 * (beta(*params) - offset))
+    offset_wave_config = OffsetWaveSolverConfig(intervals, grid_points_list, np.sqrt(0.5 * alpha()), 0.5 * offset)
+
+    linhyp_config.init_solver(t0, u0, u0t)
+    linhyp_config.start_velocity *= 0.5
+    return Splitting([linhyp_config, offset_wave_config, linhyp_config], [0.5, 1., 0.5], name="ORStrang")
 
 
 def make_klein_gordon_lie_trotter_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):

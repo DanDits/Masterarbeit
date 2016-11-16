@@ -147,4 +147,3 @@ if len(solutions_for_order_estimate) == 3:
 
         plt.show()
 
-# TODO how to enforce constraints for alpha, beta>0 ? implicitly? discard if invalid?
