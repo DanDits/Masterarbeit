@@ -8,6 +8,11 @@ import numpy as np
 
 
 def mul_prod(factors):
+    """
+    As python does not include a "prod" equivalent to "sum", here it is.
+    :param factors: Factors to multiply by using the operator.mul
+    :return: The product of all factors, 1 if empty.
+    """
     return reduce(operator.mul, factors, 1)
 
 
@@ -24,6 +29,7 @@ class StochasticTrial(Trial):
     def __init__(self, variable_distributions, start_position, start_velocity, reference=None,
                  random_variables=None):
         super().__init__(start_position, start_velocity, reference)
+        self.raw_reference = reference
         self.variable_distributions = variable_distributions
         self.rvalues = None
 
@@ -47,15 +53,23 @@ class StochasticTrial(Trial):
         """
         self.rvalues = [rvar(distr.generate()) for rvar, distr in zip(self.rvars, self.variable_distributions)]
 
-    # TODO does not yet include a dependency on x, this probably needs to be done point wise for each x
     def calculate_expectancy(self, xs_lines, t, function):
+        """
+        This very far from efficient method calculates the expectancy of a given function(x-coordinates, time, ys) at
+        the every point on the grid defined by the axes "xs_lines" and the given time t.
+        :param xs_lines: List of one dimensional numpy arrays containing the grid coordinates for the given dimension.
+        :param t: The time to get expectancy at.
+        :param function: The function as described above.
+        :return: A nd-array with shape defined by the lengths of the given xs_lines.
+        """
         sizes = tuple(map(len, xs_lines))
         result = np.zeros(shape=sizes)
-        for index, x_coords in zip(product(map(range, sizes)), product(*xs_lines)):
-
+        for index, x_coords in zip(product(*map(range, sizes)), product(*xs_lines)):
+            # iterate over every coordinate, calculating the expectancy for this point by calculating the integral
+            # over the variables ys weighted by the distribution's weights
             def func_in_ys(*ys):
                 transformed_ys = [rvar(value) for rvar, value in zip(self.rvars, ys)]
-                return (function(x_coords, t, transformed_ys)  # TODO contains an error still
+                return (function(x_coords, t, transformed_ys)
                         * mul_prod(distr.weight(y) for y, distr in zip(ys, self.variable_distributions)))
 
             point_value = nquad(func_in_ys, [distr.support for distr in self.variable_distributions])[0]

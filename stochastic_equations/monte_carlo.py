@@ -7,14 +7,16 @@ from itertools import repeat
 import matplotlib.pyplot as plt
 from scipy.integrate import quad
 from util.analysis import error_l2
+from util.animate import animate_2d_surface
 
-dimension = 1
+dimension = 2
 grid_size_N = 128 if dimension >= 2 else 512
+do_calculate_expectancy = True  # dimension == 1  # for 128*128 in dim=2 already takes about 30s
 domain = list(repeat([-np.pi, np.pi], dimension))
 delta_time = 0.001
 start_time = 0.
 stop_time = 0.5
-simulations_count = 1000
+simulations_count = 200
 
 order_factor = 2  # the factor of the step number between two consecutive solutions used to estimate order of converg.
 steps_for_order_estimate = [int(simulations_count / (order_factor ** i)) for i in range(3)]
@@ -67,7 +69,7 @@ trial_4 = StochasticTrial([distributions.gaussian, distributions.make_uniform(0,
     .add_parameters("beta", lambda xs, ys: 2 + np.sin(xs[0] + ys[2]),
                     "alpha", lambda ys: 1 + 0.5 * ys[0] + 3 * ys[1])
 
-# TODO 2d trial and visualization
+
 trial = trial_2_1
 
 last_solutions_sum = None
@@ -82,39 +84,43 @@ for i in range(1, simulations_count + 1):
         print("Simulation", i)  # about 7s for 100 simulations with leapfrog (1min with lie trotter), 512, 0.001, [0,.5]
     trial.randomize()
 
-    lie_splitting = make_klein_gordon_leapfrog_splitting(domain, [grid_size_N], start_time, trial.start_position,
-                                                         trial.start_velocity, trial.alpha,
-                                                         trial.beta)
-    lie_splitting.progress(stop_time, delta_time)
+    splitting = make_klein_gordon_leapfrog_splitting(domain, [grid_size_N], start_time, trial.start_position,
+                                                     trial.start_velocity, trial.alpha,
+                                                     trial.beta)
+    splitting.progress(stop_time, delta_time)
 
-    last_solution = lie_splitting.solutions()[-1]
+    last_solution = splitting.solutions()[-1]
     if last_solutions_sum is not None:
         last_solutions_sum += last_solution
     else:
-        splitting_xs = lie_splitting.get_xs()
-        splitting_xs_mesh = lie_splitting.get_xs_mesh()
+        splitting_xs = splitting.get_xs()
+        splitting_xs_mesh = splitting.get_xs_mesh()
         if trial.has_parameter("expectancy"):
-            expectancy = trial.expectancy(splitting_xs_mesh, lie_splitting.times()[-1])
-        elif trial.reference is not None:
-            expectancy = trial.calculate_expectancy(splitting_xs, lie_splitting.times()[-1], trial.reference)
+            expectancy = trial.expectancy(splitting_xs_mesh, splitting.times()[-1])
+        elif trial.raw_reference is not None and do_calculate_expectancy:
+            expectancy = trial.calculate_expectancy(splitting_xs, splitting.times()[-1], trial.raw_reference)
         last_solutions_sum = last_solution
-    if i % 1000 == 0:
-        solution_at_step.append((i, last_solutions_sum / (i + 1)))
+    if i % 1 == 0:
+        solution_at_step.append((i, last_solutions_sum / i))
     if i in steps_for_order_estimate:
-        solutions_for_order_estimate.append(last_solutions_sum / (i + 1))
+        solutions_for_order_estimate.append(last_solutions_sum / i)
     if expectancy is not None:
-        errors.append(error_l2(expectancy, last_solutions_sum / (i + 1)))
+        errors.append(error_l2(expectancy, last_solutions_sum / i))
 last_solutions_sum *= 1 / simulations_count
 solution_at_step.append((simulations_count, last_solutions_sum))
 
-plt.figure()
-plt.title("Solutions at time={}, dt={}".format(stop_time, delta_time))
-if expectancy is not None:
-    plt.plot(*splitting_xs, expectancy, label="Expectancy")
-for step, solution in solution_at_step:
-    plt.plot(*splitting_xs, solution, label="Mean with N={}".format(step))
-plt.legend()
-#plt.savefig("/home/daniel/PycharmProjects/Masterarbeit/images/mc_plots_trial4.png")
+if dimension == 1:
+    plt.figure()
+    plt.title("Solutions at time={}, dt={}".format(stop_time, delta_time))
+    if expectancy is not None:
+        plt.plot(*splitting_xs, expectancy, label="Expectancy")
+    for step, solution in solution_at_step:
+        plt.plot(*splitting_xs, solution, label="Mean with N={}".format(step))
+    plt.legend()
+    #plt.savefig("/home/daniel/PycharmProjects/Masterarbeit/images/mc_plots_trial4.png")
+elif dimension == 2:
+    animate_2d_surface(splitting_xs[0], splitting_xs[1], [sol for _, sol in solution_at_step],
+                       [step for step, sol in solution_at_step], 100)
 
 if len(errors) > 0:
     plt.figure()
@@ -123,20 +129,22 @@ if len(errors) > 0:
     plt.xlabel("Simulation")
     plt.ylabel("Error")
     plt.yscale('log')
+    plt.show()
 
 if len(solutions_for_order_estimate) == 3:
     order = np.log((solutions_for_order_estimate[0] - solutions_for_order_estimate[1])
                    / (solutions_for_order_estimate[1] - solutions_for_order_estimate[2])) / np.log(order_factor)
 
-    total_order = np.log(sum(1. / order_factor ** (order * 2)) / order.size) / (np.log(1 / order_factor) * 2)
-    print("Estimated convergence rate:", total_order.real)
-    plt.figure()
-    plt.title("Monte Carlo convergence rate to expectancy={:.2E}, dt={}, N={}"
-              .format(total_order.real, delta_time, grid_size_N))
-    plt.plot(*splitting_xs, order, label="Point wise estimated convergence rate")
-    #plt.savefig("/home/daniel/PycharmProjects/Masterarbeit/images/mc_convergence_trial4.png")
-    plt.legend()
+    total_order = np.log(np.sum(1. / order_factor ** (order * 2)) / order.size) / (np.log(1 / order_factor) * 2)
 
-plt.show()
+    if dimension == 1:
+        plt.figure()
+        plt.title("Monte Carlo convergence rate to expectancy={:.2E}, dt={}, N={}"
+                  .format(total_order.real, delta_time, grid_size_N))
+        plt.plot(*splitting_xs, order, label="Point wise estimated convergence rate")
+        #plt.savefig("/home/daniel/PycharmProjects/Masterarbeit/images/mc_convergence_trial4.png")
+        plt.legend()
+
+        plt.show()
 
 # TODO how to enforce constraints for alpha, beta>0 ? implicitly? discard if invalid?

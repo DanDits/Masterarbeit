@@ -4,6 +4,8 @@ from functools import partial
 from math import pi
 import matplotlib.pyplot as plt
 import time
+
+from diff_equation.pseudospectral_solver import OffsetWaveSolverConfig
 from util.animate import animate_1d, animate_2d_surface
 
 from diff_equation.splitting import make_klein_gordon_lie_trotter_splitting, make_klein_gordon_strang_splitting, \
@@ -20,13 +22,13 @@ delta_time = 0.001
 save_every_x_solution = 1
 plot_solutions_count = 5
 start_time = 0.
-stop_time = 4
+stop_time = 1
 show_errors = True
 show_reference = True
-do_animate = True
+do_animate = False
 
-param_g1 = 3  # some parameter greater than one
-alpha_1 = 0.2  # smaller than param_g1 ** 2 / dimension to ensure beta>0
+param_g1 = 7  # some parameter greater than one
+alpha_1 = 2  # smaller than param_g1 ** 2 / dimension to ensure beta>0
 trial_1 = Trial(lambda xs: np.sin(sum(xs)),
                 lambda xs: param_g1 * np.cos(sum(xs)),
                 lambda xs, t: np.sin(sum(xs) + param_g1 * t)) \
@@ -93,7 +95,17 @@ trial_frog3 = Trial(lambda xs: np.sin(sum(xs)),
     .add_parameters("beta", lambda xs: 2 + np.sin(sum(xs) + 1),
                     "alpha", lambda: 1 + 0.5 + 3 * 0.5,
                     "frog_only", True)
-trial = trial_2
+trial = trial_3
+
+
+offset_wave_solver = None
+if trial == trial_1:
+    offset_wave_solver = OffsetWaveSolverConfig(domain, [grid_size_N], np.sqrt(alpha_1), param_g1 ** 2 - alpha_1)
+    offset_wave_solver.init_solver(start_time, trial.start_position, trial.start_velocity)
+elif trial == trial_3:
+    offset_wave_solver = OffsetWaveSolverConfig(domain, [grid_size_N], np.sqrt(alpha_g0),
+                                                -alpha_g0 * (param_n1 ** 2) + param_3 ** 2)
+    offset_wave_solver.init_solver(start_time, trial.start_position, trial.start_velocity)
 
 splitting_factories = [make_klein_gordon_lie_trotter_splitting, make_klein_gordon_lie_trotter_reversed_splitting,
                        make_klein_gordon_strang_splitting, make_klein_gordon_strang_reversed_splitting,
@@ -136,6 +148,11 @@ if dimension == 1:
                          label="{} solution at {}".format(ref_splitting.name, curr_t))
                 plt.plot(*result_xs, solution_1, "+", color=color,
                          label="{} solution at {:.2E}".format(ref_splitting_2.name, curr_t))
+                if offset_wave_solver is not None:
+                    offset_wave_solver.solve([curr_t])
+                    plt.plot(*result_xs, offset_wave_solver.solutions()[-1], ".", color=color,
+                             label="OW solution at {:.2E}".format(offset_wave_solver.times()[-1]))
+
                 if show_reference:
                     plt.plot(*result_xs, trial.reference(xs_mesh, curr_t),
                              color=color, label="Reference at {}".format(curr_t))
@@ -151,6 +168,11 @@ if show_errors and trial.reference is not None:
         print("Error of {} splitting at end:{:.2E}".format(splitting.name, errors[-1]))
         plt.plot(splitting.times(), errors, label="Errors of {} in discrete L2 norm".format(splitting.name))
 
+    if offset_wave_solver is not None:
+        last_time = splittings[0].times()[-1]
+        offset_wave_solver.solve([last_time])
+        print("Error of OffsetWaveSolver at end:{:.2E}".format(trial.error(xs_mesh, last_time,
+                                                                           offset_wave_solver.solutions()[-1])))
     plt.title("Splitting method errors for Klein Gordon, dt={}, N={}".format(delta_time, grid_size_N))
     plt.xlabel("Time")
     plt.ylabel("Error")

@@ -25,13 +25,12 @@ class Splitting:
 
     @classmethod
     def sub_step(cls, config, time, time_step_size, step_fraction):
-        # TODO can we implicitly make a leapfrog step for every splitting? Does this improve performance?
-        config.solve([time + 1 * time_step_size * step_fraction])
-        positions = config.solutions()
-        next_position = positions[0]
-        velocities = config.velocities()
-        next_velocity = velocities[0]
-        return next_position, next_velocity
+        # making an inner leapfrog for each sub sub does not seem to improve performance notably
+        config.solve([time + time_step_size * step_fraction])
+        next_position = config.solutions()[0]
+        next_velocity = config.velocities()[0]
+
+        return next_position, next_velocity # 2e-8, 3e-7
 
     def progress(self, end_time, time_step_size, save_solution_step=1):
         # zeroth config is assumed to be properly initialized with starting values and solver
