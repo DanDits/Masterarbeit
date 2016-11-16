@@ -38,7 +38,8 @@ def heat_solution(intervals, grid_points_list, t0, u0, alpha, wanted_times):
 class VelocityConfig(SolverConfig):
     def init_solver(self, t0, u0, u0t):
         self.init_initial_values(t0, u0, u0t)
-        self.solver = lambda time: self.start_position + (time - self.start_time) * self.start_velocity
+        self.solver = (lambda time: [self.start_position + (time - self.start_time) * self.start_velocity,
+                                     self.start_velocity])
 
 
 class KleinGordonMomentConfig(SolverConfig):
@@ -57,11 +58,12 @@ class KleinGordonMomentConfig(SolverConfig):
         self.moment = (self.alpha * uxx - self.beta * self.start_position)
 
         def solution_at(time):
-            # Careful. Returns a velocity, not a position!
-            return self.start_velocity + self.moment * (time - self.start_time)
+            return [self.start_position,
+                    self.start_velocity + self.moment * (time - self.start_time)]
         self.solver = solution_at
 
 
+# TODO offset configs neither working, finished nor tested
 class OffsetWaveSolverConfig(SolverConfig):
     def __init__(self, intervals, grid_points_list, wave_speed, offset):
         super().__init__(intervals, grid_points_list, pseudospectral_power=2)
@@ -90,7 +92,7 @@ class OffsetWaveSolverConfig(SolverConfig):
             v_hat_ = np.exp(1j * self.japan * (time - self.start_time)) * v_start_
 
             v = ifftn(v_hat_)
-            return (v + np.conj(v)) / 2
+            return [(v + np.conj(v)) / 2]
 
         self.solver = solution_at
 
@@ -113,11 +115,11 @@ class OffsetLinhypSolver(SolverConfig):
 
         self.init_initial_values(t0, u0, u0t)
         v_start = self.start_velocity - (1j / self.japan) * (self.start_velocity * self.c / (self.wave_speed ** 2))
-        v_ascend = 1  # TODO
+        v_ascend = 1  # TODO not correct, solver needs to return derivative as well
 
         def solution_at(time):
             v = v_start + (time - self.start_time) * v_ascend
-            return (v + np.conj(v)) / 2  # TODO refactor to let solver return derivatives of solution at time too! do this here
+            return [(v + np.conj(v)) / 2]
 
         self.solver = solution_at
 
@@ -176,6 +178,7 @@ class WaveSolverConfig(SolverConfig):
             u_hat_ = c1_ * np.cos(self.wave_speed * self.norm2_factors * (time - t0)) \
                      + c2_ * np.sin(self.wave_speed * self.norm2_factors * (time - t0))
 
-            return ifftn(u_hat_)
+            return [ifftn(u_hat_),
+                    self.start_velocity + self.start_momentum() * (time - self.start_time)]
 
         self.solver = solution_at

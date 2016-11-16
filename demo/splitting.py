@@ -74,8 +74,8 @@ trial_6 = Trial(lambda xs: 2 * np.sin(sum(xs)),
     .add_parameters("beta", lambda xs: y_6 ** 2 - y_6,  # y^2 - alpha(y)
                     "alpha", lambda: y_6)
 trial_frog = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
-                lambda xs: 2 * np.exp(-np.cos(sum(xs))),
-                lambda xs, t: np.sin(2 * t) * np.exp(-np.cos(sum(xs)))) \
+                   lambda xs: 2 * np.exp(-np.cos(sum(xs))),
+                   lambda xs, t: np.sin(2 * t) * np.exp(-np.cos(sum(xs)))) \
     .add_parameters("beta", lambda xs: 4 + np.cos(sum(xs)) + np.sin(sum(xs)) ** 2,
                     "alpha", lambda: 1,
                     "frog_only", True)
@@ -93,7 +93,7 @@ trial_frog3 = Trial(lambda xs: np.sin(sum(xs)),
     .add_parameters("beta", lambda xs: 2 + np.sin(sum(xs) + 1),
                     "alpha", lambda: 1 + 0.5 + 3 * 0.5,
                     "frog_only", True)
-trial = trial_frog3
+trial = trial_2
 
 splitting_factories = [make_klein_gordon_lie_trotter_splitting, make_klein_gordon_lie_trotter_reversed_splitting,
                        make_klein_gordon_strang_splitting, make_klein_gordon_strang_reversed_splitting,
@@ -101,7 +101,6 @@ splitting_factories = [make_klein_gordon_lie_trotter_splitting, make_klein_gordo
                        make_klein_gordon_leapfrog_splitting, make_klein_gordon_leapfrog_reversed_splitting]
 if trial.has_parameter("frog_only"):
     splitting_factories = [make_klein_gordon_leapfrog_splitting, make_klein_gordon_leapfrog_reversed_splitting]
-
 
 splittings = [factory(domain, [grid_size_N], start_time, trial.start_position,
                       trial.start_velocity, trial.alpha, trial.beta)
@@ -111,10 +110,9 @@ for splitting in splittings:
     splitting.progress(stop_time, delta_time, save_every_x_solution)
     print(splitting.name, "took", (time.time() - measure_start))
 
-
 ref_splitting = splittings[0]
 ref_splitting_2 = splittings[2] if len(splittings) > 2 else splittings[-1]
-xs = ref_splitting.get_xs()
+result_xs = ref_splitting.get_xs()
 xs_mesh = ref_splitting.get_xs_mesh()
 
 plot_counter = 0
@@ -122,34 +120,34 @@ plot_every_x_solution = ((stop_time - start_time) / delta_time) / plot_solutions
 
 if dimension == 1:
     if do_animate:
-        animate_1d(xs[0], ref_splitting.solutions(), ref_splitting.times(), 1)
+        animate_1d(result_xs[0], ref_splitting.solutions(), ref_splitting.times(), 1)
     else:
         plt.figure()
-        plt.plot(*xs, trial.start_position(xs_mesh), label="Start position")
+        plt.plot(*result_xs, trial.start_position(xs_mesh), label="Start position")
 
-        for (t, solution_0), (_, solution_1), color in zip(ref_splitting.timed_solutions,
-                                                                  ref_splitting_2.timed_solutions,
-                                                                  cycle(['r', 'b', 'g', 'k', 'm', 'c', 'y'])):
+        for (curr_t, solution_0), (_, solution_1), color in zip(ref_splitting.timed_solutions(),
+                                                                ref_splitting_2.timed_solutions(),
+                                                                cycle(['r', 'b', 'g', 'k', 'm', 'c', 'y'])):
             plot_counter += 1
             if plot_counter == plot_every_x_solution:
                 plot_counter = 0
                 # not filled color circles so we can see when strang solution is very close!
-                plt.plot(*xs, solution_0, "o", markeredgecolor=color, markerfacecolor="None",
-                         label="{} solution at {}".format(ref_splitting.name, t))
-                plt.plot(*xs, solution_1, "+", color=color,
-                         label="{} solution at {:.2E}".format(ref_splitting_2.name, t))
+                plt.plot(*result_xs, solution_0, "o", markeredgecolor=color, markerfacecolor="None",
+                         label="{} solution at {}".format(ref_splitting.name, curr_t))
+                plt.plot(*result_xs, solution_1, "+", color=color,
+                         label="{} solution at {:.2E}".format(ref_splitting_2.name, curr_t))
                 if show_reference:
-                    plt.plot(*xs, trial.reference(xs_mesh, t), color=color, label="Reference at {}".format(t))
+                    plt.plot(*result_xs, trial.reference(xs_mesh, curr_t),
+                             color=color, label="Reference at {}".format(curr_t))
         plt.legend()
         plt.title("Splitting methods for Klein Gordon equation, dt={}".format(delta_time))
 elif dimension == 2:
-    animate_2d_surface(xs[0], xs[1], ref_splitting.solutions(), ref_splitting.times(), 100)
+    animate_2d_surface(result_xs[0], result_xs[1], ref_splitting.solutions(), ref_splitting.times(), 100)
 
-if show_errors:
+if show_errors and trial.reference is not None:
     plt.figure()
     for splitting in splittings:
-        errors = [trial.error(xs_mesh, t, y) for t, y in splitting.timed_solutions]
-
+        errors = [trial.error(xs_mesh, t, y) for t, y in splitting.timed_solutions()]
         print("Error of {} splitting at end:{:.2E}".format(splitting.name, errors[-1]))
         plt.plot(splitting.times(), errors, label="Errors of {} in discrete L2 norm".format(splitting.name))
 

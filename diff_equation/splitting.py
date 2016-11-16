@@ -14,88 +14,28 @@ from itertools import cycle, islice
 # using these as starting values finally solve wave equation again to u(t0+dt,x)
 
 
-def get_derivative(start_position, start_velocity, start_momentum, next_position, after_next_position, after2_next_position,
-                   after3_next_positon, prev_position, time_step_size):
-    #TODO clean this up
-    # Use Taylor expansion of the first derivative f'(x)=f'(x-h)+h*f''(x-h)
-    # see https://en.wikipedia.org/wiki/Finite_difference_coefficient for possible coefficients
-    # unstable for dt = 0.01
-    return (start_velocity + time_step_size * start_momentum
-            + (-start_position + 3 * next_position - 3 * after_next_position + 1 * after2_next_position)
-            / (time_step_size * 2)  # same results as M3-
-            )  # + (start_position - 4 * next_position + 6 * after_next_position - 4 * after2_next_position
-               # + after3_next_positon) / (time_step_size * 6))  # doesnt really change anything
-
-    # forward differences of first order to estimate f''(x-h)=(f(x-h)-2f(x)+f(x+h))/(h*h)
-    # best but not optimal performance, but is only of first order, so even strang splitting will be of first order!
-    #return start_velocity + (start_position - 2 * next_position + after_next_position) / time_step_size
-    # the second order estimate produces worse results than the first order. but we want strang to be second order
-
-    # also approximate f'''(x-h) by first order forward differences, M3-, looks pretty good,
-    # I don't understand the -
-    #return (start_velocity + (start_position - 2 * next_position + after_next_position) / time_step_size
-    #        - (-start_position + 3 * next_position - 3 * after_next_position + 1 * after2_next_position)
-    #        / (time_step_size * 2))
-
-    # MM3+, exactly same results as M3-
-    #return (start_velocity + (2 * start_position - 5 * next_position + 4 * after_next_position - 1 * after2_next_position) / time_step_size
-    #        + (-start_position + 3 * next_position - 3 * after_next_position + 1 * after2_next_position)
-    #        / (time_step_size * 2))
-
-    # MMM3+, exactly same results as M3-
-    #return (start_velocity + (35/12 * start_position - 26/3 * next_position + 19/2 * after_next_position
-    #                          -14/3 * after2_next_position + 11/12 * after3_next_positon) / time_step_size
-    #        + (-start_position + 3 * next_position - 3 * after_next_position + 1 * after2_next_position)
-    #        / (time_step_size * 2))
-
-    # MMMM3+, exactly same results as M3-
-    #return (start_velocity + (35/12 * start_position - 26/3 * next_position + 19/2 * after_next_position
-    #                          -14/3 * after2_next_position + 11/12 * after3_next_positon) / time_step_size
-    #        + (-5/2 * start_position + 9 * next_position - 12 * after_next_position + 7 * after2_next_position
-    #           -3/2 * after3_next_positon)
-    #        / (time_step_size * 2))
-
-
-    # forward differences of second order to estimate f''(x-h)=..., unstable for bigger time steps, else first order ok
-    # return start_velocity + (2 * start_position - 5 * next_position + 4 * after_next_position
-    #                         - 1 * after2_next_position) / time_step_size
-
-    # directly using central differences to estimate f'(x) of first order
-    # return (after_next_position - start_position) / (2 * time_step_size)  # bad performance
-
-    # central differences of second order to estimate f''(x-h)=.., good first order, unstable for bigger time step..
-    # return start_velocity + (prev_position - 2 * start_position + next_position) / time_step_size  # good first order
-
-    # directly using forward differences to estimate f'(x) of second order
-    # return (-3/2 * start_position + 2 * next_position - 1/2 * after_next_position) / time_step_size # bad!
-
-
 class Splitting:
     def __init__(self, configs, step_fractions, name, on_end_callback=None):
         self.solver_configs = configs
         self.name = name
         self.solver_step_fractions = step_fractions
-        self.timed_solutions = []
+        self.timed_positions = []
         self.on_end_callback = on_end_callback
         assert len(step_fractions) == len(configs)
 
     @classmethod
     def sub_step(cls, config, time, time_step_size, step_fraction):
-        config.solve([time + 1 * time_step_size * step_fraction,
-                      time + 2 * time_step_size * step_fraction,
-                      time + 3 * time_step_size * step_fraction,
-                      time + 4 * time_step_size * step_fraction,
-                      time - 1 * time_step_size * step_fraction])
+        # TODO can we implicitly make a leapfrog step for every splitting? Does this improve performance?
+        config.solve([time + 1 * time_step_size * step_fraction])
         positions = config.solutions()
         next_position = positions[0]
-        next_velocity = get_derivative(config.start_position, config.start_velocity, config.start_momentum(),
-                                       next_position, positions[1], positions[2], positions[3], positions[4],
-                                       time_step_size * step_fraction)
+        velocities = config.velocities()
+        next_velocity = velocities[0]
         return next_position, next_velocity
 
     def progress(self, end_time, time_step_size, save_solution_step=1):
         # zeroth config is assumed to be properly initialized with starting values and solver
-        assert len(self.solver_configs[0].timed_solutions) == 0  # without any solutions yet
+        assert len(self.solver_configs[0].timed_solutions()) == 0  # without any solutions yet
         save_solution_counter = save_solution_step
         for counter, step_fraction, config, next_config \
                 in zip(cycle(range(len(self.solver_configs))),
@@ -111,7 +51,7 @@ class Splitting:
                 save_solution_counter -= 1
                 if save_solution_counter <= 0:
                     save_solution_counter = save_solution_step
-                    self.timed_solutions.append((time, next_position))
+                    self.timed_positions.append((time, next_position))
             next_config.init_solver(time, next_position, next_velocity)
             if splitting_step_completed and time >= end_time:
                 if self.on_end_callback:
@@ -125,25 +65,13 @@ class Splitting:
         return self.solver_configs[0].xs_mesh
 
     def solutions(self):
-        return [solution for _, solution in self.timed_solutions]
+        return [solution for _, solution in self.timed_positions]
+
+    def timed_solutions(self):
+        return self.timed_positions
 
     def times(self):
-        return [time for time, _ in self.timed_solutions]
-
-
-class LeapfrogSplitting(Splitting):
-
-    @classmethod
-    def sub_step(cls, config, time, time_step_size, step_fraction):
-        config.solve([time + time_step_size * step_fraction])
-        solution = config.solutions()[-1]
-        next_position = solution
-        next_velocity = config.start_velocity
-        if isinstance(config, KleinGordonMomentConfig):
-            # the calculated solution is not a position, but a velocity!
-            next_position = config.start_position
-            next_velocity = solution
-        return next_position, next_velocity
+        return [time for time, _ in self.timed_positions]
 
 
 def make_klein_gordon_lie_trotter_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
@@ -165,7 +93,7 @@ def make_klein_gordon_leapfrog_splitting(intervals, grid_points_list, t0, u0, u0
     velocity_config = VelocityConfig(intervals, grid_points_list)
 
     velocity_config.init_solver(t0, u0, u0t)
-    return LeapfrogSplitting([velocity_config, moment_config, velocity_config], [0.5, 1., 0.5],
+    return Splitting([velocity_config, moment_config, velocity_config], [0.5, 1., 0.5],
                              name="Leapfrog")
 
 
@@ -174,7 +102,7 @@ def make_klein_gordon_leapfrog_reversed_splitting(intervals, grid_points_list, t
     velocity_config = VelocityConfig(intervals, grid_points_list)
 
     moment_config.init_solver(t0, u0, u0t)
-    return LeapfrogSplitting([moment_config, velocity_config, moment_config], [0.5, 1., 0.5],
+    return Splitting([moment_config, velocity_config, moment_config], [0.5, 1., 0.5],
                              name="RLeapfrog")
 
 
@@ -231,7 +159,7 @@ def make_klein_gordon_fast_strang_splitting(intervals, grid_points_list, t0, u0,
     def on_progress_end():
         # do one more half step for wave, discard intermediate solutions
         last_position, _ = Splitting.sub_step(wave_config, wave_config.start_time, time_step_size, 0.5)
-        splitting.timed_solutions = [(wave_config.start_time, last_position)]
+        splitting.timed_positions = [(wave_config.start_time, last_position)]
 
     splitting = Splitting([wave_config, linhyp_config], [1., 1.], name="FStrang", on_end_callback=on_progress_end)
     return splitting

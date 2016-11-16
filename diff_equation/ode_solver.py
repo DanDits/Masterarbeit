@@ -22,7 +22,9 @@ class LinhypSolverConfig(SolverConfig):
         c2 = np.nan_to_num(self.start_velocity / self.beta_sqrt)
 
         def solution_at(time):
-            return c1 * np.cos(self.beta_sqrt * (time - t0)) + c2 * np.sin(self.beta_sqrt * (time - t0))
+            return [c1 * np.cos(self.beta_sqrt * (time - self.start_time))
+                    + c2 * np.sin(self.beta_sqrt * (time - self.start_time)),
+                    self.start_velocity + self.start_momentum() * (time - self.start_time)]
 
         self.solver = solution_at
 

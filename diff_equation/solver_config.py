@@ -16,7 +16,7 @@ class SolverConfig:
         self.start_time = None
         self.solver = None
         self.start_position, self.start_velocity = None, None
-        self.timed_solutions = []
+        self.timed_solved = []
 
     def init_pseudospectral_factors(self, power):
         factors = []
@@ -33,7 +33,7 @@ class SolverConfig:
         return self.pseudospectral_factors_mesh
 
     def init_initial_values(self, start_time, start_position, start_velocity):
-        self.timed_solutions = []
+        self.timed_solved = []
         self.start_time = start_time
         # we accept starting values to be callable functions
         # and evaluate them ourselves, making a promise to only keep them evaluated for easier arithmetic manipulation
@@ -62,10 +62,16 @@ class SolverConfig:
         if self.solver is None:
             raise ValueError("Solver not yet initialized!")
         for time in wanted_times:
-            self.timed_solutions.append((time, self.solver(time)))
+            self.timed_solved.append((time, self.solver(time)))
+
+    def timed_solutions(self):
+        return [(time, solution[0]) for time, solution in self.timed_solved]
 
     def times(self):
-        return [time for time, _ in self.timed_solutions]
+        return [time for time, _ in self.timed_solved]
 
     def solutions(self):
-        return [solution for _, solution in self.timed_solutions]
+        return [solution[0] for _, solution in self.timed_solved]
+
+    def velocities(self):
+        return [solution[1] for _, solution in self.timed_solved]

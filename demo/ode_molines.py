@@ -12,8 +12,8 @@ from util.trial import Trial
 show_errors = True
 plot_references = True  # when not animating, plot in same figure
 do_animate = True
-grid_n = 128  # amount of grid points per dimension
-dimension = 2  # plotting only supported for one or two dimensional
+grid_n = 256  # amount of grid points per dimension
+dimension = 1  # plotting only supported for one or two dimensional
 domain = list(repeat([-pi, pi], dimension))  # intervals with periodic boundary conditions, so a ring in 1d, torus in 2d
 anim_pause = 100  # in ms
 show_times = np.arange(0, 30, anim_pause / 1000)  # times to evaluate solution for and plot it
@@ -49,7 +49,7 @@ linhyp_config.init_solver(0, trial.start_position, trial.start_velocity)
 linhyp_config.solve(show_times)
 
 if show_errors:
-    errors = [trial.error(linhyp_config.xs_mesh, t, y) for t, y in linhyp_config.timed_solutions]
+    errors = [trial.error(linhyp_config.xs_mesh, t, y) for t, y in linhyp_config.timed_solutions()]
     plt.figure()
     plt.plot(linhyp_config.times(), errors, label="Errors in discrete L2 norm")
     plt.xlabel("Time")
@@ -62,7 +62,7 @@ if dimension == 1:
     else:
         # all times in one figure
         plt.figure()
-        for (time, sol), color in zip(linhyp_config.timed_solutions, cycle(['r', 'b', 'g', 'k', 'm', 'c', 'y'])):
+        for (time, sol), color in zip(linhyp_config.timed_solutions(), cycle(['r', 'b', 'g', 'k', 'm', 'c', 'y'])):
             plt.plot(*linhyp_config.xs, sol.real, '.', color=color, label="Solution at time=" + str(time))
             if plot_references:
                 plt.plot(*linhyp_config.xs, trial.reference(linhyp_config.xs_mesh, time), color=color,

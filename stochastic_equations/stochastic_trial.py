@@ -3,10 +3,11 @@ from functools import partial
 from scipy.integrate import nquad
 import operator
 from functools import reduce
+from itertools import product
 import numpy as np
-from scipy.integrate import quad
 
-def prod(factors):
+
+def mul_prod(factors):
     return reduce(operator.mul, factors, 1)
 
 
@@ -47,13 +48,19 @@ class StochasticTrial(Trial):
         self.rvalues = [rvar(distr.generate()) for rvar, distr in zip(self.rvars, self.variable_distributions)]
 
     # TODO does not yet include a dependency on x, this probably needs to be done point wise for each x
-    def calculate_expectancy(self, t, function):
-        def func_in_ys(*ys):
-            transformed_ys = [rvar(value) for rvar, value in zip(self.rvars, ys)]
-            return (function(t, transformed_ys) * prod(distr.weight(y)
-                                                       for y, distr in zip(ys, self.variable_distributions)))
+    def calculate_expectancy(self, xs_lines, t, function):
+        sizes = tuple(map(len, xs_lines))
+        result = np.zeros(shape=sizes)
+        for index, x_coords in zip(product(map(range, sizes)), product(*xs_lines)):
 
-        return nquad(func_in_ys, [distr.support for distr in self.variable_distributions])[0]
+            def func_in_ys(*ys):
+                transformed_ys = [rvar(value) for rvar, value in zip(self.rvars, ys)]
+                return (function(x_coords, t, transformed_ys)  # TODO contains an error still
+                        * mul_prod(distr.weight(y) for y, distr in zip(ys, self.variable_distributions)))
+
+            point_value = nquad(func_in_ys, [distr.support for distr in self.variable_distributions])[0]
+            result[index] = point_value
+        return result
 
     def __getattribute__(self, item):
         if item in ["start_position", "start_velocity", "reference", "alpha", "beta"]:

@@ -14,11 +14,10 @@ domain = list(repeat([-np.pi, np.pi], dimension))
 delta_time = 0.001
 start_time = 0.
 stop_time = 0.5
-simulations_count = 10000
+simulations_count = 1000
 
-start_step_for_order = 100
-order_factor = 10
-steps_for_order_estimate = [start_step_for_order * (order_factor ** i) for i in range(3)]
+order_factor = 2  # the factor of the step number between two consecutive solutions used to estimate order of converg.
+steps_for_order_estimate = [int(simulations_count / (order_factor ** i)) for i in range(3)]
 solutions_for_order_estimate = []
 
 # y[0] > 1
@@ -47,11 +46,7 @@ trial_2_1 = StochasticTrial([distributions.gaussian],
                             lambda xs, t, ys: np.sin(sum(xs)) * np.sin(t / ys[0]) * ys[0],
                             random_variables=[lambda y: 0.2 + 0.7 * np.sin(y) ** 2])
 trial_2_1.add_parameters("beta", lambda xs, ys: 1 / ys[0] ** 2 - 1 / ys[0],  # 1/y^2 - alpha(y)
-                         "alpha", lambda ys: 1 / ys[0],
-                         "expectancy", lambda xs, t: (np.sin(sum(xs))
-                                                      * trial_2_1.calculate_expectancy
-                                                      (t, lambda t_, ys: np.sin(t_ / ys[0]) * ys[0])))
-
+                         "alpha", lambda ys: 1 / ys[0])
 left_3, right_3 = 2.5, 3  # y[0] bigger than 2
 trial_3 = StochasticTrial([distributions.make_uniform(left_3, right_3)],  # y[0] bigger than 2
                           lambda xs, ys: 1 / (np.sin(sum(xs)) + ys[0]),
@@ -72,7 +67,8 @@ trial_4 = StochasticTrial([distributions.gaussian, distributions.make_uniform(0,
     .add_parameters("beta", lambda xs, ys: 2 + np.sin(xs[0] + ys[2]),
                     "alpha", lambda ys: 1 + 0.5 * ys[0] + 3 * ys[1])
 
-trial = trial_3
+# TODO 2d trial and visualization
+trial = trial_2_1
 
 last_solutions_sum = None
 splitting_xs = None
@@ -99,6 +95,8 @@ for i in range(1, simulations_count + 1):
         splitting_xs_mesh = lie_splitting.get_xs_mesh()
         if trial.has_parameter("expectancy"):
             expectancy = trial.expectancy(splitting_xs_mesh, lie_splitting.times()[-1])
+        elif trial.reference is not None:
+            expectancy = trial.calculate_expectancy(splitting_xs, lie_splitting.times()[-1], trial.reference)
         last_solutions_sum = last_solution
     if i % 1000 == 0:
         solution_at_step.append((i, last_solutions_sum / (i + 1)))
@@ -130,10 +128,13 @@ if len(solutions_for_order_estimate) == 3:
     order = np.log((solutions_for_order_estimate[0] - solutions_for_order_estimate[1])
                    / (solutions_for_order_estimate[1] - solutions_for_order_estimate[2])) / np.log(order_factor)
 
+    total_order = np.log(sum(1. / order_factor ** (order * 2)) / order.size) / (np.log(1 / order_factor) * 2)
+    print("Estimated convergence rate:", total_order.real)
     plt.figure()
-    plt.title("Monte Carlo convergence rate to expectancy, dt={}, N={}".format(delta_time, grid_size_N))
+    plt.title("Monte Carlo convergence rate to expectancy={:.2E}, dt={}, N={}"
+              .format(total_order.real, delta_time, grid_size_N))
     plt.plot(*splitting_xs, order, label="Point wise estimated convergence rate")
-    plt.savefig("/home/daniel/PycharmProjects/Masterarbeit/images/mc_convergence_trial4.png")
+    #plt.savefig("/home/daniel/PycharmProjects/Masterarbeit/images/mc_convergence_trial4.png")
     plt.legend()
 
 plt.show()

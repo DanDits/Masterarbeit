@@ -89,7 +89,7 @@ if trial.has_parameter("do_animate"):
 wave_config.solve(show_times)
 
 if show_errors and has_reference(trial, dimension):
-    errors = [error_l2(y, reference(trial, wave_config.xs_mesh, t)) for t, y in wave_config.timed_solutions]
+    errors = [error_l2(y, reference(trial, wave_config.xs_mesh, t)) for t, y in wave_config.timed_solutions()]
     plt.figure()
     plt.plot(wave_config.times(), errors, label="Errors in discrete L2 norm")
     plt.xlabel("Time")
@@ -101,7 +101,7 @@ if dimension == 1:
     else:
         # all times in one figure
         plt.figure()
-        for (time, sol), color in zip(wave_config.timed_solutions, cycle(['r', 'b', 'g', 'k', 'm', 'c', 'y'])):
+        for (time, sol), color in zip(wave_config.timed_solutions(), cycle(['r', 'b', 'g', 'k', 'm', 'c', 'y'])):
             plt.plot(*wave_config.xs, sol.real, '.', color=color, label="Solution at time=" + str(time))
             if plot_references:
                 plt.plot(*wave_config.xs, reference(trial, wave_config.xs_mesh, time), color=color,
