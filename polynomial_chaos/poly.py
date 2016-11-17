@@ -60,6 +60,7 @@ def _poly_basis_recursive(polys_start_coeff, recursive_poly_functions):
 
     @lru_cache(maxsize=None)
     def poly(n):
+        print("N=", n)
         coeff = poly_coeff(n)
         return lambda x: npoly.polyval(x, coeff)
     return poly

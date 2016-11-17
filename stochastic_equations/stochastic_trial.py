@@ -44,6 +44,16 @@ class StochasticTrial(Trial):
         assert len(self.rvars) == len(self.variable_distributions)
         self.randomize()
 
+    def set_random_values(self, values):
+        """
+        Allows to overwrite the randomized values by a list of given values. If these values are correct and meaningful
+        for the trial's distributions is not validated.
+        :param values: A list of values for each random value corresponding to a distribution.
+        :return: None
+        """
+        assert len(values) == len(self.rvalues)
+        self.rvalues = values
+
     def randomize(self):
         """
         Re randomizes the list of random variables by generating new values of the given distributions.
