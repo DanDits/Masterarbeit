@@ -15,17 +15,17 @@ from diff_equation.splitting import make_klein_gordon_lie_trotter_splitting, mak
     make_klein_gordon_leapfrog_reversed_splitting, make_klein_gordon_strang_offset_reversed_splitting
 from util.trial import Trial
 
-dimension = 1
+dimension = 2
 grid_size_N = 128 if dimension >= 2 else 512
 domain = list(repeat([-pi, pi], dimension))
-delta_time = 0.001
+delta_time = 0.01
 save_every_x_solution = 1
 plot_solutions_count = 5
 start_time = 0.
-stop_time = 1
+stop_time = 10
 show_errors = True
 show_reference = True
-do_animate = False
+do_animate = True
 
 param_g1 = 7  # some parameter greater than one
 alpha_1 = 2  # smaller than param_g1 ** 2 / dimension to ensure beta>0
@@ -95,11 +95,16 @@ trial_frog2 = Trial(lambda xs: 1 / (np.sin(sum(xs)) + y_frog_2),
                     "offset", 0.2)
 trial_frog3 = Trial(lambda xs: np.sin(sum(xs)),
                     lambda xs: np.sin(sum(xs)) ** 2) \
-    .add_parameters("beta", lambda xs: 2 + np.sin(sum(xs) + 1),
+    .add_parameters("beta", lambda xs: 2 + np.sin(np.sqrt(sum(x ** 2 for x in xs)) + 1),
                     "alpha", lambda: 1 + 0.5 + 3 * 0.5,
                     "frog_only", True,
                     "offset", 1)
-trial = trial_frog2
+trial_frog4 = Trial(lambda xs: np.sin(sum(xs)),
+                    lambda xs: np.zeros(shape=sum(xs).shape)) \
+    .add_parameters("beta", lambda xs: np.where(xs[0] > 0, np.zeros(shape=xs[0].shape), 10),
+                    "alpha", lambda: 0.7,
+                    "frog_only", True)
+trial = trial_frog3
 
 
 offset_wave_solver = None
@@ -159,7 +164,7 @@ if dimension == 1:
                     plt.plot(*result_xs, offset_wave_solver.solutions()[-1], ".", color=color,
                              label="OW solution at {:.2E}".format(offset_wave_solver.times()[-1]))
 
-                if show_reference:
+                if show_reference and trial.reference is not None:
                     plt.plot(*result_xs, trial.reference(xs_mesh, curr_t),
                              color=color, label="Reference at {}".format(curr_t))
         plt.legend()

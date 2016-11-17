@@ -9,14 +9,14 @@ from scipy.integrate import quad
 from util.analysis import error_l2
 from util.animate import animate_2d_surface
 
-dimension = 2
+dimension = 1
 grid_size_N = 128 if dimension >= 2 else 512
 do_calculate_expectancy = True  # dimension == 1  # for 128*128 in dim=2 already takes about 30s
 domain = list(repeat([-np.pi, np.pi], dimension))
 delta_time = 0.001
 start_time = 0.
 stop_time = 0.5
-simulations_count = 200
+simulations_count = 10000
 
 order_factor = 2  # the factor of the step number between two consecutive solutions used to estimate order of converg.
 steps_for_order_estimate = [int(simulations_count / (order_factor ** i)) for i in range(3)]
@@ -29,8 +29,11 @@ trial_1 = StochasticTrial([distributions.make_uniform(2, 3)],
                           lambda xs, t, ys: np.sin(sum(xs) + t * ys[0]) + np.sin(sum(xs) - t * ys[0])) \
     .add_parameters("beta", lambda xs, ys: ys[0] ** 2 - ys[0],  # y^2 - alpha(y)
                     "alpha", lambda ys: ys[0],
+                    # at t=0.5: 0.624096 sin(x)
                     "expectancy", lambda xs, t: 1 / t * (np.cos(sum(xs) - 3 * t) - np.cos(sum(xs) + 3 * t)
-                                                         + np.cos(sum(xs) + 2 * t) - np.cos(sum(xs) - 2 * t)))
+                                                         + np.cos(sum(xs) + 2 * t) - np.cos(sum(xs) - 2 * t)),
+                    # at t=0.5: 0.630645 sin(x), the solution evaluated at the expectancy of y[0]
+                    "orientation_func", lambda xs, t: np.sin(sum(xs) + t * 2.5) + np.sin(sum(xs) - t * 2.5))
 # y[0] in (0,1), if smaller, the time step size needs to be smaller as well
 left_2, right_2 = 0.25, 0.75
 trial_2 = StochasticTrial([distributions.make_uniform(left_2, right_2)],
@@ -70,7 +73,7 @@ trial_4 = StochasticTrial([distributions.gaussian, distributions.make_uniform(0,
                     "alpha", lambda ys: 1 + 0.5 * ys[0] + 3 * ys[1])
 
 
-trial = trial_2_1
+trial = trial_1
 
 last_solutions_sum = None
 splitting_xs = None
@@ -100,7 +103,7 @@ for i in range(1, simulations_count + 1):
         elif trial.raw_reference is not None and do_calculate_expectancy:
             expectancy = trial.calculate_expectancy(splitting_xs, splitting.times()[-1], trial.raw_reference)
         last_solutions_sum = last_solution
-    if i % 1 == 0:
+    if i % 2000 == 0:
         solution_at_step.append((i, last_solutions_sum / i))
     if i in steps_for_order_estimate:
         solutions_for_order_estimate.append(last_solutions_sum / i)
@@ -112,12 +115,13 @@ solution_at_step.append((simulations_count, last_solutions_sum))
 if dimension == 1:
     plt.figure()
     plt.title("Solutions at time={}, dt={}".format(stop_time, delta_time))
+    if trial.has_parameter("orientation_func"):
+        plt.plot(*splitting_xs, trial.orientation_func(splitting_xs_mesh, stop_time), 'o', label="...for orientation")
     if expectancy is not None:
         plt.plot(*splitting_xs, expectancy, label="Expectancy")
     for step, solution in solution_at_step:
         plt.plot(*splitting_xs, solution, label="Mean with N={}".format(step))
     plt.legend()
-    #plt.savefig("/home/daniel/PycharmProjects/Masterarbeit/images/mc_plots_trial4.png")
 elif dimension == 2:
     animate_2d_surface(splitting_xs[0], splitting_xs[1], [sol for _, sol in solution_at_step],
                        [step for step, sol in solution_at_step], 100)
@@ -142,7 +146,6 @@ if len(solutions_for_order_estimate) == 3:
         plt.title("Monte Carlo convergence rate to expectancy={:.2E}, dt={}, N={}"
                   .format(total_order.real, delta_time, grid_size_N))
         plt.plot(*splitting_xs, order, label="Point wise estimated convergence rate")
-        #plt.savefig("/home/daniel/PycharmProjects/Masterarbeit/images/mc_convergence_trial4.png")
         plt.legend()
 
         plt.show()

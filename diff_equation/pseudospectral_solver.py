@@ -95,7 +95,7 @@ class OffsetWaveSolverConfig(SolverConfig):
             v = ifftn(v_hat_)
             u = v.real
             return [u,
-                    ifftn(1j * self.japan / self.magic * (v_hat_ - fftn(u)))]  # untested if velocity is correct
+                    ifftn(1j * self.japan / self.magic * (v_hat_ - fftn(u)))]
 
         self.solver = solution_at
 

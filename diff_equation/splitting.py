@@ -31,7 +31,7 @@ class Splitting:
         next_position = config.solutions()[0]
         next_velocity = config.velocities()[0]
 
-        return next_position, next_velocity # 2e-8, 3e-7
+        return next_position, next_velocity
 
     def progress(self, end_time, time_step_size, save_solution_step=1):
         # zeroth config is assumed to be properly initialized with starting values and solver
@@ -103,7 +103,7 @@ def make_klein_gordon_leapfrog_splitting(intervals, grid_points_list, t0, u0, u0
 
     velocity_config.init_solver(t0, u0, u0t)
     return Splitting([velocity_config, moment_config, velocity_config], [0.5, 1., 0.5],
-                             name="Leapfrog")
+                     name="Leapfrog")
 
 
 def make_klein_gordon_leapfrog_reversed_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
@@ -112,7 +112,7 @@ def make_klein_gordon_leapfrog_reversed_splitting(intervals, grid_points_list, t
 
     moment_config.init_solver(t0, u0, u0t)
     return Splitting([moment_config, velocity_config, moment_config], [0.5, 1., 0.5],
-                             name="RLeapfrog")
+                     name="RLeapfrog")
 
 
 def make_klein_gordon_lie_trotter_reversed_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
