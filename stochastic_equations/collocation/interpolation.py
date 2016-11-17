@@ -13,12 +13,15 @@ from polynomial_chaos.poly_chaos_distributions import legendreChaos
 from stochastic_equations.stochastic_trial import StochasticTrial
 from numpy.linalg import lstsq
 
+from util.analysis import error_l2
+
 
 def glenshaw_curtis_nodes(size):
-    return -np.cos(np.pi * ((np.array(range(1, size - 1)) - 1) / (size - 1)))
+    size += 2  # as we do not want first and last point which would be -1 and 1
+    return -np.cos(np.pi * ((np.array(range(2, size)) - 1) / (size - 1)))
 
 
-left_3, right_3 = 2.5, 3  # y[0] bigger than 2
+left_3, right_3 = 2.5, 10  # y[0] bigger than 2
 trial = StochasticTrial([distributions.make_uniform(-1, 1)],  # y[0] bigger than 2 enforced by random variable
                         lambda xs, ys: 1 / (np.sin(sum(xs)) + ys[0]),
                         lambda xs, ys: np.zeros(shape=sum(xs).shape),
@@ -34,7 +37,7 @@ trial = StochasticTrial([distributions.make_uniform(-1, 1)],  # y[0] bigger than
                                                    - np.log(np.sin(sum(xs)) + left_3)))
 
 N = 5  # maximum degree of the polynomial, so N+1 polynomials
-M = 6  # number of nodes in random space, >= N+1
+M = N + 1  # number of nodes in random space, >= N+1
 spatial_dimension = 1
 grid_size = 128
 spatial_domain = list(repeat([-np.pi, np.pi], spatial_dimension))
@@ -59,10 +62,9 @@ for node in nodes:
     if splitting_xs is None:
         splitting_xs = splitting.get_xs()
         splitting_xs_mesh = splitting.get_xs_mesh()
-    solution_at_nodes.append(splitting.solutions()[-1])
+    solution_at_nodes.append(splitting.solutions()[-1].real)
 
 rhs_u = np.array(solution_at_nodes)
-
 
 vandermonde_A = []
 for node in nodes:
@@ -74,7 +76,9 @@ vandermonde_A = np.array(vandermonde_A)
 
 # computes the weights which are the factors for representing the random solution by the given basis polynomials
 # each column corresponds to the the factors of a spatial grid point
-weights = lstsq(vandermonde_A, rhs_u)
+
+
+weights = lstsq(vandermonde_A, rhs_u)[0]
 
 
 def poly_approximation(y):
@@ -83,11 +87,17 @@ def poly_approximation(y):
 
 
 def expectancy():
-    return weights[0, :] * chaos.normalization_gamma(0)
+    return weights[0, :]  # * chaos.normalization_gamma(0)  # TODO why no need to multiply?
 
-
+# TODO try plotting error in dependence of N (and M?), seems to rise again if N gets too big
+# TODO try other choice of random grid points
+# TODO try other distributions
+print("Plotting:")
 plt.figure()
-plt.plot(splitting_xs[0], expectancy(), "o", label="Expectancy by interpolation")
-plt.plot(splitting_xs[0], trial.expectancy(splitting_xs_mesh, stop_time), "x", label="Expectancy of trial")
+plt.title("Expectancies for degree={}, random grid size={}, spatial grid size={}".format(N, M, grid_size))
+plt.plot(splitting_xs[0], expectancy(), ".", label="Expectancy by interpolation")
+trial_expectancy = trial.expectancy(splitting_xs_mesh, stop_time)
+print("Error:", error_l2(trial_expectancy, expectancy()))
+plt.plot(splitting_xs[0], trial_expectancy, label="Exact expectancy")
 plt.legend()
 plt.show()

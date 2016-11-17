@@ -50,10 +50,12 @@ trial_2_1 = StochasticTrial([distributions.gaussian],
 trial_2_1.add_parameters("beta", lambda xs, ys: 1 / ys[0] ** 2 - 1 / ys[0],  # 1/y^2 - alpha(y)
                          "alpha", lambda ys: 1 / ys[0])
 left_3, right_3 = 2.5, 3  # y[0] bigger than 2
-trial_3 = StochasticTrial([distributions.make_uniform(left_3, right_3)],  # y[0] bigger than 2
-                          lambda xs, ys: 1 / (np.sin(sum(xs)) + ys[0]),
-                          lambda xs, ys: np.zeros(shape=sum(xs).shape),
-                          lambda xs, t, ys: np.cos(t) / (np.sin(sum(xs)) + ys[0])) \
+trial_3 = StochasticTrial([distributions.make_uniform(-1, 1)],  # y[0] bigger than 2 enforced by random variable
+                        lambda xs, ys: 1 / (np.sin(sum(xs)) + ys[0]),
+                        lambda xs, ys: np.zeros(shape=sum(xs).shape),
+                        lambda xs, t, ys: np.cos(t) / (np.sin(sum(xs)) + ys[0]),
+                        # from U(-1,1) to U(left_3, right_3)
+                        random_variables=[lambda y: (right_3 - left_3) / 2 * (y + 1) + left_3]) \
     .add_parameters("beta", lambda xs, ys: 1 + (ys[0] - 2) * (np.sin(sum(xs)) / (np.sin(sum(xs)) + ys[0])
                                                               + 2 * np.cos(sum(xs)) ** 2
                                                               / (np.sin(sum(xs)) + ys[0]) ** 2),
@@ -69,7 +71,7 @@ trial_4 = StochasticTrial([distributions.gaussian, distributions.make_uniform(0,
     .add_parameters("beta", lambda xs, ys: 2 + np.sin(xs[0] + ys[2]),
                     "alpha", lambda ys: 1 + 0.5 * ys[0] + 3 * ys[1])
 
-trial = trial_4
+trial = trial_3
 
 splitting_xs, splitting_xs_mesh, expectancy, errors, solutions, solutions_for_order_estimate = \
     simulate(trial, simulations_count, [simulations_count // 3, simulations_count // 2, simulations_count],

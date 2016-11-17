@@ -49,7 +49,8 @@ class Splitting:
             if splitting_step_completed:
                 time += time_step_size  # when one splitting step is complete, progress time (for book keeping)
                 save_solution_counter -= 1
-                if save_solution_counter == 0:
+                if save_solution_counter == 0 or time >= end_time:
+                    # either if we want to save or if its the last solution anyways: save it
                     save_solution_counter = save_solution_step
                     self.timed_positions.append((time, next_position))
             next_config.init_solver(time, next_position, next_velocity)

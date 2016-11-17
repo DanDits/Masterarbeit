@@ -60,7 +60,6 @@ def _poly_basis_recursive(polys_start_coeff, recursive_poly_functions):
 
     @lru_cache(maxsize=None)
     def poly(n):
-        print("N=", n)
         coeff = poly_coeff(n)
         return lambda x: npoly.polyval(x, coeff)
     return poly
@@ -83,5 +82,5 @@ def hermite_basis():
 # Legendre polynomials, interval assumed to be [-1,1], recursion p_n(x)=x(2n-1)/n * p_(n-1)(x)-(n-1)/n*p_(n-2)(x)
 def legendre_basis():
     return _poly_basis_recursive([array([1.]), array([0., 1.])],  # starting values
-                                 [(0, lambda n, c: (2. * n - 1) / n * npoly.polymulx(c),
-                                  (1, lambda n, c: (1. - n) / n))])
+                                 [(0, lambda n, c: (2. * n - 1) / n * npoly.polymulx(c)),
+                                  (1, lambda n, c: (1. - n) / n)])
