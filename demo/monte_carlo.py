@@ -1,12 +1,10 @@
-import random
 import numpy as np
 from stochastic_equations.stochastic_trial import StochasticTrial
 from polynomial_chaos import distributions
-from diff_equation.splitting import make_klein_gordon_leapfrog_splitting
+from stochastic_equations.sampling.monte_carlo import simulate
 from itertools import repeat
 import matplotlib.pyplot as plt
 from scipy.integrate import quad
-from util.analysis import error_l2
 from util.animate import animate_2d_surface
 
 dimension = 1
@@ -16,11 +14,10 @@ domain = list(repeat([-np.pi, np.pi], dimension))
 delta_time = 0.001
 start_time = 0.
 stop_time = 0.5
-simulations_count = 10000
+simulations_count = 300
 
-order_factor = 2  # the factor of the step number between two consecutive solutions used to estimate order of converg.
-steps_for_order_estimate = [int(simulations_count / (order_factor ** i)) for i in range(3)]
-solutions_for_order_estimate = []
+# the factor of the step number between two consecutive solutions used to estimate order of convergence
+order_factor = 2  # >=2, integer
 
 # y[0] > 1
 trial_1 = StochasticTrial([distributions.make_uniform(2, 3)],
@@ -72,45 +69,13 @@ trial_4 = StochasticTrial([distributions.gaussian, distributions.make_uniform(0,
     .add_parameters("beta", lambda xs, ys: 2 + np.sin(xs[0] + ys[2]),
                     "alpha", lambda ys: 1 + 0.5 * ys[0] + 3 * ys[1])
 
+trial = trial_4
 
-trial = trial_1
-
-last_solutions_sum = None
-splitting_xs = None
-splitting_xs_mesh = None
-expectancy = None
-errors = []
-solution_at_step = []
-random.seed(1)
-for i in range(1, simulations_count + 1):
-    if i % 100 == 0:
-        print("Simulation", i)  # about 7s for 100 simulations with leapfrog (1min with lie trotter), 512, 0.001, [0,.5]
-    trial.randomize()
-
-    splitting = make_klein_gordon_leapfrog_splitting(domain, [grid_size_N], start_time, trial.start_position,
-                                                     trial.start_velocity, trial.alpha,
-                                                     trial.beta)
-    splitting.progress(stop_time, delta_time)
-
-    last_solution = splitting.solutions()[-1]
-    if last_solutions_sum is not None:
-        last_solutions_sum += last_solution
-    else:
-        splitting_xs = splitting.get_xs()
-        splitting_xs_mesh = splitting.get_xs_mesh()
-        if trial.has_parameter("expectancy"):
-            expectancy = trial.expectancy(splitting_xs_mesh, splitting.times()[-1])
-        elif trial.raw_reference is not None and do_calculate_expectancy:
-            expectancy = trial.calculate_expectancy(splitting_xs, splitting.times()[-1], trial.raw_reference)
-        last_solutions_sum = last_solution
-    if i % 2000 == 0:
-        solution_at_step.append((i, last_solutions_sum / i))
-    if i in steps_for_order_estimate:
-        solutions_for_order_estimate.append(last_solutions_sum / i)
-    if expectancy is not None:
-        errors.append(error_l2(expectancy, last_solutions_sum / i))
-last_solutions_sum *= 1 / simulations_count
-solution_at_step.append((simulations_count, last_solutions_sum))
+splitting_xs, splitting_xs_mesh, expectancy, errors, solutions, solutions_for_order_estimate = \
+    simulate(trial, simulations_count, [simulations_count // 3, simulations_count // 2, simulations_count],
+             domain, grid_size_N, start_time,
+             stop_time, delta_time,
+             do_calculate_expectancy=do_calculate_expectancy, order_factor=order_factor)
 
 if dimension == 1:
     plt.figure()
@@ -119,12 +84,12 @@ if dimension == 1:
         plt.plot(*splitting_xs, trial.orientation_func(splitting_xs_mesh, stop_time), 'o', label="...for orientation")
     if expectancy is not None:
         plt.plot(*splitting_xs, expectancy, label="Expectancy")
-    for step, solution in solution_at_step:
+    for step, solution in solutions:
         plt.plot(*splitting_xs, solution, label="Mean with N={}".format(step))
     plt.legend()
 elif dimension == 2:
-    animate_2d_surface(splitting_xs[0], splitting_xs[1], [sol for _, sol in solution_at_step],
-                       [step for step, sol in solution_at_step], 100)
+    animate_2d_surface(splitting_xs[0], splitting_xs[1], [sol for _, sol in solutions],
+                       [step for step, sol in solutions], 100)
 
 if len(errors) > 0:
     plt.figure()
@@ -149,4 +114,3 @@ if len(solutions_for_order_estimate) == 3:
         plt.legend()
 
         plt.show()
-
