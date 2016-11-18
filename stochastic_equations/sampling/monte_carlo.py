@@ -39,9 +39,9 @@ def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
             summed_solutions += solution
         else:
             summed_solutions = solution
-        if stochastic_trial.has_parameter("expectancy"):
+        if expectancy is None and stochastic_trial.has_parameter("expectancy"):
             expectancy = stochastic_trial.expectancy(xs_mesh, eval_time)
-        elif stochastic_trial.raw_reference is not None and do_calculate_expectancy:
+        elif expectancy is None and stochastic_trial.raw_reference is not None and do_calculate_expectancy:
             expectancy = stochastic_trial.calculate_expectancy(xs, eval_time,
                                                                stochastic_trial.raw_reference)
         if i in keep_solutions_at_steps:

@@ -71,7 +71,7 @@ trial_4 = StochasticTrial([distributions.gaussian, distributions.make_uniform(0,
     .add_parameters("beta", lambda xs, ys: 2 + np.sin(xs[0] + ys[2]),
                     "alpha", lambda ys: 1 + 0.5 * ys[0] + 3 * ys[1])
 
-trial = trial_3
+trial = trial_2
 
 splitting_xs, splitting_xs_mesh, expectancy, errors, solutions, solutions_for_order_estimate = \
     simulate(trial, simulations_count, [simulations_count // 3, simulations_count // 2, simulations_count],
@@ -102,7 +102,7 @@ if len(errors) > 0:
     plt.yscale('log')
     plt.show()
 
-if len(solutions_for_order_estimate) == 3:
+if len(solutions_for_order_estimate) == 3 and expectancy is None:
     order = np.log((solutions_for_order_estimate[0] - solutions_for_order_estimate[1])
                    / (solutions_for_order_estimate[1] - solutions_for_order_estimate[2])) / np.log(order_factor)
 

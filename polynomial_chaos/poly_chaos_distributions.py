@@ -1,7 +1,7 @@
 import math
 import polynomial_chaos.poly as poly
 import polynomial_chaos.distributions as distr
-
+from functools import lru_cache
 chaos = []
 
 
@@ -12,6 +12,11 @@ class PolyChaosDistribution:
         self.distribution = distribution
         self.normalization_gamma = normalization_gamma
         chaos.append(self)
+
+    @lru_cache(maxsize=None)
+    def normalized_basis(self, degree):
+        print("Normalization for degree", degree, "is", math.sqrt(self.normalization_gamma(degree)))
+        return lambda x: (self.poly_basis(degree)(x) / math.sqrt(self.normalization_gamma(degree)))
 
 hermiteChaos = PolyChaosDistribution("Hermite", poly.hermite_basis(),
                                      distr.gaussian, lambda n: math.factorial(n))

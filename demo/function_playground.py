@@ -1,19 +1,34 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy.fft import fftn, ifftn
+import polynomial_chaos.poly as poly
+import polynomial_chaos.poly_chaos_distributions as ch
 
-n = 100
-x = np.linspace(-np.pi, np.pi, endpoint=False, num=n)
+chaos = ch.hermiteChaos
+basis = chaos.normalized_basis
 
+def ref_poly(degree, values):
+    if degree == 0:
+        return np.ones(shape=values.shape)
+    elif degree == 1:
+        return values
+    elif degree == 2:
+        return (values ** 2 - 1) / np.sqrt(2)
+    elif degree == 3:
+        return values ** 3 - 3 * values
 
-def function(t):
-    return np.sqrt(1 / t)
+def ref_poly2(degree, values):
+    if degree == 0:
+        return np.ones(shape=values.shape)
+    elif degree == 1:
+        return values
+    elif degree == 2:
+        return 1.5 * values ** 2 - 0.5
 
-
-def function2(var1):
-    return np.cos(var1)
-
-y = function(np.linspace(1, n, num=n))
-plt.plot(range(n), y)
-plt.yscale('log')
+x = np.arange(-2, 2, 0.01)
+for i in range(0, 3):
+    plt.plot(x, np.vectorize(basis(i))(x), label="i={}".format(i))
+    plt.plot(x, ref_poly(i, x), ".", label="ref i={}".format(i))
+plt.legend()
+plt.ylim((-2, 2))
 plt.show()
