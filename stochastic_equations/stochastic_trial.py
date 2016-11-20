@@ -27,8 +27,8 @@ class StochasticTrial(Trial):
     """
 
     def __init__(self, variable_distributions, start_position, start_velocity, reference=None,
-                 random_variables=None):
-        super().__init__(start_position, start_velocity, reference)
+                 random_variables=None, name=None):
+        super().__init__(start_position, start_velocity, reference, name=name)
         self.raw_reference = reference
         self.variable_distributions = variable_distributions
         self.rvalues = None

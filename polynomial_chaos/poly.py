@@ -76,11 +76,11 @@ def _polymulx(n, coeff):
 def hermite_basis():
     return _poly_basis_recursive([array([1.]), array([0., 1.])],  # starting values
                                  [(0, _polymulx),
-                                  (1, lambda n, c: npoly.polymul(c, array([1. - n])))])
+                                  (1, lambda n, c: c * (1. - n))])
 
 
 # Legendre polynomials, interval assumed to be [-1,1], recursion p_n(x)=x(2n-1)/n * p_(n-1)(x)-(n-1)/n*p_(n-2)(x)
 def legendre_basis():
     return _poly_basis_recursive([array([1.]), array([0., 1.])],  # starting values
                                  [(0, lambda n, c: (2. * n - 1) / n * npoly.polymulx(c)),
-                                  (1, lambda n, c: (1. - n) / n)])
+                                  (1, lambda n, c: (1. - n) / n * c)])

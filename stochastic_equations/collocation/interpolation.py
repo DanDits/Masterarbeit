@@ -5,7 +5,6 @@ import numpy as np
 from diff_equation.splitting import make_klein_gordon_leapfrog_splitting
 from polynomial_chaos.poly_chaos_distributions import legendreChaos, hermiteChaos
 from numpy.linalg import lstsq
-from polynomial_chaos.distributions import inverse_gaussian
 
 # TODO try interpolation approach by quadrature formula, so find good weights and nodes for gauss quadrature in 1d
 
@@ -17,18 +16,18 @@ def glenshaw_curtis_nodes(size):
 def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count, spatial_domain, grid_size,
                          start_time, stop_time, delta_time):
     if trial.variable_distributions[0].name == "Gaussian":
-        #uniform_simple = np.linspace(1. / (random_space_nodes_count + 1), 1,
-        #                             endpoint=False, num=random_space_nodes_count)
-        #nodes = np.vectorize(inverse_gaussian)(uniform_simple)
+        nodes = glenshaw_curtis_nodes(random_space_nodes_count)
+        # nodes = np.linspace(-1 / random_space_nodes_count, 1, endpoint=False, num=random_space_nodes_count)  # bad
+        nodes /= 1 - nodes ** 2  # variable transformation of the nodes in (-1, 1) to interval (-Inf, Inf)
         chaos = hermiteChaos
-    else:
+    elif trial.variable_distributions[0].name == "Uniform":
+        # belongs to uniform distribution in [-1,1] (-> for easy evaluation of expectancy,...)
+        nodes = glenshaw_curtis_nodes(random_space_nodes_count)  # in (-1,1)
         chaos = legendreChaos
-    # TODO hermite chaos seems to bring worse results even for gaussian distributions?
-    chaos = legendreChaos  # belongs to uniform distribution in [-1,1] (-> for easy evaluation of expectancy,...)
-    nodes = glenshaw_curtis_nodes(random_space_nodes_count)  # in [-1,1]
-    print("Distr:", trial.variable_distributions[0].name,
-          "Polynomials:", chaos.poly_name, ", Nodes:", nodes)
+    else:
+        raise ValueError("Not supported distribution:", trial.variable_distributions[0].name)
     basis = [chaos.normalized_basis(degree) for degree in range(max_poly_degree + 1)]
+
     # for each node in random space calculate solution u(t,x) in discrete grid at some time T
 
     # use matrix inversion method to calculate polynomial approximation to random solution u
@@ -65,10 +64,8 @@ def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count
         vectorized_basis = np.array([_basis_poly(y) for _basis_poly in basis])
         return np.transpose(weights).dot(vectorized_basis)
 
-    expectancy = np.reshape(weights[0, :], (grid_size,)) / np.sqrt(chaos.normalization_gamma(0))
-    #expectancy = np.zeros((grid_size,))
-    #for i in range(max_poly_degree):
-    #    expectancy += np.reshape(weights[i, :], (grid_size,)) / np.sqrt(chaos.normalization_gamma(i))
+    # E[w_N]=sum_0^N(weight_k*E[phi_k])=weight_0*E[1*phi_0]=weight_0*E[phi_0*phi_0]*sqrt(gamma_0)=weight_0*sqrt(gamma_0)
+    expectancy = np.reshape(weights[0, :], (grid_size,)) * np.sqrt(chaos.normalization_gamma(0))
 
     return splitting_xs, splitting_xs_mesh, expectancy
 

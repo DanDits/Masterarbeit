@@ -2,6 +2,7 @@ import math
 import polynomial_chaos.poly as poly
 import polynomial_chaos.distributions as distr
 from functools import lru_cache
+
 chaos = []
 
 
@@ -15,13 +16,16 @@ class PolyChaosDistribution:
 
     @lru_cache(maxsize=None)
     def normalized_basis(self, degree):
-        print("Normalization for degree", degree, "is", math.sqrt(self.normalization_gamma(degree)))
         return lambda x: (self.poly_basis(degree)(x) / math.sqrt(self.normalization_gamma(degree)))
+
 
 hermiteChaos = PolyChaosDistribution("Hermite", poly.hermite_basis(),
                                      distr.gaussian, lambda n: math.factorial(n))
 legendreChaos = PolyChaosDistribution("Legendre", poly.legendre_basis(),
-                                      distr.make_uniform(-1, 1), lambda n: 2 / (2 * n + 1))
+                                      distr.make_uniform(-1, 1),
+                                      # this is reduced by factor 1/2 as 1/2 is the density function of the distribution
+                                      lambda n: 1 / (2 * n + 1))
+
 
 # Other chaos pairs, not implemented:
 # ("Gamma", "Laguerre", [0, math.inf]),
@@ -44,4 +48,3 @@ def get_chaos_by_distribution(distribution_name):
         if curr.distribution.name == distribution_name:
             return curr
     raise ValueError("No polynomial chaos distribution for distribution name", distribution_name)
-

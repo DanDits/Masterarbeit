@@ -15,7 +15,7 @@ from diff_equation.splitting import make_klein_gordon_lie_trotter_splitting, mak
     make_klein_gordon_leapfrog_reversed_splitting, make_klein_gordon_strang_offset_reversed_splitting
 from util.trial import Trial
 
-dimension = 2
+dimension = 1
 grid_size_N = 128 if dimension >= 2 else 512
 domain = list(repeat([-pi, pi], dimension))
 delta_time = 0.01
@@ -99,12 +99,13 @@ trial_frog3 = Trial(lambda xs: np.sin(sum(xs)),
                     "alpha", lambda: 1 + 0.5 + 3 * 0.5,
                     "frog_only", True,
                     "offset", 1)
+# requires small step size and 1d!
 trial_frog4 = Trial(lambda xs: np.sin(sum(xs)),
                     lambda xs: np.zeros(shape=sum(xs).shape)) \
-    .add_parameters("beta", lambda xs: np.where(xs[0] > 0, np.zeros(shape=xs[0].shape), 10),
+    .add_parameters("beta", lambda xs: np.where(xs[0] > 0, xs[0], 10),
                     "alpha", lambda: 0.7,
                     "frog_only", True)
-trial = trial_frog3
+trial = trial_4
 
 
 offset_wave_solver = None

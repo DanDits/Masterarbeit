@@ -5,6 +5,8 @@ from stochastic_equations.sampling.monte_carlo import simulate
 from itertools import repeat
 import matplotlib.pyplot as plt
 from scipy.integrate import quad
+
+from util.analysis import error_l2
 from util.animate import animate_2d_surface
 
 dimension = 1
@@ -14,16 +16,17 @@ domain = list(repeat([-np.pi, np.pi], dimension))
 delta_time = 0.001
 start_time = 0.
 stop_time = 0.5
-simulations_count = 300
+simulations_count = 100000
 
 # the factor of the step number between two consecutive solutions used to estimate order of convergence
-order_factor = 2  # >=2, integer
+order_factor = 10  # >=2, integer
 
 # y[0] > 1
 trial_1 = StochasticTrial([distributions.make_uniform(2, 3)],
                           lambda xs, ys: 2 * np.sin(sum(xs)),
                           lambda xs, ys: np.zeros(shape=sum(xs).shape),
-                          lambda xs, t, ys: np.sin(sum(xs) + t * ys[0]) + np.sin(sum(xs) - t * ys[0])) \
+                          lambda xs, t, ys: np.sin(sum(xs) + t * ys[0]) + np.sin(sum(xs) - t * ys[0]),
+                          name="Trial1") \
     .add_parameters("beta", lambda xs, ys: ys[0] ** 2 - ys[0],  # y^2 - alpha(y)
                     "alpha", lambda ys: ys[0],
                     # at t=0.5: 0.624096 sin(x)
@@ -36,7 +39,8 @@ left_2, right_2 = 0.25, 0.75
 trial_2 = StochasticTrial([distributions.make_uniform(left_2, right_2)],
                           lambda xs, ys: np.zeros(shape=sum(xs).shape),
                           lambda xs, ys: np.sin(sum(xs)),
-                          lambda xs, t, ys: np.sin(sum(xs)) * np.sin(t / ys[0]) * ys[0]) \
+                          lambda xs, t, ys: np.sin(sum(xs)) * np.sin(t / ys[0]) * ys[0],
+                          name="Trial2") \
     .add_parameters("beta", lambda xs, ys: 1 / ys[0] ** 2 - 1 / ys[0],  # 1/y^2 - alpha(y)
                     "alpha", lambda ys: 1 / ys[0],
                     "expectancy", lambda xs, t: (np.sin(sum(xs)) * (1 / (right_2 - left_2))
@@ -55,7 +59,8 @@ trial_3 = StochasticTrial([distributions.make_uniform(-1, 1)],  # y[0] bigger th
                         lambda xs, ys: np.zeros(shape=sum(xs).shape),
                         lambda xs, t, ys: np.cos(t) / (np.sin(sum(xs)) + ys[0]),
                         # from U(-1,1) to U(left_3, right_3)
-                        random_variables=[lambda y: (right_3 - left_3) / 2 * (y + 1) + left_3]) \
+                        random_variables=[lambda y: (right_3 - left_3) / 2 * (y + 1) + left_3],
+                          name = "Trial3") \
     .add_parameters("beta", lambda xs, ys: 1 + (ys[0] - 2) * (np.sin(sum(xs)) / (np.sin(sum(xs)) + ys[0])
                                                               + 2 * np.cos(sum(xs)) ** 2
                                                               / (np.sin(sum(xs)) + ys[0]) ** 2),
@@ -67,11 +72,17 @@ trial_4 = StochasticTrial([distributions.gaussian, distributions.make_uniform(0,
                            distributions.make_exponential(1)],
                           lambda xs, ys: np.sin(sum(xs)),
                           lambda xs, ys: np.sin(sum(xs)) ** 2,
-                          random_variables=[lambda y: np.exp(y)]) \
+                          random_variables=[lambda y: np.exp(y)],
+                          name="Trial4") \
     .add_parameters("beta", lambda xs, ys: 2 + np.sin(xs[0] + ys[2]),
                     "alpha", lambda ys: 1 + 0.5 * ys[0] + 3 * ys[1])
-
-trial = trial_2
+trial_5 = StochasticTrial([distributions.gaussian],
+                          lambda xs, ys: np.cos(sum(xs)),
+                          lambda xs, ys: np.zeros(shape=sum(xs).shape),
+                          name="Trial5") \
+    .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] * ys[0]) + np.sin(xs[0] + ys[0]),
+                    "alpha", lambda ys: 1 + np.exp(ys[0]))
+trial = trial_5
 
 splitting_xs, splitting_xs_mesh, expectancy, errors, solutions, solutions_for_order_estimate = \
     simulate(trial, simulations_count, [simulations_count // 3, simulations_count // 2, simulations_count],
@@ -88,6 +99,8 @@ if dimension == 1:
         plt.plot(*splitting_xs, expectancy, label="Expectancy")
     for step, solution in solutions:
         plt.plot(*splitting_xs, solution, label="Mean with N={}".format(step))
+    if simulations_count >= 10000:
+        np.save('mc_{}, {}'.format(solutions[-1][0], trial.name), solutions[-1][1])
     plt.legend()
 elif dimension == 2:
     animate_2d_surface(splitting_xs[0], splitting_xs[1], [sol for _, sol in solutions],
@@ -100,19 +113,17 @@ if len(errors) > 0:
     plt.xlabel("Simulation")
     plt.ylabel("Error")
     plt.yscale('log')
-    plt.show()
 
-if len(solutions_for_order_estimate) == 3 and expectancy is None:
-    order = np.log((solutions_for_order_estimate[0] - solutions_for_order_estimate[1])
-                   / (solutions_for_order_estimate[1] - solutions_for_order_estimate[2])) / np.log(order_factor)
+if len(solutions_for_order_estimate) == 3:
+    if expectancy is None:
+        order = np.log((solutions_for_order_estimate[0] - solutions_for_order_estimate[1])
+                       / (solutions_for_order_estimate[1] - solutions_for_order_estimate[2])) / np.log(order_factor)
+        total_order = np.log(np.sum(1. / order_factor ** (order * 2)) / order.size) / (np.log(1 / order_factor) * 2)
+        print("Total convergence order without expectancy:", total_order)
+    else:
+        err_order = [error_l2(sol_order, expectancy) for sol_order in solutions_for_order_estimate]
+        print("Errors for order:", err_order)
+        total_order = np.log((err_order[0] - err_order[1]) / (err_order[1] - err_order[2])) / np.log(order_factor)
+        print("Total convergence order of error (estimate using expectancy):", total_order)
 
-    total_order = np.log(np.sum(1. / order_factor ** (order * 2)) / order.size) / (np.log(1 / order_factor) * 2)
-
-    if dimension == 1:
-        plt.figure()
-        plt.title("Monte Carlo convergence rate to expectancy={:.2E}, dt={}, N={}"
-                  .format(total_order.real, delta_time, grid_size_N))
-        plt.plot(*splitting_xs, order, label="Point wise estimated convergence rate")
-        plt.legend()
-
-        plt.show()
+plt.show()

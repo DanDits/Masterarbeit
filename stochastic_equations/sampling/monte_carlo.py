@@ -1,6 +1,7 @@
 from diff_equation.splitting import make_klein_gordon_leapfrog_splitting
 from util.analysis import error_l2
-
+from collections import deque
+import numpy as np
 
 def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
              domain, grid_size_N, start_time, stop_time, delta_time, eval_time=None, heartbeat=100,
@@ -14,9 +15,13 @@ def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
     solutions = []
     errors = []
     order_factor = order_factor
+    last_solutions_count_max = 50
+    last_solutions = deque()
+    last_solution_weights = [1 / (i + 1) for i in range(last_solutions_count_max)]  # not normalized
     steps_for_order_estimate = [int(simulations_count / (order_factor ** i)) for i in range(3)]
     solutions_for_order_estimate = []
 
+    actual_solutions_count = 0
     for i in range(1, simulations_count + 1):
         if heartbeat > 0 and i % heartbeat == 0:
             print("Simulation",
@@ -35,6 +40,11 @@ def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
                                        -1)
 
         solution = splitting.solutions()[eval_solution_index]
+        test_summed = np.sum(solution)
+        if np.isnan(test_summed) or np.isinf(test_summed):
+            print("Simulation", i, "got a invalid result, NaN or Inf:", test_summed, "Skipping")
+            continue
+        actual_solutions_count += 1
         if summed_solutions is not None:
             summed_solutions += solution
         else:
@@ -44,10 +54,19 @@ def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
         elif expectancy is None and stochastic_trial.raw_reference is not None and do_calculate_expectancy:
             expectancy = stochastic_trial.calculate_expectancy(xs, eval_time,
                                                                stochastic_trial.raw_reference)
-        if i in keep_solutions_at_steps:
-            solutions.append((i, summed_solutions / i))
-        if i in steps_for_order_estimate:
-            solutions_for_order_estimate.append(summed_solutions / i)
+        last_solution = summed_solutions / actual_solutions_count
+        if len(last_solutions) >= last_solutions_count_max:
+            last_solutions.popleft()
+        last_solutions.append(last_solution)
+
+        if actual_solutions_count in keep_solutions_at_steps:
+            solutions.append((actual_solutions_count, last_solution))
+        if actual_solutions_count in steps_for_order_estimate:
+            # do not only use exactly the solution for step i but use weighted arithmetic mean of some beforehand
+            count = min(len(last_solutions), len(last_solution_weights))
+            averaged = (1 / sum(last_solution_weights[:count]) * sum(sol * weight for sol, weight
+                                                                     in zip(last_solutions, last_solution_weights)))
+            solutions_for_order_estimate.append(averaged)
         if expectancy is not None:
-            errors.append(error_l2(expectancy, summed_solutions / i))
+            errors.append(error_l2(expectancy, last_solution))
     return xs, xs_mesh, expectancy, errors, solutions, solutions_for_order_estimate

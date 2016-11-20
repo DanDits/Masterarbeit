@@ -7,11 +7,12 @@ class Trial:
         This allows fast changes to a test and demo case and optionally evaluation of a reference solution and the error
         to an approximation. By default the error_function is the discrete normalized l2 error.
     """
-    def __init__(self, start_position, start_velocity, reference=None):
+    def __init__(self, start_position, start_velocity, reference=None, name=None):
         self.start_position = start_position
         self.start_velocity = start_velocity
         self.reference = reference
         self.error_function = error_l2
+        self.name = name
 
     def add_parameters(self, *key_values):
         """
