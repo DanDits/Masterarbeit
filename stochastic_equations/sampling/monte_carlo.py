@@ -41,8 +41,9 @@ def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
 
         solution = splitting.solutions()[eval_solution_index]
         test_summed = np.sum(solution)
-        if np.isnan(test_summed) or np.isinf(test_summed):
-            print("Simulation", i, "got a invalid result, NaN or Inf:", test_summed, "Skipping")
+        if np.isnan(test_summed) or np.isinf(test_summed) or np.abs(test_summed) > 1E10:
+            print("Simulation", i, "got a invalid result, NaN or Inf or too big:", test_summed, "Skipping",
+                  "Random parameters:", stochastic_trial.rvalues, stochastic_trial.name)
             continue
         actual_solutions_count += 1
         if summed_solutions is not None:

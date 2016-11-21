@@ -1,5 +1,5 @@
 from functools import lru_cache
-from numpy import array
+import numpy as np
 import numpy.polynomial.polynomial as npoly
 
 
@@ -49,7 +49,7 @@ def _poly_basis_recursive(polys_start_coeff, recursive_poly_functions):
         if 0 <= n < len(polys_start_coeff):
             return polys_start_coeff[n]
         elif n >= len(polys_start_coeff):
-            coeff = array([0.])
+            coeff = np.array([0.])
             for i, func in recursive_poly_functions:
                 if i < 0 or i >= n:
                     raise ValueError("Can't apply on not yet calculated polynomial! i={}, n={}".format(i, n))
@@ -71,16 +71,34 @@ def _polymulx(n, coeff):
     return npoly.polymulx(coeff)
 
 
+def calculate_nodes(alphas, betas):
+    # see http://dlmf.nist.gov/3.5#vi  for calculation of nodes = zeros of polynomial
+    # p_k(x)=(x-alpha_(k-1))*p_(k-1)(x)-beta_(k-1)p_(k-2)(x)
+    beta_sqrt = np.sqrt(betas)
+    trimat = (np.diag(alphas)
+              + np.diag(beta_sqrt, 1) + np.diag(beta_sqrt, -1))
+    return np.linalg.eig(trimat)[0]
+
+# Polynomial basis: http://dlmf.nist.gov/18.3
+# Recurrence correlations: http://dlmf.nist.gov/18.9#i
+
 # Hermite polynomials, recursion p_n(x)=x*p_(n-1)(x)-(n-1)*p_(n-2), p_0(x)=1, p_1(x)=x
 # _poly_function_basis_recursive((lambda x: 1, lambda x: x),  (lambda n, x: x, lambda n, x: 1 - n)) # as example
 def hermite_basis():
-    return _poly_basis_recursive([array([1.]), array([0., 1.])],  # starting values
+    return _poly_basis_recursive([np.array([1.]), np.array([0., 1.])],  # starting values
                                  [(0, _polymulx),
                                   (1, lambda n, c: c * (1. - n))])
 
 
+def hermite_nodes(degree):
+    if degree in [0, 1]:
+        return np.zeros(1)
+    return calculate_nodes(np.zeros(degree), np.array(range(1, degree)))
+
+
 # Legendre polynomials, interval assumed to be [-1,1], recursion p_n(x)=x(2n-1)/n * p_(n-1)(x)-(n-1)/n*p_(n-2)(x)
 def legendre_basis():
-    return _poly_basis_recursive([array([1.]), array([0., 1.])],  # starting values
+    return _poly_basis_recursive([np.array([1.]), np.array([0., 1.])],  # starting values
                                  [(0, lambda n, c: (2. * n - 1) / n * npoly.polymulx(c)),
                                   (1, lambda n, c: (1. - n) / n * c)])
+# TODO how do we calculate nodes for legendre basis? clenshaw works well but we want to try this

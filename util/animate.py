@@ -6,24 +6,37 @@ from mpl_toolkits.mplot3d import axes3d  # implicitly required for projection='3
 from matplotlib import cm
 
 
-def animate_1d(x, ys, animate_times, pause):
+def animate_1d(x, ys, animate_times, pause, comparison_ys=None):
     fig = plt.figure()
     ax = plt.axes(xlim=(min(x), max(x)), ylim=(min(np.amin(vals.real) for vals in ys),
                                                max(np.amax(vals.real) for vals in ys)))
     line, = ax.plot([], [], lw=2)
+    if comparison_ys:
+        line_comp, = ax.plot([], [], lw=2, color='r')
+        # TODO make this nicer and add legend and allow more than two line plots and calculate limits for all,....
     time_text = ax.text(0.02, 0.95, '', transform=ax.transAxes)
 
     # initialization function: plot the background of each frame
     def init():
         line.set_data([], [])
+        if comparison_ys:
+            line_comp.set_data([], [])
         time_text.set_text('')
-        return line, time_text
+        if comparison_ys:
+            return line, line_comp, time_text
+        else:
+            return line, time_text
 
     # animation function.  This is called sequentially
     def animate(i):
         line.set_data(x, ys[i].real)
+        if comparison_ys:
+            line_comp.set_data(x, comparison_ys[i].real)
         time_text.set_text("Solution at time=" + str(animate_times[i]))
-        return line, time_text
+        if comparison_ys:
+            return line, line_comp, time_text
+        else:
+            return line, time_text
 
     # call the animator.  blit=True means only re-draw the parts that have changed.
 

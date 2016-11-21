@@ -16,13 +16,13 @@ from diff_equation.splitting import make_klein_gordon_lie_trotter_splitting, mak
 from util.trial import Trial
 
 dimension = 1
-grid_size_N = 128 if dimension >= 2 else 512
+grid_size_N = 128 if dimension >= 2 else 128
 domain = list(repeat([-pi, pi], dimension))
-delta_time = 0.01
+delta_time = 0.001
 save_every_x_solution = 1
 plot_solutions_count = 5
 start_time = 0.
-stop_time = 10
+stop_time = 5
 show_errors = True
 show_reference = True
 do_animate = True
@@ -81,7 +81,6 @@ trial_frog = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
                    lambda xs, t: np.sin(2 * t) * np.exp(-np.cos(sum(xs)))) \
     .add_parameters("beta", lambda xs: 4 + np.cos(sum(xs)) + np.sin(sum(xs)) ** 2,
                     "alpha", lambda: 1,
-                    "frog_only", True,
                     "offset", 1)
 y_frog_2 = 3  # > 2
 trial_frog2 = Trial(lambda xs: 1 / (np.sin(sum(xs)) + y_frog_2),
@@ -91,21 +90,18 @@ trial_frog2 = Trial(lambda xs: 1 / (np.sin(sum(xs)) + y_frog_2),
                                                              + 2 * np.cos(sum(xs)) ** 2
                                                              / (np.sin(sum(xs)) + y_frog_2) ** 2),
                     "alpha", lambda: y_frog_2 - 2,
-                    "frog_only", True,
                     "offset", 0.2)
 trial_frog3 = Trial(lambda xs: np.sin(sum(xs)),
                     lambda xs: np.sin(sum(xs)) ** 2) \
     .add_parameters("beta", lambda xs: 2 + np.sin(np.sqrt(sum(x ** 2 for x in xs)) + 1),
                     "alpha", lambda: 1 + 0.5 + 3 * 0.5,
-                    "frog_only", True,
                     "offset", 1)
 # requires small step size and 1d!
 trial_frog4 = Trial(lambda xs: np.sin(sum(xs)),
                     lambda xs: np.zeros(shape=sum(xs).shape)) \
     .add_parameters("beta", lambda xs: np.where(xs[0] > 0, xs[0], 10),
-                    "alpha", lambda: 0.7,
-                    "frog_only", True)
-trial = trial_4
+                    "alpha", lambda: 0.7)
+trial = trial_3
 
 
 offset_wave_solver = None
@@ -135,7 +131,7 @@ for splitting in splittings:
     print(splitting.name, "took", (time.time() - measure_start))
 
 ref_splitting = splittings[0]
-ref_splitting_2 = splittings[2] if len(splittings) > 2 else splittings[-1]
+ref_splitting_2 = splittings[5] if len(splittings) > 5 else splittings[-1]
 result_xs = ref_splitting.get_xs()
 xs_mesh = ref_splitting.get_xs_mesh()
 
@@ -144,7 +140,8 @@ plot_every_x_solution = ((stop_time - start_time) / delta_time) / plot_solutions
 
 if dimension == 1:
     if do_animate:
-        animate_1d(result_xs[0], ref_splitting.solutions(), ref_splitting.times(), 1)
+        animate_1d(result_xs[0], ref_splitting.solutions(), ref_splitting.times(), 1,
+                   comparison_ys=ref_splitting_2.solutions())
     else:
         plt.figure()
         plt.plot(*result_xs, trial.start_position(xs_mesh), label="Start position")

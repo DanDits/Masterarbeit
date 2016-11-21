@@ -53,7 +53,9 @@ trial_fancy = Trial(lambda xs: 1 / np.cosh(sum(xs) * 10) ** 2,
                     "vel_integral", lambda xs: np.sin(sum(xs)),
                     "show_times", [0, 0.5, 1, 2, 3, 5, 10],
                     "do_animate", False)
-
+trial_5 = Trial(lambda xs: np.sin(sum(xs)),
+                lambda xs: np.exp(np.cos(sum(xs)) ** 2)) \
+    .add_parameters("wave_speed", 1.)
 
 def reference_1d_dalembert(start_position, start_velocity_integral, wave_speed, xs, t):
     # this is the d'Alembert reference solution if the indefinite integral of the start_velocity is known
@@ -77,7 +79,7 @@ def has_reference(ref_trial, dim):
 
 # --- CALCULATION AND VISUALIZATION -------------
 
-trial = trial_2
+trial = trial_5
 
 wave_config = WaveSolverConfig(domain, [grid_n], trial.wave_speed)
 wave_config.init_solver(0, trial.start_position, trial.start_velocity)

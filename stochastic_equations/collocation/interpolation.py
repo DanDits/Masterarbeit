@@ -4,7 +4,9 @@
 import numpy as np
 from diff_equation.splitting import make_klein_gordon_leapfrog_splitting
 from polynomial_chaos.poly_chaos_distributions import legendreChaos, hermiteChaos
+import polynomial_chaos.poly as p
 from numpy.linalg import lstsq
+
 
 # TODO try interpolation approach by quadrature formula, so find good weights and nodes for gauss quadrature in 1d
 
@@ -14,15 +16,56 @@ def glenshaw_curtis_nodes(size):
 
 
 def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count, spatial_domain, grid_size,
-                         start_time, stop_time, delta_time):
+                                start_time, stop_time, delta_time):
+    # TODO check out jblevins.org on "Numerical Quadrature Rules for Commmon Distributions"
+    # TODO also support exponential distribution
+        # TODO so far the convergence for higher poly degree reverses itself for every nodes we tried so far
+    #TODO this effect occurs faster for gaussian (trial2_1 about degree 20-30), later for uniform (trial3 degree 65)
     if trial.variable_distributions[0].name == "Gaussian":
-        nodes = glenshaw_curtis_nodes(random_space_nodes_count)
-        # nodes = np.linspace(-1 / random_space_nodes_count, 1, endpoint=False, num=random_space_nodes_count)  # bad
-        nodes /= 1 - nodes ** 2  # variable transformation of the nodes in (-1, 1) to interval (-Inf, Inf)
+        # nodes = glenshaw_curtis_nodes(random_space_nodes_count)
+        # nodes /= 1 - nodes ** 2  # variable transformation of the nodes in (-1, 1) to interval (-Inf, Inf)
+
+        # Taken from http://keisan.casio.com/exec/system/1281195844 the zeros of the hermite polynomial H_30
+        nodes = [-6.863345293529891581061,
+                 -6.138279220123934620395,
+                 -5.533147151567495725118,
+                 -4.988918968589943944486,
+                 -4.483055357092518341887,
+                 -4.003908603861228815228,
+                 -3.544443873155349886925,
+                 -3.099970529586441748689,
+                 -2.667132124535617200571,
+                 -2.243391467761504072473,
+                 -1.826741143603688038836,
+                 -1.415527800198188511941,
+                 -1.008338271046723461805,
+                 -0.6039210586255523077782,
+                 -0.2011285765488714855458,
+                 0.2011285765488714855458,
+                 0.6039210586255523077782,
+                 1.008338271046723461805,
+                 1.415527800198188511941,
+                 1.826741143603688038836,
+                 2.243391467761504072473,
+                 2.667132124535617200571,
+                 3.099970529586441748689,
+                 3.544443873155349886925,
+                 4.003908603861228815228,
+                 4.483055357092518341887,
+                 4.988918968589943944486,
+                 5.533147151567495725118,
+                 6.138279220123934620395,
+                 6.863345293529891581061]
+        nodes = p.hermite_nodes(random_space_nodes_count)
         chaos = hermiteChaos
     elif trial.variable_distributions[0].name == "Uniform":
         # belongs to uniform distribution in [-1,1] (-> for easy evaluation of expectancy,...)
         nodes = glenshaw_curtis_nodes(random_space_nodes_count)  # in (-1,1)
+        """nodes = [-1/3 * np.sqrt(5 + 2 * np.sqrt(10 / 7)),
+                 - 1 / 3 * np.sqrt(5 - 2 * np.sqrt(10 / 7)),
+                 0,
+                 1 / 3 * np.sqrt(5 - 2 * np.sqrt(10 / 7)),
+                 1 / 3 * np.sqrt(5 + 2 * np.sqrt(10 / 7))]"""
         chaos = legendreChaos
     else:
         raise ValueError("Not supported distribution:", trial.variable_distributions[0].name)
@@ -58,6 +101,7 @@ def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count
     # each column corresponds to the the factors of a spatial grid point
 
     weights = lstsq(vandermonde_A, rhs_u)[0]
+
     # weights = np.linalg.solve(vandermonde_A, rhs_u)  # only works for square vandermonde matrix
 
     def poly_approximation(y):
@@ -68,5 +112,3 @@ def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count
     expectancy = np.reshape(weights[0, :], (grid_size,)) * np.sqrt(chaos.normalization_gamma(0))
 
     return splitting_xs, splitting_xs_mesh, expectancy
-
-

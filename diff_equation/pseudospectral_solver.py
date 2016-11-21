@@ -109,12 +109,17 @@ class WaveSolverConfig(SolverConfig):
         self.wave_speed = wave_speed
 
         # as the pseudospectral factors of order 2 are negative integers, negate sum!
-        # numbers are real (+0j) anyways, but using '.real' saves some calculation time and storage space
+        # numbers are real (+0j) anyways, but using '.real' might save some calculation time and storage space
         self.norm2_factors = np.sqrt(-sum(self.pseudospectral_factors_mesh).real)
-
-        # top left corner of norm2_ks contains a zero, temporarily replace it
+        # top left corner of norm2_ks contains a zero
         self.zero_index = (0,) * len(self.norm2_factors.shape)
         assert self.norm2_factors[self.zero_index] == 0
+        # but when we calculate sin(j)/j for j->0 (so, the zeroth fourier coefficient) this will lead to errors
+        # therefore we handle this linear growth of the zeroth fourier coefficient explicitly
+
+        # more or less a copy, but zeroth factor changed to avoid division by zero
+        self.norm2_factors_special = np.array(self.norm2_factors)
+        self.norm2_factors_special[self.zero_index] = 1 / self.wave_speed
 
     def start_momentum(self):
         return (self.wave_speed ** 2) * ifftn(sum(self.pseudospectral_factors_mesh) * fftn(self.start_position))
@@ -130,19 +135,10 @@ class WaveSolverConfig(SolverConfig):
 
         # calculate factors c1_ and c2_
         c1_ = y0_
-        if abs(y0t_[self.zero_index]) > self.norm2_factors.size * 1e-9:  # as the fourier coefficients are unscaled
-            # the zeroth fourier coefficient is the (unscaled) discrete integral
-            # over the function (multiplied by 1=e^(i*0))
-            # and since the pseudospectral method conserves the energy we require the starting energy to be zero
-            # so positive and negative parts sum away (is there a better explanation?)
-            print("Warning! Start velocity for wave solver not possible, solution will be incorrect: "
-                  + "0th fourier coefficient not zero but", y0t_[self.zero_index], "for size",
-                  self.norm2_factors.size)
-        # this makes sure that c2_[zero_index] is 0 and no warning is triggered
-        self.norm2_factors[self.zero_index] = np.inf
-        c2_ = y0t_ / self.norm2_factors
-        self.norm2_factors[self.zero_index] = 0  # revert temporal change
-        c2_ *= 1 / self.wave_speed
+        c2_ = y0t_ / (self.wave_speed * self.norm2_factors_special)
+
+        # c1_derivative_ = -self.norm2_factors * self.wave_speed * y0_
+        # c2_derivative_ = y0t_
 
         def solution_at(time):
             # for all j solve (d/dt)^2 u_hat(j; t) = -j*j*u_hat(j; t) and starting conditions u_hat(j;0)=y0_(j),
@@ -150,11 +146,15 @@ class WaveSolverConfig(SolverConfig):
             # here we are in the position to know the exact solution for this linear ordinary differential equation!
 
             # solution at time t with starting value y0_ and y0t_, all in fourier space
-
-            u_hat_ = c1_ * np.cos(self.wave_speed * self.norm2_factors * (time - t0)) \
-                     + c2_ * np.sin(self.wave_speed * self.norm2_factors * (time - t0))
+            sin_part = np.sin(self.wave_speed * self.norm2_factors_special * (time - t0))
+            sin_part[self.zero_index] = (time - t0)  # special treatment for zeroth index as sin(j)/j ->1 (j->0)
+            u_hat_ = (c1_ * np.cos(self.wave_speed * self.norm2_factors * (time - t0))
+                      + c2_ * sin_part)
+            # ut_hat_ = (c1_derivative_ * np.sin(self.wave_speed * self.norm2_factors * (time - t0))
+            #           + c2_derivative_ * np.cos(self.wave_speed * self.norm2_factors * (time - t0)))
 
             return [ifftn(u_hat_),
-                    self.start_velocity + self.start_momentum() * (time - self.start_time)]
+                    self.start_velocity + self.start_momentum() * (time - t0)]
+                    # ifftn(ut_hat_)]  # TODO incorrect
 
         self.solver = solution_at

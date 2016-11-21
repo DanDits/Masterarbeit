@@ -19,6 +19,9 @@ class PolyChaosDistribution:
         return lambda x: (self.poly_basis(degree)(x) / math.sqrt(self.normalization_gamma(degree)))
 
 
+
+
+
 hermiteChaos = PolyChaosDistribution("Hermite", poly.hermite_basis(),
                                      distr.gaussian, lambda n: math.factorial(n))
 legendreChaos = PolyChaosDistribution("Legendre", poly.legendre_basis(),
