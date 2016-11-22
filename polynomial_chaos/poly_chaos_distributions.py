@@ -1,17 +1,18 @@
 import math
 import polynomial_chaos.poly as poly
 import polynomial_chaos.distributions as distr
-from functools import lru_cache
+from functools import lru_cache, partial
 
 chaos = []
 
 
 class PolyChaosDistribution:
-    def __init__(self, poly_name, poly_basis, distribution, normalization_gamma):
+    def __init__(self, poly_name, poly_basis, distribution, normalization_gamma, nodes):
         self.poly_name = poly_name
         self.poly_basis = poly_basis
         self.distribution = distribution
         self.normalization_gamma = normalization_gamma
+        self.interpolation_nodes = nodes
         chaos.append(self)
 
     @lru_cache(maxsize=None)
@@ -19,19 +20,34 @@ class PolyChaosDistribution:
         return lambda x: (self.poly_basis(degree)(x) / math.sqrt(self.normalization_gamma(degree)))
 
 
-
-
-
 hermiteChaos = PolyChaosDistribution("Hermite", poly.hermite_basis(),
-                                     distr.gaussian, lambda n: math.factorial(n))
+                                     distr.gaussian, lambda n: math.factorial(n),
+                                     poly.hermite_nodes)
 legendreChaos = PolyChaosDistribution("Legendre", poly.legendre_basis(),
                                       distr.make_uniform(-1, 1),
                                       # this is reduced by factor 1/2 as 1/2 is the density function of the distribution
-                                      lambda n: 1 / (2 * n + 1))
+                                      lambda n: 1 / (2 * n + 1),
+                                      poly.legendre_nodes)
+
+
+# Notation hint for literature: Pochhammer symbol for falling factorial.. was hard to find!
+# Xiu seems to use falling instead of rising?
+# Falling: alpha_n = alpha*(alpha-1)*...*(alpha-n+1)
+def rising_factorial(alpha, n):
+    prod = 1
+    for i in range(n):
+        prod *= alpha + i
+    return prod
+
+
+def make_laguerreChaos(alpha):
+    return PolyChaosDistribution("Laguerre", poly.laguerre_basis(alpha),
+                                 distr.make_gamma(alpha, 1),
+                                 lambda n: rising_factorial(alpha, n) / math.factorial(n),
+                                 partial(poly.laguerre_nodes, alpha=alpha))
 
 
 # Other chaos pairs, not implemented:
-# ("Gamma", "Laguerre", [0, math.inf]),
 # ("Beta","Jacobi", [a, b]),
 # ("Poisson", "Charlier", support_Naturals),
 # ("Binomial", "Krawtchouk", support_NaturalsFinite),

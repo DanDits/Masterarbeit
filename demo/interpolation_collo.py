@@ -36,6 +36,13 @@ trial_2_1 = StochasticTrial([distributions.gaussian],
                             random_variables=[lambda y: 0.5 + 0.2 * np.sin(y) ** 2])
 trial_2_1.add_parameters("beta", lambda xs, ys: 1 / ys[0] ** 2 - 1 / ys[0],  # 1/y^2 - alpha(y)
                          "alpha", lambda ys: 1 / ys[0])
+trial_2_2 = StochasticTrial([distributions.make_gamma(2.5, 1)],
+                            lambda xs, ys: np.zeros(shape=sum(xs).shape),
+                            lambda xs, ys: np.sin(sum(xs)),
+                            lambda xs, t, ys: np.sin(sum(xs)) * np.sin(t / ys[0]) * ys[0],
+                            random_variables=[lambda y: 0.5 + 0.2 * np.sin(y) ** 2])
+trial_2_2.add_parameters("beta", lambda xs, ys: 1 / ys[0] ** 2 - 1 / ys[0],  # 1/y^2 - alpha(y)
+                         "alpha", lambda ys: 1 / ys[0])
 left_3, right_3 = 10, 50  # y[0] bigger than 2
 trial_3 = StochasticTrial([distributions.make_uniform(-1, 1)],  # y[0] bigger than 2 enforced by random variable
                           lambda xs, ys: 1 / (np.sin(sum(xs)) + ys[0]),
@@ -51,7 +58,7 @@ trial_3 = StochasticTrial([distributions.make_uniform(-1, 1)],  # y[0] bigger th
                                                 * (np.log(np.sin(sum(xs)) + right_3)
                                                    - np.log(np.sin(sum(xs)) + left_3)))
 
-trial = trial_2_1
+trial = trial_2_2
 N = list(range(40))  # maximum degree of the polynomial, so N+1 polynomials
 # from n+1 to n+10 notably difference for most examples
 M = [n + 1 for n in N]  # number of nodes in random space, >= N+1, the higher the more accuracy (for higher polys)

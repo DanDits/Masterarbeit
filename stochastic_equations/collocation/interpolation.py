@@ -3,7 +3,7 @@
 
 import numpy as np
 from diff_equation.splitting import make_klein_gordon_leapfrog_splitting
-from polynomial_chaos.poly_chaos_distributions import legendreChaos, hermiteChaos
+from polynomial_chaos.poly_chaos_distributions import legendreChaos, hermiteChaos, make_laguerreChaos
 import polynomial_chaos.poly as p
 from numpy.linalg import lstsq
 
@@ -22,14 +22,22 @@ def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count
     # TODO also support exponential distribution
         # TODO so far the convergence for higher poly degree reverses itself for every nodes we tried so far
     #TODO this effect occurs faster for gaussian (trial2_1 about degree 20-30), later for uniform (trial3 degree 65)
-    if trial.variable_distributions[0].name == "Gaussian":
+    distr = trial.variable_distributions[0]
+    if distr.name == "Gaussian":
+        assert distr.parameters == (0, 1)
         # belongs to gaussian distribution in [-Inf, Inf]
-        nodes = p.hermite_nodes(random_space_nodes_count)
         chaos = hermiteChaos
-    elif trial.variable_distributions[0].name == "Uniform":
+        nodes = chaos.interpolation_nodes(random_space_nodes_count)
+    elif distr.name == "Uniform":
+        assert distr.parameters == (-1, 1)
         # belongs to uniform distribution in [-1,1] (-> for easy evaluation of expectancy,...)
-        nodes = p.legendre_nodes(random_space_nodes_count)  # are better than glenshaw by factor 10 to 100 (trial3)
+        # clenshaw curtis nodes are pretty good for uniform distribution, but not as good as legendre nodes
         chaos = legendreChaos
+        nodes = chaos.interpolation_nodes(random_space_nodes_count)
+    elif distr.name == "Gamma":
+        assert distr.parameters[1] == 1
+        chaos = make_laguerreChaos(trial.variable_distributions[0].parameters[0])
+        nodes = chaos.interpolation_nodes(random_space_nodes_count)
     else:
         raise ValueError("Not supported distribution:", trial.variable_distributions[0].name)
     basis = [chaos.normalized_basis(degree) for degree in range(max_poly_degree + 1)]

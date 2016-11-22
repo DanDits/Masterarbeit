@@ -100,6 +100,19 @@ def hermite_nodes(degree):
     return calculate_nodes(np.zeros(degree), np.array(range(1, degree)))
 
 
+def laguerre_basis(alpha):
+    return _poly_basis_recursive([np.array([1.]), np.array([alpha, -1.])],
+                                 [(0, lambda n, c: npoly.polyadd(c * (2 * (n - 1) + alpha) / n,
+                                                                 - npoly.polymulx(c) / n)),
+                                  (1, lambda n, c: -(n - 1 + alpha - 1) / n * c)])
+
+
+def laguerre_nodes(degree, alpha):
+    # normalized recurrence relation: q_n=xq_(n-1) - (2(n-1) + alpha)q_(n-1) - (n-1)(n - 2 + alpha)q_(n-2)
+    return calculate_nodes(2 * np.array(range(0, degree)) + alpha,
+                           np.array(range(1, degree)) * (np.array(range(1, degree)) - 1 + alpha))
+
+
 # Legendre polynomials, interval assumed to be [-1,1], recursion p_n(x)=x(2n-1)/n * p_(n-1)(x)-(n-1)/n*p_(n-2)(x)
 def legendre_basis():
     return _poly_basis_recursive([np.array([1.]), np.array([0., 1.])],  # starting values
@@ -119,7 +132,7 @@ def legendre_nodes(degree):
 
 def legendre_nodes_fast(degree):
     # when returned 'amount' nodes is fixed (no matter the degree),
-    # this using 'amount' nodes gives stable and converging results up to degree<2*amount
+    # this using 'amount' nodes gives stable and converging results up to degree<2*amount (sometimes only <=amount?!)
     if degree <= 30:
         # Taken from http://keisan.casio.com/exec/system/1281195844 the roots of the legendre polynomial P_30
         return [-0.9968934840746495402716, -0.98366812327974720997, -0.9600218649683075122169,

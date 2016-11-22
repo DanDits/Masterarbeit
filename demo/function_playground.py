@@ -2,18 +2,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 import polynomial_chaos.poly as poly
 import polynomial_chaos.poly_chaos_distributions as ch
+import polynomial_chaos.distributions as dst
+from scipy.integrate import quad
 
+alpha = 0.1
+chaos = ch.make_laguerreChaos(alpha)
+basis = [chaos.normalized_basis(i) for i in range(5)]
+for i in range(5):
+    print(chaos.normalization_gamma(i))
 
-
-ref = [-0.973906528517171720078,
--0.8650633666889845107321,
--0.6794095682990244062343,
--0.4333953941292471907993,
--0.1488743389816312108848,
-0.1488743389816312108848,
-0.4333953941292471907993,
-0.6794095682990244062343,
-0.8650633666889845107321,
-0.973906528517171720078]
-print(approx(np.array(range(1, 31)), 30))
-
+for b1 in basis:
+    print("New")
+    for b2 in basis:
+        result = quad(lambda x: b1(x) * b2(x) * chaos.distribution.weight(x),
+                      chaos.distribution.support[0], chaos.distribution.support[1])[0]
+        print(result)
