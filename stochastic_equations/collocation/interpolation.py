@@ -4,7 +4,6 @@
 import numpy as np
 from diff_equation.splitting import make_klein_gordon_leapfrog_splitting
 from polynomial_chaos.poly_chaos_distributions import legendreChaos, hermiteChaos, make_laguerreChaos
-import polynomial_chaos.poly as p
 from numpy.linalg import lstsq
 
 
@@ -18,10 +17,10 @@ def glenshaw_curtis_nodes(size):
 
 def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count, spatial_domain, grid_size,
                                 start_time, stop_time, delta_time):
-    # TODO check out jblevins.org on "Numerical Quadrature Rules for Commmon Distributions"
-    # TODO also support exponential distribution
-        # TODO so far the convergence for higher poly degree reverses itself for every nodes we tried so far
-    #TODO this effect occurs faster for gaussian (trial2_1 about degree 20-30), later for uniform (trial3 degree 65)
+
+    # TODO so far the convergence for higher poly degree reverses itself for every nodes we tried so far
+    # TODO this effect occurs faster for gaussian (trial2_1 about degree 20-30), later for uniform (trial3 degree 65)
+    # TODO and rather fast (trial2_2 about degree 16) for gamma(2.5)
     distr = trial.variable_distributions[0]
     if distr.name == "Gaussian":
         assert distr.parameters == (0, 1)
@@ -36,10 +35,10 @@ def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count
         nodes = chaos.interpolation_nodes(random_space_nodes_count)
     elif distr.name == "Gamma":
         assert distr.parameters[1] == 1
-        chaos = make_laguerreChaos(trial.variable_distributions[0].parameters[0])
+        chaos = make_laguerreChaos(distr.parameters[0])
         nodes = chaos.interpolation_nodes(random_space_nodes_count)
     else:
-        raise ValueError("Not supported distribution:", trial.variable_distributions[0].name)
+        raise ValueError("Not supported distribution:", distr.name)
     basis = [chaos.normalized_basis(degree) for degree in range(max_poly_degree + 1)]
 
     # for each node in random space calculate solution u(t,x) in discrete grid at some time T

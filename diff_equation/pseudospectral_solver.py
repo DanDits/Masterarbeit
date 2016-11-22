@@ -155,6 +155,6 @@ class WaveSolverConfig(SolverConfig):
 
             return [ifftn(u_hat_),
                     self.start_velocity + self.start_momentum() * (time - t0)]
-                    # ifftn(ut_hat_)]  # TODO incorrect
+                    # ifftn(ut_hat_)]  # TODO incorrect, where did I miscalculate?
 
         self.solver = solution_at

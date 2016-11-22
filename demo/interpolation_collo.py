@@ -75,8 +75,7 @@ for n, m in zip(N, M):
                                                                         start_time, stop_time, delta_time)
     expectancies.append((n, m, expectancy))
 # TODO try plotting error in dependence of N (and M?), seems to rise again if N gets too big
-# TODO try other choice of random grid points
-# TODO try other distributions
+# TODO more trials, maybe try to find a more complicated one with known expectancy (or reference)
 print("Plotting:")
 if trial.has_parameter("expectancy"):
     trial_expectancy = trial.expectancy(result_xs_mesh, stop_time)
