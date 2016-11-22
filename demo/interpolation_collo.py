@@ -51,8 +51,8 @@ trial_3 = StochasticTrial([distributions.make_uniform(-1, 1)],  # y[0] bigger th
                                                 * (np.log(np.sin(sum(xs)) + right_3)
                                                    - np.log(np.sin(sum(xs)) + left_3)))
 
-trial = trial_3
-N = list(range(50, 80))  # maximum degree of the polynomial, so N+1 polynomials
+trial = trial_2_1
+N = list(range(40))  # maximum degree of the polynomial, so N+1 polynomials
 # from n+1 to n+10 notably difference for most examples
 M = [n + 1 for n in N]  # number of nodes in random space, >= N+1, the higher the more accuracy (for higher polys)
 spatial_dimension = 1

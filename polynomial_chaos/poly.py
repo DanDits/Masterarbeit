@@ -1,6 +1,7 @@
 from functools import lru_cache
 import numpy as np
 import numpy.polynomial.polynomial as npoly
+from math import factorial
 
 
 # Pretty general implementation for a recursively defined polynomial basis in function form, so it is not optimized
@@ -44,6 +45,7 @@ def _poly_basis_recursive(polys_start_coeff, recursive_poly_functions):
     make the new polynomial's coefficients.
     :return: A function taking a degree n and returning a function which evaluates the n-th polynomial at the point x.
     """
+
     @lru_cache(maxsize=None)
     def poly_coeff(n):
         if 0 <= n < len(polys_start_coeff):
@@ -62,6 +64,7 @@ def _poly_basis_recursive(polys_start_coeff, recursive_poly_functions):
     def poly(n):
         coeff = poly_coeff(n)
         return lambda x: npoly.polyval(x, coeff)
+
     return poly
 
 
@@ -78,6 +81,7 @@ def calculate_nodes(alphas, betas):
     trimat = (np.diag(alphas)
               + np.diag(beta_sqrt, 1) + np.diag(beta_sqrt, -1))
     return np.linalg.eig(trimat)[0]
+
 
 # Polynomial basis: http://dlmf.nist.gov/18.3
 # Recurrence correlations: http://dlmf.nist.gov/18.9#i
@@ -101,4 +105,41 @@ def legendre_basis():
     return _poly_basis_recursive([np.array([1.]), np.array([0., 1.])],  # starting values
                                  [(0, lambda n, c: (2. * n - 1) / n * npoly.polymulx(c)),
                                   (1, lambda n, c: (1. - n) / n * c)])
-# TODO how do we calculate nodes for legendre basis? clenshaw works well but we want to try this
+
+
+# http://math.stackexchange.com/questions/12160/roots-of-legendre-polynomial gives the monic version of the legendre
+# polynomials: p_n(x)=x*p_(n-1)(x)-(n-1)^2/(4(n-1)^2-1)p_(n-2), to get the normal polynomial divide by
+# (n!)^2 * 2^n / (2n)!
+def legendre_nodes(degree):
+    if degree in [0, 1]:
+        return np.zeros(1)
+    nm1 = np.array(range(1, degree))
+    return calculate_nodes(np.zeros(degree), nm1 ** 2 / (4 * (nm1 ** 2) - 1))
+
+
+def legendre_nodes_fast(degree):
+    # when returned 'amount' nodes is fixed (no matter the degree),
+    # this using 'amount' nodes gives stable and converging results up to degree<2*amount
+    if degree <= 30:
+        # Taken from http://keisan.casio.com/exec/system/1281195844 the roots of the legendre polynomial P_30
+        return [-0.9968934840746495402716, -0.98366812327974720997, -0.9600218649683075122169,
+                -0.9262000474292743258793,
+                -0.8825605357920526815431, -0.8295657623827683974429, -0.767777432104826194918,
+                -0.6978504947933157969323,
+                -0.6205261829892428611405, -0.5366241481420198992642, -0.4470337695380891767806,
+                -0.352704725530878113471,
+                -0.2546369261678898464398, -0.1538699136085835469638, -0.051471842555317695833, 0.051471842555317695833,
+                0.1538699136085835469638, 0.2546369261678898464398, 0.352704725530878113471, 0.4470337695380891767806,
+                0.5366241481420198992642, 0.6205261829892428611405, 0.6978504947933157969323, 0.767777432104826194918,
+                0.8295657623827683974429, 0.8825605357920526815431, 0.9262000474292743258793, 0.9600218649683075122169,
+                0.98366812327974720997, 0.9968934840746495402716]
+    else:
+        # approximate the roots of higher degree polynomials
+        # http://math.stackexchange.com/questions/12160/roots-of-legendre-polynomial by  Francesco Tricomi
+        # http://naturalunits.blogspot.de/2013/10/zeros-of-legendre-polynomials.html
+        n = degree
+        k = np.array(range(1, n + 1))
+        sigma = np.pi * (n - k + 3 / 4) / (n + 1 / 2)
+        return (1 - 1 / (8 * n ** 2) + 1 / (8 * n ** 3) - (39 - 28 / (np.sin(sigma) ** 2)) / (384 * n ** 4)) * np.cos(
+            sigma)  # O(n^(-5))
+        # return (1-1/(8*n*n)+1/(8*n*n*n))*np.cos(np.pi*(4*k-1)/(4*n+2)) # O(n^(-4))
