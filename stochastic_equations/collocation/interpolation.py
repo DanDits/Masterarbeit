@@ -30,21 +30,19 @@ def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count
         assert distr.parameters == (0, 1)
         # belongs to gaussian distribution in [-Inf, Inf]
         chaos = hermiteChaos
-        nodes = chaos.interpolation_nodes(random_space_nodes_count)
     elif distr.name == "Uniform":
         assert distr.parameters == (-1, 1)
         # belongs to uniform distribution in [-1,1] (-> for easy evaluation of expectancy,...)
         # clenshaw curtis nodes are pretty good for uniform distribution, but not as good as legendre nodes
         chaos = legendreChaos
-        nodes = chaos.interpolation_nodes(random_space_nodes_count)
     elif distr.name == "Gamma":
         assert distr.parameters[1] == 1
         chaos = make_laguerreChaos(distr.parameters[0])
-        nodes = chaos.interpolation_nodes(random_space_nodes_count)
     else:
         raise ValueError("Not supported distribution:", distr.name)
-
+    nodes = chaos.nodes_and_weights(random_space_nodes_count)[0]
     # nodes = chebyshev_nodes(random_space_nodes_count)
+    # nodes /= 1 - nodes ** 2
     # nodes = glenshaw_curtis_nodes(random_space_nodes_count)
     basis = [chaos.normalized_basis(degree) for degree in range(max_poly_degree + 1)]
 
@@ -90,4 +88,7 @@ def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count
     # E[w_N]=sum_0^N(weight_k*E[phi_k])=weight_0*E[1*phi_0]=weight_0*E[phi_0*phi_0]*sqrt(gamma_0)=weight_0*sqrt(gamma_0)
     expectancy = np.reshape(weights[0, :], (grid_size,)) * np.sqrt(chaos.normalization_gamma(0))
 
-    return splitting_xs, splitting_xs_mesh, expectancy, rank
+    # Var[w_N]=E[(w_N)^2]-E[w_N]^2
+    variance = np.reshape(np.sum(weights ** 2, axis=0) - chaos.normalization_gamma(0) * (weights[0, :] ** 2),
+                          (grid_size,))
+    return splitting_xs, splitting_xs_mesh, expectancy, variance, rank

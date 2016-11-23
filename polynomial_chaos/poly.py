@@ -74,17 +74,20 @@ def _polymulx(n, coeff):
     return npoly.polymulx(coeff)
 
 
-def calculate_nodes(alphas, betas):
-    # see http://dlmf.nist.gov/3.5#vi  for calculation of nodes = zeros of polynomial
+def calculate_nodes_and_weights(alphas, betas):
+    # The Golub-Welsch algorithm in symmetrized form
+    # see https://en.wikipedia.org/wiki/Gaussian_quadrature#Computation_of_Gaussian_quadrature_rules
+    # or see http://dlmf.nist.gov/3.5#vi  for calculation of nodes = zeros of polynomial
     # p_k(x)=(x-alpha_(k-1))*p_(k-1)(x)-beta_(k-1)p_(k-2)(x)
     beta_sqrt = np.sqrt(betas)
     trimat = (np.diag(alphas)
               + np.diag(beta_sqrt, 1) + np.diag(beta_sqrt, -1))
-    return np.linalg.eig(trimat)[0]
-
+    nodes, vectors = np.linalg.eigh(trimat)
+    return nodes, np.reshape(vectors[0, :], (len(nodes),))
 
 # Polynomial basis: http://dlmf.nist.gov/18.3
 # Recurrence correlations: http://dlmf.nist.gov/18.9#i
+
 
 # Hermite polynomials, recursion p_n(x)=x*p_(n-1)(x)-(n-1)*p_(n-2), p_0(x)=1, p_1(x)=x
 # _poly_function_basis_recursive((lambda x: 1, lambda x: x),  (lambda n, x: x, lambda n, x: 1 - n)) # as example
@@ -94,10 +97,8 @@ def hermite_basis():
                                   (1, lambda n, c: c * (1. - n))])
 
 
-def hermite_nodes(degree):
-    if degree in [0, 1]:
-        return np.zeros(1)
-    return calculate_nodes(np.zeros(degree), np.array(range(1, degree)))
+def hermite_nodes_and_weights(degree):
+    return calculate_nodes_and_weights(np.zeros(degree), np.array(range(1, degree)))
 
 
 def laguerre_basis(alpha):
@@ -107,9 +108,9 @@ def laguerre_basis(alpha):
                                   (1, lambda n, c: -(n - 1 + alpha - 1) / n * c)])
 
 
-def laguerre_nodes(degree, alpha):
+def laguerre_nodes_and_weights(degree, alpha):
     # normalized recurrence relation: q_n=xq_(n-1) - (2(n-1) + alpha)q_(n-1) - (n-1)(n - 2 + alpha)q_(n-2)
-    return calculate_nodes(2 * np.array(range(0, degree)) + alpha,
+    return calculate_nodes_and_weights(2 * np.array(range(0, degree)) + alpha,
                            np.array(range(1, degree)) * (np.array(range(1, degree)) - 1 + alpha))
 
 
@@ -123,16 +124,14 @@ def legendre_basis():
 # http://math.stackexchange.com/questions/12160/roots-of-legendre-polynomial gives the monic version of the legendre
 # polynomials: p_n(x)=x*p_(n-1)(x)-(n-1)^2/(4(n-1)^2-1)p_(n-2), to get the normal polynomial divide by
 # (n!)^2 * 2^n / (2n)!
-def legendre_nodes(degree):
-    if degree in [0, 1]:
-        return np.zeros(1)
+def legendre_nodes_and_weights(degree):
     nm1 = np.array(range(1, degree))
-    return calculate_nodes(np.zeros(degree), nm1 ** 2 / (4 * (nm1 ** 2) - 1))
+    return calculate_nodes_and_weights(np.zeros(degree), nm1 ** 2 / (4 * (nm1 ** 2) - 1))
 
 
 def legendre_nodes_fast(degree):
     # when returned 'amount' nodes is fixed (no matter the degree),
-    # this using 'amount' nodes gives stable and converging results up to degree<2*amount (sometimes only <=amount?!)
+    # this using 'amount' nodes gives stable and converging results up to degree<2*amount
     if degree <= 30:
         # Taken from http://keisan.casio.com/exec/system/1281195844 the roots of the legendre polynomial P_30
         return [-0.9968934840746495402716, -0.98366812327974720997, -0.9600218649683075122169,
@@ -156,3 +155,20 @@ def legendre_nodes_fast(degree):
         return (1 - 1 / (8 * n ** 2) + 1 / (8 * n ** 3) - (39 - 28 / (np.sin(sigma) ** 2)) / (384 * n ** 4)) * np.cos(
             sigma)  # O(n^(-5))
         # return (1-1/(8*n*n)+1/(8*n*n*n))*np.cos(np.pi*(4*k-1)/(4*n+2)) # O(n^(-4))
+
+
+# jacobi polynomial basis (belongs to beta distribution on (-1,1))
+def jacobi_basis(alpha, beta):
+    def get_factor(n):
+        return (2 * n + alpha + beta - 1) * (2 * n + alpha + beta) / (2 * n * (n + alpha + beta))
+    # this doesn't even look nice on paper
+    return _poly_basis_recursive([np.array([1.]),
+                                  np.array([0.5 * (alpha - beta), 0.5 * (alpha + beta + 2)])],  # starting values
+                                 [(0, lambda n, c: npoly.polyadd(npoly.polymulx(c) * get_factor(n),
+                                                                 -c * get_factor(n) * (beta ** 2 - alpha ** 2) / ((2 * n + alpha + beta - 2) * (2 * n + alpha + beta)))),
+                                  (1, lambda n, c: (-2 * get_factor(n) * (n + alpha - 1) * (n + beta - 1) / ((2 * n + alpha + beta - 2) * (2 * n + alpha + beta - 1))))])
+
+
+def jacobi_nodes_and_weights(alpha, beta):
+    # TODO jacobi and beta distribution all untested and this function here not yet implemented
+    pass

@@ -3,6 +3,7 @@ from functools import partial
 import random
 from numpy import inf
 from scipy.special import gamma
+from scipy.special import beta as beta_func
 
 
 # See "The Wiener--Askey Polynomial Chaos for Stochastic Differential Equations"
@@ -81,3 +82,19 @@ def make_exponential(lamb=1.):
     distr.show_name = "Exponential({})".format(lamb)
     distr.inverse_distribution = make_inverse_exponential(lamb)
     return distr
+
+
+def make_beta(alpha, beta):
+    if alpha <= -1 or beta <= -1:
+        raise ValueError("Parameters must be greater than -1", alpha, beta)
+    beta_01 = partial(random.betavariate, alpha + 1, beta + 1)
+
+    def generator():
+        return beta_01() * 2 - 1
+    return Distribution("Beta",
+                        lambda x: (((1 - x) ** alpha) * ((1 + x) ** beta) / (2 ** (alpha + beta + 1))
+                                   / beta_func(alpha + 1, beta + 1) if -1 <= x <= 1 else 0),
+                        [-1, 1],
+                        generator,
+                        show_name="Beta({}, {})".format(alpha, beta),
+                        parameters=(alpha, beta))

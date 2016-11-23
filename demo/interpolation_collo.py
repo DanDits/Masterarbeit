@@ -18,7 +18,12 @@ trial_1 = StochasticTrial([distributions.make_uniform(-1, 1)],
     .add_parameters("beta", lambda xs, ys: ys[0] ** 2 - ys[0],  # y^2 - alpha(y)
                     "alpha", lambda ys: ys[0],
                     "expectancy", lambda xs, t: (2 / (t * (right_1 - left_1)) * np.sin(sum(xs))
-                                                 * (np.sin(right_1 * t) - np.sin(left_1 * t))))
+                                                 * (np.sin(right_1 * t) - np.sin(left_1 * t))),
+                    "variance", lambda xs, t: (1 / (t * (right_1 - left_1)) * np.sin(sum(xs)) ** 2
+                                               * (2 * t * right_1 + np.sin(2 * t * right_1)
+                                                  - 2 * t * left_1 - np.sin(2 * t * left_1))
+                                               - (2 / (t * (right_1 - left_1)) * np.sin(sum(xs))
+                                                  * (np.sin(right_1 * t) - np.sin(left_1 * t))) ** 2))
 # y[0] in (0,1)
 left_2, right_2 = 0.1, 0.9
 trial_2 = StochasticTrial([distributions.make_uniform(-1, 1)],
@@ -63,10 +68,11 @@ trial_3 = StochasticTrial([distributions.make_uniform(-1, 1)],  # y[0] bigger th
                                                 * (np.log(np.sin(sum(xs)) + right_3)
                                                    - np.log(np.sin(sum(xs)) + left_3)))
 
-trial = trial_1
+trial = trial_3
+
 # "High order is not the same as high accuracy. High order translates to high accuracy only when the integrand
 # is very smooth" (http://apps.nrbook.com/empanel/index.html?pg=179#)
-N = list(range(100))  # maximum degree of the polynomial, so N+1 polynomials
+N = list(range(30))  # maximum degree of the polynomial, so N+1 polynomials
 # from n+1 to n+10 notably difference for most examples
 M = [n + 1 for n in N]  # number of nodes in random space, >= N+1, the higher the more accuracy (for higher polys)
 spatial_dimension = 1
@@ -76,37 +82,55 @@ start_time = 0
 stop_time = 0.5
 delta_time = 0.001
 
-expectancies, ranks = [], []
+exp_var_results, ranks = [], []
 for n, m in zip(N, M):
-    result_xs, result_xs_mesh, expectancy, rank = matrix_inversion_expectancy(trial, n, m, spatial_domain, grid_size,
-                                                                        start_time, stop_time, delta_time)
-    expectancies.append((n, m, expectancy))
+    result_xs, result_xs_mesh, expectancy, variance, rank = matrix_inversion_expectancy(trial, n, m,
+                                                                                        spatial_domain, grid_size,
+                                                                                        start_time, stop_time,
+                                                                                        delta_time)
+    exp_var_results.append((n, m, expectancy, variance))
     ranks.append(rank)
 rank_fractions = list(map(lambda n, x: 10 ** (-(1 - x / (n + 1))*10), N, ranks))  # rescale to make visible in l
 # TODO more trials, maybe try to find a more complicated one with known expectancy (or reference)
 print("Plotting:")
+trial_expectancy = None
 if trial.has_parameter("expectancy"):
     trial_expectancy = trial.expectancy(result_xs_mesh, stop_time)
-else:
+elif trial.raw_reference is not None:
     trial_expectancy = trial.calculate_expectancy(result_xs, stop_time, trial.raw_reference)
+trial_variance = None
+if trial.has_parameter("variance"):
+    trial_variance = trial.variance(result_xs_mesh, stop_time)
+
 plt.figure()
 plt.title("Expectancies by matrix inversion coll. in spatial grid size={}".format(grid_size))
-errors = []
-for n, m, expectancy in expectancies:
-    error = error_l2(trial_expectancy, expectancy)
-    errors.append(error)
-    print("Error", n, "=", error)
-    plt.plot(result_xs[0], expectancy, "o" if n == 2 else ".", label="deg={}, error={:.5E}"
+errors, errors_variance = [], []
+for n, m, expectancy, variance in exp_var_results:
+    error = -1
+    if trial_expectancy is not None:
+        error = error_l2(trial_expectancy, expectancy)
+        errors.append(error)
+        print("Error", n, "=", error)
+    if trial_variance is not None:
+        error_var = error_l2(trial_variance, variance)
+        errors_variance.append(error_var)
+        print("Error variance", n, "=", error_var)
+    plt.plot(result_xs[0], expectancy, "o" if n < 7 else ".", label="deg={}, error={:.5E}"
              .format(n, error))
-plt.plot(result_xs[0], trial_expectancy, label="Exact expectancy")
+ref = trial_expectancy
+if ref is not None:
+    plt.plot(result_xs[0], ref, label="Exact reference")
 # plt.ylim((0, 1))
 plt.legend()
 
-plt.figure()
-plt.title("Collocation interpolation by matrix inversion for {}".format(trial.name))
-plt.plot(N, errors, label="Errors to expectancy")
-plt.plot(N, rank_fractions, label="Vandermonde rank deficiency")
-plt.yscale('log')
-plt.legend()
-plt.xlabel('Maximum polynom degree')
+if len(errors) > 0:
+    plt.figure()
+    plt.title("Collocation interpolation by matrix inversion for {}".format(trial.name))
+    plt.plot(N, errors, label="Errors to expectancy")
+    if len(errors_variance) > 0:
+        plt.plot(N, errors_variance, label="Errors to variance")
+    plt.plot(N, rank_fractions, label="Vandermonde rank deficiency")
+    plt.yscale('log')
+    plt.legend()
+    plt.xlabel('Maximum polynom degree')
 plt.show()

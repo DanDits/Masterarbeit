@@ -7,12 +7,12 @@ chaos = []
 
 
 class PolyChaosDistribution:
-    def __init__(self, poly_name, poly_basis, distribution, normalization_gamma, nodes):
+    def __init__(self, poly_name, poly_basis, distribution, normalization_gamma, nodes_and_weights):
         self.poly_name = poly_name
         self.poly_basis = poly_basis
         self.distribution = distribution
         self.normalization_gamma = normalization_gamma
-        self.interpolation_nodes = nodes
+        self.nodes_and_weights = nodes_and_weights
         chaos.append(self)
 
     @lru_cache(maxsize=None)
@@ -22,12 +22,12 @@ class PolyChaosDistribution:
 
 hermiteChaos = PolyChaosDistribution("Hermite", poly.hermite_basis(),
                                      distr.gaussian, lambda n: math.factorial(n),
-                                     poly.hermite_nodes)
+                                     poly.hermite_nodes_and_weights)
 legendreChaos = PolyChaosDistribution("Legendre", poly.legendre_basis(),
                                       distr.make_uniform(-1, 1),
                                       # this is reduced by factor 1/2 as 1/2 is the density function of the distribution
                                       lambda n: 1 / (2 * n + 1),
-                                      poly.legendre_nodes)
+                                      poly.legendre_nodes_and_weights)
 
 
 # Notation hint for literature: Pochhammer symbol for falling factorial.. was hard to find!
@@ -40,19 +40,24 @@ def rising_factorial(alpha, n):
     return prod
 
 
-def make_laguerreChaos(alpha):
+def make_laguerreChaos(alpha):  # alpha > 0
     return PolyChaosDistribution("Laguerre", poly.laguerre_basis(alpha),
                                  distr.make_gamma(alpha, 1),
                                  lambda n: rising_factorial(alpha, n) / math.factorial(n),
-                                 partial(poly.laguerre_nodes, alpha=alpha))
+                                 partial(poly.laguerre_nodes_and_weights, alpha=alpha))
 
 
-# Other chaos pairs, not implemented:
-# ("Beta","Jacobi", [a, b]),
-# ("Poisson", "Charlier", support_Naturals),
-# ("Binomial", "Krawtchouk", support_NaturalsFinite),
-# ("Negative Binomial", "Meixner", support_Naturals),
-# ("Hypergeometric", "Hahn", support_NaturalsFinite)
+def make_jacobiChaos(alpha, beta): # alpha, beta > -1
+    return PolyChaosDistribution("Jacobi", poly.jacobi_basis(alpha, beta),
+                                 distr.make_beta(alpha, beta),
+                                 lambda n: (rising_factorial(alpha + 1, n) * rising_factorial(beta + 1, n)
+                                            / (math.factorial(n) * (2 * n + alpha + beta + 1) * rising_factorial(alpha + beta + 2, n - 1))),
+                                 partial(poly.jacobi_nodes_and_weights, alpha=alpha, beta=beta))
+# Other chaos pairs (with discrete distributions); not implemented:
+# ("Poisson", "Charlier")
+# ("Binomial", "Krawtchouk")
+# ("Negative Binomial", "Meixner")
+# ("Hypergeometric", "Hahn")
 
 
 def get_chaos_by_poly(poly_name):
