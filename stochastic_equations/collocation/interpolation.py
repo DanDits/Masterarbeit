@@ -15,12 +15,16 @@ def glenshaw_curtis_nodes(size):
     return -np.cos(np.pi * ((np.array(range(2, size)) - 1) / (size - 1)))
 
 
+# nodes in interval (-1,1), increasingly dense at boundary. Minimize polynomial prod(x-node_i) in [-1,1]
+def chebyshev_nodes(size):
+    return np.cos(np.pi * (np.array(range(1, size + 1)) * 2 - 1) / (2 * size))
+
+
 def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count, spatial_domain, grid_size,
                                 start_time, stop_time, delta_time):
-
-    # TODO so far the convergence for higher poly degree reverses itself for every nodes we tried so far
-    # TODO this effect occurs faster for gaussian (trial2_1 about degree 20-30), later for uniform (trial3 degree 65)
-    # TODO and rather fast (trial2_2 about degree 16) for gamma(2.5)
+    # if poly degree gets too big, the vandermonde matrix will become singular (with increasingly decreasing rank)
+    # and this will make the calculated expectancy become unusable for high degrees
+    # For uniform distribution this effect occurs around degree 63, for gaussian around 36, for gamma(2.5) around 22
     distr = trial.variable_distributions[0]
     if distr.name == "Gaussian":
         assert distr.parameters == (0, 1)
@@ -39,6 +43,9 @@ def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count
         nodes = chaos.interpolation_nodes(random_space_nodes_count)
     else:
         raise ValueError("Not supported distribution:", distr.name)
+
+    # nodes = chebyshev_nodes(random_space_nodes_count)
+    # nodes = glenshaw_curtis_nodes(random_space_nodes_count)
     basis = [chaos.normalized_basis(degree) for degree in range(max_poly_degree + 1)]
 
     # for each node in random space calculate solution u(t,x) in discrete grid at some time T
@@ -70,7 +77,9 @@ def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count
     # computes the weights which are the factors for representing the random solution by the given basis polynomials
     # each column corresponds to the the factors of a spatial grid point
 
-    weights = lstsq(vandermonde_A, rhs_u)[0]
+    result = lstsq(vandermonde_A, rhs_u)
+    rank = result[2]
+    weights = result[0]
 
     # weights = np.linalg.solve(vandermonde_A, rhs_u)  # only works for square vandermonde matrix
 
@@ -81,4 +90,4 @@ def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count
     # E[w_N]=sum_0^N(weight_k*E[phi_k])=weight_0*E[1*phi_0]=weight_0*E[phi_0*phi_0]*sqrt(gamma_0)=weight_0*sqrt(gamma_0)
     expectancy = np.reshape(weights[0, :], (grid_size,)) * np.sqrt(chaos.normalization_gamma(0))
 
-    return splitting_xs, splitting_xs_mesh, expectancy
+    return splitting_xs, splitting_xs_mesh, expectancy, rank
