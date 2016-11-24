@@ -1,6 +1,7 @@
 import numpy as np
 from itertools import repeat
 import polynomial_chaos.distributions as distributions
+from stochastic_equations.collocation.discrete_projection import discrete_projection_expectancy
 from stochastic_equations.stochastic_trial import StochasticTrial
 from stochastic_equations.collocation.interpolation import matrix_inversion_expectancy
 import matplotlib.pyplot as plt
@@ -68,28 +69,37 @@ trial_3 = StochasticTrial([distributions.make_uniform(-1, 1)],  # y[0] bigger th
                                                 * (np.log(np.sin(sum(xs)) + right_3)
                                                    - np.log(np.sin(sum(xs)) + left_3)))
 
-trial = trial_3
+trial = trial_1
 
 # "High order is not the same as high accuracy. High order translates to high accuracy only when the integrand
 # is very smooth" (http://apps.nrbook.com/empanel/index.html?pg=179#)
-N = list(range(30))  # maximum degree of the polynomial, so N+1 polynomials
+N = list(range(10))  # maximum degree of the polynomial, so N+1 polynomials
 # from n+1 to n+10 notably difference for most examples
-M = [n + 1 for n in N]  # number of nodes in random space, >= N+1, the higher the more accuracy (for higher polys)
+M = [n + 1 for n in N]  # number of nodes in random space, >= N+1, higher CAN give more accuracy (for higher polys)
 spatial_dimension = 1
 grid_size = 128
 spatial_domain = list(repeat([-np.pi, np.pi], spatial_dimension))
 start_time = 0
 stop_time = 0.5
 delta_time = 0.001
+use_matrix_inversion = False
 
+rank = None
 exp_var_results, ranks = [], []
 for n, m in zip(N, M):
-    result_xs, result_xs_mesh, expectancy, variance, rank = matrix_inversion_expectancy(trial, n, m,
+    if use_matrix_inversion:
+        result_xs, result_xs_mesh, expectancy, variance, rank = matrix_inversion_expectancy(trial, n, m,
                                                                                         spatial_domain, grid_size,
                                                                                         start_time, stop_time,
-                                                                                        delta_time)
+                                                                                    delta_time)
+    else:
+        result_xs, result_xs_mesh, expectancy, variance = discrete_projection_expectancy(trial, n, m,
+                                                                                         spatial_domain, grid_size,
+                                                                                         start_time, stop_time,
+                                                                                         delta_time)
     exp_var_results.append((n, m, expectancy, variance))
-    ranks.append(rank)
+    if rank is not None:
+        ranks.append(rank)
 rank_fractions = list(map(lambda n, x: 10 ** (-(1 - x / (n + 1))*10), N, ranks))  # rescale to make visible in l
 # TODO more trials, maybe try to find a more complicated one with known expectancy (or reference)
 print("Plotting:")
@@ -103,7 +113,7 @@ if trial.has_parameter("variance"):
     trial_variance = trial.variance(result_xs_mesh, stop_time)
 
 plt.figure()
-plt.title("Expectancies by matrix inversion coll. in spatial grid size={}".format(grid_size))
+plt.title("Expectancies, spatial grid size={}".format(grid_size))
 errors, errors_variance = [], []
 for n, m, expectancy, variance in exp_var_results:
     error = -1
@@ -125,11 +135,14 @@ plt.legend()
 
 if len(errors) > 0:
     plt.figure()
-    plt.title("Collocation interpolation by matrix inversion for {}".format(trial.name))
+    plt.title("Collocation interpolation by {} for {}".format(("Matrix inversion" if use_matrix_inversion
+                                                               else "Discrete projection"),
+                                                              trial.name))
     plt.plot(N, errors, label="Errors to expectancy")
     if len(errors_variance) > 0:
         plt.plot(N, errors_variance, label="Errors to variance")
-    plt.plot(N, rank_fractions, label="Vandermonde rank deficiency")
+    if len(rank_fractions) > 0:
+        plt.plot(N, rank_fractions, label="Vandermonde rank deficiency")
     plt.yscale('log')
     plt.legend()
     plt.xlabel('Maximum polynom degree')

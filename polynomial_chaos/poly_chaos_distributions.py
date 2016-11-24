@@ -3,8 +3,6 @@ import polynomial_chaos.poly as poly
 import polynomial_chaos.distributions as distr
 from functools import lru_cache, partial
 
-chaos = []
-
 
 class PolyChaosDistribution:
     def __init__(self, poly_name, poly_basis, distribution, normalization_gamma, nodes_and_weights):
@@ -13,7 +11,6 @@ class PolyChaosDistribution:
         self.distribution = distribution
         self.normalization_gamma = normalization_gamma
         self.nodes_and_weights = nodes_and_weights
-        chaos.append(self)
 
     @lru_cache(maxsize=None)
     def normalized_basis(self, degree):
@@ -21,7 +18,7 @@ class PolyChaosDistribution:
 
 
 hermiteChaos = PolyChaosDistribution("Hermite", poly.hermite_basis(),
-                                     distr.gaussian, lambda n: math.factorial(n),
+                                     distr.gaussian, lambda n: math.factorial(n),  # TODO can we avoid using this for high values of n?
                                      poly.hermite_nodes_and_weights)
 legendreChaos = PolyChaosDistribution("Legendre", poly.legendre_basis(),
                                       distr.make_uniform(-1, 1),
@@ -40,6 +37,7 @@ def rising_factorial(alpha, n):
     return prod
 
 
+# TODO check again if laguerre is correct, convergence for interpolation_collo is zigzac
 def make_laguerreChaos(alpha):  # alpha > 0
     return PolyChaosDistribution("Laguerre", poly.laguerre_basis(alpha),
                                  distr.make_gamma(alpha, 1),
@@ -60,15 +58,16 @@ def make_jacobiChaos(alpha, beta): # alpha, beta > -1
 # ("Hypergeometric", "Hahn")
 
 
-def get_chaos_by_poly(poly_name):
-    for curr in chaos:
-        if curr.poly_name == poly_name:
-            return curr
-    raise ValueError("No polynomial chaos distribution for polynomial name", poly_name)
+def get_chaos_by_distribution(find_distr):
+    if find_distr.name == "Gaussian":
+        chaos = hermiteChaos
+    elif find_distr.name == "Uniform":
+        chaos = legendreChaos
+    elif find_distr.name == "Gamma":
+        chaos = make_laguerreChaos(find_distr.parameters[0])
+    elif find_distr.name == "Beta":
+        chaos = make_jacobiChaos(find_distr.parameters[0], find_distr.parameters[1])
+    else:
+        raise ValueError("Not supported distribution:", find_distr.name)
+    return chaos
 
-
-def get_chaos_by_distribution(distribution_name):
-    for curr in chaos:
-        if curr.distribution.name == distribution_name:
-            return curr
-    raise ValueError("No polynomial chaos distribution for distribution name", distribution_name)

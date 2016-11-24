@@ -83,7 +83,7 @@ def calculate_nodes_and_weights(alphas, betas):
     trimat = (np.diag(alphas)
               + np.diag(beta_sqrt, 1) + np.diag(beta_sqrt, -1))
     nodes, vectors = np.linalg.eigh(trimat)
-    return nodes, np.reshape(vectors[0, :], (len(nodes),))
+    return nodes, 2 * np.reshape(vectors[0, :] ** 2, (len(nodes),))
 
 # Polynomial basis: http://dlmf.nist.gov/18.3
 # Recurrence correlations: http://dlmf.nist.gov/18.9#i
@@ -99,7 +99,11 @@ def hermite_basis():
 
 def hermite_nodes_and_weights(degree):
     return calculate_nodes_and_weights(np.zeros(degree), np.array(range(1, degree)))
-
+print("Hermite")
+print(hermite_nodes_and_weights(1))
+print(hermite_nodes_and_weights(2))
+print(hermite_nodes_and_weights(3))
+print(hermite_nodes_and_weights(4))
 
 def laguerre_basis(alpha):
     return _poly_basis_recursive([np.array([1.]), np.array([alpha, -1.])],
@@ -113,6 +117,11 @@ def laguerre_nodes_and_weights(degree, alpha):
     return calculate_nodes_and_weights(2 * np.array(range(0, degree)) + alpha,
                            np.array(range(1, degree)) * (np.array(range(1, degree)) - 1 + alpha))
 
+print("Laguerre")
+print(laguerre_nodes_and_weights(1, 0.5))
+print(laguerre_nodes_and_weights(2, 0.5))
+print(laguerre_nodes_and_weights(3, 0.5))
+print(laguerre_nodes_and_weights(4, 0.5))
 
 # Legendre polynomials, interval assumed to be [-1,1], recursion p_n(x)=x(2n-1)/n * p_(n-1)(x)-(n-1)/n*p_(n-2)(x)
 def legendre_basis():
@@ -127,7 +136,11 @@ def legendre_basis():
 def legendre_nodes_and_weights(degree):
     nm1 = np.array(range(1, degree))
     return calculate_nodes_and_weights(np.zeros(degree), nm1 ** 2 / (4 * (nm1 ** 2) - 1))
-
+print("Legendre")
+print(legendre_nodes_and_weights(1))
+print(legendre_nodes_and_weights(2))
+print(legendre_nodes_and_weights(3))
+print(legendre_nodes_and_weights(4))
 
 def legendre_nodes_fast(degree):
     # when returned 'amount' nodes is fixed (no matter the degree),
@@ -169,6 +182,11 @@ def jacobi_basis(alpha, beta):
                                   (1, lambda n, c: (-2 * get_factor(n) * (n + alpha - 1) * (n + beta - 1) / ((2 * n + alpha + beta - 2) * (2 * n + alpha + beta - 1))))])
 
 
-def jacobi_nodes_and_weights(alpha, beta):
-    # TODO jacobi and beta distribution all untested and this function here not yet implemented
-    pass
+def jacobi_nodes_and_weights(degree, alpha, beta):
+    # TODO jacobi basis, nodes, weights and beta distribution all untested!
+    temp = np.array(range(1, degree + 1))
+    return calculate_nodes_and_weights((beta ** 2 - alpha ** 2) / ((2 * np.array(range(degree)) + alpha + beta)
+                                                                   * (2 * np.array(range(degree)) + 2 + alpha + beta)),
+                                       4 * temp * (temp + alpha) * (temp + beta) * (temp + alpha + beta)
+                                       / ((2 * temp + alpha + beta - 1) * ((2 * temp + alpha + beta) ** 2)
+                                          * (2 * temp + alpha + beta + 1)))

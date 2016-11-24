@@ -11,12 +11,12 @@ approx_orders_P = [1, 3, 5, 7, 9]  # orders to approximate and plot
 
 
 # Load required distributions and hermite polynomial basis
-uniform_legendre_chaos = chaos.get_chaos_by_distribution("Uniform")
+uniform_legendre_chaos = chaos.legendreChaos
 uniform = uniform_legendre_chaos.distribution
 
 expo = make_exponential(1.)
 
-gaussian_hermite_chaos = chaos.get_chaos_by_distribution("Gaussian")
+gaussian_hermite_chaos = chaos.hermiteChaos
 gaussian = gaussian_hermite_chaos.distribution
 hermite_basis = gaussian_hermite_chaos.poly_basis
 hermite_normalization = gaussian_hermite_chaos.normalization_gamma

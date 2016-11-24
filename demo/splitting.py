@@ -16,7 +16,7 @@ from diff_equation.splitting import make_klein_gordon_lie_trotter_splitting, mak
 from util.trial import Trial
 
 dimension = 1
-grid_size_N = 128 if dimension >= 2 else 128
+grid_size_N = 64 if dimension >= 2 else 128
 domain = list(repeat([-pi, pi], dimension))
 delta_time = 0.001
 save_every_x_solution = 1
@@ -101,7 +101,7 @@ trial_frog4 = Trial(lambda xs: np.sin(sum(xs)),
                     lambda xs: np.zeros(shape=sum(xs).shape)) \
     .add_parameters("beta", lambda xs: np.where(xs[0] > 0, xs[0], 10),
                     "alpha", lambda: 0.7)
-trial = trial_3
+trial = trial_frog4
 
 
 offset_wave_solver = None
