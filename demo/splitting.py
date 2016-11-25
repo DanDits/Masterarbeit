@@ -140,8 +140,8 @@ plot_every_x_solution = ((stop_time - start_time) / delta_time) / plot_solutions
 
 if dimension == 1:
     if do_animate:
-        animate_1d(result_xs[0], ref_splitting.solutions(), ref_splitting.times(), 1,
-                   comparison_ys=ref_splitting_2.solutions())
+        animate_1d(result_xs[0], [ref_splitting.solutions(), ref_splitting_2.solutions()], ref_splitting.times(), 1,
+                   labels=[ref_splitting.name, ref_splitting_2.name])
     else:
         plt.figure()
         plt.plot(*result_xs, trial.start_position(xs_mesh), label="Start position")

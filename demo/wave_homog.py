@@ -99,7 +99,7 @@ if show_errors and has_reference(trial, dimension):
 
 if dimension == 1:
     if do_animate:
-        animate_1d(wave_config.xs[0], wave_config.solutions(), show_times, 100)  # pause between frames in ms
+        animate_1d(wave_config.xs[0], [wave_config.solutions()], show_times, 100)  # pause between frames in ms
     else:
         # all times in one figure
         plt.figure()

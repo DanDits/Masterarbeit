@@ -58,7 +58,7 @@ if show_errors:
 
 if dimension == 1:
     if do_animate:
-        animate_1d(linhyp_config.xs[0], linhyp_config.solutions(), show_times, 100)  # pause between frames in ms
+        animate_1d(linhyp_config.xs[0], [linhyp_config.solutions()], show_times, 100)  # pause between frames in ms
     else:
         # all times in one figure
         plt.figure()

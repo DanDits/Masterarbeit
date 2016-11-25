@@ -9,7 +9,7 @@ from util.animate import animate_1d, animate_2d
 do_animate = True
 grid_n = 128  # power of 2 for best performance of fft
 thermal_diffusivity = 0.1  # > 0
-dimension = 2  # plotting only supported for one or two dimensional, higher dimension will require lower grid_n
+dimension = 1  # plotting only supported for one or two dimensional, higher dimension will require lower grid_n
 domain = list(repeat([-pi, pi], dimension))  # intervals with periodic boundary conditions, so a torus
 show_times = np.arange(0, 20, 0.1)  # times to evaluate solution for and plot it
 
@@ -26,7 +26,7 @@ x_result, t_result, y_result = heat_solution(domain, [grid_n],
 
 if len(x_result) == 1:  # 1D plots
     if do_animate:
-        animate_1d(x_result[0], y_result, show_times, 100)  # pause between frames in ms
+        animate_1d(x_result[0], [y_result], show_times, 100)  # pause between frames in ms
     else:
         # all times in one figure
         for time, sol in zip(t_result, y_result):
