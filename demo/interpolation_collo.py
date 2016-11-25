@@ -69,13 +69,14 @@ trial_3 = StochasticTrial([distributions.make_uniform(-1, 1)],  # y[0] bigger th
                                                 * (np.log(np.sin(sum(xs)) + right_3)
                                                    - np.log(np.sin(sum(xs)) + left_3)))
 
-trial = trial_3
+trial = trial_2_2
 
 # "High order is not the same as high accuracy. High order translates to high accuracy only when the integrand
 # is very smooth" (http://apps.nrbook.com/empanel/index.html?pg=179#)
 N = list(range(10))  # maximum degree of the polynomial, so N+1 polynomials
 # from n+1 to n+10 notably difference for most examples
 M = [n + 1 for n in N]  # number of nodes in random space, >= N+1, higher CAN give more accuracy (for higher polys)
+Q = [15] * len(N)  # number of nodes and weights used for discrete projection's quadrature formula
 spatial_dimension = 1
 grid_size = 128
 spatial_domain = list(repeat([-np.pi, np.pi], spatial_dimension))
@@ -86,21 +87,21 @@ use_matrix_inversion = False
 
 rank = None
 exp_var_results, ranks = [], []
-for n, m in zip(N, M):
+for n, m, q in zip(N, M, Q):
     if use_matrix_inversion:
         result_xs, result_xs_mesh, expectancy, variance, rank = matrix_inversion_expectancy(trial, n, m,
-                                                                                        spatial_domain, grid_size,
-                                                                                        start_time, stop_time,
-                                                                                    delta_time)
+                                                                                            spatial_domain, grid_size,
+                                                                                            start_time, stop_time,
+                                                                                            delta_time)
     else:
-        result_xs, result_xs_mesh, expectancy, variance = discrete_projection_expectancy(trial, n, m,
+        result_xs, result_xs_mesh, expectancy, variance = discrete_projection_expectancy(trial, n, q,
                                                                                          spatial_domain, grid_size,
                                                                                          start_time, stop_time,
                                                                                          delta_time)
     exp_var_results.append((n, m, expectancy, variance))
     if rank is not None:
         ranks.append(rank)
-rank_fractions = list(map(lambda n, x: 10 ** (-(1 - x / (n + 1))*10), N, ranks))  # rescale to make visible in l
+rank_fractions = list(map(lambda n, x: 10 ** (-(1 - x / (n + 1)) * 10), N, ranks))  # rescale to make visible in l
 # TODO more trials, maybe try to find a more complicated one with known expectancy (or reference)
 print("Plotting:")
 trial_expectancy = None

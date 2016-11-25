@@ -18,7 +18,7 @@ class PolyChaosDistribution:
 
 
 hermiteChaos = PolyChaosDistribution("Hermite", poly.hermite_basis(),
-                                     distr.gaussian, lambda n: math.factorial(n),  # TODO can we avoid using this for high values of n?
+                                     distr.gaussian, lambda n: math.factorial(n),
                                      poly.hermite_nodes_and_weights)
 legendreChaos = PolyChaosDistribution("Legendre", poly.legendre_basis(),
                                       distr.make_uniform(-1, 1),

@@ -9,8 +9,6 @@ from numpy.linalg import lstsq
 import math
 
 
-# TODO try interpolation approach by quadrature formula, so find good weights and nodes for gauss quadrature in 1d
-
 # nodes in interval (-1,1), increasingly dense at boundary
 def glenshaw_curtis_nodes(size):
     size += 2  # as we do not want first and last point which would be -1 and 1

@@ -1,7 +1,6 @@
 from functools import lru_cache
 import numpy as np
 import numpy.polynomial.polynomial as npoly
-from scipy.special import gamma as gamma_func
 
 
 # Pretty general implementation for a recursively defined polynomial basis in function form, so it is not optimized
@@ -74,9 +73,9 @@ def _polymulx(n, coeff):
     return npoly.polymulx(coeff)
 
 
-# TODO I dont understand why I need to scale the weights depending on the polybasis (but not on the degree)
-# weights_scle is tested for laguerre to be gamma(alpha), for legendre to be 2, the rest is currently untested
-def calculate_nodes_and_weights(alphas, betas, weights_scale=1):
+# to get the traditional weights for gauss-laguerre multiply by gamma(alpha),
+# to get the traditional weights for gauss legendre multiply by 2
+def calculate_nodes_and_weights(alphas, betas):
     # The Golub-Welsch algorithm in symmetrized form
     # see https://en.wikipedia.org/wiki/Gaussian_quadrature#Computation_of_Gaussian_quadrature_rules
     # or see http://dlmf.nist.gov/3.5#vi  for calculation of nodes = zeros of polynomial
@@ -85,7 +84,7 @@ def calculate_nodes_and_weights(alphas, betas, weights_scale=1):
     trimat = (np.diag(alphas)
               + np.diag(beta_sqrt, 1) + np.diag(beta_sqrt, -1))
     nodes, vectors = np.linalg.eigh(trimat)
-    return nodes, weights_scale * np.reshape(vectors[0, :] ** 2, (len(nodes),))
+    return nodes, np.reshape(vectors[0, :] ** 2, (len(nodes),))
 
 # Polynomial basis: http://dlmf.nist.gov/18.3
 # Recurrence correlations: http://dlmf.nist.gov/18.9#i
@@ -100,7 +99,7 @@ def hermite_basis():
 
 
 def hermite_nodes_and_weights(degree):
-    return calculate_nodes_and_weights(np.zeros(degree), np.array(range(1, degree)), np.sqrt(2 * np.pi))
+    return calculate_nodes_and_weights(np.zeros(degree), np.array(range(1, degree)))
 
 
 def laguerre_basis(alpha):
@@ -114,8 +113,7 @@ def laguerre_nodes_and_weights(degree, alpha):
     # normalized recurrence relation: q_n=xq_(n-1) - (2(n-1) + alpha)q_(n-1) - (n-1)(n - 2 + alpha)q_(n-2)
     # to obtain the regular polynomials multiply by (-1)^n / n!
     return calculate_nodes_and_weights(2 * np.array(range(0, degree)) + alpha,
-                                       np.array(range(1, degree)) * (np.array(range(1, degree)) - 1 + alpha),
-                                       gamma_func(alpha))
+                                       np.array(range(1, degree)) * (np.array(range(1, degree)) - 1 + alpha))
 
 
 # Legendre polynomials, interval assumed to be [-1,1], recursion p_n(x)=x(2n-1)/n * p_(n-1)(x)-(n-1)/n*p_(n-2)(x)
@@ -130,7 +128,7 @@ def legendre_basis():
 # (n!)^2 * 2^n / (2n)!
 def legendre_nodes_and_weights(degree):
     nm1 = np.array(range(1, degree))
-    return calculate_nodes_and_weights(np.zeros(degree), nm1 ** 2 / (4 * (nm1 ** 2) - 1), 2)
+    return calculate_nodes_and_weights(np.zeros(degree), nm1 ** 2 / (4 * (nm1 ** 2) - 1))
 
 
 def legendre_nodes_fast(degree):
@@ -180,5 +178,4 @@ def jacobi_nodes_and_weights(degree, alpha, beta):
                                                                    * (2 * np.array(range(degree)) + 2 + alpha + beta)),
                                        4 * temp * (temp + alpha) * (temp + beta) * (temp + alpha + beta)
                                        / ((2 * temp + alpha + beta - 1) * ((2 * temp + alpha + beta) ** 2)
-                                          * (2 * temp + alpha + beta + 1)),
-                                       1)
+                                          * (2 * temp + alpha + beta + 1)))

@@ -2,7 +2,8 @@ from diff_equation.splitting import make_klein_gordon_leapfrog_splitting
 from polynomial_chaos.poly_chaos_distributions import get_chaos_by_distribution
 from stochastic_equations.collocation.util import check_distribution_assertions
 
-
+# expectancy accuracy does not depend on max_poly_degree, only on the quadrature nodes count
+# the variance error decreases for higher poly degrees, as long as the quadrature nodes count is higher (high enough)
 def discrete_projection_expectancy(trial, max_poly_degree, random_space_quadrature_nodes_count, spatial_domain, grid_size,
                                 start_time, stop_time, delta_time):
     distr = trial.variable_distributions[0]
@@ -11,7 +12,6 @@ def discrete_projection_expectancy(trial, max_poly_degree, random_space_quadratu
     basis = [chaos.poly_basis(degree) for degree in range(max_poly_degree + 1)]
 
     quad_nodes, quad_weights = chaos.nodes_and_weights(random_space_quadrature_nodes_count)
-    quad_weights /= 2 # TODO ok i just multply by 2 and divide here again by 2, remove that weight factor for poly, also ok for other distributions then? quad weights are not the traditional weights then though
     print("For distr", distr, "got poly", chaos.poly_name)
     print("Nodes:", quad_nodes, "weights:", quad_weights)
     poly_weights = []
