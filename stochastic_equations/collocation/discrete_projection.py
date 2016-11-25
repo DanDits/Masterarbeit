@@ -12,8 +12,7 @@ def discrete_projection_expectancy(trial, max_poly_degree, random_space_quadratu
     basis = [chaos.poly_basis(degree) for degree in range(max_poly_degree + 1)]
 
     quad_nodes, quad_weights = chaos.nodes_and_weights(random_space_quadrature_nodes_count)
-    print("For distr", distr, "got poly", chaos.poly_name)
-    print("Nodes:", quad_nodes, "weights:", quad_weights)
+
     poly_weights = []
     splitting_xs = None
     splitting_xs_mesh = None
@@ -31,7 +30,6 @@ def discrete_projection_expectancy(trial, max_poly_degree, random_space_quadratu
                 splitting_xs_mesh = splitting.get_xs_mesh()
             curr_poly_weight += poly(node) * weight * splitting.solutions()[-1].real
         poly_weights.append(curr_poly_weight / chaos.normalization_gamma(i))
-    print("gamma0:", chaos.normalization_gamma(0))
     expectancy = chaos.normalization_gamma(0) * poly_weights[0]
     variance = (sum((weight ** 2) * chaos.normalization_gamma(i) for i, weight in enumerate(poly_weights))
                 - (chaos.normalization_gamma(0) * poly_weights[0]) ** 2)

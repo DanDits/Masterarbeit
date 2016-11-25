@@ -4,7 +4,8 @@ from functools import partial
 from math import pi
 import matplotlib.pyplot as plt
 import time
-
+from scipy.special import jn as bessel_first
+from scipy.special import yn as bessel_second
 from diff_equation.pseudospectral_solver import OffsetWaveSolverConfig
 from util.animate import animate_1d, animate_2d_surface
 
@@ -101,7 +102,23 @@ trial_frog4 = Trial(lambda xs: np.sin(sum(xs)),
                     lambda xs: np.zeros(shape=sum(xs).shape)) \
     .add_parameters("beta", lambda xs: np.where(xs[0] > 0, xs[0], 10),
                     "alpha", lambda: 0.7)
-trial = trial_frog4
+
+bessel_A, bessel_B, bessel_alpha, bessel_beta, bessel_C1, bessel_C2 = 1, -1, 1, 1, 10, 0
+def bessel_xi(xs, t):
+    temp = (bessel_alpha ** 2) * ((t + bessel_C1) ** 2) - ((sum(xs) + bessel_C2) ** 2)
+    return np.sqrt(bessel_beta) * np.sqrt(temp) / bessel_alpha
+# not a valid trial as the spatial derivative is not periodic, but works for some small time spans in the center!
+trial_bessel = Trial(lambda xs: (bessel_A * bessel_first(0, bessel_xi(xs, 0))
+                                 + bessel_B * bessel_second(0, bessel_xi(xs, 0))),
+                     lambda xs: (bessel_A * bessel_first(1, bessel_xi(xs, 0)) * (-bessel_beta * bessel_C1)
+                                 / bessel_xi(xs, 0)
+                                 + bessel_B * bessel_second(1, bessel_xi(xs, 0)) * (-bessel_beta * bessel_C1)
+                                 / bessel_xi(xs, 0)),
+                     lambda xs, t: (bessel_A * bessel_first(0, bessel_xi(xs, t))
+                                    + bessel_B * bessel_second(0, bessel_xi(xs, t)))) \
+    .add_parameters("beta", lambda xs: bessel_beta,
+                    "alpha", lambda: bessel_alpha ** 2)
+trial = trial_bessel
 
 
 offset_wave_solver = None
@@ -135,13 +152,15 @@ ref_splitting_2 = splittings[5] if len(splittings) > 5 else splittings[-1]
 result_xs = ref_splitting.get_xs()
 xs_mesh = ref_splitting.get_xs_mesh()
 
+ref = [trial.reference(xs_mesh, t) for t in ref_splitting.times()]
 plot_counter = 0
 plot_every_x_solution = ((stop_time - start_time) / delta_time) / plot_solutions_count
 
 if dimension == 1:
     if do_animate:
-        animate_1d(result_xs[0], [ref_splitting.solutions(), ref_splitting_2.solutions()], ref_splitting.times(), 1,
-                   labels=[ref_splitting.name, ref_splitting_2.name])
+        animate_1d(result_xs[0], [ref_splitting.solutions(), ref_splitting_2.solutions(), ref],
+                   ref_splitting.times(), 1,
+                   labels=[ref_splitting.name, ref_splitting_2.name, "Exact"])
     else:
         plt.figure()
         plt.plot(*result_xs, trial.start_position(xs_mesh), label="Start position")

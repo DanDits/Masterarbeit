@@ -79,11 +79,13 @@ def calculate_nodes_and_weights(alphas, betas):
     # The Golub-Welsch algorithm in symmetrized form
     # see https://en.wikipedia.org/wiki/Gaussian_quadrature#Computation_of_Gaussian_quadrature_rules
     # or see http://dlmf.nist.gov/3.5#vi  for calculation of nodes = zeros of polynomial
-    # p_k(x)=(x-alpha_(k-1))*p_(k-1)(x)-beta_(k-1)p_(k-2)(x)
+    # p_k(x)=(x-alpha_(k-1))*p_(k-1)(x)-beta_(k-1)p_(k-2)(x)  # the monic recurrence correlation of the polynomials
     beta_sqrt = np.sqrt(betas)
     trimat = (np.diag(alphas)
               + np.diag(beta_sqrt, 1) + np.diag(beta_sqrt, -1))
     nodes, vectors = np.linalg.eigh(trimat)
+    # nodes are the roots of the n-th polynom which are the eigenvalues of this matrix
+    # the weights are the squares of the first entry of the corresponding eigenvectors
     return nodes, np.reshape(vectors[0, :] ** 2, (len(nodes),))
 
 # Polynomial basis: http://dlmf.nist.gov/18.3

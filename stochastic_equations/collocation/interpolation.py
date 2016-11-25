@@ -1,6 +1,4 @@
-# TODO extend to multidim case, how to get stochastic polynomial basis? how to build tensor product of 1d interpolations?
-# TODO use sparse grids for higher dimensional case
-
+# TODO extend to multidim case
 import numpy as np
 from diff_equation.splitting import make_klein_gordon_leapfrog_splitting
 from polynomial_chaos.poly_chaos_distributions import get_chaos_by_distribution

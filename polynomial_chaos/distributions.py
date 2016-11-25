@@ -90,7 +90,7 @@ def make_beta(alpha, beta):
     beta_01 = partial(random.betavariate, alpha + 1, beta + 1)
 
     def generator():
-        return beta_01() * 2 - 1
+        return beta_01() * 2 - 1  # not completely sure if this scaling from [0,1] to [-1,1] is correct
     return Distribution("Beta",
                         lambda x: (((1 - x) ** alpha) * ((1 + x) ** beta) / (2 ** (alpha + beta + 1))
                                    / beta_func(alpha + 1, beta + 1) if -1 <= x <= 1 else 0),
