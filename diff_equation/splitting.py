@@ -37,6 +37,8 @@ class Splitting:
         # zeroth config is assumed to be properly initialized with starting values and solver
         assert len(self.solver_configs[0].timed_solutions()) == 0  # without any solutions yet
         save_solution_counter = save_solution_step
+        total_start_time = self.solver_configs[0].start_time
+        steps_completed_count = 0
         for counter, step_fraction, config, next_config \
                 in zip(cycle(range(len(self.solver_configs))),
                        cycle(self.solver_step_fractions),
@@ -47,7 +49,9 @@ class Splitting:
 
             splitting_step_completed = counter == len(self.solver_configs) - 1
             if splitting_step_completed:
-                time += time_step_size  # when one splitting step is complete, progress time (for book keeping)
+                steps_completed_count += 1
+                # when one splitting step is complete, progress time (for book keeping)
+                time = total_start_time + time_step_size * steps_completed_count
                 save_solution_counter -= 1
                 if save_solution_counter == 0 or time >= end_time:
                     # either if we want to save or if its the last solution anyways: save it

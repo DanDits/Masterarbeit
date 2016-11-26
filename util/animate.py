@@ -40,7 +40,7 @@ def animate_1d(x, ys, animate_times, pause, labels=None):
     def animate(i):
         for line, y in zip(lines, ys):
             line.set_data(x, y[i].real)
-        time_text.set_text("Solution at time=" + str(animate_times[i]))
+        time_text.set_text("Solution at time={:.4}".format(animate_times[i]))
         return (*lines), time_text
 
     # call the animator.  blit=True means only re-draw the parts that have changed.

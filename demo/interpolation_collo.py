@@ -69,7 +69,7 @@ trial_3 = StochasticTrial([distributions.make_uniform(-1, 1)],  # y[0] bigger th
                                                 * (np.log(np.sin(sum(xs)) + right_3)
                                                    - np.log(np.sin(sum(xs)) + left_3)))
 
-trial = trial_2_2
+trial = trial_2
 
 # "High order is not the same as high accuracy. High order translates to high accuracy only when the integrand
 # is very smooth" (http://apps.nrbook.com/empanel/index.html?pg=179#)
@@ -108,6 +108,7 @@ trial_expectancy = None
 if trial.has_parameter("expectancy"):
     trial_expectancy = trial.expectancy(result_xs_mesh, stop_time)
 elif trial.raw_reference is not None:
+    print("Calculating expectancy")
     trial_expectancy = trial.calculate_expectancy(result_xs, stop_time, trial.raw_reference)
 trial_variance = None
 if trial.has_parameter("variance"):

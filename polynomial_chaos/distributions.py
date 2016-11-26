@@ -87,10 +87,10 @@ def make_exponential(lamb=1.):
 def make_beta(alpha, beta):
     if alpha <= -1 or beta <= -1:
         raise ValueError("Parameters must be greater than -1", alpha, beta)
-    beta_01 = partial(random.betavariate, alpha + 1, beta + 1)
+    beta_01 = partial(random.betavariate, beta + 1, alpha + 1)  # random uses switched notation...
 
     def generator():
-        return beta_01() * 2 - 1  # not completely sure if this scaling from [0,1] to [-1,1] is correct
+        return beta_01() * 2 - 1  # scaling from [0,1] to [-1,1]
     return Distribution("Beta",
                         lambda x: (((1 - x) ** alpha) * ((1 + x) ** beta) / (2 ** (alpha + beta + 1))
                                    / beta_func(alpha + 1, beta + 1) if -1 <= x <= 1 else 0),
@@ -98,3 +98,20 @@ def make_beta(alpha, beta):
                         generator,
                         show_name="Beta({}, {})".format(alpha, beta),
                         parameters=(alpha, beta))
+
+
+if __name__ == "__main__":
+    import numpy as np
+    import matplotlib.pyplot as plt
+    test_distribution = make_beta(1., 2.)
+
+    x = [test_distribution.sample_generator() for _ in range(100000)]
+    hist, bin_edges = np.histogram(x, bins='auto', density=True)
+    bin_centers = bin_edges[:-1] + (bin_edges[1:] - bin_edges[:-1]) / 2
+
+    plt.figure()
+    plt.plot(bin_centers, hist, label="Calculated distribution")
+    plt.plot(bin_centers, np.vectorize(test_distribution.weight)(bin_centers), label="PDF")
+    plt.ylim((0, plt.ylim()[1]))
+    plt.legend()
+    plt.show()

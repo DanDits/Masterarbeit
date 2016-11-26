@@ -101,7 +101,7 @@ def hermite_basis():
 
 
 def hermite_nodes_and_weights(degree):
-    return calculate_nodes_and_weights(np.zeros(degree), np.array(range(1, degree)))
+    return calculate_nodes_and_weights(np.zeros(degree), np.arange(1, degree))
 
 
 def laguerre_basis(alpha):
@@ -114,8 +114,8 @@ def laguerre_basis(alpha):
 def laguerre_nodes_and_weights(degree, alpha):
     # normalized recurrence relation: q_n=xq_(n-1) - (2(n-1) + alpha)q_(n-1) - (n-1)(n - 2 + alpha)q_(n-2)
     # to obtain the regular polynomials multiply by (-1)^n / n!
-    return calculate_nodes_and_weights(2 * np.array(range(0, degree)) + alpha,
-                                       np.array(range(1, degree)) * (np.array(range(1, degree)) - 1 + alpha))
+    return calculate_nodes_and_weights(2 * np.arange(0, degree) + alpha,
+                                       np.arange(1, degree) * (np.arange(1, degree) - 1 + alpha))
 
 
 # Legendre polynomials, interval assumed to be [-1,1], recursion p_n(x)=x(2n-1)/n * p_(n-1)(x)-(n-1)/n*p_(n-2)(x)
@@ -129,7 +129,7 @@ def legendre_basis():
 # polynomials: p_n(x)=x*p_(n-1)(x)-(n-1)^2/(4(n-1)^2-1)p_(n-2), to get the normal polynomial divide by
 # (n!)^2 * 2^n / (2n)!
 def legendre_nodes_and_weights(degree):
-    nm1 = np.array(range(1, degree))
+    nm1 = np.arange(1, degree)
     return calculate_nodes_and_weights(np.zeros(degree), nm1 ** 2 / (4 * (nm1 ** 2) - 1))
 
 
@@ -154,7 +154,7 @@ def legendre_nodes_fast(degree):
         # http://math.stackexchange.com/questions/12160/roots-of-legendre-polynomial by  Francesco Tricomi
         # http://naturalunits.blogspot.de/2013/10/zeros-of-legendre-polynomials.html
         n = degree
-        k = np.array(range(1, n + 1))
+        k = np.arange(1, n + 1)
         sigma = np.pi * (n - k + 3 / 4) / (n + 1 / 2)
         return (1 - 1 / (8 * n ** 2) + 1 / (8 * n ** 3) - (39 - 28 / (np.sin(sigma) ** 2)) / (384 * n ** 4)) * np.cos(
             sigma)  # O(n^(-5))
@@ -169,15 +169,17 @@ def jacobi_basis(alpha, beta):
     return _poly_basis_recursive([np.array([1.]),
                                   np.array([0.5 * (alpha - beta), 0.5 * (alpha + beta + 2)])],  # starting values
                                  [(0, lambda n, c: npoly.polyadd(npoly.polymulx(c) * get_factor(n),
-                                                                 -c * get_factor(n) * (beta ** 2 - alpha ** 2) / ((2 * n + alpha + beta - 2) * (2 * n + alpha + beta)))),
-                                  (1, lambda n, c: (-2 * get_factor(n) * (n + alpha - 1) * (n + beta - 1) / ((2 * n + alpha + beta - 2) * (2 * n + alpha + beta - 1))))])
+                                                                 -c * get_factor(n) * (beta ** 2 - alpha ** 2)
+                                                                 / ((2 * n + alpha + beta - 2)
+                                                                    * (2 * n + alpha + beta)))),
+                                  (1, lambda n, c: c * (-2 * get_factor(n) * (n + alpha - 1) * (n + beta - 1) / ((2 * n + alpha + beta - 2) * (2 * n + alpha + beta - 1))))])
 
 
 def jacobi_nodes_and_weights(degree, alpha, beta):
-    # TODO jacobi basis, nodes, weights and beta distribution all untested!
-    temp = np.array(range(1, degree + 1))
-    return calculate_nodes_and_weights((beta ** 2 - alpha ** 2) / ((2 * np.array(range(degree)) + alpha + beta)
-                                                                   * (2 * np.array(range(degree)) + 2 + alpha + beta)),
+    # TODO jacobi nodes, weights untested; laguerre convergence for interpolation_pollo zigzac, could need another test
+    temp = np.arange(1, degree + 1)
+    return calculate_nodes_and_weights((beta ** 2 - alpha ** 2) / ((2 * np.arange(degree) + alpha + beta)
+                                                                   * (2 * np.arange(degree) + 2 + alpha + beta)),
                                        4 * temp * (temp + alpha) * (temp + beta) * (temp + alpha + beta)
                                        / ((2 * temp + alpha + beta - 1) * ((2 * temp + alpha + beta) ** 2)
                                           * (2 * temp + alpha + beta + 1)))

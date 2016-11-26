@@ -2,10 +2,11 @@ from diff_equation.splitting import make_klein_gordon_leapfrog_splitting
 from polynomial_chaos.poly_chaos_distributions import get_chaos_by_distribution
 from stochastic_equations.collocation.util import check_distribution_assertions
 
+
 # expectancy accuracy does not depend on max_poly_degree, only on the quadrature nodes count
 # the variance error decreases for higher poly degrees, as long as the quadrature nodes count is higher (high enough)
-def discrete_projection_expectancy(trial, max_poly_degree, random_space_quadrature_nodes_count, spatial_domain, grid_size,
-                                start_time, stop_time, delta_time):
+def discrete_projection_expectancy(trial, max_poly_degree, random_space_quadrature_nodes_count, spatial_domain,
+                                   grid_size, start_time, stop_time, delta_time):
     distr = trial.variable_distributions[0]
     chaos = get_chaos_by_distribution(distr)
     check_distribution_assertions(distr)

@@ -44,13 +44,7 @@ print(gpc_factors)
 def gpc_approx(y, factors):
     return sum(factor * hermite_basis(m)(y) for factor, m in zip(factors, range(len(factors))))
 
-# Relevant for visualizing results and data
-left_bound = -6
-right_bound = 6
-output_resolution = 0.1  # width of the discrete distribution
-
-t = np.arange(left_bound, right_bound, output_resolution)
-t += 0.5 * output_resolution  # to adjust that samples are from all the interval [L, L+resolution] set t in the middle
+bin_centers = None
 for approx_order in approx_orders_P:
     # Calculate discrete distribution (=histogram) of the gpc approximation by sampling
     samples_count = 2000  # how many samples of the normal distribution to draw
@@ -59,20 +53,19 @@ for approx_order in approx_orders_P:
 
     uniform_samples = np.arange(1. / samples_count, 1. - 1. / samples_count, 1. / samples_count)  # 0 and 1 exclusive!
     samples = np.vectorize(inverse_gaussian)(uniform_samples)
-    output = sorted(np.vectorize(lambda y: gpc_approx(y, gpc_factors[:factors_by_order(approx_order)]))(samples))
+    output = np.vectorize(lambda y: gpc_approx(y, gpc_factors[:factors_by_order(approx_order)]))(samples)
 
-    output_distribution = np.zeros(shape=t.shape)
-    for value in output:
-        ind = np.clip([int((value - left_bound) / output_resolution)], 0, len(output_distribution) - 1)
-        output_distribution[ind] += 1
-    output_distribution /= (samples_count * output_resolution)
+    # to see the stochastic gibbs effect when approximating the uniform distribution more clear, set bins=100
+    hist, bin_edges = np.histogram(output, bins='auto', density=True)
+    bin_centers = bin_edges[:-1] + (bin_edges[1:] - bin_edges[:-1]) / 2
 
     # Plotting of the demo approximation
-    plt.plot(t, output_distribution, label="Hermite approximation of order " + str(approx_order))
+    plt.plot(bin_centers, hist, label="Hermite approximation of order " + str(approx_order))
 
 
 plt.title("gPC approximation of a distribution by hermite polynomials")
-plt.plot(t, np.vectorize(to_approximate.weight)(t), label="Exact " + str(to_approximate) + " distribution")
+plt.plot(bin_centers, np.vectorize(to_approximate.weight)(bin_centers),
+         label="Exact " + str(to_approximate) + " distribution")
 plt.legend()
 # plt.axis([-6, 14, 0, 1])
 plt.show()

@@ -118,7 +118,7 @@ trial_bessel = Trial(lambda xs: (bessel_A * bessel_first(0, bessel_xi(xs, 0))
                                     + bessel_B * bessel_second(0, bessel_xi(xs, t)))) \
     .add_parameters("beta", lambda xs: bessel_beta,
                     "alpha", lambda: bessel_alpha ** 2)
-trial = trial_bessel
+trial = trial_3
 
 
 offset_wave_solver = None

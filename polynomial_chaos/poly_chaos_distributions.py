@@ -28,7 +28,7 @@ legendreChaos = PolyChaosDistribution("Legendre", poly.legendre_basis(),
 
 
 # Notation hint for literature: Pochhammer symbol for falling factorial.. was hard to find!
-# Xiu seems to use falling instead of rising?
+# Xiu and other authors define this to be rising factorial in contrast to wikipedia
 # Falling: alpha_n = alpha*(alpha-1)*...*(alpha-n+1)
 def rising_factorial(alpha, n):
     prod = 1
@@ -37,7 +37,6 @@ def rising_factorial(alpha, n):
     return prod
 
 
-# TODO check again if laguerre is correct, convergence for interpolation_collo is zigzac
 def make_laguerreChaos(alpha):  # alpha > 0
     return PolyChaosDistribution("Laguerre", poly.laguerre_basis(alpha),
                                  distr.make_gamma(alpha, 1),
@@ -48,8 +47,9 @@ def make_laguerreChaos(alpha):  # alpha > 0
 def make_jacobiChaos(alpha, beta): # alpha, beta > -1
     return PolyChaosDistribution("Jacobi", poly.jacobi_basis(alpha, beta),
                                  distr.make_beta(alpha, beta),
-                                 lambda n: (rising_factorial(alpha + 1, n) * rising_factorial(beta + 1, n)
-                                            / (math.factorial(n) * (2 * n + alpha + beta + 1) * rising_factorial(alpha + beta + 2, n - 1))),
+                                 lambda n: ((rising_factorial(alpha + 1, n) * rising_factorial(beta + 1, n)
+                                            / (math.factorial(n) * (2 * n + alpha + beta + 1)
+                                               * rising_factorial(alpha + beta + 2, n - 1))) if n > 0 else 1),
                                  partial(poly.jacobi_nodes_and_weights, alpha=alpha, beta=beta))
 # Other chaos pairs (with discrete distributions); not implemented:
 # ("Poisson", "Charlier")
@@ -71,3 +71,19 @@ def get_chaos_by_distribution(find_distr):
         raise ValueError("Not supported distribution:", find_distr.name)
     return chaos
 
+
+if __name__ == "__main__":
+    from scipy.integrate import quad
+
+    # for testing the orthogonality and normalization of the polynomial basis
+    alpha, beta = 1.5, -0.5
+    chaos = make_laguerreChaos(alpha)  # make_jacobiChaos(alpha, beta)
+    basis = [chaos.normalized_basis(i) for i in range(5)]
+
+    for b1 in basis:
+        row = []
+        for b2 in basis:
+            result = quad(lambda x: b1(x) * b2(x) * chaos.distribution.weight(x),
+                          chaos.distribution.support[0], chaos.distribution.support[1])[0]
+            row.append(result)
+        print(row)
