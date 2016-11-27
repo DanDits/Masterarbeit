@@ -1,4 +1,15 @@
 import numpy as np
+import operator
+from functools import reduce
+
+
+def mul_prod(factors):
+    """
+    As python does not include a "prod" equivalent to "sum", here it is.
+    :param factors: Factors to multiply by using the operator.mul
+    :return: The product of all factors, 1 if empty.
+    """
+    return reduce(operator.mul, factors, 1)
 
 
 # noinspection PyTypeChecker

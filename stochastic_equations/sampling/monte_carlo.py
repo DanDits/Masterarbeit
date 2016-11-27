@@ -22,10 +22,11 @@ def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
     solutions_for_order_estimate = []
 
     actual_solutions_count = 0
-    for i in range(1, simulations_count + 1):
-        if heartbeat > 0 and i % heartbeat == 0:
+    fail_count = 0
+    while actual_solutions_count < simulations_count:
+        if heartbeat > 0 and actual_solutions_count % heartbeat == 0:
             print("Simulation",
-                  i)  # about 7s for 100 simulations with leapfrog (1min with lie trotter), 512, 0.001, [0,.5]
+                  actual_solutions_count)
         stochastic_trial.randomize()
 
         splitting = make_klein_gordon_leapfrog_splitting(domain, [grid_size_N], start_time,
@@ -41,10 +42,15 @@ def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
 
         solution = splitting.solutions()[eval_solution_index]
         test_summed = np.sum(solution)
-        if np.isnan(test_summed) or np.isinf(test_summed) or np.abs(test_summed) > 1E10:
-            print("Simulation", i, "got a invalid result, NaN or Inf or too big:", test_summed, "Skipping",
+        if np.isnan(test_summed) or np.isinf(test_summed) or np.abs(test_summed) > 1E5:
+            fail_count += 1
+            print("Simulation", actual_solutions_count,
+                  "got a invalid result, NaN or Inf or too big:", test_summed, "Skipping",
                   "Random parameters:", stochastic_trial.rvalues, stochastic_trial.name)
-            continue
+            if fail_count < simulations_count:
+                continue
+            else:
+                break  # to make simulation stop at maximum of twice the runtime
         actual_solutions_count += 1
         if summed_solutions is not None:
             summed_solutions += solution

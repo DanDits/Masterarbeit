@@ -1,19 +1,9 @@
 from util.trial import Trial
 from functools import partial
 from scipy.integrate import nquad
-import operator
-from functools import reduce
+from util.analysis import mul_prod
 from itertools import product
 import numpy as np
-
-
-def mul_prod(factors):
-    """
-    As python does not include a "prod" equivalent to "sum", here it is.
-    :param factors: Factors to multiply by using the operator.mul
-    :return: The product of all factors, 1 if empty.
-    """
-    return reduce(operator.mul, factors, 1)
 
 
 class StochasticTrial(Trial):

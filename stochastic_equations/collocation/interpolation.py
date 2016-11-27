@@ -1,4 +1,3 @@
-# TODO extend to multidim case
 import numpy as np
 from diff_equation.splitting import make_klein_gordon_leapfrog_splitting
 from polynomial_chaos.poly_chaos_distributions import get_chaos_by_distribution

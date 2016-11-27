@@ -16,7 +16,8 @@ domain = list(repeat([-np.pi, np.pi], dimension))
 delta_time = 0.001
 start_time = 0.
 stop_time = 0.5
-simulations_count = 300
+save_last_solution = True
+simulations_count = 100000
 
 # the factor of the step number between two consecutive solutions used to estimate order of convergence
 order_factor = 10  # >=2, integer
@@ -78,11 +79,11 @@ trial_4 = StochasticTrial([distributions.gaussian, distributions.make_uniform(0,
                     "alpha", lambda ys: 1 + 0.5 * ys[0] + 3 * ys[1])
 trial_5 = StochasticTrial([distributions.gaussian],
                           lambda xs, ys: np.cos(sum(xs)),
-                          lambda xs, ys: np.zeros(shape=sum(xs).shape),
+                          lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
                           name="Trial5") \
     .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] * ys[0]) + np.sin(xs[0] + ys[0]),
                     "alpha", lambda ys: 1 + np.exp(ys[0]))
-trial = trial_2_1
+trial = trial_5
 
 splitting_xs, splitting_xs_mesh, expectancy, errors, solutions, solutions_for_order_estimate = \
     simulate(trial, simulations_count, [simulations_count // 3, simulations_count // 2, simulations_count],
@@ -99,8 +100,8 @@ if dimension == 1:
         plt.plot(*splitting_xs, expectancy, label="Expectancy")
     for step, solution in solutions:
         plt.plot(*splitting_xs, solution, label="Mean with N={}".format(step))
-    if simulations_count >= 10000:
-        np.save('mc_{}, {}'.format(solutions[-1][0], trial.name), solutions[-1][1])
+    if save_last_solution:
+        np.save('../data/mc_{}, {}, {}'.format(solutions[-1][0], trial.name, stop_time), solutions[-1][1])
     plt.legend()
 elif dimension == 2:
     animate_2d_surface(splitting_xs[0], splitting_xs[1], [sol for _, sol in solutions],
