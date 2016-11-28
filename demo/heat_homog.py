@@ -9,7 +9,7 @@ from util.animate import animate_1d, animate_2d
 do_animate = True
 grid_n = 128  # power of 2 for best performance of fft
 thermal_diffusivity = 0.1  # > 0
-dimension = 1  # plotting only supported for one or two dimensional, higher dimension will require lower grid_n
+dimension = 2  # plotting only supported for one or two dimensional, higher dimension will require lower grid_n
 domain = list(repeat([-pi, pi], dimension))  # intervals with periodic boundary conditions, so a torus
 show_times = np.arange(0, 20, 0.1)  # times to evaluate solution for and plot it
 

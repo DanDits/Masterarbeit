@@ -44,7 +44,7 @@ class Distribution:
 
 gaussian = Distribution("Gaussian",
                         lambda x: math.exp(-x * x / 2.) / math.sqrt(2. * math.pi),
-                        [-inf, inf],
+                        (-inf, inf),
                         partial(random.gauss, 0, 1),
                         inverse_gaussian,
                         parameters=(0, 1))
@@ -55,7 +55,7 @@ def make_uniform(left_bound, right_bound):
         raise ValueError("Left bound must be smaller than right bound:", left_bound, right_bound)
     return Distribution("Uniform",
                         lambda x: 1. / (right_bound - left_bound) if left_bound <= x <= right_bound else 0.,
-                        [left_bound, right_bound],
+                        (left_bound, right_bound),
                         partial(random.uniform, left_bound, right_bound),
                         make_inverse_uniform(left_bound, right_bound),
                         parameters=(left_bound, right_bound))
@@ -68,7 +68,7 @@ def make_gamma(shape, rate):
     return Distribution("Gamma",
                         lambda x: ((rate ** shape) * (x ** (shape - 1)) * math.exp(-rate * x) / gamma_shape
                                    if x >= 0 else 0.),
-                        [0, inf],
+                        (0, inf),
                         partial(random.gammavariate, shape, 1. / rate),
                         show_name="Gamma({}, {})".format(shape, rate),
                         parameters=(shape, rate))
@@ -94,7 +94,7 @@ def make_beta(alpha, beta):
     return Distribution("Beta",
                         lambda x: (((1 - x) ** alpha) * ((1 + x) ** beta) / (2 ** (alpha + beta + 1))
                                    / beta_func(alpha + 1, beta + 1) if -1 <= x <= 1 else 0),
-                        [-1, 1],
+                        (-1, 1),
                         generator,
                         show_name="Beta({}, {})".format(alpha, beta),
                         parameters=(alpha, beta))

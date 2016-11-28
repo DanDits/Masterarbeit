@@ -176,10 +176,22 @@ def jacobi_basis(alpha, beta):
 
 
 def jacobi_nodes_and_weights(degree, alpha, beta):
-    # TODO jacobi nodes, weights untested; laguerre convergence for interpolation_pollo zigzac, could need another test
-    temp = np.arange(1, degree + 1)
+    temp = np.arange(1, degree)
     return calculate_nodes_and_weights((beta ** 2 - alpha ** 2) / ((2 * np.arange(degree) + alpha + beta)
                                                                    * (2 * np.arange(degree) + 2 + alpha + beta)),
                                        4 * temp * (temp + alpha) * (temp + beta) * (temp + alpha + beta)
                                        / ((2 * temp + alpha + beta - 1) * ((2 * temp + alpha + beta) ** 2)
                                           * (2 * temp + alpha + beta + 1)))
+
+
+if __name__ == "__main__":
+    a, b = 0.5, 3.7
+    degree = 20
+    # HINT: hermite and laguerre nodes are becoming wrong for degree >= 15, orthonormal basis are correct
+    # the nodes are also correct, the problem is that the polynomial evaluation becomes increasingly bad for these
+    # types of basis because of cancellation and round off errors.
+    test_nodes = hermite_nodes_and_weights(degree)[0]
+    # nodes are the roots of the corresponding polynom
+    test_poly = hermite_basis()(degree)
+    print("Nodes:", np.array(test_nodes) * np.sqrt(0.5))
+    print("Should all be ~zero:", np.vectorize(test_poly)(test_nodes))

@@ -53,6 +53,14 @@ trial_2_2 = StochasticTrial([distributions.make_gamma(2.5, 1)],
                             name="Trial2_2")
 trial_2_2.add_parameters("beta", lambda xs, ys: 1 / ys[0] ** 2 - 1 / ys[0],  # 1/y^2 - alpha(y)
                          "alpha", lambda ys: 1 / ys[0])
+trial_2_3 = StochasticTrial([distributions.make_beta(-0.5, 0.7)],
+                            lambda xs, ys: np.zeros(shape=sum(xs).shape),
+                            lambda xs, ys: np.sin(sum(xs)),
+                            lambda xs, t, ys: np.sin(sum(xs)) * np.sin(t / ys[0]) * ys[0],
+                            random_variables=[lambda y: 0.5 + 0.2 * np.sin(y) ** 2],
+                            name="Trial2_3")
+trial_2_3.add_parameters("beta", lambda xs, ys: 1 / ys[0] ** 2 - 1 / ys[0],  # 1/y^2 - alpha(y)
+                         "alpha", lambda ys: 1 / ys[0])
 left_3, right_3 = 10, 50  # y[0] bigger than 2
 trial_3 = StochasticTrial([distributions.make_uniform(-1, 1)],  # y[0] bigger than 2 enforced by random variable
                           lambda xs, ys: 1 / (np.sin(sum(xs)) + ys[0]),
@@ -65,15 +73,15 @@ trial_3 = StochasticTrial([distributions.make_uniform(-1, 1)],  # y[0] bigger th
                                                               + 2 * np.cos(sum(xs)) ** 2
                                                               / (np.sin(sum(xs)) + ys[0]) ** 2),
                     "alpha", lambda ys: ys[0] - 2,
-                    "expectancy", lambda xs, t: np.cos(t) / (right_3 - left_3)
-                                                * (np.log(np.sin(sum(xs)) + right_3)
-                                                   - np.log(np.sin(sum(xs)) + left_3)))
+                    "expectancy", lambda xs, t: (np.cos(t) / (right_3 - left_3)
+                                                 * (np.log(np.sin(sum(xs)) + right_3)
+                                                    - np.log(np.sin(sum(xs)) + left_3))))
 
-trial = trial_2
+trial = trial_2_2
 
 # "High order is not the same as high accuracy. High order translates to high accuracy only when the integrand
 # is very smooth" (http://apps.nrbook.com/empanel/index.html?pg=179#)
-N = list(range(10))  # maximum degree of the polynomial, so N+1 polynomials
+N = list(range(30))  # maximum degree of the polynomial, so N+1 polynomials
 # from n+1 to n+10 notably difference for most examples
 M = [n + 1 for n in N]  # number of nodes in random space, >= N+1, higher CAN give more accuracy (for higher polys)
 Q = [15] * len(N)  # number of nodes and weights used for discrete projection's quadrature formula
@@ -83,7 +91,7 @@ spatial_domain = list(repeat([-np.pi, np.pi], spatial_dimension))
 start_time = 0
 stop_time = 0.5
 delta_time = 0.001
-use_matrix_inversion = False
+use_matrix_inversion = True
 
 rank = None
 exp_var_results, ranks = [], []

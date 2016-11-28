@@ -76,9 +76,9 @@ if __name__ == "__main__":
     from scipy.integrate import quad
 
     # for testing the orthogonality and normalization of the polynomial basis
-    alpha, beta = 1.5, -0.5
-    chaos = make_laguerreChaos(alpha)  # make_jacobiChaos(alpha, beta)
-    basis = [chaos.normalized_basis(i) for i in range(5)]
+    alpha, beta = 2.5, -0.5
+    chaos = hermiteChaos  # make_jacobiChaos(alpha, beta)
+    basis = [chaos.normalized_basis(i) for i in range(20)]
 
     for b1 in basis:
         row = []
