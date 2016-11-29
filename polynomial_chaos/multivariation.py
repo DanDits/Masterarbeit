@@ -84,6 +84,7 @@ def chaos_multify(chaos_list, sum_bound):
         nodes_weights_pairs = [chaos.nodes_and_weights(length) for length, chaos in zip(lengths, chaos_list)]
         nodes_list = [nodes for nodes, _ in nodes_weights_pairs]
         weights_list = [weights for _, weights in nodes_weights_pairs]
+
         # use full tensor product of all dimensions by using 'product'
         nodes_list = [grid_nodes for grid_nodes in product(*nodes_list)]
         weights_list = [grid_weights for grid_weights in product(*weights_list)]
