@@ -3,9 +3,46 @@ from util.analysis import error_l2
 from collections import deque
 import numpy as np
 
+
 def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
              domain, grid_size_N, start_time, stop_time, delta_time, eval_time=None, heartbeat=100,
              do_calculate_expectancy=True, order_factor=2):
+    """
+    Monte Carlo simulation for the stochastic Klein-Gordon equation using a splitting method to solve the equation
+    for randomly generated values of the trial's distributions. Calculates the expectancy by calculating the mean
+    value of the simulations. Takes quite some time for high simulations_count. Convergence is of
+    order 1/sqrt(simulations_count), though the random character makes this not perfectly visible. Offers
+    an estimation of the convergence order (should be 0.5), but as the convergence might switch from coming from above
+    or from below, this is mostly not super accurate if no reference solution is available for the trial.
+    If a setting of randomized values fails for some reason (result blows up, NaN or Inf appears), the simulation is
+    repeated, but in total only the double amount of simulations will be done.
+    :param stochastic_trial: The stochastic trial to get starting values and data from.
+    :param simulations_count: (int) The amount (>0) of simulations to use. 1000 is ok and fast, 100,000 offers ca.
+    error in range of O(10^-3) to O(10^-4) for most examples.
+    :param keep_solutions_at_steps: A list of integers of solutions to keep (if intermediate estimates of expectancy
+    are wanted).
+    :param domain: The domain to solve the Klein-Gordon equation on. List of intervals.
+    :param grid_size_N: The grid size(s) to discretize each spatial dimension into. Should be power of 2.
+    For spatial dimension 1, this can be higher (like 512), for higher dimensions should be low. The higher this is,
+    the lower lower the delta_time parameter should be (CFL-condition).
+    :param start_time: The starting time to use. Does not really matter, mostly 0.
+    :param stop_time: The stop time. Will stop when the splitting time is bigger than or equal to this time for the
+    first time, so after (stop_time-start_time) / delta_time steps.
+    :param delta_time: The delta time increment to use for splitting.
+    :param eval_time: The time to evaluate the solution at. So the expectancy is calculated at this time only. If None,
+    then stop_time is used.
+    :param heartbeat: (int) if positive then every heartbeat steps a small print will be made to console.
+    :param do_calculate_expectancy: If there is no expectancy set for the trial but it has a reference set, uses this
+    reference to calculate the exact expectancy and later returns it. Can take some time but useful for error analysis.
+    :param order_factor: Factor between the steps of the simulations used to approximate the order. Can be 2, default is
+    10. Should not be changed though.
+    :return: xs: A list of 1d nd-arrays of the spatial discretization
+             xs_mesh: A list of the sparse mesh grids belong to xs.
+             expectancy: The trial's evaluated expectancy, the calculated expectancy or None
+             errors: 1d nd-array how to error evolved over the simulations
+             solutions: The solutions that we should save which are approximations to the expectancy
+             solutions_for_order_estimate: The 3 solutions for the order estimate (if possible)
+    """
     xs, xs_mesh = None, None
     eval_solution_index = None
     expectancy = None

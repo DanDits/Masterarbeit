@@ -57,7 +57,7 @@ def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count
 
     # computes the weights which are the factors for representing the random solution by the given basis polynomials
     # each column corresponds to the the factors of a spatial grid point
-
+    print("VandA:", vandermonde_A.shape, "rhsu:", rhs_u.shape)
     result = lstsq(vandermonde_A, rhs_u)
     rank = result[2] / min(vandermonde_A.shape)
     print("Vandermonde_A:", vandermonde_A.shape, "u:", rhs_u.shape, "Weights:", result[0].shape)

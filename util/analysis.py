@@ -9,20 +9,19 @@ def mul_prod(factors):
     :param factors: Factors to multiply by using the operator.mul
     :return: The product of all factors, 1 if empty.
     """
-    try:
-        return reduce(operator.mul, factors, 1)
-    except OverflowError as oe:
-        print("Overflow on product of factors.")
-        raise oe
+    return reduce(operator.mul, factors, 1)
 
 
 # noinspection PyTypeChecker
 def error_l2(approx_y, solution_y):
     """
     Calculates the discrete L2 distance between the given nd-arrays of the same shape.
+    Does not take into account to length of the interval this approximation lives on. To get
+    the exact integral multiply by sqrt of the area of the domain.
     :param approx_y: First nd-array
     :param solution_y: Second nd-array
-    :return: The real distance, which is the discrete L2 integral between the functions.
+    :return: The real distance, which is the (up to a constant factor)
+    the discrete L2 integral between the functions.
     """
     assert approx_y.shape == solution_y.shape
     return np.sqrt(np.sum(np.abs(approx_y - solution_y) ** 2) / approx_y.size)

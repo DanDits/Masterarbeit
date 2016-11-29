@@ -101,7 +101,7 @@ trial = trial_mc4
 
 # "High order is not the same as high accuracy. High order translates to high accuracy only when the integrand
 # is very smooth" (http://apps.nrbook.com/empanel/index.html?pg=179#)
-N = list(range(10))  # maximum degree of the polynomial, so N+1 polynomials
+N = list(range(20))  # maximum degree of the polynomial, so N+1 polynomials
 # from n+1 to n+10 notably difference for most examples
 
 # number of nodes in random space, >= N+1, higher CAN give more accuracy (for higher polys)
@@ -111,7 +111,7 @@ N = list(range(10))  # maximum degree of the polynomial, so N+1 polynomials
 # if minimal: rank of vandermonde decreases by 10-30% and solution does not improve; very fast!
 # if minimal+1:
 M = [(int(np.ceil(multi_index_bounded_sum_length(len(trial.variable_distributions), n)
-              ** (1 / len(trial.variable_distributions)))) + 1,) * len(trial.variable_distributions)
+              ** (1 / len(trial.variable_distributions)))),) * len(trial.variable_distributions)
      for n in N]
 Q = [15] * len(N)  # number of nodes and weights used for discrete projection's quadrature formula
 spatial_dimension = 1

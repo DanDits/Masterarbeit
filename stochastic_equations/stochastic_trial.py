@@ -13,11 +13,27 @@ class StochasticTrial(Trial):
     functions that take an additional list of random parameters (named 'ys'). Getting these attributes from this trial
     will assign them the currently randomized values.
     To generate a new trial according to the given distributions, use the randomize method after all required attributes
-    have been referenced.
+    have been referenced. Can be overwritten by set_random_values(values) to arbitrary values.
     """
 
     def __init__(self, variable_distributions, start_position, start_velocity, reference=None,
                  random_variables=None, name=None):
+        """
+        Creates a new Stochastic Trial. See Trial's constructor for parameters: start_position, start_velocity,
+        reference, name for basic usage, remember they take an additional parameter ys.
+        If you need to get the reference which is not seeded by the random values, use attribute
+        raw_reference instead.
+        :param variable_distributions: A list of distributions to use to generate random values. List length determines
+         the dimension of the random space of this trial.
+        :param start_position: See Trial.
+        :param start_velocity: See Trial.
+        :param reference: (Optional) See Trial
+        :param random_variables: (Optional) A list of random variables. These are functions taking a single y and
+        arbitrarily mapping it to another y. Useful if the distributions are expected to have some default parameters
+        and do not repeat oneself all the time when using y for reference,...
+        If none or not enough given will be filled by identity function.
+        :param name: See Trial.
+        """
         super().__init__(start_position, start_velocity, reference, name=name)
         self.raw_reference = reference
         self.variable_distributions = variable_distributions

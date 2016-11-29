@@ -44,7 +44,7 @@ def make_laguerreChaos(alpha):  # alpha > 0
                                  partial(poly.laguerre_nodes_and_weights, alpha=alpha))
 
 
-def make_jacobiChaos(alpha, beta): # alpha, beta > -1
+def make_jacobiChaos(alpha, beta):  # alpha, beta > -1
     return PolyChaosDistribution("Jacobi", poly.jacobi_basis(alpha, beta),
                                  distr.make_beta(alpha, beta),
                                  lambda n: ((rising_factorial(alpha + 1, n) * rising_factorial(beta + 1, n)
@@ -76,14 +76,14 @@ if __name__ == "__main__":
     from scipy.integrate import quad
 
     # for testing the orthogonality and normalization of the polynomial basis
-    alpha, beta = 2.5, -0.5
-    chaos = hermiteChaos  # make_jacobiChaos(alpha, beta)
-    basis = [chaos.normalized_basis(i) for i in range(20)]
+    test_alpha, test_beta = 2.5, -0.5
+    test_chaos = hermiteChaos  # make_jacobiChaos(test_alpha, test_beta)
+    basis = [test_chaos.normalized_basis(i) for i in range(20)]
 
     for b1 in basis:
         row = []
         for b2 in basis:
-            result = quad(lambda x: b1(x) * b2(x) * chaos.distribution.weight(x),
-                          chaos.distribution.support[0], chaos.distribution.support[1])[0]
+            result = quad(lambda x: b1(x) * b2(x) * test_chaos.distribution.weight(x),
+                          test_chaos.distribution.support[0], test_chaos.distribution.support[1])[0]
             row.append(result)
         print(row)

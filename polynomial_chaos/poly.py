@@ -187,14 +187,14 @@ def jacobi_nodes_and_weights(degree, alpha, beta):
 
 if __name__ == "__main__":
     a, b = 0.5, 3.7
-    degree = 20
+    test_degree = 20
     # HINT: hermite (so hermite-gauss chaos) and laguerre (so laguerre-gamma chaos)
     # nodes are becoming wrong for degree >= 15, orthonormal basis are correct!
     # the nodes are also correct, the problem is that the polynomial evaluation becomes increasingly bad for these
     # types of basis because of cancellation and round off errors.
-    test_nodes = hermite_nodes_and_weights(degree)[0]
+    test_nodes = hermite_nodes_and_weights(test_degree)[0]
     # nodes are the roots of the corresponding polynom
-    test_poly = hermite_basis()(degree)
+    test_poly = hermite_basis()(test_degree)
     print("Nodes:", np.array(test_nodes))
     # multiply test_nodes by np.sqrt(0.5)
     # when comparing to http://keisan.casio.com/exec/system/1281195844
