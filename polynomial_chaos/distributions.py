@@ -105,8 +105,8 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
     test_distribution = make_beta(1., 2.)
 
-    x = [test_distribution.sample_generator() for _ in range(100000)]
-    hist, bin_edges = np.histogram(x, bins='auto', density=True)
+    data = [test_distribution.sample_generator() for _ in range(100000)]
+    hist, bin_edges = np.histogram(data, bins='auto', density=True)
     bin_centers = bin_edges[:-1] + (bin_edges[1:] - bin_edges[:-1]) / 2
 
     plt.figure()

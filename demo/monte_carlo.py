@@ -10,7 +10,7 @@ from util.analysis import error_l2
 from util.animate import animate_2d_surface
 
 dimension = 1
-grid_size_N = 128 if dimension >= 2 else 512
+grid_size_N = 128 if dimension >= 2 else 128
 do_calculate_expectancy = True  # dimension == 1  # for 128*128 in dim=2 already takes about 30s
 domain = list(repeat([-np.pi, np.pi], dimension))
 delta_time = 0.001
@@ -69,13 +69,14 @@ trial_3 = StochasticTrial([distributions.make_uniform(-1, 1)],  # y[0] bigger th
                     "expectancy", lambda xs, t: np.cos(t) / (right_3 - left_3)
                                                 * (np.log(np.sin(sum(xs)) + right_3)
                                                    - np.log(np.sin(sum(xs)) + left_3)))
-trial_4 = StochasticTrial([distributions.gaussian, distributions.make_uniform(0, 1),
-                           distributions.make_exponential(1)],
+trial_4 = StochasticTrial([distributions.gaussian, distributions.make_uniform(-1, 1),
+                           distributions.make_beta(-0.5, 2.5), distributions.make_uniform(-1, 1)],
                           lambda xs, ys: np.sin(sum(xs)),
                           lambda xs, ys: np.sin(sum(xs)) ** 2,
-                          random_variables=[lambda y: np.exp(y)],
+                          random_variables=[lambda y: np.exp(y), lambda y: (y + 1) / 2,
+                                            lambda y: y, lambda y: y * 4 + 2],
                           name="Trial4") \
-    .add_parameters("beta", lambda xs, ys: 2 + np.sin(xs[0] + ys[2]),
+    .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] + ys[2]) + np.sin(xs[0] + ys[3]),
                     "alpha", lambda ys: 1 + 0.5 * ys[0] + 3 * ys[1])
 trial_5 = StochasticTrial([distributions.gaussian],
                           lambda xs, ys: np.cos(sum(xs)),
@@ -83,7 +84,7 @@ trial_5 = StochasticTrial([distributions.gaussian],
                           name="Trial5") \
     .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] * ys[0]) + np.sin(xs[0] + ys[0]),
                     "alpha", lambda ys: 1 + np.exp(ys[0]))
-trial = trial_5
+trial = trial_4
 
 splitting_xs, splitting_xs_mesh, expectancy, errors, solutions, solutions_for_order_estimate = \
     simulate(trial, simulations_count, [simulations_count // 3, simulations_count // 2, simulations_count],
@@ -101,7 +102,8 @@ if dimension == 1:
     for step, solution in solutions:
         plt.plot(*splitting_xs, solution, label="Mean with N={}".format(step))
     if save_last_solution:
-        np.save('../data/mc_{}, {}, {}'.format(solutions[-1][0], trial.name, stop_time), solutions[-1][1])
+        np.save('../data/mc_{}, {}, {}, {}'.format(solutions[-1][0], trial.name, stop_time, grid_size_N),
+                solutions[-1][1])
     plt.legend()
 elif dimension == 2:
     animate_2d_surface(splitting_xs[0], splitting_xs[1], [sol for _, sol in solutions],

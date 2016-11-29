@@ -9,7 +9,11 @@ def mul_prod(factors):
     :param factors: Factors to multiply by using the operator.mul
     :return: The product of all factors, 1 if empty.
     """
-    return reduce(operator.mul, factors, 1)
+    try:
+        return reduce(operator.mul, factors, 1)
+    except OverflowError as oe:
+        print("Overflow on product of factors.")
+        raise oe
 
 
 # noinspection PyTypeChecker

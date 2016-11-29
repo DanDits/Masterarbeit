@@ -2,7 +2,7 @@
 
 # TODO how to get stochastic polynomial basis? how to build tensor product of 1d interpolations?
 # TODO use sparse grids for higher dimensional case (n>=5)
-from itertools import combinations
+from itertools import combinations, product
 from math import factorial
 from util.analysis import mul_prod
 from functools import lru_cache
@@ -17,7 +17,7 @@ def multi_index_bounded_sum_length(dimension, sum_bound):
     :param sum_bound: The bound for the sum.
     :return: The sequence length
     """
-    return factorial(dimension + sum_bound) / (factorial(dimension) * factorial(sum_bound))
+    return factorial(dimension + sum_bound) // (factorial(dimension) * factorial(sum_bound))
 
 
 def multi_index_bounded_sum(dimension, sum_bound):
@@ -51,7 +51,7 @@ def multi_index_bounded_sum(dimension, sum_bound):
             yield ind
 
 
-def poly_basis_multify(basis_list, sum_bound):
+def poly_basis_multify(basis_list, sum_bound, multi_indices=None):
     """
     Generates a multivariate polynomial basis from the given list of univariate polynomial basis.
     The returned basis is again indexed by a simple integer i which corresponds to the multi index
@@ -61,9 +61,11 @@ def poly_basis_multify(basis_list, sum_bound):
     :param basis_list: A list of functions that take one index parameter and return the corresponding basis
     polynomial. The length of this list determines the dimension of the multi index and the new multivariate basis.
     :param sum_bound: The multi index sum is bounded by this value.
+    :param multi_indices: (Optional) A list of multi indices if already computed, else this will be computed internally.
     :return: The basis which is again indexed by a single integer.
     """
-    multi_indices = list(multi_index_bounded_sum(len(basis_list), sum_bound))
+    if multi_indices is None:
+        multi_indices = list(multi_index_bounded_sum(len(basis_list), sum_bound))
 
     @lru_cache(maxsize=None)
     def poly(simple_index):
@@ -76,15 +78,31 @@ def poly_basis_multify(basis_list, sum_bound):
 
 
 def chaos_multify(chaos_list, sum_bound):
-    def nodes_and_weights_multify(*args):
+    def nodes_and_weights_multify(lengths):
         # contains [([n11,n12,n13],[w11,w12,w13]), ([n21,n22],[w21,w22])]
-        nodes_weights_pairs = [chaos.nodes_and_weights(*arg) for arg, chaos in zip(args, chaos_list)]
-        # TODO how do we want to use the return value in discrete_projection and interpolation?
+        assert len(lengths) == len(chaos_list)
+        nodes_weights_pairs = [chaos.nodes_and_weights(length) for length, chaos in zip(lengths, chaos_list)]
+        nodes_list = [nodes for nodes, _ in nodes_weights_pairs]
+        weights_list = [weights for _, weights in nodes_weights_pairs]
+        # use full tensor product of all dimensions by using 'product'
+        nodes_list = [grid_nodes for grid_nodes in product(*nodes_list)]
+        weights_list = [grid_weights for grid_weights in product(*weights_list)]
+        return nodes_list, weights_list
+
+    basis_list = [chaos.poly_basis for chaos in chaos_list]
+    multi_indices = list(multi_index_bounded_sum(len(basis_list), sum_bound))
+
+    def gamma_multify(n):
+        prod = 1.
+        multi_index = multi_indices[n]
+        for dim_index, chaos in zip(multi_index, chaos_list):
+            prod *= chaos.normalization_gamma(dim_index)
+        return prod
 
     multi_chaos = PolyChaosDistribution(",".join(chaos.poly_name for chaos in chaos_list),
-                                        poly_basis_multify((chaos.poly_basis for chaos in chaos_list), sum_bound),
+                                        poly_basis_multify(basis_list, sum_bound, multi_indices),
                                         [chaos.distribution for chaos in chaos_list],
-                                        lambda n: mul_prod(chaos.normalization_gamma(n) for chaos in chaos_list),
+                                        gamma_multify,
                                         nodes_and_weights_multify)
     return multi_chaos
 

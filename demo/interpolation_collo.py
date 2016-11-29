@@ -1,11 +1,13 @@
 import numpy as np
 from itertools import repeat
 import polynomial_chaos.distributions as distributions
+from polynomial_chaos.multivariation import multi_index_bounded_sum_length
 from stochastic_equations.collocation.discrete_projection import discrete_projection_expectancy
 from stochastic_equations.stochastic_trial import StochasticTrial
-from stochastic_equations.collocation.interpolation import matrix_inversion_expectancy
+from stochastic_equations.collocation.interpolation import matrix_inversion_expectancy_1d, matrix_inversion_expectancy
 import matplotlib.pyplot as plt
 from util.analysis import error_l2
+from util.storage import save_fig
 
 # y[0] > 1
 left_1, right_1 = 2, 3
@@ -76,41 +78,71 @@ trial_3 = StochasticTrial([distributions.make_uniform(-1, 1)],  # y[0] bigger th
                     "expectancy", lambda xs, t: (np.cos(t) / (right_3 - left_3)
                                                  * (np.log(np.sin(sum(xs)) + right_3)
                                                     - np.log(np.sin(sum(xs)) + left_3))))
-
-trial = trial_2_2
+# equal to mc trial_4
+trial_mc4 = StochasticTrial([distributions.gaussian, distributions.make_uniform(-1, 1),
+                             distributions.make_beta(-0.5, 2.5), distributions.make_uniform(-1, 1)],
+                            lambda xs, ys: np.sin(sum(xs)),
+                            lambda xs, ys: np.sin(sum(xs)) ** 2,
+                            random_variables=[lambda y: np.exp(y), lambda y: (y + 1) / 2,
+                                              lambda y: y, lambda y: y * 4 + 2],
+                            name="Trialmc4") \
+    .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] + ys[2]) + np.sin(xs[0] + ys[3]),
+                    "alpha", lambda ys: 1 + 0.5 * ys[0] + 3 * ys[1],
+                    "expectancy_data", "../data/mc_100000, Trial4, 0.5, 128.npy")
+# equal to mc trial_5, we have saved simulation data: (-> dt=0.0001 or else unstable after degree 6)
+trial_mc5 = StochasticTrial([distributions.gaussian],
+                            lambda xs, ys: np.cos(sum(xs)),
+                            lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
+                            name="Trialmc5") \
+    .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] * ys[0]) + np.sin(xs[0] + ys[0]),
+                    "alpha", lambda ys: 1 + np.exp(ys[0]),
+                    "expectancy_data", "../data/mc_100000, Trial5, 0.5, 512.npy")
+trial = trial_mc4
 
 # "High order is not the same as high accuracy. High order translates to high accuracy only when the integrand
 # is very smooth" (http://apps.nrbook.com/empanel/index.html?pg=179#)
-N = list(range(30))  # maximum degree of the polynomial, so N+1 polynomials
+N = list(range(10))  # maximum degree of the polynomial, so N+1 polynomials
 # from n+1 to n+10 notably difference for most examples
-M = [n + 1 for n in N]  # number of nodes in random space, >= N+1, higher CAN give more accuracy (for higher polys)
+
+# number of nodes in random space, >= N+1, higher CAN give more accuracy (for higher polys)
+# M = [(n + 1,) * len(trial.variable_distributions) for n in N]
+
+# minimum possible value that the full tensor product of nodes is still bigger than the number of basis polynomials
+# if minimal: rank of vandermonde decreases by 10-30% and solution does not improve; very fast!
+# if minimal+1:
+M = [(int(np.ceil(multi_index_bounded_sum_length(len(trial.variable_distributions), n)
+              ** (1 / len(trial.variable_distributions)))) + 1,) * len(trial.variable_distributions)
+     for n in N]
 Q = [15] * len(N)  # number of nodes and weights used for discrete projection's quadrature formula
 spatial_dimension = 1
 grid_size = 128
 spatial_domain = list(repeat([-np.pi, np.pi], spatial_dimension))
 start_time = 0
 stop_time = 0.5
-delta_time = 0.001
+delta_time = 0.001  # if grid_size is bigger this needs to be smaller, especially for higher poly degrees
 use_matrix_inversion = True
 
-rank = None
-exp_var_results, ranks = [], []
+rank_frac = None
+exp_var_results, rank_fracs = [], []
 for n, m, q in zip(N, M, Q):
+    print("n,m,q=", n, m, q)
     if use_matrix_inversion:
-        result_xs, result_xs_mesh, expectancy, variance, rank = matrix_inversion_expectancy(trial, n, m,
-                                                                                            spatial_domain, grid_size,
-                                                                                            start_time, stop_time,
-                                                                                            delta_time)
+        result_xs, result_xs_mesh, expectancy, variance, rank_frac = matrix_inversion_expectancy(trial, n, m,
+                                                                                                 spatial_domain,
+                                                                                                 grid_size,
+                                                                                                 start_time, stop_time,
+                                                                                                 delta_time)
     else:
         result_xs, result_xs_mesh, expectancy, variance = discrete_projection_expectancy(trial, n, q,
                                                                                          spatial_domain, grid_size,
                                                                                          start_time, stop_time,
                                                                                          delta_time)
     exp_var_results.append((n, m, expectancy, variance))
-    if rank is not None:
-        ranks.append(rank)
-rank_fractions = list(map(lambda n, x: 10 ** (-(1 - x / (n + 1)) * 10), N, ranks))  # rescale to make visible in l
-# TODO more trials, maybe try to find a more complicated one with known expectancy (or reference)
+    if rank_frac is not None:
+        rank_fracs.append(rank_frac)
+rank_fractions = list(map(lambda frac: 10 ** ((frac - 1) * 10),
+                          rank_fracs))  # rescale to make visible in logarithmic scale
+
 print("Plotting:")
 trial_expectancy = None
 if trial.has_parameter("expectancy"):
@@ -118,12 +150,17 @@ if trial.has_parameter("expectancy"):
 elif trial.raw_reference is not None:
     print("Calculating expectancy")
     trial_expectancy = trial.calculate_expectancy(result_xs, stop_time, trial.raw_reference)
+elif trial.has_parameter("expectancy_data"):
+    try:
+        trial_expectancy = np.load(trial.expectancy_data)
+    except FileNotFoundError:
+        print("No expectancy data found, should be here!?")
 trial_variance = None
 if trial.has_parameter("variance"):
     trial_variance = trial.variance(result_xs_mesh, stop_time)
 
 plt.figure()
-plt.title("Expectancies, spatial grid size={}".format(grid_size))
+plt.title("Expectancies, spatial grid size={}, {}".format(grid_size, trial.name))
 errors, errors_variance = [], []
 for n, m, expectancy, variance in exp_var_results:
     error = -1
@@ -142,7 +179,7 @@ if ref is not None:
     plt.plot(result_xs[0], ref, label="Exact reference")
 # plt.ylim((0, 1))
 plt.legend()
-
+# save_fig(plt.axes(), "../data/interpol_invmat_trial5_512_0.00005.pickle")
 if len(errors) > 0:
     plt.figure()
     plt.title("Collocation interpolation by {} for {}".format(("Matrix inversion" if use_matrix_inversion

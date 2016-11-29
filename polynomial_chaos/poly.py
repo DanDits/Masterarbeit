@@ -91,6 +91,7 @@ def calculate_nodes_and_weights(alphas, betas):
 # Polynomial basis: http://dlmf.nist.gov/18.3
 # Recurrence correlations: http://dlmf.nist.gov/18.9#i
 
+# TODO cache or save calculated nodes/weights on disk, especially for higher degrees
 
 # Hermite polynomials, recursion p_n(x)=x*p_(n-1)(x)-(n-1)*p_(n-2), p_0(x)=1, p_1(x)=x
 # _poly_function_basis_recursive((lambda x: 1, lambda x: x),  (lambda n, x: x, lambda n, x: 1 - n)) # as example
@@ -187,11 +188,14 @@ def jacobi_nodes_and_weights(degree, alpha, beta):
 if __name__ == "__main__":
     a, b = 0.5, 3.7
     degree = 20
-    # HINT: hermite and laguerre nodes are becoming wrong for degree >= 15, orthonormal basis are correct
+    # HINT: hermite (so hermite-gauss chaos) and laguerre (so laguerre-gamma chaos)
+    # nodes are becoming wrong for degree >= 15, orthonormal basis are correct!
     # the nodes are also correct, the problem is that the polynomial evaluation becomes increasingly bad for these
     # types of basis because of cancellation and round off errors.
     test_nodes = hermite_nodes_and_weights(degree)[0]
     # nodes are the roots of the corresponding polynom
     test_poly = hermite_basis()(degree)
-    print("Nodes:", np.array(test_nodes) * np.sqrt(0.5))
+    print("Nodes:", np.array(test_nodes))
+    # multiply test_nodes by np.sqrt(0.5)
+    # when comparing to http://keisan.casio.com/exec/system/1281195844
     print("Should all be ~zero:", np.vectorize(test_poly)(test_nodes))
