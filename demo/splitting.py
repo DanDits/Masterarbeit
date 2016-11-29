@@ -13,7 +13,8 @@ from diff_equation.splitting import make_klein_gordon_lie_trotter_splitting, mak
     make_klein_gordon_fast_strang_splitting, \
     make_klein_gordon_lie_trotter_reversed_splitting, \
     make_klein_gordon_strang_reversed_splitting, make_klein_gordon_leapfrog_splitting, \
-    make_klein_gordon_leapfrog_reversed_splitting, make_klein_gordon_strang_offset_reversed_splitting
+    make_klein_gordon_leapfrog_reversed_splitting, make_klein_gordon_strang_offset_reversed_splitting, \
+    make_klein_gordon_leapfrog_fast_splitting
 from util.trial import Trial
 
 dimension = 1
@@ -133,7 +134,8 @@ elif trial == trial_3:
 splitting_factories = [make_klein_gordon_lie_trotter_splitting, make_klein_gordon_lie_trotter_reversed_splitting,
                        make_klein_gordon_strang_splitting, make_klein_gordon_strang_reversed_splitting,
                        partial(make_klein_gordon_fast_strang_splitting, time_step_size=delta_time),
-                       make_klein_gordon_leapfrog_splitting, make_klein_gordon_leapfrog_reversed_splitting]
+                       make_klein_gordon_leapfrog_splitting, make_klein_gordon_leapfrog_reversed_splitting,
+                       partial(make_klein_gordon_leapfrog_fast_splitting, time_step_size=delta_time)]
 if trial.has_parameter("frog_only"):
     splitting_factories = [make_klein_gordon_leapfrog_splitting, make_klein_gordon_leapfrog_reversed_splitting]
 if trial.has_parameter("offset"):

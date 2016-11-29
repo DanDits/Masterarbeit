@@ -111,6 +111,30 @@ def make_klein_gordon_leapfrog_splitting(intervals, grid_points_list, t0, u0, u0
                      name="Leapfrog")
 
 
+def make_klein_gordon_leapfrog_fast_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta, time_step_size):
+    moment_config = KleinGordonMomentConfig(intervals, grid_points_list, alpha, beta)
+    velocity_config = VelocityConfig(intervals, grid_points_list)
+
+    moment_config.init_solver(t0, u0, u0t)
+
+    next_position, next_velocity = Splitting.sub_step(moment_config, moment_config.start_time,
+                                                      time_step_size, 0.5)
+    velocity_config.init_solver(moment_config.start_time, next_position, next_velocity)
+    next_position, next_velocity = Splitting.sub_step(velocity_config, moment_config.start_time,
+                                                      time_step_size, 1.)
+    # we advance time here, but keep in mind that intermediate results for this splitting are not useful as it
+    # would require one additional half step of wave, so at the end discard all but the last
+    moment_config.init_solver(t0 + time_step_size, next_position, next_velocity)
+
+    def on_progress_end():
+        # do one more half step for wave, discard intermediate solutions
+        last_position, _ = Splitting.sub_step(moment_config, moment_config.start_time, time_step_size, 0.5)
+        splitting.timed_positions = [(moment_config.start_time, last_position)]
+
+    splitting = Splitting([moment_config, velocity_config], [1., 1.], name="FFrog", on_end_callback=on_progress_end)
+    return splitting
+
+
 def make_klein_gordon_leapfrog_reversed_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
     moment_config = KleinGordonMomentConfig(intervals, grid_points_list, alpha, beta)
     velocity_config = VelocityConfig(intervals, grid_points_list)

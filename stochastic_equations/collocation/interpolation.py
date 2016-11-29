@@ -1,5 +1,5 @@
 import numpy as np
-from diff_equation.splitting import make_klein_gordon_leapfrog_splitting
+from diff_equation.splitting import make_klein_gordon_leapfrog_fast_splitting
 from polynomial_chaos.poly_chaos_distributions import get_chaos_by_distribution
 from stochastic_equations.collocation.util import check_distribution_assertions
 from numpy.linalg import lstsq
@@ -35,8 +35,9 @@ def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count
     solution_shape = None
     for nodes in nodes_list:
         trial.set_random_values(nodes)
-        splitting = make_klein_gordon_leapfrog_splitting(spatial_domain, [grid_size], start_time, trial.start_position,
-                                                         trial.start_velocity, trial.alpha, trial.beta)
+        splitting = make_klein_gordon_leapfrog_fast_splitting(spatial_domain, [grid_size], start_time,
+                                                              trial.start_position, trial.start_velocity,
+                                                              trial.alpha, trial.beta, delta_time)
         splitting.progress(stop_time, delta_time, 0)
         last_solution = splitting.solutions()[-1]
         if splitting_xs is None:
@@ -105,8 +106,9 @@ def matrix_inversion_expectancy_1d(trial, max_poly_degree, random_space_nodes_co
     splitting_xs_mesh = None
     for node in nodes:
         trial.set_random_values([node])
-        splitting = make_klein_gordon_leapfrog_splitting(spatial_domain, [grid_size], start_time, trial.start_position,
-                                                         trial.start_velocity, trial.alpha, trial.beta)
+        splitting = make_klein_gordon_leapfrog_fast_splitting(spatial_domain, [grid_size], start_time,
+                                                              trial.start_position, trial.start_velocity,
+                                                              trial.alpha, trial.beta, delta_time)
         splitting.progress(stop_time, delta_time, 0)
         if splitting_xs is None:
             splitting_xs = splitting.get_xs()

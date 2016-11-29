@@ -1,4 +1,4 @@
-from diff_equation.splitting import make_klein_gordon_leapfrog_splitting
+from diff_equation.splitting import make_klein_gordon_leapfrog_fast_splitting
 from util.analysis import error_l2
 from collections import deque
 import numpy as np
@@ -66,10 +66,11 @@ def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
                   actual_solutions_count)
         stochastic_trial.randomize()
 
-        splitting = make_klein_gordon_leapfrog_splitting(domain, [grid_size_N], start_time,
-                                                         stochastic_trial.start_position,
-                                                         stochastic_trial.start_velocity, stochastic_trial.alpha,
-                                                         stochastic_trial.beta)
+        splitting = make_klein_gordon_leapfrog_fast_splitting(domain, [grid_size_N], start_time,
+                                                              stochastic_trial.start_position,
+                                                              stochastic_trial.start_velocity, stochastic_trial.alpha,
+                                                              stochastic_trial.beta,
+                                                              delta_time)
         splitting.progress(stop_time, delta_time)
         if xs is None:
             xs = splitting.get_xs()
