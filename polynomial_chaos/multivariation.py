@@ -1,7 +1,5 @@
 # methods for multidimensional polynomials, simple tensor products of 1d polynomials or sparse grid variants
 
-# TODO how to get stochastic polynomial basis? how to build tensor product of 1d interpolations?
-# TODO use sparse grids for higher dimensional case (n>=5)
 from itertools import combinations, product
 from math import factorial
 
@@ -11,6 +9,7 @@ from util.analysis import mul_prod
 from functools import lru_cache
 from polynomial_chaos.poly_chaos_distributions import PolyChaosDistribution
 from polynomial_chaos.poly import PolyBasis
+
 
 def multi_index_bounded_sum_length(dimension, sum_bound):
     """

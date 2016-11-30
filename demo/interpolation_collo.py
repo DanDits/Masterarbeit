@@ -97,11 +97,11 @@ trial_mc5 = StochasticTrial([distributions.gaussian],
     .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] * ys[0]) + np.sin(xs[0] + ys[0]),
                     "alpha", lambda ys: 1 + np.exp(ys[0]),
                     "expectancy_data", "../data/mc_100000, Trial5, 0.5, 512.npy")
-trial = trial_mc5
+trial = trial_2_1  # TODo why does trialmc5 explode at N=7 (and not N=20 like 2_1?) would normalization help?
 
 # "High order is not the same as high accuracy. High order translates to high accuracy only when the integrand
 # is very smooth" (http://apps.nrbook.com/empanel/index.html?pg=179#)
-N = list(range(10))  # maximum degree of the polynomial, so N+1 polynomials
+N = list(range(30))  # maximum degree of the polynomial, so N+1 polynomials
 # from n+1 to n+10 notably difference for most examples
 
 # number of nodes in random space, >= N+1, higher CAN give more accuracy (for higher polys)

@@ -28,7 +28,7 @@ def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count
 
     nodes_list = chaos.nodes_and_weights(random_space_nodes_counts)[0]
     poly_count = mv.multi_index_bounded_sum_length(len(distrs), sum_bound)
-    basis = [chaos.poly_basis.polys(degree) for degree in range(poly_count)]
+    basis = [chaos.poly_basis.polys(degree) for degree in range(poly_count)]  # TODO try to use normalized basis here to avoid explosion of gaussian
 
     solution_at_nodes = []  # used to build right hand side (simultaneously at every grid point)
     splitting_xs = None

@@ -1,6 +1,7 @@
 from functools import lru_cache
 import numpy as np
 import numpy.polynomial.polynomial as npoly
+import math
 
 
 # Pretty general implementation for a recursively defined polynomial basis in function form, so it is not optimized
@@ -90,6 +91,8 @@ def poly_by_roots(roots, leading_coefficient):
 # to get the traditional weights for gauss-laguerre multiply by gamma(alpha),
 # to get the traditional weights for gauss legendre multiply by 2
 def calculate_nodes_and_weights(alphas, betas):
+    if len(alphas) <= 0 and len(betas) <= 0:
+        return [], []
     # The Golub-Welsch algorithm in symmetrized form
     # see https://en.wikipedia.org/wiki/Gaussian_quadrature#Computation_of_Gaussian_quadrature_rules
     # or see http://dlmf.nist.gov/3.5#vi  for calculation of nodes = zeros of polynomial
@@ -106,7 +109,7 @@ def calculate_nodes_and_weights(alphas, betas):
 # Polynomial basis: http://dlmf.nist.gov/18.3
 # Recurrence correlations: http://dlmf.nist.gov/18.9#i
 
-# TODO cache or save calculated nodes/weights on disk, especially for higher degrees
+# TODO maybe save calculated nodes/weights on disk, especially for higher degrees
 
 
 # when returned 'amount' of nodes is fixed (no matter the degree),
@@ -115,7 +118,7 @@ class PolyBasis:
     def __init__(self, name, polys, nodes_and_weights):
         self.name = name
         self.polys = polys
-        self.nodes_and_weights = nodes_and_weights
+        self.nodes_and_weights = lru_cache(maxsize=None)(nodes_and_weights)
 
 
 def make_hermite():
@@ -126,6 +129,7 @@ def make_hermite():
                                             [(0, lambda n, c: npoly.polymulx(c)),
                                              (1, lambda n, c: c * (1. - n))]),
                       lambda degree: calculate_nodes_and_weights(np.zeros(degree), np.arange(1, degree)))
+    basis.polys = lambda degree: poly_by_roots(basis.nodes_and_weights(degree)[0], 1)
     return basis
 
 
@@ -140,6 +144,8 @@ def make_laguerre(alpha):
                       lambda degree: calculate_nodes_and_weights(2 * np.arange(0, degree) + alpha,
                                                                  np.arange(1, degree) * (
                                                                  np.arange(1, degree) - 1 + alpha)))
+    basis.polys = lambda degree: poly_by_roots(basis.nodes_and_weights(degree)[0],
+                                               (1, -1)[degree % 2] / math.factorial(degree))  # (-1)^n/n!
     return basis
 
 
@@ -188,7 +194,7 @@ def make_jacobi(alpha, beta):
 
 if __name__ == "__main__":
     a, b = 0.5, 3.7
-    test_degree = 21
+    test_degree = 25
     # HINT: hermite (so hermite-gauss chaos) and laguerre (so laguerre-gamma chaos)
     # nodes are becoming wrong for degree >= 15 when using the recurrence correlation
     # as the image becomes very big (but also if normalized very small (O(10^-16))), orthonormal basis are correct!
@@ -198,14 +204,9 @@ if __name__ == "__main__":
     test_nodes = poly_basis.nodes_and_weights(test_degree)[0]
     # nodes are the roots of the corresponding polynom
     test_poly = poly_basis.polys(test_degree)
-
-    test_leading_factor = 1  # laguerre: (-1) ** test_degree / math.factorial(test_degree)
-
-    compare_poly = poly_by_roots(test_nodes, test_leading_factor)
-
+    compare_poly = poly_by_roots(test_nodes, 1)  # for hermite
     print("Nodes:", np.array(test_nodes))
-    # multiply test_nodes by np.sqrt(0.5)
-    # when comparing to http://keisan.casio.com/exec/system/1281195844
+    # multiply test_nodes by np.sqrt(0.5) when comparing to http://keisan.casio.com/exec/system/1281195844
     print("Should all be ~zero:", np.vectorize(test_poly)(test_nodes))
     print("Should all be ~zero:", compare_poly(test_nodes))
     import matplotlib.pyplot as plt
@@ -213,6 +214,5 @@ if __name__ == "__main__":
     plt.figure()
     x_data = np.arange(-5, 5, 0.01)
     plt.plot(x_data, np.vectorize(test_poly)(x_data), label="test_poly")
-    plt.plot(x_data, np.vectorize(compare_poly)(x_data), label="compare_poly")
     plt.legend()
     plt.show()
