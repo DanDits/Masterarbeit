@@ -25,10 +25,13 @@ legendreChaos = PolyChaosDistribution(poly.make_legendre(),
                                       lambda n: 1 / (2 * n + 1))
 
 
+# TODO convergence very zigzac like when using interpolation by matrix inversion as this uses a method that
+# TODO does require some symmetry of the nodes around the middle node which is not fulfilled for laguerre nodes
+# nodes are not symmetric around 0., unstable fast,...
 def make_laguerreChaos(alpha):  # alpha > 0
     return PolyChaosDistribution(poly.make_laguerre(alpha),
                                  distr.make_gamma(alpha, 1),
-                                 lambda n: rising_factorial(alpha, n) / math.factorial(n))
+                                 lambda n: 1)
 
 
 def make_jacobiChaos(alpha, beta):  # alpha, beta > -1
@@ -63,8 +66,8 @@ if __name__ == "__main__":
 
     # for testing the orthogonality and normalization of the polynomial basis
     test_alpha, test_beta = 2.5, -0.5
-    test_chaos = hermiteChaos  # make_jacobiChaos(test_alpha, test_beta)
-    basis = [test_chaos.normalized_basis(i) for i in range(20)]
+    test_chaos = make_laguerreChaos(test_alpha)  # make_jacobiChaos(test_alpha, test_beta)
+    basis = [test_chaos.normalized_basis(i) for i in range(24)]
 
     for b1 in basis:
         row = []

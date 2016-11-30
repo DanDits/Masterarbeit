@@ -28,7 +28,7 @@ def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count
 
     nodes_list = chaos.nodes_and_weights(random_space_nodes_counts)[0]
     poly_count = mv.multi_index_bounded_sum_length(len(distrs), sum_bound)
-    basis = [chaos.poly_basis.polys(degree) for degree in range(poly_count)]  # TODO try to use normalized basis here to avoid explosion of gaussian
+    basis = [chaos.normalized_basis(degree) for degree in range(poly_count)]
 
     solution_at_nodes = []  # used to build right hand side (simultaneously at every grid point)
     splitting_xs = None
@@ -60,12 +60,13 @@ def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count
     # computes the weights which are the factors for representing the random solution by the given basis polynomials
     # each column corresponds to the the factors of a spatial grid point
     print("VandA:", vandermonde_A.shape, "rhsu:", rhs_u.shape)
-    result = lstsq(vandermonde_A, rhs_u)
+    result = lstsq(vandermonde_A, rhs_u)  # TODO try change accuracy
     rank = result[2] / min(vandermonde_A.shape)
     print("Vandermonde_A:", vandermonde_A.shape, "u:", rhs_u.shape, "Weights:", result[0].shape)
+    print("Condition:", abs(result[3][0] / result[3][-1]))
     weights = result[0]
-    # normalize weights as the basis wasn't normalized. use math.sqrt as this "works" aka doesn't crash for big integers
-    weights = np.diag([math.sqrt(chaos.normalization_gamma(i)) for i in range(weights.shape[0])]).dot(weights)
+    # normalize weights if the basis wasn't normalized. use math.sqrt as this "works" aka doesn't crash for big integers
+    # weights = np.diag([math.sqrt(chaos.normalization_gamma(i)) for i in range(weights.shape[0])]).dot(weights)
 
     def poly_approximation(y):
         vectorized_basis = np.array([_basis_poly(y) for _basis_poly in basis])

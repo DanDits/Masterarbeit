@@ -8,6 +8,9 @@ import math
 # as terms that cancel out are still calculated and may lead to inaccuracies.
 # For higher accuracy (for low order terms) use more hand
 # calculated polynomials for "polys_start"
+from util.analysis import rising_factorial
+
+
 def _poly_function_basis_recursive(polys_start, recursion_factors):
     """
     Factory function for a basis of polynomials p(x) for a single double variable x.
@@ -145,7 +148,8 @@ def make_laguerre(alpha):
                                                                  np.arange(1, degree) * (
                                                                  np.arange(1, degree) - 1 + alpha)))
     basis.polys = lambda degree: poly_by_roots(basis.nodes_and_weights(degree)[0],
-                                               (1, -1)[degree % 2] / math.factorial(degree))  # (-1)^n/n!
+                                               (1, -1)[degree % 2] / math.sqrt(rising_factorial(alpha, degree))
+                                               / math.sqrt(math.factorial(degree)))  # (-1)^n/n!
     return basis
 
 
@@ -204,11 +208,8 @@ if __name__ == "__main__":
     test_nodes = poly_basis.nodes_and_weights(test_degree)[0]
     # nodes are the roots of the corresponding polynom
     test_poly = poly_basis.polys(test_degree)
-    compare_poly = poly_by_roots(test_nodes, 1)  # for hermite
     print("Nodes:", np.array(test_nodes))
-    # multiply test_nodes by np.sqrt(0.5) when comparing to http://keisan.casio.com/exec/system/1281195844
     print("Should all be ~zero:", np.vectorize(test_poly)(test_nodes))
-    print("Should all be ~zero:", compare_poly(test_nodes))
     import matplotlib.pyplot as plt
 
     plt.figure()

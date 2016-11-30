@@ -60,6 +60,9 @@ def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
 
     actual_solutions_count = 0
     fail_count = 0
+    # HINT: To estimate sample variance, you would need to sum the squares of the simulation solution minus the
+    # estimated expectancy and then divide this by either: simulations_count, or simulations_count-1 (to eliminate bias)
+    # see: https://en.wikipedia.org/wiki/Variance#Population_variance_and_sample_variance
     while actual_solutions_count < simulations_count:
         if heartbeat > 0 and actual_solutions_count % heartbeat == 0:
             print("Simulation",

@@ -89,19 +89,21 @@ trial_mc4 = StochasticTrial([distributions.gaussian, distributions.make_uniform(
     .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] + ys[2]) + np.sin(xs[0] + ys[3]),
                     "alpha", lambda ys: 1 + 0.5 * ys[0] + 3 * ys[1],
                     "expectancy_data", "../data/mc_100000, Trial4, 0.5, 128.npy")
-# equal to mc trial_5, we have saved simulation data: (-> dt=0.0001 or else unstable after degree 6)
+# equal to mc trial_5, we have saved simulation data:
 trial_mc5 = StochasticTrial([distributions.gaussian],
                             lambda xs, ys: np.cos(sum(xs)),
                             lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
                             name="Trialmc5") \
     .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] * ys[0]) + np.sin(xs[0] + ys[0]),
                     "alpha", lambda ys: 1 + np.exp(ys[0]),
-                    "expectancy_data", "../data/mc_100000, Trial5, 0.5, 512.npy")
-trial = trial_2_1  # TODo why does trialmc5 explode at N=7 (and not N=20 like 2_1?) would normalization help?
+                    "expectancy_data", "../data/mc_100000, Trial5, 0.5, 512.npy",
+                    "delta_time", 0.0001,  # (-> dt=0.0001 or else unstable after degree 6)
+                    "grid_size", 512)
+trial = trial_mc4
 
 # "High order is not the same as high accuracy. High order translates to high accuracy only when the integrand
 # is very smooth" (http://apps.nrbook.com/empanel/index.html?pg=179#)
-N = list(range(30))  # maximum degree of the polynomial, so N+1 polynomials
+N = list(range(10))  # maximum degree of the polynomial, so N+1 polynomials
 # from n+1 to n+10 notably difference for most examples
 
 # number of nodes in random space, >= N+1, higher CAN give more accuracy (for higher polys)
@@ -113,14 +115,16 @@ N = list(range(30))  # maximum degree of the polynomial, so N+1 polynomials
 M = [(int(np.ceil(multi_index_bounded_sum_length(len(trial.variable_distributions), n)
               ** (1 / len(trial.variable_distributions)))),) * len(trial.variable_distributions)
      for n in N]
-Q = [15] * len(N)  # number of nodes and weights used for discrete projection's quadrature formula
+# number of nodes and weights used for discrete projection's quadrature formula
+Q = [(n + 1,) * len(trial.variable_distributions) for n in N]
 spatial_dimension = 1
-grid_size = 512
+grid_size = 128 if not trial.has_parameter("grid_size") else trial.grid_size
 spatial_domain = list(repeat([-np.pi, np.pi], spatial_dimension))
 start_time = 0
 stop_time = 0.5
-delta_time = 0.001  # if grid_size is bigger this needs to be smaller, especially for higher poly degrees
-use_matrix_inversion = True
+# if grid_size is bigger this needs to be smaller, especially for higher poly degrees
+delta_time = 0.001 if not trial.has_parameter("delta_time") else trial.delta_time
+use_matrix_inversion = False
 
 rank_frac = None
 exp_var_results, rank_fracs = [], []
@@ -136,7 +140,8 @@ for n, m, q in zip(N, M, Q):
         result_xs, result_xs_mesh, expectancy, variance = discrete_projection_expectancy(trial, n, q,
                                                                                          spatial_domain, grid_size,
                                                                                          start_time, stop_time,
-                                                                                         delta_time)
+                                                                                         delta_time,
+                                                                                         expectancy_only=True)
     exp_var_results.append((n, m, expectancy, variance))
     if rank_frac is not None:
         rank_fracs.append(rank_frac)
@@ -165,6 +170,7 @@ errors, errors_variance = [], []
 for n, m, expectancy, variance in exp_var_results:
     error = -1
     if trial_expectancy is not None:
+        print("BLA:", trial_expectancy.shape, expectancy)
         error = error_l2(trial_expectancy, expectancy)
         errors.append(error)
         print("Error", n, "=", error)
