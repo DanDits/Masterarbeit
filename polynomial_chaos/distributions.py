@@ -15,6 +15,11 @@ def inverse_gaussian(u):
             * (h - (2.515517 + 0.802853 * h + 0.010328 * h * h)
                / (1 + 1.432788 * h + 0.189269 * h * h + 0.001308 * h * h * h)))
 
+# TODO inverse gamma and beta missing:
+# inverse_gamma: https://de.mathworks.com/help/stats/gaminv.html not exact, so use scipy.stats.gamma.ppf (parameters?)
+# inverse_beta: https://de.mathworks.com/help/stats/betainv.html not exact,
+# so use scipy.stats.beta.ppf (parameters?) https://docs.scipy.org/doc/scipy-0.18.1/reference/generated/scipy.stats.beta.html
+
 
 def make_inverse_exponential(lamb):
     return lambda u: -math.log(1. - u) / lamb
@@ -103,15 +108,28 @@ def make_beta(alpha, beta):
 if __name__ == "__main__":
     import numpy as np
     import matplotlib.pyplot as plt
-    test_distribution = make_beta(1., 2.)
+    test_weight = False
 
-    data = [test_distribution.sample_generator() for _ in range(100000)]
-    hist, bin_edges = np.histogram(data, bins='auto', density=True)
-    bin_centers = bin_edges[:-1] + (bin_edges[1:] - bin_edges[:-1]) / 2
+    if test_weight:
+        test_distribution = make_beta(1., 2.)
 
-    plt.figure()
-    plt.plot(bin_centers, hist, label="Calculated distribution")
-    plt.plot(bin_centers, np.vectorize(test_distribution.weight)(bin_centers), label="PDF")
-    plt.ylim((0, plt.ylim()[1]))
-    plt.legend()
-    plt.show()
+        data = [test_distribution.sample_generator() for _ in range(100000)]
+        hist, bin_edges = np.histogram(data, bins='auto', density=True)
+        bin_centers = bin_edges[:-1] + (bin_edges[1:] - bin_edges[:-1]) / 2
+
+        plt.figure()
+        plt.plot(bin_centers, hist, label="Calculated distribution")
+        plt.plot(bin_centers, np.vectorize(test_distribution.weight)(bin_centers), label="PDF")
+        plt.ylim((0, plt.ylim()[1]))
+        plt.legend()
+        plt.show()
+    else:
+        from scipy.stats import norm as test_distr
+        inverse = np.vectorize(inverse_gaussian)
+
+        x_data = np.arange(0.001, 1, 0.001)
+        plt.figure()
+        plt.plot(x_data, test_distr.ppf(x_data), label="ppf")
+        plt.plot(x_data, inverse(x_data), label="own_inverse")
+        plt.legend()
+        plt.show()

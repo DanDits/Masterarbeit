@@ -10,7 +10,7 @@ import math
 from util.analysis import mul_prod
 from functools import lru_cache
 from polynomial_chaos.poly_chaos_distributions import PolyChaosDistribution
-
+from polynomial_chaos.poly import PolyBasis
 
 def multi_index_bounded_sum_length(dimension, sum_bound):
     """
@@ -54,18 +54,19 @@ def multi_index_bounded_sum(dimension, sum_bound):
             yield ind
 
 
-def poly_basis_multify(basis_list, sum_bound, multi_indices=None):
+def poly_basis_multify(basis_list, sum_bound, nodes_and_weights, multi_indices=None):
     """
     Generates a multivariate polynomial basis from the given list of univariate polynomial basis.
-    The returned basis is again indexed by a simple integer i which corresponds to the multi index
+    The returned basis polynomials are again indexed by a simple integer i which corresponds to the multi index
     given by the i-th element of the multi_index_bounded_sum sequence.
     Does not use the full tensor product basis where each component would be bounded by the given bound as this
     would be way too huge for higher dimensions.
     :param basis_list: A list of functions that take one index parameter and return the corresponding basis
     polynomial. The length of this list determines the dimension of the multi index and the new multivariate basis.
     :param sum_bound: The multi index sum is bounded by this value.
+    :param nodes_and_weights The nodes and weights
     :param multi_indices: (Optional) A list of multi indices if already computed, else this will be computed internally.
-    :return: The basis which is again indexed by a single integer.
+    :return: The multivariate PolyBasis.
     """
     if multi_indices is None:
         multi_indices = list(multi_index_bounded_sum(len(basis_list), sum_bound))
@@ -75,9 +76,13 @@ def poly_basis_multify(basis_list, sum_bound, multi_indices=None):
         multi_index = multi_indices[simple_index]
 
         def multi_poly(ys):
-            return mul_prod(basis(index)(y) for y, index, basis in zip(ys, multi_index, basis_list))
+            return mul_prod(basis.polys(index)(y) for y, index, basis in zip(ys, multi_index, basis_list))
         return multi_poly
-    return poly
+
+    basis = PolyBasis(",".join(basis.name for basis in basis_list),
+                      poly,
+                      nodes_and_weights)
+    return basis
 
 
 def center_iterator(data):
@@ -99,7 +104,7 @@ def chaos_multify(chaos_list, sum_bound):
     basis_list = [chaos.poly_basis for chaos in chaos_list]
     multi_indices = list(multi_index_bounded_sum(len(basis_list), sum_bound))
 
-    def nodes_and_weights_multify(lengths, use_full_tensor_product=True):
+    def nodes_and_weights_multify(lengths, use_full_tensor_product=False):
         if use_full_tensor_product:
             # contains [([n11,n12,n13],[w11,w12,w13]), ([n21,n22],[w21,w22])]
             assert len(lengths) == len(chaos_list)
@@ -133,11 +138,10 @@ def chaos_multify(chaos_list, sum_bound):
             prod *= chaos.normalization_gamma(dim_index)
         return prod
 
-    multi_chaos = PolyChaosDistribution(",".join(chaos.poly_name for chaos in chaos_list),
-                                        poly_basis_multify(basis_list, sum_bound, multi_indices),
+    multi_chaos = PolyChaosDistribution(poly_basis_multify(basis_list, sum_bound, nodes_and_weights_multify,
+                                                           multi_indices),
                                         [chaos.distribution for chaos in chaos_list],
-                                        gamma_multify,
-                                        nodes_and_weights_multify)
+                                        gamma_multify)
     return multi_chaos
 
 if __name__ == "__main__":

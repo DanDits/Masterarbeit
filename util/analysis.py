@@ -12,6 +12,16 @@ def mul_prod(factors):
     return reduce(operator.mul, factors, 1)
 
 
+# Notation hint for literature: Pochhammer symbol for falling factorial.. was hard to find!
+# Xiu and other authors define this to be rising factorial in contrast to wikipedia
+# Falling: alpha_n = alpha*(alpha-1)*...*(alpha-n+1)
+def rising_factorial(alpha, n):
+    prod = 1
+    for i in range(n):
+        prod *= alpha + i
+    return prod
+
+
 # noinspection PyTypeChecker
 def error_l2(approx_y, solution_y):
     """

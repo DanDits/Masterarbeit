@@ -18,7 +18,7 @@ expo = make_exponential(1.)
 
 gaussian_hermite_chaos = chaos.hermiteChaos
 gaussian = gaussian_hermite_chaos.distribution
-hermite_basis = gaussian_hermite_chaos.poly_basis
+hermite_basis = gaussian_hermite_chaos.poly_basis.polys
 hermite_normalization = gaussian_hermite_chaos.normalization_gamma
 
 

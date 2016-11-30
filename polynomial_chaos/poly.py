@@ -67,10 +67,24 @@ def _poly_basis_recursive(polys_start_coeff, recursive_poly_functions):
     return poly
 
 
-# Helper method that just ignores the required parameter n for the polynomial recursion functions
-# noinspection PyUnusedLocal
-def _polymulx(n, coeff):
-    return npoly.polymulx(coeff)
+def poly_by_roots(roots, leading_coefficient):
+    """
+    Returns the polynom that is defined by:
+    p(x)=leading_coefficient * (x-r1)*(x-r2)*...*(x-r_n)
+    if n roots are given. The leading factor is the factor between the monic version and the normal
+    version of the polynomials.
+    :param roots: The roots of the polynomial.
+    :param leading_coefficient: The leading coefficient in front of the highest power.
+    :return: A polynomial function which can be evaluated at an array-like parameter.
+    """
+
+    def poly(x):
+        prod = leading_coefficient
+        for root in roots:
+            prod *= (x - root)
+        return prod
+
+    return poly
 
 
 # to get the traditional weights for gauss-laguerre multiply by gamma(alpha),
@@ -88,114 +102,117 @@ def calculate_nodes_and_weights(alphas, betas):
     # the weights are the squares of the first entry of the corresponding eigenvectors
     return nodes, np.reshape(vectors[0, :] ** 2, (len(nodes),))
 
+
 # Polynomial basis: http://dlmf.nist.gov/18.3
 # Recurrence correlations: http://dlmf.nist.gov/18.9#i
 
 # TODO cache or save calculated nodes/weights on disk, especially for higher degrees
 
-# Hermite polynomials, recursion p_n(x)=x*p_(n-1)(x)-(n-1)*p_(n-2), p_0(x)=1, p_1(x)=x
-# _poly_function_basis_recursive((lambda x: 1, lambda x: x),  (lambda n, x: x, lambda n, x: 1 - n)) # as example
-def hermite_basis():
-    return _poly_basis_recursive([np.array([1.]), np.array([0., 1.])],  # starting values
-                                 [(0, _polymulx),
-                                  (1, lambda n, c: c * (1. - n))])
+
+# when returned 'amount' of nodes is fixed (no matter the degree),
+# then using 'amount' nodes gives stable and converging results up to degree<2*amount for collocation
+class PolyBasis:
+    def __init__(self, name, polys, nodes_and_weights):
+        self.name = name
+        self.polys = polys
+        self.nodes_and_weights = nodes_and_weights
 
 
-def hermite_nodes_and_weights(degree):
-    return calculate_nodes_and_weights(np.zeros(degree), np.arange(1, degree))
+def make_hermite():
+    # Hermite polynomials, recursion p_n(x)=x*p_(n-1)(x)-(n-1)*p_(n-2), p_0(x)=1, p_1(x)=x
+    # _poly_function_basis_recursive((lambda x: 1, lambda x: x),  (lambda n, x: x, lambda n, x: 1 - n)) # as example
+    basis = PolyBasis("Hermite",
+                      _poly_basis_recursive([np.array([1.]), np.array([0., 1.])],  # starting values
+                                            [(0, lambda n, c: npoly.polymulx(c)),
+                                             (1, lambda n, c: c * (1. - n))]),
+                      lambda degree: calculate_nodes_and_weights(np.zeros(degree), np.arange(1, degree)))
+    return basis
 
 
-def laguerre_basis(alpha):
-    return _poly_basis_recursive([np.array([1.]), np.array([alpha, -1.])],
-                                 [(0, lambda n, c: npoly.polyadd(c * (2 * (n - 1) + alpha) / n,
-                                                                 - npoly.polymulx(c) / n)),
-                                  (1, lambda n, c: -(n - 1 + alpha - 1) / n * c)])
-
-
-def laguerre_nodes_and_weights(degree, alpha):
+def make_laguerre(alpha):
     # normalized recurrence relation: q_n=xq_(n-1) - (2(n-1) + alpha)q_(n-1) - (n-1)(n - 2 + alpha)q_(n-2)
     # to obtain the regular polynomials multiply by (-1)^n / n!
-    return calculate_nodes_and_weights(2 * np.arange(0, degree) + alpha,
-                                       np.arange(1, degree) * (np.arange(1, degree) - 1 + alpha))
+    basis = PolyBasis("Laguerre",
+                      _poly_basis_recursive([np.array([1.]), np.array([alpha, -1.])],
+                                            [(0, lambda n, c: npoly.polyadd(c * (2 * (n - 1) + alpha) / n,
+                                                                            - npoly.polymulx(c) / n)),
+                                             (1, lambda n, c: -(n - 1 + alpha - 1) / n * c)]),
+                      lambda degree: calculate_nodes_and_weights(2 * np.arange(0, degree) + alpha,
+                                                                 np.arange(1, degree) * (
+                                                                 np.arange(1, degree) - 1 + alpha)))
+    return basis
 
 
-# Legendre polynomials, interval assumed to be [-1,1], recursion p_n(x)=x(2n-1)/n * p_(n-1)(x)-(n-1)/n*p_(n-2)(x)
-def legendre_basis():
-    return _poly_basis_recursive([np.array([1.]), np.array([0., 1.])],  # starting values
+def make_legendre():
+    # Legendre polynomials, interval assumed to be [-1,1], recursion p_n(x)=x(2n-1)/n * p_(n-1)(x)-(n-1)/n*p_(n-2)(x)
+    # http://math.stackexchange.com/questions/12160/roots-of-legendre-polynomial gives the monic version of the legendre
+    # polynomials: p_n(x)=x*p_(n-1)(x)-(n-1)^2/(4(n-1)^2-1)p_(n-2), to get the normal polynomial divide by
+    # (n!)^2 * 2^n / (2n)!
+    basis = PolyBasis("Legendre",
+                      _poly_basis_recursive([np.array([1.]), np.array([0., 1.])],  # starting values
                                  [(0, lambda n, c: (2. * n - 1) / n * npoly.polymulx(c)),
-                                  (1, lambda n, c: (1. - n) / n * c)])
+                                  (1, lambda n, c: (1. - n) / n * c)]),
+                      lambda degree: calculate_nodes_and_weights(np.zeros(degree), np.arange(1, degree) ** 2
+                                                                 / (4 * (np.arange(1, degree) ** 2) - 1)))
+    return basis
 
 
-# http://math.stackexchange.com/questions/12160/roots-of-legendre-polynomial gives the monic version of the legendre
-# polynomials: p_n(x)=x*p_(n-1)(x)-(n-1)^2/(4(n-1)^2-1)p_(n-2), to get the normal polynomial divide by
-# (n!)^2 * 2^n / (2n)!
-def legendre_nodes_and_weights(degree):
-    nm1 = np.arange(1, degree)
-    return calculate_nodes_and_weights(np.zeros(degree), nm1 ** 2 / (4 * (nm1 ** 2) - 1))
+def make_jacobi(alpha, beta):
+    # jacobi polynomial basis (belongs to beta distribution on (-1,1))
+    def jacobi_basis():
+        def get_factor(n):
+            return (2 * n + alpha + beta - 1) * (2 * n + alpha + beta) / (2 * n * (n + alpha + beta))
 
+        # this doesn't even look nice on paper
+        return _poly_basis_recursive([np.array([1.]),
+                                      np.array([0.5 * (alpha - beta), 0.5 * (alpha + beta + 2)])],  # starting values
+                                     [(0, lambda n, c: npoly.polyadd(npoly.polymulx(c) * get_factor(n),
+                                                                     -c * get_factor(n) * (beta ** 2 - alpha ** 2)
+                                                                     / ((2 * n + alpha + beta - 2)
+                                                                        * (2 * n + alpha + beta)))),
+                                      (1, lambda n, c: c * (-2 * get_factor(n) * (n + alpha - 1) * (n + beta - 1) / (
+                                          (2 * n + alpha + beta - 2) * (2 * n + alpha + beta - 1))))])
 
-def legendre_nodes_fast(degree):
-    # when returned 'amount' nodes is fixed (no matter the degree),
-    # this using 'amount' nodes gives stable and converging results up to degree<2*amount
-    if degree <= 30:
-        # Taken from http://keisan.casio.com/exec/system/1281195844 the roots of the legendre polynomial P_30
-        return [-0.9968934840746495402716, -0.98366812327974720997, -0.9600218649683075122169,
-                -0.9262000474292743258793,
-                -0.8825605357920526815431, -0.8295657623827683974429, -0.767777432104826194918,
-                -0.6978504947933157969323,
-                -0.6205261829892428611405, -0.5366241481420198992642, -0.4470337695380891767806,
-                -0.352704725530878113471,
-                -0.2546369261678898464398, -0.1538699136085835469638, -0.051471842555317695833, 0.051471842555317695833,
-                0.1538699136085835469638, 0.2546369261678898464398, 0.352704725530878113471, 0.4470337695380891767806,
-                0.5366241481420198992642, 0.6205261829892428611405, 0.6978504947933157969323, 0.767777432104826194918,
-                0.8295657623827683974429, 0.8825605357920526815431, 0.9262000474292743258793, 0.9600218649683075122169,
-                0.98366812327974720997, 0.9968934840746495402716]
-    else:
-        # approximate the roots of higher degree polynomials
-        # http://math.stackexchange.com/questions/12160/roots-of-legendre-polynomial by  Francesco Tricomi
-        # http://naturalunits.blogspot.de/2013/10/zeros-of-legendre-polynomials.html
-        n = degree
-        k = np.arange(1, n + 1)
-        sigma = np.pi * (n - k + 3 / 4) / (n + 1 / 2)
-        return (1 - 1 / (8 * n ** 2) + 1 / (8 * n ** 3) - (39 - 28 / (np.sin(sigma) ** 2)) / (384 * n ** 4)) * np.cos(
-            sigma)  # O(n^(-5))
-        # return (1-1/(8*n*n)+1/(8*n*n*n))*np.cos(np.pi*(4*k-1)/(4*n+2)) # O(n^(-4))
-
-
-# jacobi polynomial basis (belongs to beta distribution on (-1,1))
-def jacobi_basis(alpha, beta):
-    def get_factor(n):
-        return (2 * n + alpha + beta - 1) * (2 * n + alpha + beta) / (2 * n * (n + alpha + beta))
-    # this doesn't even look nice on paper
-    return _poly_basis_recursive([np.array([1.]),
-                                  np.array([0.5 * (alpha - beta), 0.5 * (alpha + beta + 2)])],  # starting values
-                                 [(0, lambda n, c: npoly.polyadd(npoly.polymulx(c) * get_factor(n),
-                                                                 -c * get_factor(n) * (beta ** 2 - alpha ** 2)
-                                                                 / ((2 * n + alpha + beta - 2)
-                                                                    * (2 * n + alpha + beta)))),
-                                  (1, lambda n, c: c * (-2 * get_factor(n) * (n + alpha - 1) * (n + beta - 1) / ((2 * n + alpha + beta - 2) * (2 * n + alpha + beta - 1))))])
-
-
-def jacobi_nodes_and_weights(degree, alpha, beta):
-    temp = np.arange(1, degree)
-    return calculate_nodes_and_weights((beta ** 2 - alpha ** 2) / ((2 * np.arange(degree) + alpha + beta)
-                                                                   * (2 * np.arange(degree) + 2 + alpha + beta)),
-                                       4 * temp * (temp + alpha) * (temp + beta) * (temp + alpha + beta)
-                                       / ((2 * temp + alpha + beta - 1) * ((2 * temp + alpha + beta) ** 2)
-                                          * (2 * temp + alpha + beta + 1)))
+    def jacobi_nodes_and_weights(degree):
+        temp = np.arange(1, degree)
+        return calculate_nodes_and_weights((beta ** 2 - alpha ** 2) / ((2 * np.arange(degree) + alpha + beta)
+                                                                       * (2 * np.arange(degree) + 2 + alpha + beta)),
+                                           4 * temp * (temp + alpha) * (temp + beta) * (temp + alpha + beta)
+                                           / ((2 * temp + alpha + beta - 1) * ((2 * temp + alpha + beta) ** 2)
+                                              * (2 * temp + alpha + beta + 1)))
+    basis = PolyBasis("Jacobi",
+                      jacobi_basis(),
+                      jacobi_nodes_and_weights)
+    return basis
 
 
 if __name__ == "__main__":
     a, b = 0.5, 3.7
-    test_degree = 20
+    test_degree = 21
     # HINT: hermite (so hermite-gauss chaos) and laguerre (so laguerre-gamma chaos)
-    # nodes are becoming wrong for degree >= 15, orthonormal basis are correct!
+    # nodes are becoming wrong for degree >= 15 when using the recurrence correlation
+    # as the image becomes very big (but also if normalized very small (O(10^-16))), orthonormal basis are correct!
     # the nodes are also correct, the problem is that the polynomial evaluation becomes increasingly bad for these
-    # types of basis because of cancellation and round off errors.
-    test_nodes = hermite_nodes_and_weights(test_degree)[0]
+    # types of basis because of cancellation and round off errors. Therefore use definition by roots.
+    poly_basis = make_hermite()
+    test_nodes = poly_basis.nodes_and_weights(test_degree)[0]
     # nodes are the roots of the corresponding polynom
-    test_poly = hermite_basis()(test_degree)
+    test_poly = poly_basis.polys(test_degree)
+
+    test_leading_factor = 1  # laguerre: (-1) ** test_degree / math.factorial(test_degree)
+
+    compare_poly = poly_by_roots(test_nodes, test_leading_factor)
+
     print("Nodes:", np.array(test_nodes))
     # multiply test_nodes by np.sqrt(0.5)
     # when comparing to http://keisan.casio.com/exec/system/1281195844
     print("Should all be ~zero:", np.vectorize(test_poly)(test_nodes))
+    print("Should all be ~zero:", compare_poly(test_nodes))
+    import matplotlib.pyplot as plt
+
+    plt.figure()
+    x_data = np.arange(-5, 5, 0.01)
+    plt.plot(x_data, np.vectorize(test_poly)(x_data), label="test_poly")
+    plt.plot(x_data, np.vectorize(compare_poly)(x_data), label="compare_poly")
+    plt.legend()
+    plt.show()

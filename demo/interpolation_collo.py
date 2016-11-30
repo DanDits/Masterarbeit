@@ -4,7 +4,7 @@ import polynomial_chaos.distributions as distributions
 from polynomial_chaos.multivariation import multi_index_bounded_sum_length
 from stochastic_equations.collocation.discrete_projection import discrete_projection_expectancy
 from stochastic_equations.stochastic_trial import StochasticTrial
-from stochastic_equations.collocation.interpolation import matrix_inversion_expectancy_1d, matrix_inversion_expectancy
+from stochastic_equations.collocation.interpolation import matrix_inversion_expectancy
 import matplotlib.pyplot as plt
 from util.analysis import error_l2
 from util.storage import save_fig
@@ -97,11 +97,11 @@ trial_mc5 = StochasticTrial([distributions.gaussian],
     .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] * ys[0]) + np.sin(xs[0] + ys[0]),
                     "alpha", lambda ys: 1 + np.exp(ys[0]),
                     "expectancy_data", "../data/mc_100000, Trial5, 0.5, 512.npy")
-trial = trial_1
+trial = trial_mc5
 
 # "High order is not the same as high accuracy. High order translates to high accuracy only when the integrand
 # is very smooth" (http://apps.nrbook.com/empanel/index.html?pg=179#)
-N = list(range(18))  # maximum degree of the polynomial, so N+1 polynomials
+N = list(range(10))  # maximum degree of the polynomial, so N+1 polynomials
 # from n+1 to n+10 notably difference for most examples
 
 # number of nodes in random space, >= N+1, higher CAN give more accuracy (for higher polys)
@@ -115,7 +115,7 @@ M = [(int(np.ceil(multi_index_bounded_sum_length(len(trial.variable_distribution
      for n in N]
 Q = [15] * len(N)  # number of nodes and weights used for discrete projection's quadrature formula
 spatial_dimension = 1
-grid_size = 128
+grid_size = 512
 spatial_domain = list(repeat([-np.pi, np.pi], spatial_dimension))
 start_time = 0
 stop_time = 0.5
