@@ -16,8 +16,8 @@ domain = list(repeat([-np.pi, np.pi], dimension))
 delta_time = 0.001
 start_time = 0.
 stop_time = 0.5
-save_last_solution = False
-simulations_count = 1000
+save_last_solution = True
+simulations_count = 100000
 
 # the factor of the step number between two consecutive solutions used to estimate order of convergence
 order_factor = 10  # >=2, integer
@@ -84,7 +84,16 @@ trial_5 = StochasticTrial([distributions.gaussian],
                           name="Trial5") \
     .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] * ys[0]) + np.sin(xs[0] + ys[0]),
                     "alpha", lambda ys: 1 + np.exp(ys[0]))
-trial = trial_1
+trial_6 = StochasticTrial([distributions.make_beta(1.5, 4.5), distributions.make_uniform(-1, 1),
+                           distributions.make_beta(-0.5, 2.5), distributions.make_uniform(-1, 1)],
+                          lambda xs, ys: np.sin(sum(xs)),
+                          lambda xs, ys: np.sin(sum(xs)) ** 2,
+                          random_variables=[lambda y: np.exp(y), lambda y: (y + 1) / 2,
+                                            lambda y: y, lambda y: y * 4 + 2],
+                          name="Trial6") \
+    .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] + ys[2]) + np.sin(xs[0] + ys[3]),
+                    "alpha", lambda ys: 1 + 0.5 * ys[0] + 3 * ys[1])
+trial = trial_4
 
 splitting_xs, splitting_xs_mesh, expectancy, errors, solutions, solutions_for_order_estimate = \
     simulate(trial, simulations_count, [simulations_count // 3, simulations_count // 2, simulations_count],

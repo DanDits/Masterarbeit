@@ -3,7 +3,6 @@ from diff_equation.splitting import make_klein_gordon_leapfrog_fast_splitting
 from polynomial_chaos.poly_chaos_distributions import get_chaos_by_distribution
 from stochastic_equations.collocation.util import check_distribution_assertions
 from numpy.linalg import lstsq
-import math
 import polynomial_chaos.multivariation as mv
 
 
@@ -26,7 +25,12 @@ def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count
         check_distribution_assertions(distr)
     chaos = mv.chaos_multify([get_chaos_by_distribution(distr) for distr in distrs], sum_bound)
 
-    nodes_list = chaos.nodes_and_weights(random_space_nodes_counts)[0]
+    nodes_list = chaos.nodes_and_weights(random_space_nodes_counts, use_full_tensor_product=False)[0]
+
+    # for uniform or beta distribution you could also use chebyshev (or slightly worse glenshaw) nodes
+    # not always optimal performance, but pretty good
+    # nodes_list = [[node] for node in chebyshev_nodes(random_space_nodes_counts[0])]  # if 1d
+
     poly_count = mv.multi_index_bounded_sum_length(len(distrs), sum_bound)
     basis = [chaos.normalized_basis(degree) for degree in range(poly_count)]
 
@@ -59,8 +63,7 @@ def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count
 
     # computes the weights which are the factors for representing the random solution by the given basis polynomials
     # each column corresponds to the the factors of a spatial grid point
-    print("VandA:", vandermonde_A.shape, "rhsu:", rhs_u.shape)
-    result = lstsq(vandermonde_A, rhs_u)  # TODO try change accuracy
+    result = lstsq(vandermonde_A, rhs_u)
     rank = result[2] / min(vandermonde_A.shape)
     print("Vandermonde_A:", vandermonde_A.shape, "u:", rhs_u.shape, "Weights:", result[0].shape)
     print("Condition:", abs(result[3][0] / result[3][-1]))

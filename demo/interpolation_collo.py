@@ -99,7 +99,7 @@ trial_mc5 = StochasticTrial([distributions.gaussian],
                     "expectancy_data", "../data/mc_100000, Trial5, 0.5, 512.npy",
                     "delta_time", 0.0001,  # (-> dt=0.0001 or else unstable after degree 6)
                     "grid_size", 512)
-trial = trial_mc4
+trial = trial_1
 
 # "High order is not the same as high accuracy. High order translates to high accuracy only when the integrand
 # is very smooth" (http://apps.nrbook.com/empanel/index.html?pg=179#)
@@ -113,10 +113,11 @@ N = list(range(10))  # maximum degree of the polynomial, so N+1 polynomials
 # if minimal: rank of vandermonde decreases by 10-30% and solution does not improve; very fast!
 # if minimal+1:
 M = [(int(np.ceil(multi_index_bounded_sum_length(len(trial.variable_distributions), n)
-              ** (1 / len(trial.variable_distributions)))),) * len(trial.variable_distributions)
+                  ** (1 / len(trial.variable_distributions)))),) * len(trial.variable_distributions)
      for n in N]
 # number of nodes and weights used for discrete projection's quadrature formula
 Q = [(n + 1,) * len(trial.variable_distributions) for n in N]
+
 spatial_dimension = 1
 grid_size = 128 if not trial.has_parameter("grid_size") else trial.grid_size
 spatial_domain = list(repeat([-np.pi, np.pi], spatial_dimension))
@@ -124,27 +125,25 @@ start_time = 0
 stop_time = 0.5
 # if grid_size is bigger this needs to be smaller, especially for higher poly degrees
 delta_time = 0.001 if not trial.has_parameter("delta_time") else trial.delta_time
-use_matrix_inversion = False
 
 rank_frac = None
-exp_var_results, rank_fracs = [], []
+exp_var_results_mi, exp_var_results_dp, rank_fracs = [], [], []
 for n, m, q in zip(N, M, Q):
     print("n,m,q=", n, m, q)
-    if use_matrix_inversion:
-        result_xs, result_xs_mesh, expectancy, variance, rank_frac = matrix_inversion_expectancy(trial, n, m,
-                                                                                                 spatial_domain,
-                                                                                                 grid_size,
-                                                                                                 start_time, stop_time,
-                                                                                                 delta_time)
-    else:
-        result_xs, result_xs_mesh, expectancy, variance = discrete_projection_expectancy(trial, n, q,
-                                                                                         spatial_domain, grid_size,
-                                                                                         start_time, stop_time,
-                                                                                         delta_time,
-                                                                                         expectancy_only=True)
-    exp_var_results.append((n, m, expectancy, variance))
-    if rank_frac is not None:
-        rank_fracs.append(rank_frac)
+    result_xs, result_xs_mesh, mi_expectancy, mi_variance, mi_rank_frac = matrix_inversion_expectancy(trial, n, m,
+                                                                                                      spatial_domain,
+                                                                                                      grid_size,
+                                                                                                      start_time,
+                                                                                                      stop_time,
+                                                                                                      delta_time)
+    _, __, dp_expectancy, dp_variance = discrete_projection_expectancy(trial, n, q,
+                                                                       spatial_domain, grid_size,
+                                                                       start_time, stop_time,
+                                                                       delta_time,
+                                                                       expectancy_only=False)
+    exp_var_results_mi.append((n, m, mi_expectancy, mi_variance))
+    exp_var_results_dp.append((n, q, dp_expectancy, dp_variance))
+    rank_fracs.append(mi_rank_frac)
 rank_fractions = list(map(lambda frac: 10 ** ((frac - 1) * 10),
                           rank_fracs))  # rescale to make visible in logarithmic scale
 
@@ -166,19 +165,30 @@ if trial.has_parameter("variance"):
 
 plt.figure()
 plt.title("Expectancies, spatial grid size={}, {}".format(grid_size, trial.name))
-errors, errors_variance = [], []
-for n, m, expectancy, variance in exp_var_results:
+errors_mi, errors_variance_mi, errors_dp, errors_variance_dp = [], [], [], []
+for n, m, expectancy, variance in exp_var_results_mi:
     error = -1
     if trial_expectancy is not None:
-        print("BLA:", trial_expectancy.shape, expectancy)
         error = error_l2(trial_expectancy, expectancy)
-        errors.append(error)
-        print("Error", n, "=", error)
+        errors_mi.append(error)
+        print("Error expectancy mi", n, m, "=", error)
     if trial_variance is not None:
         error_var = error_l2(trial_variance, variance)
-        errors_variance.append(error_var)
-        print("Error variance", n, "=", error_var)
-    plt.plot(result_xs[0], expectancy, "o" if n < 7 else ".", label="deg={}, error={:.5E}"
+        errors_variance_mi.append(error_var)
+        print("Error variance mi", n, m, "=", error_var)
+    plt.plot(result_xs[0], expectancy, "D" if n < 7 else ".", label="MI, deg={}, error={:.5E}"
+             .format(n, error))
+for n, q, expectancy, variance in exp_var_results_dp:
+    error = -1
+    if trial_expectancy is not None:
+        error = error_l2(trial_expectancy, expectancy)
+        errors_dp.append(error)
+        print("Error expectancy dp", n, q, "=", error)
+    if trial_variance is not None:
+        error_var = error_l2(trial_variance, variance)
+        errors_variance_dp.append(error_var)
+        print("Error variance dp", n, q, "=", error_var)
+    plt.plot(result_xs[0], expectancy, "s" if n < 7 else "x", label="DP, deg={}, error={:.5E}"
              .format(n, error))
 ref = trial_expectancy
 if ref is not None:
@@ -186,16 +196,19 @@ if ref is not None:
 # plt.ylim((0, 1))
 plt.legend()
 # save_fig(plt.axes(), "../data/interpol_invmat_trial5_512_0.00005.pickle")
-if len(errors) > 0:
+if len(errors_dp) > 0 or len(errors_mi) > 0:
     plt.figure()
-    plt.title("Collocation interpolation by {} for {}".format(("Matrix inversion" if use_matrix_inversion
-                                                               else "Discrete projection"),
-                                                              trial.name))
-    plt.plot(N, errors, label="Errors to expectancy")
-    if len(errors_variance) > 0:
-        plt.plot(N, errors_variance, label="Errors to variance")
-    if len(rank_fractions) > 0:
-        plt.plot(N, rank_fractions, label="Vandermonde rank deficiency")
+    plt.title("Collocation interpolation for {}, gridsize={}, dt={}".format(trial.name, grid_size, delta_time))
+    if len(errors_mi) == len(N):
+        plt.plot(N, errors_mi, label="Errors MI to expectancy")
+    if len(errors_dp) == len(N):
+        plt.plot(N, errors_dp, label="Errors DP to expectancy")
+    if len(errors_variance_mi) == len(N):
+        plt.plot(N, errors_variance_mi, label="Errors MI to variance")
+    if len(errors_variance_dp) == len(N):
+        plt.plot(N, errors_variance_dp, label="Errors DP to variance")
+    if len(rank_fractions) == len(N):
+        plt.plot(N, rank_fractions, label="Vandermonde rank deficiency MI")
     plt.yscale('log')
     plt.legend()
     plt.xlabel('Maximum polynom degree')

@@ -197,14 +197,14 @@ def make_jacobi(alpha, beta):
 
 
 if __name__ == "__main__":
-    a, b = 0.5, 3.7
-    test_degree = 25
+    a, b = 2.5, 3.7
+    test_degree = 5
     # HINT: hermite (so hermite-gauss chaos) and laguerre (so laguerre-gamma chaos)
     # nodes are becoming wrong for degree >= 15 when using the recurrence correlation
     # as the image becomes very big (but also if normalized very small (O(10^-16))), orthonormal basis are correct!
     # the nodes are also correct, the problem is that the polynomial evaluation becomes increasingly bad for these
     # types of basis because of cancellation and round off errors. Therefore use definition by roots.
-    poly_basis = make_hermite()
+    poly_basis = make_laguerre(a)
     test_nodes = poly_basis.nodes_and_weights(test_degree)[0]
     # nodes are the roots of the corresponding polynom
     test_poly = poly_basis.polys(test_degree)
