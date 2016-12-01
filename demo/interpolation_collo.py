@@ -99,7 +99,17 @@ trial_mc5 = StochasticTrial([distributions.gaussian],
                     "expectancy_data", "../data/mc_100000, Trial5, 0.5, 512.npy",
                     "delta_time", 0.0001,  # (-> dt=0.0001 or else unstable after degree 6)
                     "grid_size", 512)
-trial = trial_1
+trial_mc6 = StochasticTrial([distributions.make_beta(1.5, 4.5), distributions.make_uniform(-1, 1),
+                           distributions.make_beta(-0.5, 2.5), distributions.make_uniform(-1, 1)],
+                          lambda xs, ys: np.sin(sum(xs)),
+                          lambda xs, ys: np.sin(sum(xs)) ** 2,
+                          random_variables=[lambda y: np.exp(y), lambda y: (y + 1) / 2,
+                                            lambda y: y, lambda y: y * 4 + 2],
+                          name="Trialmc6") \
+    .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] + ys[2]) + np.sin(xs[0] + ys[3]),
+                    "alpha", lambda ys: 1 + 0.5 * ys[0] + 3 * ys[1],
+                    "expectancy_data", "../data/mc_100000, Trial6, 0.5, 128.npy")
+trial = trial_mc6
 
 # "High order is not the same as high accuracy. High order translates to high accuracy only when the integrand
 # is very smooth" (http://apps.nrbook.com/empanel/index.html?pg=179#)
@@ -140,7 +150,7 @@ for n, m, q in zip(N, M, Q):
                                                                        spatial_domain, grid_size,
                                                                        start_time, stop_time,
                                                                        delta_time,
-                                                                       expectancy_only=False)
+                                                                       expectancy_only=True)
     exp_var_results_mi.append((n, m, mi_expectancy, mi_variance))
     exp_var_results_dp.append((n, q, dp_expectancy, dp_variance))
     rank_fracs.append(mi_rank_frac)

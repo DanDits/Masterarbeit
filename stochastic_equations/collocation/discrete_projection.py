@@ -7,7 +7,6 @@ import polynomial_chaos.multivariation as mv
 from util.analysis import mul_prod
 
 
-# TODO  compare to interpolation by inv.
 def discrete_projection_expectancy(trial, max_poly_degree, random_space_quadrature_nodes_counts, spatial_domain,
                                    grid_size, start_time, stop_time, delta_time,
                                    expectancy_only=False):
