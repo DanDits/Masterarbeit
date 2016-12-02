@@ -29,6 +29,7 @@ legendreChaos = PolyChaosDistribution(poly.make_legendre(),
 # TODO does require some symmetry of the nodes around the middle node which is not fulfilled for laguerre nodes
 # nodes are not symmetric around 0., unstable fast,...
 def make_laguerreChaos(alpha):  # alpha > 0
+    assert alpha > 0
     return PolyChaosDistribution(poly.make_laguerre(alpha),
                                  distr.make_gamma(alpha, 1),
                                  lambda n: 1)
@@ -59,20 +60,3 @@ def get_chaos_by_distribution(find_distr):
     else:
         raise ValueError("Not supported distribution:", find_distr.name)
     return chaos
-
-
-if __name__ == "__main__":
-    from scipy.integrate import quad
-
-    # for testing the orthogonality and normalization of the polynomial basis
-    test_alpha, test_beta = 2.5, -0.5
-    test_chaos = make_laguerreChaos(test_alpha)  # make_jacobiChaos(test_alpha, test_beta)
-    basis = [test_chaos.normalized_basis(i) for i in range(24)]
-
-    for b1 in basis:
-        row = []
-        for b2 in basis:
-            result = quad(lambda x: b1(x) * b2(x) * test_chaos.distribution.weight(x),
-                          test_chaos.distribution.support[0], test_chaos.distribution.support[1])[0]
-            row.append(result)
-        print(row)

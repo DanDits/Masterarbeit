@@ -3,7 +3,6 @@ import numpy as np
 import numpy.polynomial.polynomial as npoly
 import math
 
-
 # Pretty general implementation for a recursively defined polynomial basis in function form, so it is not optimized
 # as terms that cancel out are still calculated and may lead to inaccuracies.
 # For higher accuracy (for low order terms) use more hand
@@ -71,6 +70,11 @@ def _poly_basis_recursive(polys_start_coeff, recursive_poly_functions):
     return poly
 
 
+# HINT: hermite (so hermite-gauss chaos) and laguerre (so laguerre-gamma chaos)
+# nodes are becoming wrong for degree >= 15 when using the recurrence correlation
+# as the image becomes very big (but also if normalized very small (O(10^-16))), orthonormal basis are correct!
+# the nodes are also correct, the problem is that the polynomial evaluation becomes increasingly bad for these
+# types of basis because of cancellation and round off errors. Therefore use definition by roots.
 def poly_by_roots(roots, leading_coefficient):
     """
     Returns the polynom that is defined by:
@@ -118,8 +122,9 @@ def calculate_nodes_and_weights(alphas, betas):
 # when returned 'amount' of nodes is fixed (no matter the degree),
 # then using 'amount' nodes gives stable and converging results up to degree<2*amount for collocation
 class PolyBasis:
-    def __init__(self, name, polys, nodes_and_weights):
+    def __init__(self, name, polys, nodes_and_weights, params=()):
         self.name = name
+        self.params = params
         self.polys = polys
         self.nodes_and_weights = lru_cache(maxsize=None)(nodes_and_weights)
 
@@ -137,6 +142,7 @@ def make_hermite():
 
 
 def make_laguerre(alpha):
+    assert alpha > 0
     # normalized recurrence relation: q_n=xq_(n-1) - (2(n-1) + alpha)q_(n-1) - (n-1)(n - 2 + alpha)q_(n-2)
     # to obtain the regular polynomials multiply by (-1)^n / n!
     basis = PolyBasis("Laguerre",
@@ -146,7 +152,8 @@ def make_laguerre(alpha):
                                              (1, lambda n, c: -(n - 1 + alpha - 1) / n * c)]),
                       lambda degree: calculate_nodes_and_weights(2 * np.arange(0, degree) + alpha,
                                                                  np.arange(1, degree) * (
-                                                                 np.arange(1, degree) - 1 + alpha)))
+                                                                     np.arange(1, degree) - 1 + alpha)),
+                      params=(alpha,))
     basis.polys = lambda degree: poly_by_roots(basis.nodes_and_weights(degree)[0],
                                                (1, -1)[degree % 2] / math.sqrt(rising_factorial(alpha, degree))
                                                / math.sqrt(math.factorial(degree)))  # (-1)^n/n!
@@ -160,14 +167,17 @@ def make_legendre():
     # (n!)^2 * 2^n / (2n)!
     basis = PolyBasis("Legendre",
                       _poly_basis_recursive([np.array([1.]), np.array([0., 1.])],  # starting values
-                                 [(0, lambda n, c: (2. * n - 1) / n * npoly.polymulx(c)),
-                                  (1, lambda n, c: (1. - n) / n * c)]),
+                                            [(0, lambda n, c: (2. * n - 1) / n * npoly.polymulx(c)),
+                                             (1, lambda n, c: (1. - n) / n * c)]),
                       lambda degree: calculate_nodes_and_weights(np.zeros(degree), np.arange(1, degree) ** 2
                                                                  / (4 * (np.arange(1, degree) ** 2) - 1)))
     return basis
 
 
 def make_jacobi(alpha, beta):
+    assert alpha > -1
+    assert beta > -1
+
     # jacobi polynomial basis (belongs to beta distribution on (-1,1))
     def jacobi_basis():
         def get_factor(n):
@@ -184,36 +194,42 @@ def make_jacobi(alpha, beta):
                                           (2 * n + alpha + beta - 2) * (2 * n + alpha + beta - 1))))])
 
     def jacobi_nodes_and_weights(degree):
+        # handle special cases to avoid division by zero
+        if np.allclose([alpha, beta], np.zeros(2)):
+            # uniform distribution so legendre nodes and weights
+            return calculate_nodes_and_weights(np.zeros(degree), np.arange(1, degree) ** 2
+                                               / (4 * (np.arange(1, degree) ** 2) - 1))
+
+        first_term = ((beta ** 2 - alpha ** 2) / ((2 * np.arange(degree) + alpha + beta)
+                                                  * (2 * np.arange(degree) + 2 + alpha + beta)))
+
+        if np.allclose([alpha + beta], [-1.]):  # second term would have division by zero in second term for n=1
+            # for (alpha,beta)==(-0.5,-0.5) the arcsine distribution
+            temp = np.arange(2, degree)
+            second_temp = (4 * temp * (temp + alpha) * (temp + beta) * (temp + alpha + beta)
+                           / ((2 * temp + alpha + beta - 1) * ((2 * temp + alpha + beta) ** 2)
+                              * (2 * temp + alpha + beta + 1)))
+            second_temp = np.append((np.array([(4 * 1 * (1 + alpha) * (1 + beta)
+                                                / (((2 * 1 + alpha + beta) ** 2) * (
+                                                    2 * 1 + alpha + beta + 1)))])),
+                                    second_temp)
+            return calculate_nodes_and_weights(first_term, np.array([]) if degree <= 1 else second_temp)
+        # (alpha,beta)==(0.5,0.5): Wigner semicircle distribution; nodes are chebychev nodes of the second kind
         temp = np.arange(1, degree)
-        return calculate_nodes_and_weights((beta ** 2 - alpha ** 2) / ((2 * np.arange(degree) + alpha + beta)
-                                                                       * (2 * np.arange(degree) + 2 + alpha + beta)),
-                                           4 * temp * (temp + alpha) * (temp + beta) * (temp + alpha + beta)
-                                           / ((2 * temp + alpha + beta - 1) * ((2 * temp + alpha + beta) ** 2)
-                                              * (2 * temp + alpha + beta + 1)))
+        second_term = (4 * temp * (temp + alpha) * (temp + beta) * (temp + alpha + beta)
+                       / ((2 * temp + alpha + beta - 1) * ((2 * temp + alpha + beta) ** 2)
+                          * (2 * temp + alpha + beta + 1)))
+        return calculate_nodes_and_weights(first_term, second_term)
+
     basis = PolyBasis("Jacobi",
                       jacobi_basis(),
-                      jacobi_nodes_and_weights)
+                      jacobi_nodes_and_weights,
+                      params=(alpha, beta))
     return basis
 
 
-if __name__ == "__main__":
-    a, b = 2.5, 3.7
-    test_degree = 5
-    # HINT: hermite (so hermite-gauss chaos) and laguerre (so laguerre-gamma chaos)
-    # nodes are becoming wrong for degree >= 15 when using the recurrence correlation
-    # as the image becomes very big (but also if normalized very small (O(10^-16))), orthonormal basis are correct!
-    # the nodes are also correct, the problem is that the polynomial evaluation becomes increasingly bad for these
-    # types of basis because of cancellation and round off errors. Therefore use definition by roots.
-    poly_basis = make_laguerre(a)
-    test_nodes = poly_basis.nodes_and_weights(test_degree)[0]
-    # nodes are the roots of the corresponding polynom
-    test_poly = poly_basis.polys(test_degree)
-    print("Nodes:", np.array(test_nodes))
-    print("Should all be ~zero:", np.vectorize(test_poly)(test_nodes))
-    import matplotlib.pyplot as plt
-
-    plt.figure()
-    x_data = np.arange(-5, 5, 0.01)
-    plt.plot(x_data, np.vectorize(test_poly)(x_data), label="test_poly")
-    plt.legend()
-    plt.show()
+jac = make_jacobi(-0.5, -0.5)
+print(jac.nodes_and_weights(0))
+print(jac.nodes_and_weights(1))
+print(jac.nodes_and_weights(2))
+print(jac.nodes_and_weights(3))
