@@ -227,9 +227,3 @@ def make_jacobi(alpha, beta):
                       params=(alpha, beta))
     return basis
 
-
-jac = make_jacobi(-0.5, -0.5)
-print(jac.nodes_and_weights(0))
-print(jac.nodes_and_weights(1))
-print(jac.nodes_and_weights(2))
-print(jac.nodes_and_weights(3))

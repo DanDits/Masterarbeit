@@ -22,6 +22,23 @@ def multi_index_bounded_sum_length(dimension, sum_bound):
     return factorial(dimension + sum_bound) // (factorial(dimension) * factorial(sum_bound))
 
 
+def multi_index_exact_sum(dimension, sum_value):
+    i = sum_value + dimension
+    current_to_order = []
+    for comb in combinations(range(i - 1), dimension - 1):
+        # imagine i being written as i=1_1_1_..._1 with i times a 1 and (i-1) blanks
+        # replace d-1 blanks (_) with a comma, the rest with a plus to get all possibilities
+        # therefore get all possible i length combinations
+        comb += (i - 1,)  # add a virtual comma after the last 1 to simplify the next loop
+        last_pos = -1
+        index = []
+        for comma_pos in comb:
+            index.append(comma_pos - last_pos - 1)  # each reduced by 1 as we do not want [1,1,2] but [0,0,1]
+            last_pos = comma_pos
+        current_to_order.append(index)
+    return sorted(current_to_order)
+
+
 def multi_index_bounded_sum(dimension, sum_bound):
     """
     An iterable generator that returns the multi index i=(i_1,i_2,i_3,...i_dimension)
@@ -37,20 +54,31 @@ def multi_index_bounded_sum(dimension, sum_bound):
     # (and at the end subtract 1 from each position) that there are (P+d over P)=(P+d)!/(P!d!)
     for i in range(d, d + P + 1):
         # compute d-length lists whose sum is exactly equal to i
-        current_to_order = []
-        for comb in combinations(range(i - 1), d - 1):
-            # imagine i being written as i=1_1_1_..._1 with i times a 1 and (i-1) blanks
-            # replace d-1 blanks (_) with a comma, the rest with a plus to get all possibilities
-            # therefore get all possible i length combinations
-            comb += (i - 1,)  # add a virtual comma after the last 1 to simplify the next loop
-            last_pos = -1
-            index = []
-            for comma_pos in comb:
-                index.append(comma_pos - last_pos - 1)  # each reduced by 1 as we do not want [1,1,2] but [0,0,1]
-                last_pos = comma_pos
-            current_to_order.append(index)
-        for ind in sorted(current_to_order):
+        for ind in multi_index_exact_sum(dimension, i - d):  # i-d as the exact_sum function already subtracts 1s
             yield ind
+
+
+def smolyak_sparse_grid(level, univariate_nodes_and_weights):
+    dimension = len(univariate_nodes_and_weights)
+    nodes_list, weights_list = [], []
+    count = 0
+    for multi_sum in range(level + 1, level + dimension + 1):
+        factor = ([1, -1][(level + dimension - multi_sum) % 2]  # -1 only if l+d-|i| is uneven
+                  * factorial(dimension - 1) // (factorial(level + dimension - multi_sum)
+                                                 * factorial(multi_sum - level - 1)))
+        for multi_index in multi_index_exact_sum(dimension, multi_sum):
+            #pairs_per_dimension = [nodes_and_weights(index) for nodes_and_weights, index
+            #                       in zip(univariate_nodes_and_weights, multi_index)]
+            #multivariate_node, multivariate_weight = [], []
+            #for nodes, weights in pairs_per_dimension:
+            #    multivariate_node.append()
+            #count += mul_prod(map(lambda t: t + 1, multi_index))
+            count += 1
+    return count  # TODO trying stuff
+
+dim = 2
+for level in [1, 2, 3, 4]:
+    print("SMOL, dim=", dim, "level=", level, ":", smolyak_sparse_grid(level, ["bla"] * dim))
 
 
 def poly_basis_multify(basis_list, sum_bound, nodes_and_weights, multi_indices=None):
