@@ -25,7 +25,7 @@ def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count
         check_distribution_assertions(distr)
     chaos = mv.chaos_multify([get_chaos_by_distribution(distr) for distr in distrs], sum_bound)
 
-    nodes_list = chaos.nodes_and_weights(random_space_nodes_counts, use_full_tensor_product=False)[0]
+    nodes_list = chaos.nodes_and_weights(random_space_nodes_counts, method='centralized')[0]
 
     # for uniform or beta distribution you could also use chebyshev (or slightly worse glenshaw) nodes
     # not always optimal performance, but pretty good

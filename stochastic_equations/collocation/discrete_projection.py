@@ -19,7 +19,7 @@ def discrete_projection_expectancy(trial, max_poly_degree, random_space_quadratu
     # TODO instead of full tensor product try to use a sparse grid quadrature (see xiu book)
     # the symmetrized minimal node approach does not work for quadrature, only for interpolation
     quad_nodes_list, quad_weights_list = chaos.nodes_and_weights(random_space_quadrature_nodes_counts,
-                                                                 use_full_tensor_product=True)
+                                                                 method='full_tensor')
     if expectancy_only:
         poly_count = 1
     else:

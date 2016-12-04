@@ -112,7 +112,7 @@ def poly_basis_multify(basis_list, sum_bound, nodes_and_weights, multi_indices=N
     return basis
 
 
-def center_iterator(data):
+def sparse_center_iterator(data, level):
     total = len(data)
     direction = 1
     i = (total - 1) // 2
@@ -130,9 +130,11 @@ def centralize_index(index, length):
 def chaos_multify(chaos_list, sum_bound):
     basis_list = [chaos.poly_basis for chaos in chaos_list]
     multi_indices = list(multi_index_bounded_sum(len(basis_list), sum_bound))
+    multi_indices_even = list(multi_index_bounded_sum(len(basis_list),
+                                                      sum_bound + 1 if sum_bound % 2 == 1 else sum_bound))
 
-    def nodes_and_weights_multify(lengths, use_full_tensor_product=False):
-        if use_full_tensor_product:
+    def nodes_and_weights_multify(lengths, method='full_tensor'):
+        if method == 'full_tensor':
             # contains [([n11,n12,n13],[w11,w12,w13]), ([n21,n22],[w21,w22])]
             assert len(lengths) == len(chaos_list)
             nodes_weights_pairs = [chaos.nodes_and_weights(length) for length, chaos in zip(lengths, chaos_list)]
@@ -141,21 +143,31 @@ def chaos_multify(chaos_list, sum_bound):
             # use full tensor product of all dimensions by using 'product'
             nodes_list = [grid_nodes for grid_nodes in product(*nodes_list)]
             weights_list = [grid_weights for grid_weights in product(*weights_list)]
-        else:
+        elif method == 'centralized' or method == 'centralized_even':
             nodes_list, weights_list = [], []
             length = sum_bound + 1  # ignore lengths and use sum_bound+1 for every dimension to ensure we can index!
-            odes_weights_pairs = [chaos.nodes_and_weights(length) for chaos in chaos_list]
+            nodes_weights_pairs = [chaos.nodes_and_weights(length) for chaos in chaos_list]
             # for every multi index we add one nodes tuple to the list, so we will later have the same
             # amount of nodes/weights as we have basis polynomials.
-            for multi_index in multi_indices:
+            indices = multi_indices
+            if method == 'centralized_even':
+                # because of symmetry of nodes and centralization use only even bound for multi_indices
+                indices = multi_indices_even
+            for multi_index in indices:
                 current_nodes, current_weights = [], []
-                for (nodes, weights), index in zip(odes_weights_pairs, multi_index):
+                for (nodes, weights), index in zip(nodes_weights_pairs, multi_index):
                     # here it is important that we have enough nodes to use the multi_index's index!
                     centralized = centralize_index(index, length)  # important as nodes are symmetric around the center
                     current_nodes.append(nodes[centralized])
                     current_weights.append(weights[centralized])
                 nodes_list.append(current_nodes)
                 weights_list.append(current_weights)
+        elif method == 'sparse':
+            nodes_list, weights_list = [], []
+            for multi_index in multi_indices:
+                pass
+        else:
+            raise ValueError("Undefined method name:", method)
         return nodes_list, weights_list
 
     def gamma_multify(n):
