@@ -15,7 +15,8 @@ from diff_equation.splitting import make_klein_gordon_lie_trotter_splitting, mak
     make_klein_gordon_lie_trotter_reversed_splitting, \
     make_klein_gordon_strang_reversed_splitting, make_klein_gordon_leapfrog_splitting, \
     make_klein_gordon_leapfrog_reversed_splitting, make_klein_gordon_strang_offset_reversed_splitting, \
-    make_klein_gordon_leapfrog_fast_splitting
+    make_klein_gordon_leapfrog_fast_splitting, make_klein_gordon_wave_moment_splitting, \
+    make_klein_gordon_linhyp_moment_splitting
 from util.trial import Trial
 
 dimension = 1
@@ -25,7 +26,7 @@ delta_time = 0.001
 save_every_x_solution = 1
 plot_solutions_count = 5
 start_time = 0.
-stop_time = 25
+stop_time = 1
 show_errors = True
 show_reference = True
 do_animate = True
@@ -125,7 +126,8 @@ trial_bessel = Trial(lambda xs: (bessel_A * bessel_first(0, bessel_xi(xs, 0))
                     "alpha", lambda: bessel_alpha ** 2)
 
 if __name__ == "__main__":
-    trial = trial_1
+    trial = trial_3
+
     trial.error_function = error_l2_relative
     offset_wave_solver = None
     if trial == trial_1:
@@ -140,7 +142,9 @@ if __name__ == "__main__":
                            make_klein_gordon_strang_splitting, make_klein_gordon_strang_reversed_splitting,
                            partial(make_klein_gordon_fast_strang_splitting, time_step_size=delta_time),
                            make_klein_gordon_leapfrog_splitting, make_klein_gordon_leapfrog_reversed_splitting,
-                           partial(make_klein_gordon_leapfrog_fast_splitting, time_step_size=delta_time)]
+                           partial(make_klein_gordon_leapfrog_fast_splitting, time_step_size=delta_time),
+                           make_klein_gordon_wave_moment_splitting,
+                           make_klein_gordon_linhyp_moment_splitting]
     if trial.has_parameter("frog_only"):
         splitting_factories = [make_klein_gordon_leapfrog_splitting, make_klein_gordon_leapfrog_reversed_splitting]
     if trial.has_parameter("offset"):

@@ -42,6 +42,22 @@ class VelocityConfig(SolverConfig):
                                      self.start_velocity])
 
 
+class WaveMomentConfig(SolverConfig):
+    def __init__(self, intervals, grid_points_list, alpha, beta):
+        super().__init__(intervals, grid_points_list, pseudospectral_power=2)
+        self.pseudospectral_mesh_sum = sum(self.pseudospectral_factors_mesh)
+        self.moment = None
+        self.alpha = alpha()
+        self.beta = beta(self.xs_mesh)
+
+    def init_solver(self, t0, u0, u0t):
+        self.init_initial_values(t0, u0, u0t)
+        uxx = ifftn(self.pseudospectral_mesh_sum * fftn(self.start_position))
+        # saves the moment alpha*u_xx at the given start time to estimate a new velocity
+        self.moment = self.alpha * uxx
+        self.solver = lambda time: [self.start_position, self.start_velocity + self.moment * (time - self.start_time)]
+
+
 class KleinGordonMomentConfig(SolverConfig):
 
     def __init__(self, intervals, grid_points_list, alpha, beta):
