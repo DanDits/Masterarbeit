@@ -18,6 +18,7 @@ start_time = 0.
 stop_time = 0.5
 save_last_solution = True
 simulations_count = 100000
+do_quasi_monte_carlo = True
 
 # the factor of the step number between two consecutive solutions used to estimate order of convergence
 order_factor = 10  # >=2, integer
@@ -56,12 +57,12 @@ trial_2_1.add_parameters("beta", lambda xs, ys: 1 / ys[0] ** 2 - 1 / ys[0],  # 1
                          "alpha", lambda ys: 1 / ys[0])
 left_3, right_3 = 2.5, 3  # y[0] bigger than 2
 trial_3 = StochasticTrial([distributions.make_uniform(-1, 1)],  # y[0] bigger than 2 enforced by random variable
-                        lambda xs, ys: 1 / (np.sin(sum(xs)) + ys[0]),
-                        lambda xs, ys: np.zeros(shape=sum(xs).shape),
-                        lambda xs, t, ys: np.cos(t) / (np.sin(sum(xs)) + ys[0]),
-                        # from U(-1,1) to U(left_3, right_3)
-                        random_variables=[lambda y: (right_3 - left_3) / 2 * (y + 1) + left_3],
-                          name = "Trial3") \
+                          lambda xs, ys: 1 / (np.sin(sum(xs)) + ys[0]),
+                          lambda xs, ys: np.zeros(shape=sum(xs).shape),
+                          lambda xs, t, ys: np.cos(t) / (np.sin(sum(xs)) + ys[0]),
+                          # from U(-1,1) to U(left_3, right_3)
+                          random_variables=[lambda y: (right_3 - left_3) / 2 * (y + 1) + left_3],
+                          name="Trial3") \
     .add_parameters("beta", lambda xs, ys: 1 + (ys[0] - 2) * (np.sin(sum(xs)) / (np.sin(sum(xs)) + ys[0])
                                                               + 2 * np.cos(sum(xs)) ** 2
                                                               / (np.sin(sum(xs)) + ys[0]) ** 2),
@@ -93,17 +94,18 @@ trial_6 = StochasticTrial([distributions.make_beta(1.5, 4.5), distributions.make
                           name="Trial6") \
     .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] + ys[2]) + np.sin(xs[0] + ys[3]),
                     "alpha", lambda ys: 1 + 0.5 * ys[0] + 3 * ys[1])
-trial = trial_4
+trial = trial_6
 
 splitting_xs, splitting_xs_mesh, expectancy, errors, solutions, solutions_for_order_estimate = \
     simulate(trial, simulations_count, [simulations_count // 3, simulations_count // 2, simulations_count],
              domain, grid_size_N, start_time,
              stop_time, delta_time,
-             do_calculate_expectancy=do_calculate_expectancy, order_factor=order_factor)
-
+             do_calculate_expectancy=do_calculate_expectancy, order_factor=order_factor,
+             quasi_monte_carlo=do_quasi_monte_carlo)
+print("Quasi Monte Carlo:", do_quasi_monte_carlo)
 if dimension == 1:
     plt.figure()
-    plt.title("Solutions at time={}, dt={}".format(stop_time, delta_time))
+    plt.title("Solutions at time={}, dt={}, qMC={}".format(stop_time, delta_time, do_quasi_monte_carlo))
     if trial.has_parameter("orientation_func"):
         plt.plot(*splitting_xs, trial.orientation_func(splitting_xs_mesh, stop_time), 'o', label="...for orientation")
     if expectancy is not None:
@@ -111,7 +113,8 @@ if dimension == 1:
     for step, solution in solutions:
         plt.plot(*splitting_xs, solution, label="Mean with N={}".format(step))
     if save_last_solution:
-        np.save('../data/mc_{}, {}, {}, {}'.format(solutions[-1][0], trial.name, stop_time, grid_size_N),
+        np.save('../data/{}_{}, {}, {}, {}'.format("qmc" if do_quasi_monte_carlo else "mc",
+                                                   solutions[-1][0], trial.name, stop_time, grid_size_N),
                 solutions[-1][1])
     plt.legend()
 elif dimension == 2:
@@ -120,10 +123,11 @@ elif dimension == 2:
 
 if len(errors) > 0:
     plt.figure()
-    plt.title("Errors to expectancy, dt={}".format(delta_time))
+    plt.title("Errors to expectancy, dt={}, qMC={}".format(delta_time, do_quasi_monte_carlo))
     plt.plot(range(len(errors)), errors)
     plt.xlabel("Simulation")
     plt.ylabel("Error")
+    plt.xscale('log')
     plt.yscale('log')
 
 if len(solutions_for_order_estimate) == 3:

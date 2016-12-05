@@ -4,6 +4,8 @@ import random
 from numpy import inf
 from scipy.special import gamma
 from scipy.special import beta as beta_func
+from scipy.stats import beta as stats_beta
+from scipy.stats import gamma as stats_gamma
 
 
 # See "The Wiener--Askey Polynomial Chaos for Stochastic Differential Equations"
@@ -14,11 +16,6 @@ def inverse_gaussian(u):
     return (math.copysign(1, u - 0.5)
             * (h - (2.515517 + 0.802853 * h + 0.010328 * h * h)
                / (1 + 1.432788 * h + 0.189269 * h * h + 0.001308 * h * h * h)))
-
-# TODO inverse gamma and beta missing:
-# inverse_gamma: https://de.mathworks.com/help/stats/gaminv.html not exact, so use scipy.stats.gamma.ppf (parameters?)
-# inverse_beta: https://de.mathworks.com/help/stats/betainv.html not exact,
-# so use scipy.stats.beta.ppf (parameters?) https://docs.scipy.org/doc/scipy-0.18.1/reference/generated/scipy.stats.beta.html
 
 
 def make_inverse_exponential(lamb):
@@ -75,6 +72,7 @@ def make_gamma(shape, rate):
                                    if x >= 0 else 0.),
                         (0, inf),
                         partial(random.gammavariate, shape, 1. / rate),
+                        inverse_distribution=partial(stats_gamma.ppf, a=shape, rate=1./rate),
                         show_name="Gamma({}, {})".format(shape, rate),
                         parameters=(shape, rate))
 
@@ -101,6 +99,8 @@ def make_beta(alpha, beta):
                                    / beta_func(alpha + 1, beta + 1) if -1 <= x <= 1 else 0),
                         (-1, 1),
                         generator,
+                        # switched notation in stats, so a=beta+1 is by purpose
+                        inverse_distribution=partial(stats_beta.ppf, a=beta+1, b=alpha+1, loc=-1, scale=2),
                         show_name="Beta({}, {})".format(alpha, beta),
                         parameters=(alpha, beta))
 
@@ -124,12 +124,20 @@ if __name__ == "__main__":
         plt.legend()
         plt.show()
     else:
-        from scipy.stats import norm as test_distr
-        inverse = np.vectorize(inverse_gaussian)
-
-        x_data = np.arange(0.001, 1, 0.001)
+        from scipy.stats import gamma as test_distr
+        shape, rate = 0.5, 0.2  # >0
+        loc, scale = 0., 1. / rate
+        a = shape
+        own_distr = make_gamma(shape, rate)
+        x_data = np.arange(-0.999, 0.999, 0.01)
+        y_data = np.arange(0.001, 1, 0.001)
         plt.figure()
-        plt.plot(x_data, test_distr.ppf(x_data), label="ppf")
-        plt.plot(x_data, inverse(x_data), label="own_inverse")
+        from util.analysis import error_l2
+        res1 = test_distr.pdf(x_data, a, loc=loc, scale=scale)
+        res2 = np.vectorize(own_distr.weight)(x_data)
+        print(error_l2(res2, res1))
+        plt.plot(x_data, res1, 'x', label="pdf scipy")
+        plt.plot(x_data, res2, label="pdf own")
+        #plt.plot(y_data, test_distr.ppf(y_data, a, loc=loc, scale=scale), label='ppf scipy')
         plt.legend()
         plt.show()

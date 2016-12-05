@@ -2,11 +2,13 @@ from diff_equation.splitting import make_klein_gordon_leapfrog_fast_splitting
 from util.analysis import error_l2
 from collections import deque
 import numpy as np
-
+from util.quasi_randomness.halton import halton
+from util.quasi_randomness.sobol_lib import i4_sobol
 
 def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
              domain, grid_size_N, start_time, stop_time, delta_time, eval_time=None, heartbeat=100,
-             do_calculate_expectancy=True, order_factor=2):
+             do_calculate_expectancy=True, order_factor=2,
+             quasi_monte_carlo=False):
     """
     Monte Carlo simulation for the stochastic Klein-Gordon equation using a splitting method to solve the equation
     for randomly generated values of the trial's distributions. Calculates the expectancy by calculating the mean
@@ -57,9 +59,10 @@ def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
     last_solution_weights = [1 / (i + 1) for i in range(last_solutions_count_max)]  # not normalized
     steps_for_order_estimate = [int(simulations_count / (order_factor ** i)) for i in range(3)]
     solutions_for_order_estimate = []
-
+    random_dimension = len(stochastic_trial.variable_distributions)
     actual_solutions_count = 0
     fail_count = 0
+
     # HINT: To estimate sample variance, you would need to sum the squares of the simulation solution minus the
     # estimated expectancy and then divide this by either: simulations_count, or simulations_count-1 (to eliminate bias)
     # see: https://en.wikipedia.org/wiki/Variance#Population_variance_and_sample_variance
@@ -67,7 +70,17 @@ def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
         if heartbeat > 0 and actual_solutions_count % heartbeat == 0:
             print("Simulation",
                   actual_solutions_count)
-        stochastic_trial.randomize()
+        if not quasi_monte_carlo:
+            stochastic_trial.randomize()
+        else:
+            # do not use the sequence's first element as this all zeros
+            if random_dimension <= 6:  # by recommendation (of whom again...?)
+                quasi_uniform = halton(actual_solutions_count + 1, random_dimension)
+            else:
+                quasi_uniform, _ = i4_sobol(random_dimension, actual_solutions_count + 1)
+            quasi_random = [distribution.inverse_distribution(value) for value, distribution
+                            in zip(quasi_uniform, stochastic_trial.variable_distributions)]
+            stochastic_trial.set_random_values(quasi_random)
 
         splitting = make_klein_gordon_leapfrog_fast_splitting(domain, [grid_size_N], start_time,
                                                               stochastic_trial.start_position,
@@ -88,10 +101,10 @@ def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
             print("Simulation", actual_solutions_count,
                   "got a invalid result, NaN or Inf or too big:", test_summed, "Skipping",
                   "Random parameters:", stochastic_trial.rvalues, stochastic_trial.name)
-            if fail_count < simulations_count:
+            if not quasi_monte_carlo and fail_count < simulations_count:
                 continue
             else:
-                break  # to make simulation stop at maximum of twice the runtime
+                break  # to make simulation stop at maximum of twice the runtime or if it is not (pseudo)random
         actual_solutions_count += 1
         if summed_solutions is not None:
             summed_solutions += solution
