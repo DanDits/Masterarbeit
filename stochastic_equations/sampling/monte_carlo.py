@@ -5,6 +5,7 @@ import numpy as np
 from util.quasi_randomness.halton import halton
 from util.quasi_randomness.sobol_lib import i4_sobol
 
+
 def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
              domain, grid_size_N, start_time, stop_time, delta_time, eval_time=None, heartbeat=100,
              do_calculate_expectancy=True, order_factor=2,

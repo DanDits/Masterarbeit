@@ -17,7 +17,7 @@ class StochasticTrial(Trial):
     """
 
     def __init__(self, variable_distributions, start_position, start_velocity, reference=None,
-                 random_variables=None, name=None):
+                 random_variables=None, name=None, flag_raw_attributes=False):
         """
         Creates a new Stochastic Trial. See Trial's constructor for parameters: start_position, start_velocity,
         reference, name for basic usage, remember they take an additional parameter ys.
@@ -33,16 +33,20 @@ class StochasticTrial(Trial):
         and do not repeat oneself all the time when using y for reference,...
         If none or not enough given will be filled by identity function.
         :param name: See Trial.
+        :param flag_raw_attributes: If set to True, will NOT set the random parameters ys but always return the raw
+        ones which were given to this object.
         """
         super().__init__(start_position, start_velocity, reference, name=name)
         self.raw_reference = reference
         self.variable_distributions = variable_distributions
         self.rvalues = None
+        self.flag_raw_attributes = flag_raw_attributes
 
         def identity(*p):
             if len(p) == 1:
                 return p[0]
             return p
+
         random_variables = [] if random_variables is None else random_variables
         self.rvars = ([(identity if variable is None else variable)
                        for variable, _ in zip(random_variables, variable_distributions)]  # trim to shorter
@@ -50,15 +54,19 @@ class StochasticTrial(Trial):
         assert len(self.rvars) == len(self.variable_distributions)
         self.randomize()
 
+    def transform_values(self, values):
+        return [rvar(value) for rvar, value in zip(self.rvars, values)]
+
     def set_random_values(self, values):
         """
         Allows to overwrite the randomized values by a list of given values. If these values are correct and meaningful
         for the trial's distributions is not validated. They will get transformed by the set random variables though.
         :param values: A list of values for each random value corresponding to a distribution.
-        :return: None
+        :return: The new random values.
         """
         assert len(values) == len(self.rvalues)
-        self.rvalues = [rvar(value) for rvar, value in zip(self.rvars, values)]
+        self.rvalues = self.transform_values(values)
+        return self.rvalues
 
     def randomize(self):
         """
@@ -73,6 +81,7 @@ class StochasticTrial(Trial):
         """
         This very far from efficient method calculates the expectancy of a given function(x-coordinates, time, ys) at
         the every point on the grid defined by the axes "xs_lines" and the given time t.
+        Basically uses calculate_expectancy_simple on every grid point.
         :param xs_lines: List of one dimensional numpy arrays containing the grid coordinates for the given dimension.
         :param t: The time to get expectancy at.
         :param function: The function as described above.
@@ -92,7 +101,23 @@ class StochasticTrial(Trial):
             result[index] = point_value
         return result
 
+    def calculate_expectancy_simple(self, function):
+        """
+        Calculates the expectancy of a function(ys) which takes a list of values, one for each distribution and returns
+        a value. This does NOT use the random variables to transform the input ys!
+        :param function: The function as described above
+        :return: The expectancy, a float.
+        """
+
+        # nquad expects multiple arguments
+        def function_transformed(*ys):
+            return (function(ys)
+                    * mul_prod(distr.weight(y) for y, distr in zip(ys, self.variable_distributions)))
+
+        return nquad(function_transformed, [distr.support for distr in self.variable_distributions])[0]
+
     def __getattribute__(self, item):
-        if item in ["start_position", "start_velocity", "reference", "alpha", "beta"]:
+        if (item != "flag_raw_attributes" and not self.flag_raw_attributes
+                and item in ["start_position", "start_velocity", "reference", "alpha", "beta"]):
             return partial(super().__getattribute__(item), ys=self.rvalues)
         return super().__getattribute__(item)

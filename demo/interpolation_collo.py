@@ -88,17 +88,19 @@ trial_mc4 = StochasticTrial([distributions.gaussian, distributions.make_uniform(
                             name="Trialmc4") \
     .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] + ys[2]) + np.sin(xs[0] + ys[3]),
                     "alpha", lambda ys: 1 + 0.5 * ys[0] + 3 * ys[1],
-                    "expectancy_data", "../data/mc_100000, Trial4, 0.5, 128.npy")
+                    "expectancy_data", "../data/qmc_100000, Trial4, 0.5, 128.npy")
 # equal to mc trial_5, we have saved simulation data:
+# unstable for N=512,dt=0.001:  Degree 6
+#              N=128,dt=0.001:  Degree 15
+#              N=128,dt=0.0001: Degree>29
 trial_mc5 = StochasticTrial([distributions.gaussian],
                             lambda xs, ys: np.cos(sum(xs)),
                             lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
                             name="Trialmc5") \
     .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] * ys[0]) + np.sin(xs[0] + ys[0]),
                     "alpha", lambda ys: 1 + np.exp(ys[0]),
-                    "expectancy_data", "../data/mc_100000, Trial5, 0.5, 512.npy",
-                    "delta_time", 0.0001,  # (-> dt=0.0001 or else unstable after degree 6)
-                    "grid_size", 512)
+                    "expectancy_data", "../data/qmc_100000, Trial5, 0.5, 128.npy",
+                    "delta_time", 0.0001)
 trial_mc6 = StochasticTrial([distributions.make_beta(1.5, 4.5), distributions.make_uniform(-1, 1),
                            distributions.make_beta(-0.5, 2.5), distributions.make_uniform(-1, 1)],
                           lambda xs, ys: np.sin(sum(xs)),
@@ -108,12 +110,12 @@ trial_mc6 = StochasticTrial([distributions.make_beta(1.5, 4.5), distributions.ma
                           name="Trialmc6") \
     .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] + ys[2]) + np.sin(xs[0] + ys[3]),
                     "alpha", lambda ys: 1 + 0.5 * ys[0] + 3 * ys[1],
-                    "expectancy_data", "../data/mc_100000, Trial6, 0.5, 128.npy")
-trial = trial_mc4
+                    "expectancy_data", "../data/qmc_100000, Trial6, 0.5, 128.npy")
+trial = trial_mc5
 
 # "High order is not the same as high accuracy. High order translates to high accuracy only when the integrand
 # is very smooth" (http://apps.nrbook.com/empanel/index.html?pg=179#)
-N = list(range(10))  # maximum degree of the polynomial, so N+1 polynomials
+N = list(range(30))  # maximum degree of the polynomial, so N+1 polynomials
 # from n+1 to n+10 notably difference for most examples
 
 # number of nodes in random space, >= N+1, higher CAN give more accuracy (for higher polys)
