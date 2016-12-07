@@ -111,11 +111,11 @@ trial_mc6 = StochasticTrial([distributions.make_beta(1.5, 4.5), distributions.ma
     .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] + ys[2]) + np.sin(xs[0] + ys[3]),
                     "alpha", lambda ys: 1 + 0.5 * ys[0] + 3 * ys[1],
                     "expectancy_data", "../data/qmc_100000, Trial6, 0.5, 128.npy")
-trial = trial_mc5
+trial = trial_mc4
 
 # "High order is not the same as high accuracy. High order translates to high accuracy only when the integrand
 # is very smooth" (http://apps.nrbook.com/empanel/index.html?pg=179#)
-N = list(range(30))  # maximum degree of the polynomial, so N+1 polynomials
+N = list(range(10))  # maximum degree of the polynomial, so N+1 polynomials
 # from n+1 to n+10 notably difference for most examples
 
 # number of nodes in random space, >= N+1, higher CAN give more accuracy (for higher polys)
@@ -134,7 +134,7 @@ spatial_dimension = 1
 grid_size = 128 if not trial.has_parameter("grid_size") else trial.grid_size
 spatial_domain = list(repeat([-np.pi, np.pi], spatial_dimension))
 start_time = 0
-stop_time = 0.5
+stop_time = 2.
 # if grid_size is bigger this needs to be smaller, especially for higher poly degrees
 delta_time = 0.001 if not trial.has_parameter("delta_time") else trial.delta_time
 
