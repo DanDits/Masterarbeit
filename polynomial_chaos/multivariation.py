@@ -76,10 +76,6 @@ def smolyak_sparse_grid(level, univariate_nodes_and_weights):
             count += 1
     return count  # TODO trying stuff
 
-dim = 2
-for level in [1, 2, 3, 4]:
-    print("SMOL, dim=", dim, "level=", level, ":", smolyak_sparse_grid(level, ["bla"] * dim))
-
 
 def poly_basis_multify(basis_list, sum_bound, nodes_and_weights, multi_indices=None):
     """

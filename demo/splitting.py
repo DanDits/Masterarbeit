@@ -21,7 +21,7 @@ from util.trial import Trial
 dimension = 1
 grid_size_N = 64 if dimension >= 2 else 128
 domain = list(repeat([-pi, pi], dimension))
-delta_time = 0.001
+delta_time = 0.0001
 save_every_x_solution = 1
 plot_solutions_count = 5
 start_time = 0.

@@ -111,7 +111,6 @@ def matrix_b(trial, xs, basis, max_poly_degree):
                                                                     * basis[i](ys) * basis[k](ys)), max_poly_degree)
 
 
-# TODO test MultiWave solver and make sure the input/output formats fit together
 class MultiWaveSolver(SolverConfig):
     def __init__(self, intervals, grid_points_list, wave_speeds):
         super().__init__(intervals, grid_points_list)
@@ -207,6 +206,8 @@ def get_starting_value_coefficients(xs_mesh, starting_value_func, project_trial,
 
 
 def make_splitting(domain, grid_size, wave_speeds, basis, function_b, matrix_s, start_time, trial):
+    # TODO do not use the old 0.5-fixes-stuff splitting but adapt the Multi solvers to use a splitting factor!
+    # TODO then make the strang splitting to a fast one
     # the factors 0.5 appear because of this choice of splitting (see diff_equation.splitting for more details)
     multi_wave_config = MultiWaveSolver(domain, [grid_size], wave_speeds * np.sqrt(0.5))
     multi_ode_config = MultiLinearOdeSolver(domain, [grid_size], lambda *params: function_b(*params) * 0.5, matrix_s)
