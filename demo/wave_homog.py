@@ -79,7 +79,7 @@ def has_reference(ref_trial, dim):
 
 # --- CALCULATION AND VISUALIZATION -------------
 
-trial = trial_5
+trial = trial_1
 
 wave_config = WaveSolverConfig(domain, [grid_n], trial.wave_speed)
 wave_config.init_solver(0, trial.start_position, trial.start_velocity)

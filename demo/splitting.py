@@ -15,8 +15,7 @@ from diff_equation.splitting import make_klein_gordon_lie_trotter_splitting, mak
     make_klein_gordon_lie_trotter_reversed_splitting, \
     make_klein_gordon_strang_reversed_splitting, make_klein_gordon_leapfrog_splitting, \
     make_klein_gordon_leapfrog_reversed_splitting, make_klein_gordon_strang_offset_reversed_splitting, \
-    make_klein_gordon_leapfrog_fast_splitting, make_klein_gordon_wave_moment_splitting, \
-    make_klein_gordon_linhyp_moment_splitting, make_klein_gordon_leapfrog_bad_splitting
+    make_klein_gordon_leapfrog_fast_splitting, make_klein_gordon_leapfrog_bad_splitting
 from util.trial import Trial
 
 dimension = 1
@@ -27,6 +26,7 @@ save_every_x_solution = 1
 plot_solutions_count = 5
 start_time = 0.
 stop_time = 1
+wave_weight = 0.5
 show_errors = True
 show_reference = True
 do_animate = True
@@ -85,7 +85,8 @@ trial_6 = Trial(lambda xs: 2 * np.sin(sum(xs)),
                     "alpha", lambda: y_6)
 trial_frog = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
                    lambda xs: 2 * np.exp(-np.cos(sum(xs))),
-                   lambda xs, t: np.sin(2 * t) * np.exp(-np.cos(sum(xs)))) \
+                   lambda xs, t: np.sin(2 * t) * np.exp(-np.cos(sum(xs))),
+                   "TrialFrog") \
     .add_parameters("beta", lambda xs: 4 + np.cos(sum(xs)) + np.sin(sum(xs)) ** 2,
                     "alpha", lambda: 1,
                     "offset", 1)
@@ -126,7 +127,7 @@ trial_bessel = Trial(lambda xs: (bessel_A * bessel_first(0, bessel_xi(xs, 0))
                     "alpha", lambda: bessel_alpha ** 2)
 
 if __name__ == "__main__":
-    trial = trial_3
+    trial = trial_frog
 
     trial.error_function = error_l2_relative
     offset_wave_solver = None
@@ -138,14 +139,14 @@ if __name__ == "__main__":
                                                     -alpha_g0 * (param_n1 ** 2) + param_3 ** 2)
         offset_wave_solver.init_solver(start_time, trial.start_position, trial.start_velocity)
 
-    splitting_factories = [make_klein_gordon_lie_trotter_splitting, make_klein_gordon_lie_trotter_reversed_splitting,
-                           make_klein_gordon_strang_splitting, make_klein_gordon_strang_reversed_splitting,
-                           partial(make_klein_gordon_fast_strang_splitting, time_step_size=delta_time),
+    splitting_factories = [partial(make_klein_gordon_lie_trotter_splitting, wave_weight=wave_weight),
+                           partial(make_klein_gordon_lie_trotter_reversed_splitting, wave_weight=wave_weight),
+                           partial(make_klein_gordon_strang_splitting, wave_weight=wave_weight),
+                           partial(make_klein_gordon_strang_reversed_splitting, wave_weight=wave_weight),
+                           partial(make_klein_gordon_fast_strang_splitting, time_step_size=delta_time, wave_weight=wave_weight),
                            make_klein_gordon_leapfrog_splitting, make_klein_gordon_leapfrog_reversed_splitting,
                            make_klein_gordon_leapfrog_bad_splitting,
-                           partial(make_klein_gordon_leapfrog_fast_splitting, time_step_size=delta_time),
-                           make_klein_gordon_wave_moment_splitting,
-                           make_klein_gordon_linhyp_moment_splitting]
+                           partial(make_klein_gordon_leapfrog_fast_splitting, time_step_size=delta_time)]
     if trial.has_parameter("frog_only"):
         splitting_factories = [make_klein_gordon_leapfrog_splitting, make_klein_gordon_leapfrog_reversed_splitting]
     if trial.has_parameter("offset"):
@@ -203,10 +204,10 @@ if __name__ == "__main__":
 
     if show_errors and trial.reference is not None:
         plt.figure()
-        for splitting in splittings:
+        for splitting, marker in zip(splittings, "xxoooDDDD..-----"):
             errors = [trial.error(xs_mesh, t, y) for t, y in splitting.timed_solutions()]
             print("Error of {} splitting at end:{:.2E}".format(splitting.name, errors[-1]))
-            plt.plot(splitting.times(), errors, label="Errors of {} in discrete L2 norm".format(splitting.name))
+            plt.plot(splitting.times(), errors, marker, label="Errors of {}".format(splitting.name))
 
         if offset_wave_solver is not None:
             last_time = splittings[0].times()[-1]
@@ -215,7 +216,7 @@ if __name__ == "__main__":
                                                                                offset_wave_solver.solutions()[-1])))
         plt.title("Splitting method errors for Klein Gordon, dt={}, N={}".format(delta_time, grid_size_N))
         plt.xlabel("Time")
-        plt.ylabel("Error")
+        plt.ylabel("Error in discrete L2 norm")
         plt.yscale('log')
         plt.legend()
 

@@ -8,10 +8,11 @@ import matplotlib.pyplot as plt
 dimension = 1
 grid_size_N = 64 if dimension >= 2 else 128
 domain = list(repeat([-np.pi, np.pi], dimension))
-trial = ds.trial_1
+trial = ds.trial_frog
+wave_weight = 1.
 
 start_time = 0.
-delta_times = np.arange(0.25, 0.0001, -0.0001)
+delta_times = np.arange(0.25, 0.0001, -0.0005)
 stop_time = 1
 
 errors_per_delta_time = []
@@ -19,9 +20,9 @@ splittings = []
 xs_mesh = None
 for delta_time in delta_times:
     print(delta_time)
-    factories = [sp.make_klein_gordon_lie_trotter_splitting,
-                 sp.make_klein_gordon_strang_splitting,
-                 partial(sp.make_klein_gordon_fast_strang_splitting, time_step_size=delta_time),
+    factories = [partial(sp.make_klein_gordon_lie_trotter_splitting, wave_weight=wave_weight),
+                 partial(sp.make_klein_gordon_strang_splitting, wave_weight=wave_weight),
+                 partial(sp.make_klein_gordon_fast_strang_splitting, time_step_size=delta_time, wave_weight=wave_weight),
                  sp.make_klein_gordon_leapfrog_splitting,
                  sp.make_klein_gordon_leapfrog_bad_splitting,
                  partial(sp.make_klein_gordon_leapfrog_fast_splitting, time_step_size=delta_time)]
@@ -38,7 +39,8 @@ for delta_time in delta_times:
         errors_per_delta_time[i].append(trial.error(xs_mesh, splitting.times()[-1], splitting.solutions()[-1]))
 
 plt.figure()
-plt.title("Order plot for error of splittings for {}, grid size {}".format(trial.name, grid_size_N))
+plt.title("Order plot for error of splittings for {}, grid size {}, wave_weight={}"
+          .format(trial.name, grid_size_N, wave_weight))
 plt.xlabel("1/delta_time")
 plt.ylabel("Error at T={}".format(stop_time))
 plt.xscale('log')

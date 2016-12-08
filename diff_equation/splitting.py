@@ -1,6 +1,6 @@
 from diff_equation.pseudospectral_solver import WaveSolverConfig, KleinGordonMomentConfig, VelocityConfig, \
-    OffsetWaveSolverConfig, WaveMomentConfig
-from diff_equation.ode_solver import LinhypSolverConfig, LinhypMomentConfig
+    OffsetWaveSolverConfig
+from diff_equation.ode_solver import LinhypSolverConfig
 import numpy as np
 from itertools import cycle, islice
 
@@ -79,44 +79,19 @@ class Splitting:
         return [time for time, _ in self.timed_positions]
 
 
-def make_klein_gordon_wave_moment_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
-    wave_moment_config = WaveMomentConfig(intervals, grid_points_list, alpha, beta)
-    linhyp_config = LinhypSolverConfig(intervals, grid_points_list, beta)
-
-    wave_moment_config.init_solver(t0, u0, u0t)
-    return Splitting([wave_moment_config, linhyp_config, wave_moment_config], [0.5, 1., 0.5],
-                     name="WaveMoment")
-
-
-def make_klein_gordon_linhyp_moment_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
-    linhyp_moment_config = LinhypMomentConfig(intervals, grid_points_list, beta)
-    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(alpha()))
-
-    linhyp_moment_config.init_solver(t0, u0, u0t)
-    return Splitting([linhyp_moment_config, wave_config, linhyp_moment_config], [0.5, 1., 0.5],
-                     name="LinhypMoment")
-
-
 def make_klein_gordon_strang_offset_reversed_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta, offset):
-    linhyp_config = LinhypSolverConfig(intervals, grid_points_list, lambda *params: 0.5 * (beta(*params) - offset))
-    offset_wave_config = OffsetWaveSolverConfig(intervals, grid_points_list, np.sqrt(0.5 * alpha()), 0.5 * offset)
+    linhyp_config = LinhypSolverConfig(intervals, grid_points_list, lambda *params: (beta(*params) - offset), 0.)
+    offset_wave_config = OffsetWaveSolverConfig(intervals, grid_points_list, np.sqrt(alpha()), offset)
 
     linhyp_config.init_solver(t0, u0, u0t)
-    linhyp_config.start_velocity *= 0.5
     return Splitting([linhyp_config, offset_wave_config, linhyp_config], [0.5, 1., 0.5], name="ORStrang")
 
 
-def make_klein_gordon_lie_trotter_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
-    # due to the second order time derivative alpha and beta are getting multiplied by 1/2
-    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(0.5 * alpha()))
-    linhyp_config = LinhypSolverConfig(intervals, grid_points_list, lambda *params: 0.5 * beta(*params))
+def make_klein_gordon_lie_trotter_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta, wave_weight):
+    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(alpha()), splitting_factor=wave_weight)
+    linhyp_config = LinhypSolverConfig(intervals, grid_points_list, beta, splitting_factor=1.-wave_weight)
 
     wave_config.init_solver(t0, u0, u0t)
-
-    # due to the splitting into two operators and having a second order time derivative u_tt=...
-    # there is a factor 1/2 introduced. We only need to apply it once initially
-    # as it cancels out with further calls.
-    wave_config.start_velocity *= 0.5
     return Splitting([wave_config, linhyp_config], [1., 1.], name="Lie")
 
 
@@ -171,46 +146,41 @@ def make_klein_gordon_leapfrog_reversed_splitting(intervals, grid_points_list, t
                      name="RLeapfrog")
 
 
-def make_klein_gordon_lie_trotter_reversed_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
-    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(0.5 * alpha()))
-    linhyp_config = LinhypSolverConfig(intervals, grid_points_list, lambda *params: 0.5 * beta(*params))
+def make_klein_gordon_lie_trotter_reversed_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta,
+                                                     wave_weight):
+    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(alpha()), splitting_factor=wave_weight)
+    linhyp_config = LinhypSolverConfig(intervals, grid_points_list, beta, splitting_factor=1.-wave_weight)
 
     linhyp_config.init_solver(t0, u0, u0t)
-    linhyp_config.start_velocity *= 0.5
-
     return Splitting([linhyp_config, wave_config], [1., 1.], name="RLie")
 
 
-def make_klein_gordon_strang_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
-    # see lie_trotter splitting for an explanation of the 1/2 factors appearing
-    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(0.5 * alpha()))
-    linhyp_config = LinhypSolverConfig(intervals, grid_points_list, lambda *params: 0.5 * beta(*params))
+def make_klein_gordon_strang_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta, wave_weight):
+    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(alpha()), splitting_factor=wave_weight)
+    linhyp_config = LinhypSolverConfig(intervals, grid_points_list, beta, splitting_factor=1.-wave_weight)
 
     wave_config.init_solver(t0, u0, u0t)
-    wave_config.start_velocity *= 0.5
     return Splitting([wave_config, linhyp_config, wave_config], [0.5, 1., 0.5], name="Strang")
 
 
-def make_klein_gordon_strang_reversed_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
-    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(0.5 * alpha()))
-    linhyp_config = LinhypSolverConfig(intervals, grid_points_list, lambda *params: 0.5 * beta(*params))
+def make_klein_gordon_strang_reversed_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta, wave_weight):
+    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(alpha()), splitting_factor=wave_weight)
+    linhyp_config = LinhypSolverConfig(intervals, grid_points_list, beta, splitting_factor=1.-wave_weight)
 
     linhyp_config.init_solver(t0, u0, u0t)
-    linhyp_config.start_velocity *= 0.5
-
     return Splitting([linhyp_config, wave_config, linhyp_config], [0.5, 1., 0.5], name="RStrang")
 
 
 # this is as fast as lie splitting and (theoretically) equivalent to strang, but has the drawback that
 # getting intermediate results would require additional computation and the error is somewhere between lie and strang
-def make_klein_gordon_fast_strang_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta, time_step_size):
+def make_klein_gordon_fast_strang_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta, time_step_size,
+                                            wave_weight):
     # instead of doing: (wave/2 -> linhyp -> wave/2) -> (wave/2 -> linhyp -> wave/2) -> ...
     # we do: wave/2 -> linhyp -> (wave -> linhyp) -> (wave -> linhyp) -> ... -> wave/2
-    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(0.5 * alpha()))
-    linhyp_config = LinhypSolverConfig(intervals, grid_points_list, lambda *params: 0.5 * beta(*params))
+    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(alpha()), splitting_factor=wave_weight)
+    linhyp_config = LinhypSolverConfig(intervals, grid_points_list, beta, splitting_factor=1.-wave_weight)
 
     wave_config.init_solver(t0, u0, u0t)
-    wave_config.start_velocity *= 0.5
 
     next_position, next_velocity = Splitting.sub_step(wave_config, wave_config.start_time,
                                                       time_step_size, 0.5)
