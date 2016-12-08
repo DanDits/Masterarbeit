@@ -18,10 +18,12 @@ errors_per_delta_time = []
 splittings = []
 xs_mesh = None
 for delta_time in delta_times:
+    print(delta_time)
     factories = [sp.make_klein_gordon_lie_trotter_splitting,
                  sp.make_klein_gordon_strang_splitting,
                  partial(sp.make_klein_gordon_fast_strang_splitting, time_step_size=delta_time),
                  sp.make_klein_gordon_leapfrog_splitting,
+                 sp.make_klein_gordon_leapfrog_bad_splitting,
                  partial(sp.make_klein_gordon_leapfrog_fast_splitting, time_step_size=delta_time)]
 
     splittings = [factory(domain, [grid_size_N], start_time, trial.start_position,

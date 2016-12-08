@@ -16,7 +16,7 @@ from diff_equation.splitting import make_klein_gordon_lie_trotter_splitting, mak
     make_klein_gordon_strang_reversed_splitting, make_klein_gordon_leapfrog_splitting, \
     make_klein_gordon_leapfrog_reversed_splitting, make_klein_gordon_strang_offset_reversed_splitting, \
     make_klein_gordon_leapfrog_fast_splitting, make_klein_gordon_wave_moment_splitting, \
-    make_klein_gordon_linhyp_moment_splitting
+    make_klein_gordon_linhyp_moment_splitting, make_klein_gordon_leapfrog_bad_splitting
 from util.trial import Trial
 
 dimension = 1
@@ -142,6 +142,7 @@ if __name__ == "__main__":
                            make_klein_gordon_strang_splitting, make_klein_gordon_strang_reversed_splitting,
                            partial(make_klein_gordon_fast_strang_splitting, time_step_size=delta_time),
                            make_klein_gordon_leapfrog_splitting, make_klein_gordon_leapfrog_reversed_splitting,
+                           make_klein_gordon_leapfrog_bad_splitting,
                            partial(make_klein_gordon_leapfrog_fast_splitting, time_step_size=delta_time),
                            make_klein_gordon_wave_moment_splitting,
                            make_klein_gordon_linhyp_moment_splitting]

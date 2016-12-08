@@ -120,6 +120,15 @@ def make_klein_gordon_lie_trotter_splitting(intervals, grid_points_list, t0, u0,
     return Splitting([wave_config, linhyp_config], [1., 1.], name="Lie")
 
 
+def make_klein_gordon_leapfrog_bad_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
+    moment_config = KleinGordonMomentConfig(intervals, grid_points_list, alpha, beta)
+    velocity_config = VelocityConfig(intervals, grid_points_list)
+
+    velocity_config.init_solver(t0, u0, u0t)
+    return Splitting([velocity_config, moment_config], [1., 1.],
+                     name="LeapfrogBad")
+
+
 def make_klein_gordon_leapfrog_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
     moment_config = KleinGordonMomentConfig(intervals, grid_points_list, alpha, beta)
     velocity_config = VelocityConfig(intervals, grid_points_list)
