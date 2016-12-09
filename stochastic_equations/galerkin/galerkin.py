@@ -72,7 +72,7 @@ def galerkin_expectancy(trial, max_poly_degree, domain, grid_size, start_time, s
     function_b = lambda xs: matrix_b(trial, xs, basis, max_poly_degree, expectancy_params)
 
     splitting = make_splitting(domain, grid_size, wave_speeds,
-                               basis, function_b, matrix_s, start_time, trial, expectancy_params)
+                               basis, function_b, matrix_s, start_time, trial, expectancy_params, delta_time)
     xs = splitting.solver_configs[0].xs
 
     exp = None
@@ -207,8 +207,7 @@ def get_starting_value_coefficients(xs_mesh, starting_value_func, project_trial,
 
 
 def make_splitting(domain, grid_size, wave_speeds, basis, function_b, matrix_s, start_time, trial,
-                   expectancy_params, wave_weight=0.5):
-    # TODO make a fast strang splitting out of this lie splitting
+                   expectancy_params, delta_time, wave_weight=0.5):
     multi_wave_config = MultiWaveSolver(domain, [grid_size], wave_speeds, wave_weight)
     multi_ode_config = MultiLinearOdeSolver(domain, [grid_size], function_b, matrix_s, 1. - wave_weight)
     transposed_s = matrix_s.transpose()
@@ -216,8 +215,8 @@ def make_splitting(domain, grid_size, wave_speeds, basis, function_b, matrix_s, 
                                                       trial, transposed_s, basis, expectancy_params)
     start_velocities = get_starting_value_coefficients(multi_wave_config.xs_mesh, trial.start_velocity,
                                                        trial, transposed_s, basis, expectancy_params)
-    multi_wave_config.init_solver(start_time, start_positions, start_velocities)
-    splitting = Splitting([multi_wave_config, multi_ode_config], [1., 1.], "Galerkin")
+    splitting = Splitting.make_fast_strang(multi_wave_config, multi_ode_config, "FastStrangGalerkin",
+                                           start_time, start_positions, start_velocities, delta_time)
     splitting.matrix_s = matrix_s
     return splitting
 
@@ -240,7 +239,7 @@ def test(plot=True):
     domain = [(-np.pi, np.pi)]
     grid_size = 64
     start_time, stop_time, delta_time = 0., 0.25, 0.01
-    max_poly_degree = 4
+    max_poly_degree = 0
     quadrature_nodes_counts = list(range(max_poly_degree + 1, 35, 1))
     errors = []
     trial = trial_2_1

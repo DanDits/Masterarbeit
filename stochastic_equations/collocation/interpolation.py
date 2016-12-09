@@ -43,8 +43,8 @@ def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count
         trial.set_random_values(nodes)
         configs = kg.make_klein_gordon_wave_linhyp_configs(spatial_domain, [grid_size], trial.alpha,
                                                            trial.beta, wave_weight)
-        splitting = Splitting.make_fast_strang(*configs, start_time, trial.start_position, trial.start_velocity,
-                                               delta_time)
+        splitting = Splitting.make_fast_strang(*configs, "FastStrang",
+                                               start_time, trial.start_position, trial.start_velocity, delta_time)
         splitting.progress(stop_time, delta_time, 0)
         last_solution = splitting.solutions()[-1]
         if splitting_xs is None:

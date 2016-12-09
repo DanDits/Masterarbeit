@@ -11,7 +11,7 @@ import cProfile
 
 pr = cProfile.Profile()
 pr.enable()
-import demo.splitting_wave_weight
+import demo.monte_carlo
 pr.disable()
 # after your program ends
 pr.dump_stats('splitting_profile.dump')

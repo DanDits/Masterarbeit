@@ -84,11 +84,15 @@ def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
                             in zip(quasi_uniform, stochastic_trial.variable_distributions)]
             stochastic_trial.set_random_values(quasi_random)
 
-        configs = kg.make_klein_gordon_wave_linhyp_configs(domain, [grid_size_N], stochastic_trial.alpha,
-                                                           stochastic_trial.beta, wave_weight)
-        splitting = Splitting.make_fast_strang(*configs, start_time, stochastic_trial.start_position,
+        # If the time step size is too small leapfrog is unstable and we should use wave_linhyp configs
+        # but they are slower about a factor 3-4
+        # configs = kg.make_klein_gordon_wave_linhyp_configs(domain, [grid_size_N], stochastic_trial.alpha,
+        #                                                    stochastic_trial.beta, wave_weight)
+        configs = kg.make_klein_gordon_leapfrog_configs(domain, [grid_size_N], stochastic_trial.alpha,
+                                                        stochastic_trial.beta)
+        splitting = Splitting.make_fast_strang(*configs, "FastStrang", start_time, stochastic_trial.start_position,
                                                stochastic_trial.start_velocity, delta_time)
-        splitting.progress(stop_time, delta_time)
+        splitting.progress(stop_time, delta_time, 0)
         if xs is None:
             xs = splitting.get_xs()
             xs_mesh = splitting.get_xs_mesh()

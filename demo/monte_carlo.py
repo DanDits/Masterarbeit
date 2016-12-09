@@ -16,8 +16,8 @@ domain = list(repeat([-np.pi, np.pi], dimension))
 delta_time = 0.001
 start_time = 0.
 stop_time = 2.
-save_last_solution = True
-simulations_count = 100000
+save_last_solution = False
+simulations_count = 300
 do_quasi_monte_carlo = True
 
 # the factor of the step number between two consecutive solutions used to estimate order of convergence
@@ -94,7 +94,7 @@ trial_6 = StochasticTrial([distributions.make_beta(1.5, 4.5), distributions.make
                           name="Trial6") \
     .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] + ys[2]) + np.sin(xs[0] + ys[3]),
                     "alpha", lambda ys: 1 + 0.5 * ys[0] + 3 * ys[1])
-trial = trial_4
+trial = trial_1
 
 splitting_xs, splitting_xs_mesh, expectancy, errors, solutions, solutions_for_order_estimate = \
     simulate(trial, simulations_count, [simulations_count // 3, simulations_count // 2, simulations_count],
