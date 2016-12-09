@@ -1,4 +1,5 @@
-from diff_equation.splitting import make_klein_gordon_leapfrog_fast_splitting
+from diff_equation.splitting import Splitting
+import diff_equation.klein_gordon as kg
 from util.analysis import error_l2
 from collections import deque
 import numpy as np
@@ -9,7 +10,7 @@ from util.quasi_randomness.sobol_lib import i4_sobol
 def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
              domain, grid_size_N, start_time, stop_time, delta_time, eval_time=None, heartbeat=100,
              do_calculate_expectancy=True, order_factor=2,
-             quasi_monte_carlo=False):
+             quasi_monte_carlo=False, wave_weight=0.5):
     """
     Monte Carlo simulation for the stochastic Klein-Gordon equation using a splitting method to solve the equation
     for randomly generated values of the trial's distributions. Calculates the expectancy by calculating the mean
@@ -83,11 +84,10 @@ def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
                             in zip(quasi_uniform, stochastic_trial.variable_distributions)]
             stochastic_trial.set_random_values(quasi_random)
 
-        splitting = make_klein_gordon_leapfrog_fast_splitting(domain, [grid_size_N], start_time,
-                                                              stochastic_trial.start_position,
-                                                              stochastic_trial.start_velocity, stochastic_trial.alpha,
-                                                              stochastic_trial.beta,
-                                                              delta_time)
+        configs = kg.make_klein_gordon_wave_linhyp_configs(domain, [grid_size_N], stochastic_trial.alpha,
+                                                           stochastic_trial.beta, wave_weight)
+        splitting = Splitting.make_fast_strang(*configs, start_time, stochastic_trial.start_position,
+                                               stochastic_trial.start_velocity, delta_time)
         splitting.progress(stop_time, delta_time)
         if xs is None:
             xs = splitting.get_xs()

@@ -1,35 +1,51 @@
 import demo.splitting as ds
-import diff_equation.splitting as sp
+import diff_equation.klein_gordon as kg
 import numpy as np
 from itertools import repeat
-from functools import partial
 import matplotlib.pyplot as plt
+from diff_equation.splitting import Splitting
 
 dimension = 1
 grid_size_N = 64 if dimension >= 2 else 128
 domain = list(repeat([-np.pi, np.pi], dimension))
-trial = ds.trial_frog
-wave_weight = 1.
+trial = ds.trial_1
+wave_weight = 0.5
 
 start_time = 0.
 delta_times = np.arange(0.25, 0.0001, -0.0005)
-stop_time = 1
+stop_time = 1.
 
 errors_per_delta_time = []
 splittings = []
 xs_mesh = None
+
+
+def make_wave_linhyp_configs():
+    return kg.make_klein_gordon_wave_linhyp_configs(domain, [grid_size_N], trial.alpha, trial.beta, wave_weight)
+
+
+def make_leapfrog_configs():
+    return kg.make_klein_gordon_leapfrog_configs(domain, [grid_size_N], trial.alpha, trial.beta)
+
+
 for delta_time in delta_times:
     print(delta_time)
-    factories = [partial(sp.make_klein_gordon_lie_trotter_splitting, wave_weight=wave_weight),
-                 partial(sp.make_klein_gordon_strang_splitting, wave_weight=wave_weight),
-                 partial(sp.make_klein_gordon_fast_strang_splitting, time_step_size=delta_time, wave_weight=wave_weight),
-                 sp.make_klein_gordon_leapfrog_splitting,
-                 sp.make_klein_gordon_leapfrog_bad_splitting,
-                 partial(sp.make_klein_gordon_leapfrog_fast_splitting, time_step_size=delta_time)]
+    # each splitting needs its own config, as the splitting re initializes the config's solvers!
+    splittings = [Splitting.make_lie(*make_leapfrog_configs(), "LeapfrogLie",
+                                     start_time, trial.start_position, trial.start_velocity),
+                  Splitting.make_strang(*make_leapfrog_configs(), "LeapfrogStrang",
+                                        start_time, trial.start_position, trial.start_velocity),
+                  Splitting.make_fast_strang(*make_leapfrog_configs(), "LeapfrogFastStrang",
+                                             start_time, trial.start_position, trial.start_velocity, delta_time),
+                  Splitting.make_lie(*make_wave_linhyp_configs(), "Lie",
+                                     start_time, trial.start_position, trial.start_velocity),
+                  Splitting.make_strang(*make_wave_linhyp_configs(), "Strang",
+                                        start_time, trial.start_position, trial.start_velocity),
+                  Splitting.make_strang(*(reversed(make_wave_linhyp_configs())), "ReversedStrang",
+                                        start_time, trial.start_position, trial.start_velocity),
+                  Splitting.make_fast_strang(*make_wave_linhyp_configs(), "FastStrang",
+                                             start_time, trial.start_position, trial.start_velocity, delta_time)]
 
-    splittings = [factory(domain, [grid_size_N], start_time, trial.start_position,
-                          trial.start_velocity, trial.alpha, trial.beta)
-                  for factory in factories]
     for i, splitting in enumerate(splittings):
         splitting.progress(stop_time, delta_time, 0)
         if xs_mesh is None:

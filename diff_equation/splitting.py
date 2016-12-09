@@ -1,18 +1,4 @@
-from diff_equation.pseudospectral_solver import WaveSolverConfig, KleinGordonMomentConfig, VelocityConfig, \
-    OffsetWaveSolverConfig
-from diff_equation.ode_solver import LinhypSolverConfig
-import numpy as np
 from itertools import cycle, islice
-
-
-# Klein Gordon equation: u_tt=alpha()*u_xx -beta(x)*u, alpha()>0, beta(x)>0
-
-
-# Strang splitting:
-# from starting values u(t0,x)=g(x), u_t(t0,x)=h(x)
-# solve wave equation to v(t0+dt/2,x), calculate v_t(t0+dt/2,x)
-# with these as starting values solve linear hyperbolic ode with mol to w(t0+dt,x), calculate w_t(t0+dt,x)
-# using these as starting values finally solve wave equation again to u(t0+dt,x)
 
 
 class Splitting:
@@ -25,27 +11,27 @@ class Splitting:
         assert len(step_fractions) == len(configs)
 
     @classmethod
-    def sub_step(cls, config, time, time_step_size, step_fraction):
-        # making an inner leapfrog for each sub sub does not seem to improve performance notably
-        config.solve([time + time_step_size * step_fraction])
-        next_position = config.solutions()[0]
-        next_velocity = config.velocities()[0]
+    def sub_step(cls, config, time_step_size, step_fraction):
+        config.solve([config.start_time + time_step_size * step_fraction])
+        result_time, result = config.pop_last_solved()
+        next_position = result[0]
+        next_velocity = result[1]
 
         return next_position, next_velocity
 
     def progress(self, end_time, time_step_size, save_solution_step=1):
         # zeroth config is assumed to be properly initialized with starting values and solver
-        assert len(self.solver_configs[0].timed_solutions()) == 0  # without any solutions yet
+        # if there are previous solutions these will be ignored
         save_solution_counter = save_solution_step
         total_start_time = self.solver_configs[0].start_time
         steps_completed_count = 0
+        time = total_start_time
         for counter, step_fraction, config, next_config \
                 in zip(cycle(range(len(self.solver_configs))),
                        cycle(self.solver_step_fractions),
                        cycle(self.solver_configs),
                        islice(cycle(self.solver_configs), 1, None)):
-            time = config.start_time
-            next_position, next_velocity = self.sub_step(config, time, time_step_size, step_fraction)
+            next_position, next_velocity = self.sub_step(config, time_step_size, step_fraction)
 
             splitting_step_completed = counter == len(self.solver_configs) - 1
             if splitting_step_completed:
@@ -78,123 +64,38 @@ class Splitting:
     def times(self):
         return [time for time, _ in self.timed_positions]
 
+    @staticmethod
+    def make_lie(config1, config2, name, t0, u0, u0t):
+        config1.init_solver(t0, u0, u0t)
+        return Splitting([config1, config2], [1., 1.], name=name)
 
-def make_klein_gordon_strang_offset_reversed_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta, offset):
-    linhyp_config = LinhypSolverConfig(intervals, grid_points_list, lambda *params: (beta(*params) - offset), 0.)
-    offset_wave_config = OffsetWaveSolverConfig(intervals, grid_points_list, np.sqrt(alpha()), offset)
+    @staticmethod
+    def make_strang(config1, config2, name, t0, u0, u0t):
+        config1.init_solver(t0, u0, u0t)
+        return Splitting([config1, config2, config1], [0.5, 1., 0.5], name=name)
 
-    linhyp_config.init_solver(t0, u0, u0t)
-    return Splitting([linhyp_config, offset_wave_config, linhyp_config], [0.5, 1., 0.5], name="ORStrang")
+    @staticmethod
+    def make_fast_strang(config1, config2, name, t0, u0, u0t, time_step_size):
+        # this is as fast as lie splitting and (theoretically) equivalent to strang, but has the drawback that
+        # getting intermediate results would require additional computation.
+        # If stable the error is exactly (up to rounding errors) equal to the strang's error
 
+        # instead of doing: (config1/2 -> config2 -> config1/2) -> (config1/2 -> config2 -> config1/2) -> ...
+        # we do: config1/2 -> config2 -> (config1 -> config2) -> (config1 -> config2) -> ... -> config1/2
 
-def make_klein_gordon_lie_trotter_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta, wave_weight):
-    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(alpha()), splitting_factor=wave_weight)
-    linhyp_config = LinhypSolverConfig(intervals, grid_points_list, beta, splitting_factor=1.-wave_weight)
+        config1.init_solver(t0, u0, u0t)
 
-    wave_config.init_solver(t0, u0, u0t)
-    return Splitting([wave_config, linhyp_config], [1., 1.], name="Lie")
+        next_position, next_velocity = Splitting.sub_step(config1, time_step_size, 0.5)
+        config2.init_solver(config1.start_time, next_position, next_velocity)
+        next_position, next_velocity = Splitting.sub_step(config2, time_step_size, 1.)
+        # we advance time here, but keep in mind that intermediate results for this splitting are not useful as it
+        # would require one additional half step of wave, so at the end discard all but the last
+        config1.init_solver(t0 + time_step_size, next_position, next_velocity)
 
+        def on_progress_end():
+            # do one more half step for wave, discard intermediate solutions
+            last_position, _ = Splitting.sub_step(config1, time_step_size, 0.5)
+            splitting.timed_positions = [(config1.start_time, last_position)]
 
-def make_klein_gordon_leapfrog_bad_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
-    moment_config = KleinGordonMomentConfig(intervals, grid_points_list, alpha, beta)
-    velocity_config = VelocityConfig(intervals, grid_points_list)
-
-    velocity_config.init_solver(t0, u0, u0t)
-    return Splitting([velocity_config, moment_config], [1., 1.],
-                     name="LeapfrogBad")
-
-
-def make_klein_gordon_leapfrog_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
-    moment_config = KleinGordonMomentConfig(intervals, grid_points_list, alpha, beta)
-    velocity_config = VelocityConfig(intervals, grid_points_list)
-
-    velocity_config.init_solver(t0, u0, u0t)
-    return Splitting([velocity_config, moment_config, velocity_config], [0.5, 1., 0.5],
-                     name="Leapfrog")
-
-
-def make_klein_gordon_leapfrog_fast_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta, time_step_size):
-    moment_config = KleinGordonMomentConfig(intervals, grid_points_list, alpha, beta)
-    velocity_config = VelocityConfig(intervals, grid_points_list)
-
-    moment_config.init_solver(t0, u0, u0t)
-
-    next_position, next_velocity = Splitting.sub_step(moment_config, moment_config.start_time,
-                                                      time_step_size, 0.5)
-    velocity_config.init_solver(moment_config.start_time, next_position, next_velocity)
-    next_position, next_velocity = Splitting.sub_step(velocity_config, moment_config.start_time,
-                                                      time_step_size, 1.)
-    # we advance time here, but keep in mind that intermediate results for this splitting are not useful as it
-    # would require one additional half step of wave, so at the end discard all but the last
-    moment_config.init_solver(t0 + time_step_size, next_position, next_velocity)
-
-    def on_progress_end():
-        # do one more half step for wave, discard intermediate solutions
-        last_position, _ = Splitting.sub_step(moment_config, moment_config.start_time, time_step_size, 0.5)
-        splitting.timed_positions = [(moment_config.start_time, last_position)]
-
-    splitting = Splitting([moment_config, velocity_config], [1., 1.], name="FFrog", on_end_callback=on_progress_end)
-    return splitting
-
-
-def make_klein_gordon_leapfrog_reversed_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta):
-    moment_config = KleinGordonMomentConfig(intervals, grid_points_list, alpha, beta)
-    velocity_config = VelocityConfig(intervals, grid_points_list)
-
-    moment_config.init_solver(t0, u0, u0t)
-    return Splitting([moment_config, velocity_config, moment_config], [0.5, 1., 0.5],
-                     name="RLeapfrog")
-
-
-def make_klein_gordon_lie_trotter_reversed_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta,
-                                                     wave_weight):
-    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(alpha()), splitting_factor=wave_weight)
-    linhyp_config = LinhypSolverConfig(intervals, grid_points_list, beta, splitting_factor=1.-wave_weight)
-
-    linhyp_config.init_solver(t0, u0, u0t)
-    return Splitting([linhyp_config, wave_config], [1., 1.], name="RLie")
-
-
-def make_klein_gordon_strang_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta, wave_weight):
-    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(alpha()), splitting_factor=wave_weight)
-    linhyp_config = LinhypSolverConfig(intervals, grid_points_list, beta, splitting_factor=1.-wave_weight)
-
-    wave_config.init_solver(t0, u0, u0t)
-    return Splitting([wave_config, linhyp_config, wave_config], [0.5, 1., 0.5], name="Strang")
-
-
-def make_klein_gordon_strang_reversed_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta, wave_weight):
-    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(alpha()), splitting_factor=wave_weight)
-    linhyp_config = LinhypSolverConfig(intervals, grid_points_list, beta, splitting_factor=1.-wave_weight)
-
-    linhyp_config.init_solver(t0, u0, u0t)
-    return Splitting([linhyp_config, wave_config, linhyp_config], [0.5, 1., 0.5], name="RStrang")
-
-
-# this is as fast as lie splitting and (theoretically) equivalent to strang, but has the drawback that
-# getting intermediate results would require additional computation and the error is somewhere between lie and strang
-def make_klein_gordon_fast_strang_splitting(intervals, grid_points_list, t0, u0, u0t, alpha, beta, time_step_size,
-                                            wave_weight):
-    # instead of doing: (wave/2 -> linhyp -> wave/2) -> (wave/2 -> linhyp -> wave/2) -> ...
-    # we do: wave/2 -> linhyp -> (wave -> linhyp) -> (wave -> linhyp) -> ... -> wave/2
-    wave_config = WaveSolverConfig(intervals, grid_points_list, np.sqrt(alpha()), splitting_factor=wave_weight)
-    linhyp_config = LinhypSolverConfig(intervals, grid_points_list, beta, splitting_factor=1.-wave_weight)
-
-    wave_config.init_solver(t0, u0, u0t)
-
-    next_position, next_velocity = Splitting.sub_step(wave_config, wave_config.start_time,
-                                                      time_step_size, 0.5)
-    linhyp_config.init_solver(wave_config.start_time, next_position, next_velocity)
-    next_position, next_velocity = Splitting.sub_step(linhyp_config, wave_config.start_time,
-                                                      time_step_size, 1.)
-    # we advance time here, but keep in mind that intermediate results for this splitting are not useful as it
-    # would require one additional half step of wave, so at the end discard all but the last
-    wave_config.init_solver(t0 + time_step_size, next_position, next_velocity)
-
-    def on_progress_end():
-        # do one more half step for wave, discard intermediate solutions
-        last_position, _ = Splitting.sub_step(wave_config, wave_config.start_time, time_step_size, 0.5)
-        splitting.timed_positions = [(wave_config.start_time, last_position)]
-
-    splitting = Splitting([wave_config, linhyp_config], [1., 1.], name="FStrang", on_end_callback=on_progress_end)
-    return splitting
+        splitting = Splitting([config1, config2], [1., 1.], name=name, on_end_callback=on_progress_end)
+        return splitting

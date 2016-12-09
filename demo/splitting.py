@@ -1,6 +1,6 @@
 import numpy as np
 from itertools import repeat, cycle
-from functools import partial
+from diff_equation.splitting import Splitting
 from math import pi
 import matplotlib.pyplot as plt
 import time
@@ -9,13 +9,7 @@ from scipy.special import yn as bessel_second
 from diff_equation.pseudospectral_solver import OffsetWaveSolverConfig
 from util.animate import animate_1d, animate_2d_surface
 from util.analysis import error_l2_relative
-
-from diff_equation.splitting import make_klein_gordon_lie_trotter_splitting, make_klein_gordon_strang_splitting, \
-    make_klein_gordon_fast_strang_splitting, \
-    make_klein_gordon_lie_trotter_reversed_splitting, \
-    make_klein_gordon_strang_reversed_splitting, make_klein_gordon_leapfrog_splitting, \
-    make_klein_gordon_leapfrog_reversed_splitting, make_klein_gordon_strang_offset_reversed_splitting, \
-    make_klein_gordon_leapfrog_fast_splitting, make_klein_gordon_leapfrog_bad_splitting
+import diff_equation.klein_gordon as kg
 from util.trial import Trial
 
 dimension = 1
@@ -127,7 +121,7 @@ trial_bessel = Trial(lambda xs: (bessel_A * bessel_first(0, bessel_xi(xs, 0))
                     "alpha", lambda: bessel_alpha ** 2)
 
 if __name__ == "__main__":
-    trial = trial_frog
+    trial = trial_3
 
     trial.error_function = error_l2_relative
     offset_wave_solver = None
@@ -139,22 +133,30 @@ if __name__ == "__main__":
                                                     -alpha_g0 * (param_n1 ** 2) + param_3 ** 2)
         offset_wave_solver.init_solver(start_time, trial.start_position, trial.start_velocity)
 
-    splitting_factories = [partial(make_klein_gordon_lie_trotter_splitting, wave_weight=wave_weight),
-                           partial(make_klein_gordon_lie_trotter_reversed_splitting, wave_weight=wave_weight),
-                           partial(make_klein_gordon_strang_splitting, wave_weight=wave_weight),
-                           partial(make_klein_gordon_strang_reversed_splitting, wave_weight=wave_weight),
-                           partial(make_klein_gordon_fast_strang_splitting, time_step_size=delta_time, wave_weight=wave_weight),
-                           make_klein_gordon_leapfrog_splitting, make_klein_gordon_leapfrog_reversed_splitting,
-                           make_klein_gordon_leapfrog_bad_splitting,
-                           partial(make_klein_gordon_leapfrog_fast_splitting, time_step_size=delta_time)]
-    if trial.has_parameter("frog_only"):
-        splitting_factories = [make_klein_gordon_leapfrog_splitting, make_klein_gordon_leapfrog_reversed_splitting]
-    if trial.has_parameter("offset"):
-        splitting_factories.append(partial(make_klein_gordon_strang_offset_reversed_splitting, offset=trial.offset))
 
-    splittings = [factory(domain, [grid_size_N], start_time, trial.start_position,
-                          trial.start_velocity, trial.alpha, trial.beta)
-                  for factory in splitting_factories]
+    def make_wave_linhyp_configs():
+        return kg.make_klein_gordon_wave_linhyp_configs(domain, [grid_size_N], trial.alpha, trial.beta, wave_weight)
+
+
+    def make_leapfrog_configs():
+        return kg.make_klein_gordon_leapfrog_configs(domain, [grid_size_N], trial.alpha, trial.beta)
+
+
+    splittings = [Splitting.make_lie(*make_leapfrog_configs(), "LeapfrogLie",
+                                     start_time, trial.start_position, trial.start_velocity),
+                  Splitting.make_strang(*make_leapfrog_configs(), "LeapfrogStrang",
+                                        start_time, trial.start_position, trial.start_velocity),
+                  Splitting.make_fast_strang(*make_leapfrog_configs(), "LeapfrogFastStrang",
+                                             start_time, trial.start_position, trial.start_velocity, delta_time),
+                  Splitting.make_lie(*make_wave_linhyp_configs(), "Lie",
+                                     start_time, trial.start_position, trial.start_velocity),
+                  Splitting.make_strang(*make_wave_linhyp_configs(), "Strang",
+                                        start_time, trial.start_position, trial.start_velocity),
+                  Splitting.make_strang(*(reversed(make_wave_linhyp_configs())), "ReversedStrang",
+                                        start_time, trial.start_position, trial.start_velocity),
+                  Splitting.make_fast_strang(*make_wave_linhyp_configs(), "FastStrang",
+                                             start_time, trial.start_position, trial.start_velocity, delta_time)]
+
     for splitting in splittings:
         measure_start = time.time()
         splitting.progress(stop_time, delta_time, save_every_x_solution)

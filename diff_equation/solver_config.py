@@ -75,3 +75,6 @@ class SolverConfig:
 
     def velocities(self):
         return [solution[1] for _, solution in self.timed_solved]
+
+    def pop_last_solved(self):
+        return self.timed_solved.pop()

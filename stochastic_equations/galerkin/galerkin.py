@@ -9,7 +9,6 @@ from diff_equation.pseudospectral_solver import WaveSolverConfig
 from functools import partial
 from diff_equation.splitting import Splitting
 
-# TODO also possible to not use nquad but a quadrature formula for the specific distribution
 
 param_g1 = 2
 alpha_1 = 1
@@ -49,7 +48,7 @@ trial_2_1 = StochasticTrial([distributions.gaussian],
                             name="Trial2_1")
 trial_2_1.add_parameters("beta", lambda xs, ys: 1 / ys[0] ** 2 - 1 / ys[0],  # 1/y^2 - alpha(y)
                          "alpha", lambda ys: 1 / ys[0])
-
+# TODO try other harder trials (like mc5), also try to calculate variance
 
 # calculates 1d expectancy using quadrature rule defined by chaos' poly basis
 def calculate_expectancy_fast(function, chaos, quadrature_nodes_count):
@@ -83,7 +82,7 @@ def galerkin_expectancy(trial, max_poly_degree, domain, grid_size, start_time, s
         exp = trial.calculate_expectancy(xs, stop_time, trial.raw_reference)
 
     return (xs,
-            calculate_expectancy(splitting, chaos.normalization_gamma, stop_time, delta_time),
+            calculate_expectancy(splitting, chaos.normalization_gamma, start_time, stop_time, delta_time),
             exp)
 
 
@@ -107,13 +106,12 @@ def calculate_wave_speed_transform(trial, basis, max_poly_degree, expectancy_par
     matrix_a = calculate_expectancy_matrix_sym(expectancy_params,
                                                lambda ys, i, k: (trial.alpha(trial.transform_values(ys))
                                                                  * basis[i](*ys) * basis[k](*ys)), max_poly_degree)
-    print(matrix_a)
+
     # diagonalize A=SDS'
     diag, transform_s = eigh(matrix_a)  # now holds A=S*D*S', S is orthonormal, D a diagonal matrix
     # eigenvalues in D are positive and bounded by the extrema of alpha(y)
     wave_speeds = np.sqrt(diag)
     # print("DIag:", diag, "Transform:", transform_s)
-    print("Wavespeeds:", wave_speeds)
     # print("Should be zero matrix:", transform_s.dot(np.diag(diag)).dot(transform_s.transpose()) - matrix_a)
     return wave_speeds, transform_s
 
@@ -170,9 +168,8 @@ class MultiLinearOdeSolver(SolverConfig):
         z = np.zeros((2 * w_length,) * 2)
         z[:w_length, w_length:] = np.eye(w_length) * self.splitting_factor
 
-        # TODO currently only for one spatial dimension
+        # TODO currently only for one spatial dimension (like lots of other code for galerkin...)
         def solution_at(time):
-            print("Sol at:", time)
             positions, velocities = [], []
             # as the matrix b is dependent on x, we have to solve it for every x individually
             for i, x in enumerate(self.xs[0]):
@@ -211,8 +208,7 @@ def get_starting_value_coefficients(xs_mesh, starting_value_func, project_trial,
 
 def make_splitting(domain, grid_size, wave_speeds, basis, function_b, matrix_s, start_time, trial,
                    expectancy_params, wave_weight=0.5):
-    # TODO do not use the old 0.5-fixes-stuff splitting but adapt the Multi solvers to use a splitting factor!
-    # TODO then make the strang splitting to a fast one
+    # TODO make a fast strang splitting out of this lie splitting
     multi_wave_config = MultiWaveSolver(domain, [grid_size], wave_speeds, wave_weight)
     multi_ode_config = MultiLinearOdeSolver(domain, [grid_size], function_b, matrix_s, 1. - wave_weight)
     transposed_s = matrix_s.transpose()
@@ -226,7 +222,7 @@ def make_splitting(domain, grid_size, wave_speeds, basis, function_b, matrix_s, 
     return splitting
 
 
-def calculate_expectancy(splitting, normalization_gamma, stop_time, delta_time):
+def calculate_expectancy(splitting, normalization_gamma, start_time, stop_time, delta_time):
     splitting.progress(stop_time, delta_time, 0)
     last_coefficients = splitting.solutions()[-1]
     # this is now a list of length N+1, one vector for each index k, each of length 'grid_size'
@@ -245,7 +241,7 @@ def test(plot=True):
     grid_size = 64
     start_time, stop_time, delta_time = 0., 0.25, 0.01
     max_poly_degree = 4
-    quadrature_nodes_counts = list(range(max_poly_degree + 1, 35, 2))
+    quadrature_nodes_counts = list(range(max_poly_degree + 1, 35, 1))
     errors = []
     trial = trial_2_1
     for quadrature_nodes_count in quadrature_nodes_counts:

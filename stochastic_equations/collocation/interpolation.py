@@ -1,5 +1,6 @@
 import numpy as np
-from diff_equation.splitting import make_klein_gordon_leapfrog_fast_splitting
+from diff_equation.splitting import Splitting
+import diff_equation.klein_gordon as kg
 from polynomial_chaos.poly_chaos_distributions import get_chaos_by_distribution
 from stochastic_equations.collocation.util import check_distribution_assertions
 from numpy.linalg import lstsq
@@ -18,7 +19,7 @@ def chebyshev_nodes(size):
 
 
 def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_counts, spatial_domain, grid_size,
-                                start_time, stop_time, delta_time):
+                                start_time, stop_time, delta_time, wave_weight=0.5):
     sum_bound = max_poly_degree
     distrs = trial.variable_distributions
     for distr in distrs:
@@ -40,9 +41,10 @@ def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count
     solution_shape = None
     for nodes in nodes_list:
         trial.set_random_values(nodes)
-        splitting = make_klein_gordon_leapfrog_fast_splitting(spatial_domain, [grid_size], start_time,
-                                                              trial.start_position, trial.start_velocity,
-                                                              trial.alpha, trial.beta, delta_time)
+        configs = kg.make_klein_gordon_wave_linhyp_configs(spatial_domain, [grid_size], trial.alpha,
+                                                           trial.beta, wave_weight)
+        splitting = Splitting.make_fast_strang(*configs, start_time, trial.start_position, trial.start_velocity,
+                                               delta_time)
         splitting.progress(stop_time, delta_time, 0)
         last_solution = splitting.solutions()[-1]
         if splitting_xs is None:

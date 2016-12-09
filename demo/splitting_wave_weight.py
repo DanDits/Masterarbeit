@@ -1,8 +1,9 @@
 import demo.splitting as ds
-import diff_equation.splitting as sp
+from diff_equation.splitting import Splitting
 import numpy as np
 from itertools import repeat
 import matplotlib.pyplot as plt
+import diff_equation.klein_gordon as kg
 
 dimension = 1
 grid_size_N = 64 if dimension >= 2 else 128
@@ -26,9 +27,9 @@ for trial in trials:
     errors = []
     for weight in wave_weights:
         print(weight)
-        splitting = sp.make_klein_gordon_fast_strang_splitting(domain, [grid_size_N], start_time,
-                                                               trial.start_position, trial.start_velocity,
-                                                               trial.alpha, trial.beta, delta_time, weight)
+        configs = kg.make_klein_gordon_wave_linhyp_configs(domain, [grid_size_N], trial.alpha, trial.beta, weight)
+        splitting = Splitting.make_fast_strang(*configs, "FastStrang", start_time, trial.start_position,
+                                               trial.start_velocity, delta_time)
         splitting.progress(stop_time, delta_time, 0)
         if xs_mesh is None:
             xs_mesh = splitting.get_xs_mesh()
