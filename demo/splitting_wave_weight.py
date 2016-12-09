@@ -35,5 +35,6 @@ for trial in trials:
         errors.append(trial.error(xs_mesh, splitting.times()[-1], splitting.solutions()[-1]))
 
     plt.plot(wave_weights, errors, label="{}".format(trial.name))
+    print(errors)
 plt.legend()
-#plt.show()
+plt.show()

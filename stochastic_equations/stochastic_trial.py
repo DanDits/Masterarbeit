@@ -105,6 +105,8 @@ class StochasticTrial(Trial):
         """
         Calculates the expectancy of a function(ys) which takes a list of values, one for each distribution and returns
         a value. This does NOT use the random variables to transform the input ys!
+        This uses nquad to perform the integration which is very costly and does not consider the special distribution
+        weight implicitly!
         :param function: The function as described above
         :return: The expectancy, a float.
         """
