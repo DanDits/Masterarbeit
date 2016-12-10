@@ -6,6 +6,7 @@ import numpy as np
 class SolverConfig:
 
     def __init__(self, intervals, grid_points_list, pseudospectral_power=None):
+        self.last_delta_time = 0
         self.param = {}
         self.intervals, self.grid_points_list = intervals, grid_points_list
         self.xs, self.xs_mesh = SolverConfig.make_spatial_discretization(intervals, grid_points_list)
@@ -17,6 +18,9 @@ class SolverConfig:
         self.solver = None
         self.start_position, self.start_velocity = None, None
         self.timed_solved = []
+
+    def is_new_delta_time(self, delta_time):
+        return abs(self.last_delta_time - delta_time) > 1E-15
 
     def init_pseudospectral_factors(self, power):
         factors = []

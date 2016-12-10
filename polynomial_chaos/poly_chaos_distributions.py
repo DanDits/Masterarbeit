@@ -14,7 +14,8 @@ class PolyChaosDistribution:
 
     @lru_cache(maxsize=None)
     def normalized_basis(self, degree):
-        return lambda x: (self.poly_basis.polys(degree)(x) / math.sqrt(self.normalization_gamma(degree)))
+        norm_factor = 1. / math.sqrt(self.normalization_gamma(degree))
+        return lambda x: (self.poly_basis.polys(degree)(x) * norm_factor)
 
 
 hermiteChaos = PolyChaosDistribution(poly.make_hermite(),

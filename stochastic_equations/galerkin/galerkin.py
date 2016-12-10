@@ -9,7 +9,6 @@ from diff_equation.pseudospectral_solver import WaveSolverConfig
 from functools import partial
 from diff_equation.splitting import Splitting
 
-
 param_g1 = 2
 alpha_1 = 1
 assert param_g1 ** 2 - alpha_1 > 1E-7
@@ -48,7 +47,17 @@ trial_2_1 = StochasticTrial([distributions.gaussian],
                             name="Trial2_1")
 trial_2_1.add_parameters("beta", lambda xs, ys: 1 / ys[0] ** 2 - 1 / ys[0],  # 1/y^2 - alpha(y)
                          "alpha", lambda ys: 1 / ys[0])
+
+trial_5 = StochasticTrial([distributions.gaussian],
+                          lambda xs, ys: np.cos(sum(xs)),
+                          lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
+                          name="Trial5") \
+    .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] * ys[0]) + np.sin(xs[0] + ys[0]),
+                    "alpha", lambda ys: 1 + np.exp(ys[0]),
+                    "expectancy_data", "../../data/qmc_100000, Trial5, 0.5, 128.npy")
+
 # TODO try other harder trials (like mc5), also try to calculate variance
+
 
 # calculates 1d expectancy using quadrature rule defined by chaos' poly basis
 def calculate_expectancy_fast(function, chaos, quadrature_nodes_count):
@@ -61,18 +70,20 @@ def calculate_function_expectancy(function, params):
 
 # max_poly_degree is also called N in comments in order to conform with literature and because it is shorter
 def galerkin_expectancy(trial, max_poly_degree, domain, grid_size, start_time, stop_time, delta_time,
-                        quadrature_nodes_count):
+                        quadrature_nodes_count, wave_weight):
     trial.flag_raw_attributes = True
 
     # calculate symmetric matrix A where a_ik=E[alpha(y)phi_i(y)phi_k(y)]
     chaos = pcd.get_chaos_by_distribution(trial.variable_distributions[0])
     basis = [chaos.normalized_basis(i) for i in range(max_poly_degree + 1)]
     expectancy_params = (chaos, quadrature_nodes_count)
-    wave_speeds, matrix_s = calculate_wave_speed_transform(trial, basis, max_poly_degree, expectancy_params)
+    wave_speeds, matrix_s = calculate_wave_speed_transform(trial, basis, max_poly_degree,
+                                                           (chaos, max(50, quadrature_nodes_count)))
     function_b = lambda xs: matrix_b(trial, xs, basis, max_poly_degree, expectancy_params)
 
     splitting = make_splitting(domain, grid_size, wave_speeds,
-                               basis, function_b, matrix_s, start_time, trial, expectancy_params, delta_time)
+                               basis, function_b, matrix_s, start_time, trial, expectancy_params, delta_time,
+                               wave_weight)
     xs = splitting.solver_configs[0].xs
 
     exp = None
@@ -80,7 +91,11 @@ def galerkin_expectancy(trial, max_poly_degree, domain, grid_size, start_time, s
         exp = trial.expectancy(xs, stop_time)
     elif trial.raw_reference is not None:
         exp = trial.calculate_expectancy(xs, stop_time, trial.raw_reference)
-
+    elif trial.has_parameter("expectancy_data"):
+        try:
+            exp = np.load(trial.expectancy_data)
+        except FileNotFoundError:
+            print("No expectancy data found, should be here!?")
     return (xs,
             calculate_expectancy(splitting, chaos.normalization_gamma, start_time, stop_time, delta_time),
             exp)
@@ -153,6 +168,22 @@ class MultiLinearOdeSolver(SolverConfig):
         self.function_b = function_b
         self.splitting_factor = splitting_factor
         self.matrix_s = matrix_s
+        self.w_length = matrix_s.shape[1]
+        self.base_matrix_z = np.zeros((2 * self.w_length,) * 2)
+        self.base_matrix_z[:self.w_length, self.w_length:] = np.eye(self.w_length) * self.splitting_factor
+        self.matrix_z_for_xs = []
+        negative_transposed_s = -self.matrix_s.transpose()
+        for x in self.xs[0]:
+            current_z = np.copy(self.base_matrix_z)
+            current_z[self.w_length:, :self.w_length] = negative_transposed_s.dot(self.function_b([x])
+                                                                                  .dot(self.matrix_s))
+            self.matrix_z_for_xs.append(current_z)
+        self.last_delta_time = 0
+        self.matrix_expm_z_dt_for_xs = None
+
+    def calculate_matrix_exponentials(self, time_step_size):
+        self.last_delta_time = time_step_size
+        self.matrix_expm_z_dt_for_xs = [expm(current_z * time_step_size) for current_z in self.matrix_z_for_xs]
 
     # input format see MultiWaveSolver: u0s a list of u0 vectors
     def init_solver(self, t0, u0s, u0ts):
@@ -163,20 +194,17 @@ class MultiLinearOdeSolver(SolverConfig):
         #                    [u0t_0 u0t_1 ..u0t_grid_size] (one row per element in u0ts)
         #                    [ ...                       ]
         starting_value_matrix = np.array(u0s + u0ts)
-        w_length = len(u0s)
-        negative_transposed_s = -self.matrix_s.transpose()
-        z = np.zeros((2 * w_length,) * 2)
-        z[:w_length, w_length:] = np.eye(w_length) * self.splitting_factor
 
         # TODO currently only for one spatial dimension (like lots of other code for galerkin...)
         def solution_at(time):
             positions, velocities = [], []
             # as the matrix b is dependent on x, we have to solve it for every x individually
-            for i, x in enumerate(self.xs[0]):
-                z[w_length:, :w_length] = negative_transposed_s.dot(self.function_b([x]).dot(self.matrix_s))
-                solution = expm(z * (time - self.start_time)).dot(starting_value_matrix[:, i])
-                positions.append(solution[:w_length])
-                velocities.append(solution[w_length:])
+            if self.is_new_delta_time(time - self.start_time):
+                self.calculate_matrix_exponentials(time - self.start_time)
+            for i, matrix_exp in enumerate(self.matrix_expm_z_dt_for_xs):
+                solution = matrix_exp.dot(starting_value_matrix[:, i])
+                positions.append(solution[:self.w_length])
+                velocities.append(solution[self.w_length:])
             # positions currently a list of length 'grid_size' with each entry a vector of length 'N+1'
             # we want the transposed of this and also to map the tuple to a vector
             positions = list(map(np.array, zip(*positions)))
@@ -237,15 +265,17 @@ def calculate_expectancy(splitting, normalization_gamma, start_time, stop_time, 
 def test(plot=True):
     from util.analysis import error_l2_relative
     domain = [(-np.pi, np.pi)]
-    grid_size = 64
-    start_time, stop_time, delta_time = 0., 0.25, 0.01
-    max_poly_degree = 0
-    quadrature_nodes_counts = list(range(max_poly_degree + 1, 35, 1))
+    grid_size = 128
+    start_time, stop_time, delta_time = 0., 0.5, 0.0001
+    max_poly_degree = 40
+    wave_weight = 0.5  # does not seem to have much influence (at least on trial5); but can have on stability!
+    quadrature_nodes_counts = [50]
     errors = []
-    trial = trial_2_1
+    trial = trial_5
     for quadrature_nodes_count in quadrature_nodes_counts:
         xs, exp, trial_exp = galerkin_expectancy(trial, max_poly_degree, domain, grid_size,
-                                                 start_time, stop_time, delta_time, quadrature_nodes_count)
+                                                 start_time, stop_time, delta_time, quadrature_nodes_count,
+                                                 wave_weight)
 
         error = error_l2_relative(exp, trial_exp)
         errors.append(error)
@@ -254,8 +284,8 @@ def test(plot=True):
     if plot:
         import matplotlib.pyplot as plt
         plt.figure()
-        plt.title("Galerkin Error to expectancy for {}, PolyDegree={}, T={}, dt={}, grid={}"
-                  .format(trial.name, max_poly_degree, stop_time, delta_time, grid_size))
+        plt.title("Galerkin Error to expectancy for {}, PolyDegree={}, T={}, dt={}, grid={}, wave_weight={}"
+                  .format(trial.name, max_poly_degree, stop_time, delta_time, grid_size, wave_weight))
         plt.xlabel("Quadrature nodes count")
         plt.ylabel("discrete l2 error")
         plt.yscale('log')
@@ -267,8 +297,12 @@ def test(plot=True):
         plt.plot(xs[0], trial_exp, label="Exact exp")
         plt.legend()
         plt.show()
+# TODO maybe instead of using beta(x,y) split equation further into spectral coefficients sum beta'_i(x)phi_i(y)
+# TODO and use another splitting method for this (chained sum of strang splittings, always group 2)
 
 
+# TODO why is splitting unstable for bigger dt? why does it mostly not show order 2 convergence but none at all?
+# TODO why does it improve only very slightly for higher poly degree?
 # import tests.profile_execute as profile
 # profile.profile_function(partial(test, False), 'galerkin.dump')
 test()

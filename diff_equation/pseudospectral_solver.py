@@ -118,7 +118,16 @@ class WaveSolverConfig(SolverConfig):
         # this will lead to errors when using np.sin
         # therefore we would have to handle this linear growth of the zeroth fourier coefficient or the
         # special case of splitting_factor=0. explicitly...
-        # but thanks god for the np.sinc function which does the buisness when we rewrite some constants
+        # but thanks god for the np.sinc function which does the business when we rewrite some constants
+        self.sinc_part,  self.cos_part = 0, 0
+
+    def update_cached(self, delta_time):
+        self.last_delta_time = delta_time
+        timed_wave_factor = np.sqrt(self.splitting_factor) * self.wave_speed * self.norm2_factors * delta_time
+
+        # np.sinc multiplies arguments by pi, so revert this
+        self.sinc_part = np.sinc(timed_wave_factor / np.pi) * delta_time
+        self.cos_part = np.cos(timed_wave_factor)
 
     def start_momentum(self):
         return (self.wave_speed ** 2) * ifftn(sum(self.pseudospectral_factors_mesh) * fftn(self.start_position))
@@ -142,13 +151,10 @@ class WaveSolverConfig(SolverConfig):
             # here we are in the position to know the exact solution for this linear ordinary differential equation!
 
             # solution at time t with starting value y0_ and y0t_, all in fourier space
-            timed_wave_factor = np.sqrt(self.splitting_factor) * self.wave_speed * self.norm2_factors \
-                                * (time - self.start_time)
-            cos_part = np.cos(timed_wave_factor)
-            # np.sinc multplies arguments by pi, so revert this
-            sinc_part = np.sinc(timed_wave_factor / np.pi) * (time - self.start_time)
-            u_hat_ = y0_ * cos_part + c2_ * sinc_part
-            ut_hat_ = c1_derivative_ * sinc_part + y0t_ * cos_part
+            if self.is_new_delta_time(time - self.start_time):
+                self.update_cached(time - self.start_time)
+            u_hat_ = y0_ * self.cos_part + c2_ * self.sinc_part
+            ut_hat_ = c1_derivative_ * self.sinc_part + y0t_ * self.cos_part
             return [ifftn(u_hat_), ifftn(ut_hat_)]
 
         self.solver = solution_at
