@@ -54,10 +54,10 @@ trial_5 = StochasticTrial([distributions.gaussian],
                           name="Trial5") \
     .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] * ys[0]) + np.sin(xs[0] + ys[0]),
                     "alpha", lambda ys: 1 + np.exp(ys[0]),
-                    "expectancy_data", "../../data/qmc_100000, Trial5, 0.5, 128.npy")
+                    "expectancy_data", "../../data/qmc_200000, Trial5, 0.5, 128.npy")
 
 
-# TODO try other harder trials (like mc5), also try to calculate variance
+# TODO try other harder trials (like 2_2,2_3), also make a new like mc5 but not instable and proper start velocity
 
 
 # calculates 1d expectancy using quadrature rule defined by chaos' poly basis
@@ -72,18 +72,23 @@ def calculate_function_expectancy(function, expectancy_params):
 def get_evaluated_poly(cache, basis, i, expectancy_params):
     quadrature_nodes = expectancy_params[0]
     if len(quadrature_nodes) != cache.get("quadrature_nodes_count", 0):
-        cache.clear()
+        cache.clear()  # TODO also same name of nodes as amount alone does not notify if distribution changes e.g.
         cache["quadrature_nodes_count"] = len(quadrature_nodes)
-    cached_evaluated_polys = cache.get("evaluated_polys", [])
+        print("CLEARING CACHE!")
+    cached_evaluated_polys = cache.get("evaluated_polys")
+    if cached_evaluated_polys is None:
+        cached_evaluated_polys = []
+        cache["evaluated_polys"] = cached_evaluated_polys
     if len(cached_evaluated_polys) <= i:
         for j in range(len(cached_evaluated_polys), i + 1):
+            print("NEW IN CACHE:", j)
             cached_evaluated_polys.append(np.apply_along_axis(basis[i], 1, quadrature_nodes))
     return cached_evaluated_polys[i]
 
 
 # max_poly_degree is also called N in comments in order to conform with literature and because it is shorter
 def galerkin_expectancy(trial, max_poly_degree, domain, grid_size, start_time, stop_time, delta_time,
-                        quadrature_nodes_count, wave_weight):
+                        quadrature_nodes_count, wave_weight, cache=None):
     trial.flag_raw_attributes = True
 
     # calculate symmetric matrix A where a_ik=E[alpha(y)phi_i(y)phi_k(y)]
@@ -94,7 +99,8 @@ def galerkin_expectancy(trial, max_poly_degree, domain, grid_size, start_time, s
     nodes = nodes.reshape((nodes.shape[0], 1))  # to allow for future multivariate nodes and weights
     weights = weights.reshape((weights.shape[0], 1))
     expectancy_params = (nodes, weights)
-    cache = {}
+    if cache is None:
+        cache = {}
     wave_speeds, matrix_s = calculate_wave_speed_transform(trial, basis, max_poly_degree, expectancy_params, cache)
     function_b = lambda xs: matrix_b(trial, xs, basis, max_poly_degree, expectancy_params, cache)
 
@@ -114,7 +120,7 @@ def galerkin_expectancy(trial, max_poly_degree, domain, grid_size, start_time, s
         except FileNotFoundError:
             print("No expectancy data found, should be here!?")
     return (xs,
-            calculate_expectancy(splitting, chaos.normalization_gamma, start_time, stop_time, delta_time),
+            calculate_expectancy(splitting, chaos.normalization_gamma, stop_time, delta_time),
             exp)
 
 
@@ -159,7 +165,8 @@ def calculate_wave_speed_transform(trial, basis, max_poly_degree, expectancy_par
 def matrix_b(trial, xs, basis, max_poly_degree, expectancy_params, cache):
     def transformed_beta(ys):
         return [trial.beta(xs, trial.transform_values(ys))]
-
+    # TODO to ensure we get (shape[0],1) everywhere the functions given to apply_along_axis return a single element
+    # TODO list, I guess this hurts performance, can we instead use a vector everywhere (also for evaluated polys)
     return calculate_expectancy_matrix_sym(expectancy_params,
                                            lambda all_ys, i, k: (np.apply_along_axis(transformed_beta, 1, all_ys)
                                                                  * get_evaluated_poly(cache, basis, i,
@@ -284,7 +291,8 @@ def make_splitting(domain, grid_size, wave_speeds, basis, function_b, matrix_s, 
     return splitting
 
 
-def calculate_expectancy(splitting, normalization_gamma, start_time, stop_time, delta_time):
+def calculate_expectancy(splitting, normalization_gamma, stop_time, delta_time):
+    print("Starting progressing splitting.")
     splitting.progress(stop_time, delta_time, 0)
     last_coefficients = splitting.solutions()[-1]
     # this is now a list of length N+1, one vector for each index k, each of length 'grid_size'
@@ -301,39 +309,43 @@ def test(plot=True):
     from util.analysis import error_l2
     domain = [(-np.pi, np.pi)]
     grid_size = 128
-    start_time, stop_time, delta_time = 0., 0.5, 0.001
-    max_poly_degree = 15
-    # trial 1, Q=50, D=15,dt=0.0001->error=7.5E-10  # perfect order 10 convergence
-    # trial 1, Q=50, D=5,dt=0.0001->error=7.5E-10  # perfect order 10 convergence
-    # trial 1, Q=50, D=3,dt=0.0001->error=5.8E-9, for dt<=0.001 perfect order 10 convergence
+    start_time, stop_time = 0., 0.5
+    delta_times = [0.1, 0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001, 0.00005, 0.00001]
+    max_poly_degrees = [0, 1, 2, 3, 4, 5, 10]
+    # trial 1, Q=50, D=15,dt=0.0001->error=7.5E-10  # perfect order 2 convergence
+    # trial 1, Q=50, D=5,dt=0.0001->error=7.5E-10  # perfect order 2 convergence
+    # trial 1, Q=50, D=3,dt=0.0001->error=5.8E-9, for dt<=0.001 perfect order 2 convergence
     # trial 1, Q=50, D=1, independent of dt, wont get better than 2.4E-4
     wave_weight = 0.5  # does not seem to have much influence (at least on trial5); but can have on stability as this problem is kinda irregular!
-    quadrature_nodes_counts = [50]
-    errors = []
-    trial = trial_1  # trial_5 saved expectancy is not bette than 1.4E-4
-    for quadrature_nodes_count in quadrature_nodes_counts:
-        xs, exp, trial_exp = galerkin_expectancy(trial, max_poly_degree, domain, grid_size,
-                                                 start_time, stop_time, delta_time, quadrature_nodes_count,
-                                                 wave_weight)
-
-        error = error_l2(exp, trial_exp)
-        errors.append(error)
-        print("Degree={}, Q nodes={}, rel. error={}".format(max_poly_degree, quadrature_nodes_count, error))
-    print("Relative errors for {}".format(trial.name), errors)
+    quadrature_nodes_count = 50
+    trial = trial_0  # trial_5 saved expectancy is not better than 1.4E-4 for qmc_100k
     if plot:
         import matplotlib.pyplot as plt
         plt.figure()
-        plt.title("Galerkin Error to expectancy for {}, PolyDegree={}, T={}, dt={}, grid={}, wave_weight={}"
-                  .format(trial.name, max_poly_degree, stop_time, delta_time, grid_size, wave_weight))
-        plt.xlabel("Quadrature nodes count")
+        plt.title("Galerkin Error to expectancy for {}, T={}, grid={}, wave_weight={}"
+                  .format(trial.name, stop_time, grid_size, wave_weight))
+        plt.xlabel("1/Delta_time")
         plt.ylabel("discrete l2 error")
+        plt.xscale('log')
         plt.yscale('log')
-        plt.plot(quadrature_nodes_counts, errors, "o")
-        plt.show()
+    cache = {}
+    for max_poly_degree in max_poly_degrees:
+        errors = []
+        for delta_time in delta_times:
+            xs, exp, trial_exp = galerkin_expectancy(trial, max_poly_degree, domain, grid_size,
+                                                     start_time, stop_time, delta_time, quadrature_nodes_count,
+                                                     wave_weight, cache)
 
-        plt.figure()
-        plt.plot(xs[0], exp, label="Calculated exp")
-        plt.plot(xs[0], trial_exp, label="Exact exp")
+            error = error_l2(exp, trial_exp)
+            errors.append(error)
+            print("Degree={}, Q nodes={}, dt={}, error={}".format(max_poly_degree, quadrature_nodes_count,
+                                                                  delta_time, error))
+        print("errors for {}".format(trial.name), errors)
+        if plot:
+            plt.plot(1. / np.array(delta_times), errors, "-", label="max poly degree={}".format(max_poly_degree))
+
+    if plot:
+        plt.ylim((1E-13, 1.))
         plt.legend()
         plt.show()
 
@@ -342,6 +354,6 @@ def test(plot=True):
 # TODO and use another splitting method for this (chained sum of strang splittings, always group 2)
 
 
-import tests.profile_execute as profile
-profile.profile_function(partial(test, False), 'galerkin.dump')
-#test()
+#import tests.profile_execute as profile
+#profile.profile_function(partial(test, False), 'galerkin5.dump')
+test()
