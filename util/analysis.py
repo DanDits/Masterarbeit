@@ -5,6 +5,7 @@ from functools import reduce
 from util.general import coroutine
 
 
+_invalid_usage_msg = "Probably forgot to next() the coroutine after sending last value."
 # based on http://www.johndcook.com/blog/standard_deviation/ from Knut
 @coroutine
 def running_mean_variance():
@@ -15,21 +16,22 @@ def running_mean_variance():
     After sending a value, make sure to invoke next(coroutine).
     :return: A coroutine.
     """
-    m0 = (yield)
-    m1 = m0
+    mean = (yield)
     k = 1
-    s = 0 * m0  # to ensure the type and shape is correct
-    yield m1, s  # special case of first value, cannot estimate much
+    s = 0 * mean  # to ensure the type and shape is correct
+    ret = yield (mean, s)  # special case of first value, cannot estimate much
+    if ret is not None:
+        raise ValueError(_invalid_usage_msg)
     while True:
         k += 1
         value = (yield)
-        m1 += (value - m1) / k
-        s += (value - m1) * (value - m0)
-        m0 = m1
-        returned = (m1, s / (k - 1))
-        ret = yield returned
+        delta = value - mean
+        mean += delta / k
+        delta2 = value - mean
+        s += delta2 * delta
+        ret = yield (mean, s / (k - 1))
         if ret is not None:
-            raise ValueError("Probably forgot to next() the coroutine after sending last value.")
+            raise ValueError(_invalid_usage_msg)
 
 
 def mul_prod(factors):

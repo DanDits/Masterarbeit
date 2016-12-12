@@ -85,7 +85,11 @@ trial_4 = StochasticTrial([distributions.gaussian, distributions.make_uniform(-1
                                             lambda y: y, lambda y: y * 4 + 2],
                           name="Trial4") \
     .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] + ys[2]) + np.sin(xs[0] + ys[3]),
-                    "alpha", lambda ys: 1 + 0.5 * ys[0] + 3 * ys[1])
+                    "alpha", lambda ys: 1 + 0.5 * ys[0] + 3 * ys[1],
+                    "expectancy_data", "../data/qmc_exp, 100000, Trial4, 0.5, 128.npy",
+                    "variance_data", "../data/qmc_var, 100000, Trial4, 0.5, 128.npy",
+                    "stop_time", 0.5,
+                    "grid_size", 128)
 
 # unstable for N=512,dt=0.001:  Degree 6
 #              N=128,dt=0.001:  Degree 15
@@ -110,7 +114,8 @@ trial_6 = StochasticTrial([distributions.make_beta(1.5, 4.5), distributions.make
                           name="Trial6") \
     .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] + ys[2]) + np.sin(xs[0] + ys[3]),
                     "alpha", lambda ys: 1 + 0.5 * ys[0] + 3 * ys[1],
-                    "expectancy_data", "../data/qmc_100000, Trial6, 0.5, 128.npy",
+                    "expectancy_data", "../data/qmc_exp, 100000, Trial6, 0.5, 128.npy",
+                    "variance_data", "../data/qmc_var, 100000, Trial6, 0.5, 128.npy",
                     "grid_size", 128,
                     "stop_time", 0.5)
 
@@ -122,3 +127,12 @@ trial_7 = StochasticTrial([distributions.make_beta(0.5, 0.5)],
                     "alpha", lambda ys: 1 + np.exp(ys[0]),
                     "grid_size", 128,
                     "stop_time", 0.5)
+
+trial_discont = StochasticTrial([distributions.make_uniform(-1, 1)],
+                                lambda xs, ys: np.cos(sum(xs)),
+                                lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
+                                name="TrialDiscont") \
+    .add_parameters("beta", lambda xs, ys: 100 * np.cos(ys[0]) ** 2 + 1 if ys[0] > 0. else 1.5 + np.sin(3 * ys[0]),
+                    "alpha", lambda ys: 2 + ys[0] if ys[0] > 0. else 0.5,
+                    "expectancy_data", "../data/qmc_exp, 100000, TrialDiscont, 0.5, 128.npy",
+                    "variance_data", "../data/qmc_var, 100000, TrialDiscont, 0.5, 128.npy")
