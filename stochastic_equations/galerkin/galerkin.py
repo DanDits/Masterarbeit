@@ -1,6 +1,5 @@
 import numpy as np
-from stochastic_equations.stochastic_trial import StochasticTrial
-from polynomial_chaos import distributions
+import demo.stochastic_trials as st
 import polynomial_chaos.poly_chaos_distributions as pcd
 from numpy.linalg import eigh
 from scipy.linalg import expm
@@ -8,56 +7,6 @@ from diff_equation.solver_config import SolverConfig
 from diff_equation.pseudospectral_solver import WaveSolverConfig
 from functools import partial
 from diff_equation.splitting import Splitting
-
-param_g1 = 2
-alpha_1 = 1
-assert param_g1 ** 2 - alpha_1 > 1E-7
-trial_0 = StochasticTrial([distributions.make_uniform(-1, 1)],
-                          lambda xs, ys: np.sin(sum(xs)),
-                          lambda xs, ys: param_g1 * np.cos(sum(xs)),
-                          lambda xs, t, ys: np.sin(sum(xs) + param_g1 * t),
-                          name="Trial0") \
-    .add_parameters("beta", lambda xs, ys: param_g1 ** 2 - alpha_1,
-                    "alpha", lambda ys: alpha_1)
-# y[0] > 1
-left_1, right_1 = 2., 5.
-trial_1 = StochasticTrial([distributions.make_uniform(-1, 1)],
-                          lambda xs, ys: 2 * np.sin(sum(xs)),
-                          lambda xs, ys: np.zeros(shape=sum(xs).shape),
-                          lambda xs, t, ys: 2 * np.cos(t * ys[0]) * np.sin(sum(xs)),
-                          # from U(-1,1) to U(left_1, right_1)
-                          random_variables=[lambda y: (right_1 - left_1) / 2 * (y + 1) + left_1],
-                          name="Trial1") \
-    .add_parameters("beta", lambda xs, ys: ys[0] ** 2 - ys[0],  # y^2 - alpha(y)
-                    "alpha", lambda ys: ys[0],
-                    "expectancy", lambda xs, t: (2 / (t * (right_1 - left_1)) * np.sin(sum(xs))
-                                                 * (np.sin(right_1 * t) - np.sin(left_1 * t))),
-                    "variance", lambda xs, t: (1 / (t * (right_1 - left_1)) * np.sin(sum(xs)) ** 2
-                                               * (2 * t * right_1 + np.sin(2 * t * right_1)
-                                                  - 2 * t * left_1 - np.sin(2 * t * left_1))
-                                               - (2 / (t * (right_1 - left_1)) * np.sin(sum(xs))
-                                                  * (np.sin(right_1 * t) - np.sin(left_1 * t))) ** 2))
-
-# y[0] in (0,1), is enforced by random variable which can take any real value!
-trial_2_1 = StochasticTrial([distributions.gaussian],
-                            lambda xs, ys: np.zeros(shape=sum(xs).shape),
-                            lambda xs, ys: np.sin(sum(xs)),
-                            lambda xs, t, ys: np.sin(sum(xs)) * np.sin(t / ys[0]) * ys[0],
-                            random_variables=[lambda y: 0.5 + 0.2 * np.sin(y) ** 2],
-                            name="Trial2_1")
-trial_2_1.add_parameters("beta", lambda xs, ys: 1 / ys[0] ** 2 - 1 / ys[0],  # 1/y^2 - alpha(y)
-                         "alpha", lambda ys: 1 / ys[0])
-
-trial_5 = StochasticTrial([distributions.gaussian],
-                          lambda xs, ys: np.cos(sum(xs)),
-                          lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
-                          name="Trial5") \
-    .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] * ys[0]) + np.sin(xs[0] + ys[0]),
-                    "alpha", lambda ys: 1 + np.exp(ys[0]),
-                    "expectancy_data", "../../data/qmc_200000, Trial5, 0.5, 128.npy")
-
-
-# TODO try other harder trials (like 2_2,2_3), also make a new like mc5 but not instable and proper start velocity
 
 
 # calculates 1d expectancy using quadrature rule defined by chaos' poly basis
@@ -308,17 +257,14 @@ def calculate_expectancy(splitting, normalization_gamma, stop_time, delta_time):
 def test(plot=True):
     from util.analysis import error_l2
     domain = [(-np.pi, np.pi)]
-    grid_size = 128
-    start_time, stop_time = 0., 0.5
-    delta_times = [0.1, 0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001, 0.00005, 0.00001]
+    trial = st.trial_2_3
+    grid_size = trial.get_parameter("grid_size", 128)
+    start_time = 0.
+    stop_time = trial.get_parameter("stop_time", 0.5)
+    delta_times = [0.1, 0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001, 0.00005]
     max_poly_degrees = [0, 1, 2, 3, 4, 5, 10]
-    # trial 1, Q=50, D=15,dt=0.0001->error=7.5E-10  # perfect order 2 convergence
-    # trial 1, Q=50, D=5,dt=0.0001->error=7.5E-10  # perfect order 2 convergence
-    # trial 1, Q=50, D=3,dt=0.0001->error=5.8E-9, for dt<=0.001 perfect order 2 convergence
-    # trial 1, Q=50, D=1, independent of dt, wont get better than 2.4E-4
     wave_weight = 0.5  # does not seem to have much influence (at least on trial5); but can have on stability as this problem is kinda irregular!
     quadrature_nodes_count = 50
-    trial = trial_0  # trial_5 saved expectancy is not better than 1.4E-4 for qmc_100k
     if plot:
         import matplotlib.pyplot as plt
         plt.figure()
@@ -348,10 +294,6 @@ def test(plot=True):
         plt.ylim((1E-13, 1.))
         plt.legend()
         plt.show()
-
-
-# TODO maybe instead of using beta(x,y) split equation further into spectral coefficients sum beta'_i(x)phi_i(y)
-# TODO and use another splitting method for this (chained sum of strang splittings, always group 2)
 
 
 #import tests.profile_execute as profile

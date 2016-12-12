@@ -44,6 +44,11 @@ class Trial:
         """
         return hasattr(self, key)
 
+    def get_parameter(self, key, default):
+        if self.has_parameter(key):
+            return getattr(self, key, default)
+        return default
+
     def error(self, xs, t, approximation):
         """
         Calculates the error of the given approximation (nd-array of same shape as sum of xs) to the
