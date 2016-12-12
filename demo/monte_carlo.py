@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 
 from util.analysis import error_l2
 from util.animate import animate_2d_surface
+from itertools import cycle
+
 
 dimension = 1
 grid_size_N = 128 if dimension >= 2 else 128
@@ -15,15 +17,16 @@ delta_time = 0.001
 start_time = 0.
 stop_time = 0.5
 save_last_solution = True
-simulations_count = 200000
+simulations_count = 100000
 do_quasi_monte_carlo = True
 
 # the factor of the step number between two consecutive solutions used to estimate order of convergence
 order_factor = 10  # >=2, integer
 
-trial = st.trial_7
+trial = st.trial_6
 
-splitting_xs, splitting_xs_mesh, expectancy, errors, solutions, solutions_for_order_estimate = \
+splitting_xs, splitting_xs_mesh, expectancy, variance, expectancy_errors, variance_errors, \
+    solutions, solutions_for_order_estimate = \
     simulate(trial, simulations_count, [simulations_count // 3, simulations_count // 2, simulations_count],
              domain, grid_size_N, start_time,
              stop_time, delta_time,
@@ -37,25 +40,37 @@ if dimension == 1:
         plt.plot(*splitting_xs, trial.orientation_func(splitting_xs_mesh, stop_time), 'o', label="...for orientation")
     if expectancy is not None:
         plt.plot(*splitting_xs, expectancy, label="Expectancy")
-    for step, solution in solutions:
-        plt.plot(*splitting_xs, solution, label="Mean with N={}".format(step))
+    if variance is not None:
+        plt.plot(*splitting_xs, variance, "D", label="Variance")
+    for (step, current_expectancy, current_variance), color in zip(solutions,
+                                                                   cycle(['r', 'b', 'g', 'k', 'm', 'c', 'y'])):
+        plt.plot(*splitting_xs, current_expectancy, color=color, label="Exp. with N={}".format(step))
+        plt.plot(*splitting_xs, current_variance, "D", color=color, label="Var. with N={}".format(step))
     if save_last_solution:
-        np.save('../data/{}_{}, {}, {}, {}'.format("qmc" if do_quasi_monte_carlo else "mc",
+        np.save('../data/{}_exp, {}, {}, {}, {}'.format("qmc" if do_quasi_monte_carlo else "mc",
                                                    solutions[-1][0], trial.name, stop_time, grid_size_N),
                 solutions[-1][1])
+        np.save('../data/{}_var, {}, {}, {}, {}'.format("qmc" if do_quasi_monte_carlo else "mc",
+                                                   solutions[-1][0], trial.name, stop_time, grid_size_N),
+                solutions[-1][2])
     plt.legend()
 elif dimension == 2:
-    animate_2d_surface(splitting_xs[0], splitting_xs[1], [sol for _, sol in solutions],
-                       [step for step, sol in solutions], 100)
+    animate_2d_surface(splitting_xs[0], splitting_xs[1], [sol for _, sol, __ in solutions],
+                       [step for step, sol, _ in solutions], 100)
 
-if len(errors) > 0:
+if len(expectancy_errors) > 0 or len(variance_errors) > 0:
     plt.figure()
-    plt.title("Errors to expectancy, dt={}, qMC={}".format(delta_time, do_quasi_monte_carlo))
-    plt.plot(range(len(errors)), errors)
+    plt.title("{}MonteCarlo estimation, {}, dt={}".format("Quasi" if do_quasi_monte_carlo else "",
+                                                          trial.name, delta_time))
+    if len(expectancy_errors) > 0:
+        plt.plot(range(len(expectancy_errors)), expectancy_errors, label="Expectancy")
+    if len(variance_errors) > 0:
+        plt.plot(range(len(expectancy_errors)), variance_errors, label="Variance")
     plt.xlabel("Simulation")
     plt.ylabel("Error")
     plt.xscale('log')
     plt.yscale('log')
+    plt.legend()
 
 if len(solutions_for_order_estimate) == 3:
     if expectancy is None:

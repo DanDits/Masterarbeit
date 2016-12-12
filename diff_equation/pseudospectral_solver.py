@@ -103,7 +103,7 @@ class OffsetWaveSolverConfig(SolverConfig):
 # u_tt(t,x) = (wave_speed ** 2) * u_xx(t,x), u(t0,x)=u0(x), u_t(t0,x)=u0_t(x), wave_speed > 0
 class WaveSolverConfig(SolverConfig):
 
-    def __init__(self, intervals, grid_points_list, wave_speed, splitting_factor=1.):
+    def __init__(self, intervals, grid_points_list, wave_speed: float, splitting_factor=1.):
         super().__init__(intervals, grid_points_list, pseudospectral_power=2)
         assert wave_speed > 0.
         self.wave_speed = wave_speed

@@ -5,6 +5,7 @@ from collections import deque
 import numpy as np
 from util.quasi_randomness.halton import halton
 from util.quasi_randomness.sobol_lib import i4_sobol
+from util.analysis import running_mean_variance
 
 
 def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
@@ -43,31 +44,33 @@ def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
     :return: xs: A list of 1d nd-arrays of the spatial discretization
              xs_mesh: A list of the sparse mesh grids belong to xs.
              expectancy: The trial's evaluated expectancy, the calculated expectancy or None
-             errors: 1d nd-array how to error evolved over the simulations
-             solutions: The solutions that we should save which are approximations to the expectancy
-             solutions_for_order_estimate: The 3 solutions for the order estimate (if possible)
+             variance: The trial's evaluated variance or None
+             expectancy_errors: 1d nd-array how the error to expectancy (if given) evolved over the simulations
+             variance_errors: Same as expectancy_errors just for the variance (if given)
+             solutions: The solutions that we should save which are approximations to the expectancy, a tuple
+             consisting of the step index, the expectancy and the variance
+             expectancies_for_order_estimate: The 3 solutions for the order estimate (if possible)
     """
     xs, xs_mesh = None, None
     eval_solution_index = None
-    expectancy = None
+    expectancy, variance = None, None
     if eval_time is None:
         eval_time = stop_time
-    summed_solutions = None
     solutions = []
-    errors = []
+    expectancy_errors, variance_errors = [], []
     order_factor = order_factor
-    last_solutions_count_max = 50
-    last_solutions = deque()
-    last_solution_weights = [1 / (i + 1) for i in range(last_solutions_count_max)]  # not normalized
     steps_for_order_estimate = [int(simulations_count / (order_factor ** i)) for i in range(3)]
-    solutions_for_order_estimate = []
+    expectancies_for_order_estimate = []
     random_dimension = len(stochastic_trial.variable_distributions)
     actual_solutions_count = 0
     fail_count = 0
+    running_estimator = running_mean_variance()
 
     # HINT: To estimate sample variance, you would need to sum the squares of the simulation solution minus the
     # estimated expectancy and then divide this by either: simulations_count, or simulations_count-1 (to eliminate bias)
     # see: https://en.wikipedia.org/wiki/Variance#Population_variance_and_sample_variance
+    # comparsion: http://www.johndcook.com/blog/2008/09/26/comparing-three-methods-of-computing-standard-deviation/
+    # stable calculation: http://math.stackexchange.com/questions/20593/calculate-variance-from-a-stream-of-sample-values
     while actual_solutions_count < simulations_count:
         if heartbeat > 0 and actual_solutions_count % heartbeat == 0:
             print("Simulation",
@@ -111,28 +114,22 @@ def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
             else:
                 break  # to make simulation stop at maximum of twice the runtime or if it is not (pseudo)random
         actual_solutions_count += 1
-        if summed_solutions is not None:
-            summed_solutions += solution
-        else:
-            summed_solutions = solution
+        current_expectancy_estimate, current_variance_estimate = running_estimator.send(solution)
+        next(running_estimator)
         if expectancy is None and stochastic_trial.has_parameter("expectancy"):
             expectancy = stochastic_trial.expectancy(xs_mesh, eval_time)
         elif expectancy is None and stochastic_trial.raw_reference is not None and do_calculate_expectancy:
             expectancy = stochastic_trial.calculate_expectancy(xs, eval_time,
                                                                stochastic_trial.raw_reference)
-        last_solution = summed_solutions / actual_solutions_count
-        if len(last_solutions) >= last_solutions_count_max:
-            last_solutions.popleft()
-        last_solutions.append(last_solution)
-
+        if variance is None and stochastic_trial.has_parameter("variance"):
+            variance = stochastic_trial.variance(xs_mesh, eval_time)
         if actual_solutions_count in keep_solutions_at_steps:
-            solutions.append((actual_solutions_count, last_solution))
+            solutions.append((actual_solutions_count, current_expectancy_estimate, current_variance_estimate))
         if actual_solutions_count in steps_for_order_estimate:
-            # do not only use exactly the solution for step i but use weighted arithmetic mean of some beforehand
-            count = min(len(last_solutions), len(last_solution_weights))
-            averaged = (1 / sum(last_solution_weights[:count]) * sum(sol * weight for sol, weight
-                                                                     in zip(last_solutions, last_solution_weights)))
-            solutions_for_order_estimate.append(averaged)
+            expectancies_for_order_estimate.append(current_variance_estimate)
         if expectancy is not None:
-            errors.append(error_l2(expectancy, last_solution))
-    return xs, xs_mesh, expectancy, errors, solutions, solutions_for_order_estimate
+            expectancy_errors.append(error_l2(expectancy, current_expectancy_estimate))
+        if variance is not None:
+            variance_errors.append(error_l2(variance, current_variance_estimate))
+    return (xs, xs_mesh, expectancy, variance, expectancy_errors, variance_errors,
+            solutions, expectancies_for_order_estimate)

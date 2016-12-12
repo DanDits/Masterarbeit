@@ -14,6 +14,7 @@ trial_1 = StochasticTrial([distributions.make_uniform(-1, 1)],
                           name="Trial1") \
     .add_parameters("beta", lambda xs, ys: ys[0] ** 2 - ys[0],  # y^2 - alpha(y)
                     "alpha", lambda ys: ys[0],
+                    # at t=0.5: 0.624096 sin(x)
                     "expectancy", lambda xs, t: (2 / (t * (right_1 - left_1)) * np.sin(sum(xs))
                                                  * (np.sin(right_1 * t) - np.sin(left_1 * t))),
                     "variance", lambda xs, t: (1 / (t * (right_1 - left_1)) * np.sin(sum(xs)) ** 2
