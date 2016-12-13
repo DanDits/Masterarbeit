@@ -9,11 +9,11 @@ from util.storage import save_fig
 import demo.stochastic_trials as st
 
 
-trial = st.trial_5
+trial = st.trial_2_2
 
 # "High order is not the same as high accuracy. High order translates to high accuracy only when the integrand
 # is very smooth" (http://apps.nrbook.com/empanel/index.html?pg=179#)
-N = list(range(7))  # maximum degree of the polynomial, so N+1 polynomials
+N = list(range(15))  # maximum degree of the polynomial, so N+1 polynomials
 # from n+1 to n+10 notably difference for most examples
 
 # number of nodes in random space, >= N+1, higher CAN give more accuracy (for higher polys)
@@ -34,7 +34,7 @@ spatial_domain = list(repeat([-np.pi, np.pi], spatial_dimension))
 start_time = 0
 stop_time = trial.get_parameter("stop_time", 0.5)
 # if grid_size is bigger this needs to be smaller, especially for higher poly degrees
-delta_time = trial.get_parameter("delta_time", 0.001)
+delta_time = trial.get_parameter("delta_time", 0.0001)
 
 rank_frac = None
 exp_var_results_mi, exp_var_results_dp, rank_fracs = [], [], []

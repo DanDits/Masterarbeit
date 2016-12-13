@@ -75,7 +75,7 @@ def smolyak_sparse_grid(level, univariate_nodes_and_weights):
             #count += mul_prod(map(lambda t: t + 1, multi_index))
             count += 1
     return count  # TODO trying stuff
-# TODO check out code from https://people.sc.fsu.edu/~jburkardt/m_src/sandia_sparse/sandia_sparse.html !!
+
 
 def poly_basis_multify(basis_list, sum_bound, nodes_and_weights, multi_indices=None):
     """

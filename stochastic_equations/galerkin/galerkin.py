@@ -65,7 +65,7 @@ def galerkin_expectancy(trial, max_poly_degree, domain, grid_size, start_time, s
         exp = trial.calculate_expectancy(xs, stop_time, trial.raw_reference)
     elif trial.has_parameter("expectancy_data"):
         try:
-            exp = np.load(trial.expectancy_data)
+            exp = np.load(trial.expectancy_data)  # TODO relativ path wrong here, make demo for galerkin
         except FileNotFoundError:
             print("No expectancy data found, should be here!?")
     return (xs,
@@ -257,11 +257,11 @@ def calculate_expectancy(splitting, normalization_gamma, stop_time, delta_time):
 def test(plot=True):
     from util.analysis import error_l2
     domain = [(-np.pi, np.pi)]
-    trial = st.trial_2_2
+    trial = st.trial_discont
     grid_size = trial.get_parameter("grid_size", 128)
     start_time = 0.
     stop_time = trial.get_parameter("stop_time", 0.5)
-    delta_times = [0.1, 0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001, 0.00005, 0.00001]
+    delta_times = [0.1, 0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001]
     max_poly_degrees = [0, 1, 2, 3, 4, 5, 10, 15, 20]
     wave_weight = 0.5  # does not seem to have much influence (at least on trial5); but can have on stability as this problem is kinda irregular!
     quadrature_nodes_count = 50

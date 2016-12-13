@@ -126,7 +126,9 @@ trial_7 = StochasticTrial([distributions.make_beta(0.5, 0.5)],
     .add_parameters("beta", lambda xs, ys: 4 + np.sin(2 * xs[0] + ys[0]) + 2 * np.sin(xs[0] + ys[0]),
                     "alpha", lambda ys: 1 + np.exp(ys[0]),
                     "grid_size", 128,
-                    "stop_time", 0.5)
+                    "stop_time", 0.5,
+                    "expectancy_data", "../data/qmc_exp, 100000, Trial7, 0.5, 128.npy",
+                    "variance_data", "../data/qmc_var, 100000, Trial7, 0.5, 128.npy")
 
 trial_discont = StochasticTrial([distributions.make_uniform(-1, 1)],
                                 lambda xs, ys: np.cos(sum(xs)),
