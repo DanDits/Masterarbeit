@@ -4,6 +4,24 @@ import numpy as np
 from util.analysis import mul_prod
 from scipy.misc import comb
 
+# A table of amount of nodes used for a combination of dimension and level:
+# level\dimension
+#   1   2       3       4       5
+# 0	1	1	    1	    1	    1
+# 1	3	5	    7	    9	    11
+# 2	7	21	    37	    57	    81
+# 3	15	73	    159	    289	    471
+# 4	31	225	    597	    1,265	2,341
+# 5	63	637	    2,031	4,969	10,363
+# 6	127	1,693	6,405	17,945	41,913
+# 7	255	4,289	19,023	60,577	157,583
+# 8	511	10,473	53,829	193,457	557,693
+
+# Testing values: Integrating with hermite nodes and weights (so the integral is implicitly over complete R^dimension):
+# dimension=1: f(x)=1 integrated is exactly 1.
+# dimension=1: f(x)=sin(x)**2 integrated is (1/2 - 1/(2*e**2))=0.43233235838169365
+# dimension=2: f(x)=sin(x[0])**2*sin(x[1])**2 integrated is (1/2 - 1/(2*e**2)) ** 2 = 0.1869112681038772
+
 
 # open weakly nested include Gauss Hermite and Gauss Legendre.
 def calculate_point_num(dim_num: int, level_max: int):
@@ -98,7 +116,6 @@ def sparse_grid(dim_num: int, level_max: int, point_num: int, nodes_and_weights_
     else:
         level_min2 = 0
     for level in range(level_min2, level_max + 1):
-        print("LEVEL=", level)
         for level_1d in compositions(level, dim_num):
             order_1d = level_to_order_open(level_1d)
             print("LEVEL1D=", level_1d, "ORDER1D=", order_1d)
@@ -122,19 +139,15 @@ def sparse_grid(dim_num: int, level_max: int, point_num: int, nodes_and_weights_
                     if level_min <= level:
                         grid_point_temp = multigrid_point(dim_num, grid_base2, grid_index2[:, point],
                                                                     order_1d, nodes_and_weights_func)
+                        # find the index
                         point3 = -1
                         for point2 in range(point_num2):
                             if np.allclose(grid_point[:, point2], grid_point_temp):
                                 point3 = point2
                                 break
-                        if point3 == -1:
-                            print("OHOH:", grid_point)
-                            print("LOOKING FOR:", grid_point_temp)
-                        assert point3 != -1
+                        assert point3 != -1  # we know it has to be somewhere as grid_level[point] != level
                         grid_weight[point3] += coeff * grid_weights2[point]
     assert point_num2 == point_num
-    print("GridPoints:", grid_point)
-    print("Grid_weight:", grid_weight)
     return np.rollaxis(grid_point, 1), grid_weight
 
 nesting_open_weakly = rules.Nesting(calculate_point_num, levels_index, sparse_grid)

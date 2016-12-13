@@ -8,10 +8,11 @@ class QuadratureRule:
         self.nodes_and_weights_func = nodes_and_weights_func
 
     def apply(self, function):
+        nodes, weights = self.nesting.calculate_nodes_and_weights(self.dim_num, self.level_max,
+                                                                     self.nodes_and_weights_func)
+        print("Used nodes:", len(nodes))
         summed = 0
-        for node, weight in zip(*self.nesting.calculate_nodes_and_weights(self.dim_num, self.level_max,
-                                                                     self.nodes_and_weights_func)):
-            print("Weight=", weight, "Node=", node)
+        for node, weight in zip(nodes, weights):
             summed += weight * function(node)
         return summed
 
@@ -19,9 +20,10 @@ def test():
     from polynomial_chaos.poly import make_hermite
     hermite = make_hermite()
     import util.sparse_quadrature.open_weakly_nested as own
-    quad = QuadratureRule(2, 3, own.nesting_open_weakly, hermite.nodes_and_weights)
+    quad = QuadratureRule(2, 6, own.nesting_open_weakly, hermite.nodes_and_weights)
     import numpy as np
     print("RESULT=", quad.apply(lambda x: np.sin(x[0]) ** 2 * np.sin(x[1]) ** 2))
+
 
 if __name__ == "__main__":
     test()
