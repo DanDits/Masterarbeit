@@ -20,11 +20,12 @@ from scipy.misc import comb
 # Testing values: Integrating with hermite nodes and weights (so the integral is implicitly over complete R^dimension):
 # dimension=1: f(x)=1 integrated is exactly 1.
 # dimension=1: f(x)=sin(x)**2 integrated is (1/2 - 1/(2*e**2))=0.43233235838169365
+# dimension=1: f(x)=x^n integrated is 0 for n odd, and (n-1)!! for n even
 # dimension=2: f(x)=sin(x[0])**2*sin(x[1])**2 integrated is (1/2 - 1/(2*e**2)) ** 2 = 0.1869112681038772
 
 
 # open weakly nested include Gauss Hermite and Gauss Legendre.
-def calculate_point_num(dim_num: int, level_max: int):
+def calculate_point_num(dim_num: int, level_max: int):  # TODO see folder "point_num". own and onn are similar and also cc and ofn
     if level_max == 0:
         return 1
     # normally level_min = max ( 0, level_max + 1 - dim_num )
@@ -97,15 +98,17 @@ def levels_index(dim_num: int, level_max: int, point_num: int):
     return grid_index, grid_base
 
 
-def multigrid_point(dim_num, grid_base, grid_index, order_1d, nodes_and_weights_func):
+def multigrid_point(dim_num, grid_base, grid_index, order_1d, nodes_and_weights_funcs):
     grid_point = np.zeros(dim_num)
-    for dim in range(dim_num):
+    assert len(nodes_and_weights_funcs) == dim_num
+    for dim, nodes_and_weights_func in enumerate(nodes_and_weights_funcs):
         nodes, _ = nodes_and_weights_func(order_1d[dim])
         grid_point[dim] = nodes[grid_index[dim] + grid_base[dim]]
     return grid_point
 
 
-def sparse_grid(dim_num: int, level_max: int, point_num: int, nodes_and_weights_func):
+# TODO folder "sparse grid": own and onn pretty similar, also cfn and ofn are similar
+def sparse_grid(dim_num: int, level_max: int, point_num: int, nodes_and_weights_funcs):
     grid_weight = np.zeros(point_num)
     grid_point = np.zeros((dim_num, point_num))
 
@@ -118,10 +121,9 @@ def sparse_grid(dim_num: int, level_max: int, point_num: int, nodes_and_weights_
     for level in range(level_min2, level_max + 1):
         for level_1d in compositions(level, dim_num):
             order_1d = level_to_order_open(level_1d)
-            print("LEVEL1D=", level_1d, "ORDER1D=", order_1d)
             grid_base2 = (order_1d - 1) // 2
             order_nd = mul_prod(order_1d)
-            grid_weights2 = product_weights(dim_num, order_1d, order_nd, nodes_and_weights_func)
+            grid_weights2 = product_weights(dim_num, order_1d, order_nd, nodes_and_weights_funcs)
             coeff = ((-1) ** ((level_max - level) % 2)) * comb(dim_num - 1, level_max - level)
             grid_index2 = multigrid_index(dim_num, order_1d, order_nd)
             grid_level = index_level(level, level_max, dim_num, order_nd, grid_index2, grid_base2)
@@ -131,14 +133,14 @@ def sparse_grid(dim_num: int, level_max: int, point_num: int, nodes_and_weights_
                     point_num2 += 1
                     assert point_num2 <= point_num
                     grid_point[:, point_num2 - 1] = multigrid_point(dim_num, grid_base2, grid_index2[:, point],
-                                                                    order_1d, nodes_and_weights_func)
+                                                                    order_1d, nodes_and_weights_funcs)
                     if level_min <= level:
                         grid_weight[point_num2 - 1] = coeff * grid_weights2[point]
                 else:
                     # already existing point!
                     if level_min <= level:
                         grid_point_temp = multigrid_point(dim_num, grid_base2, grid_index2[:, point],
-                                                                    order_1d, nodes_and_weights_func)
+                                                                    order_1d, nodes_and_weights_funcs)
                         # find the index
                         point3 = -1
                         for point2 in range(point_num2):
