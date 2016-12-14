@@ -58,25 +58,6 @@ def multi_index_bounded_sum(dimension, sum_bound):
             yield ind
 
 
-def smolyak_sparse_grid(level, univariate_nodes_and_weights):
-    dimension = len(univariate_nodes_and_weights)
-    nodes_list, weights_list = [], []
-    count = 0
-    for multi_sum in range(level + 1, level + dimension + 1):
-        factor = ([1, -1][(level + dimension - multi_sum) % 2]  # -1 only if l+d-|i| is uneven
-                  * factorial(dimension - 1) // (factorial(level + dimension - multi_sum)
-                                                 * factorial(multi_sum - level - 1)))
-        for multi_index in multi_index_exact_sum(dimension, multi_sum):
-            #pairs_per_dimension = [nodes_and_weights(index) for nodes_and_weights, index
-            #                       in zip(univariate_nodes_and_weights, multi_index)]
-            #multivariate_node, multivariate_weight = [], []
-            #for nodes, weights in pairs_per_dimension:
-            #    multivariate_node.append()
-            #count += mul_prod(map(lambda t: t + 1, multi_index))
-            count += 1
-    return count  # TODO trying stuff
-
-
 def poly_basis_multify(basis_list, sum_bound, nodes_and_weights, multi_indices=None):
     """
     Generates a multivariate polynomial basis from the given list of univariate polynomial basis.
@@ -106,16 +87,6 @@ def poly_basis_multify(basis_list, sum_bound, nodes_and_weights, multi_indices=N
                       poly,
                       nodes_and_weights)
     return basis
-
-
-def sparse_center_iterator(data, level):
-    total = len(data)
-    direction = 1
-    i = (total - 1) // 2
-    while 0 <= i < total:
-        yield data[i]
-        i += direction
-        direction = int(-math.copysign(abs(direction) + 1, direction))
 
 
 def centralize_index(index, length):
@@ -160,8 +131,7 @@ def chaos_multify(chaos_list, sum_bound):
                 weights_list.append(current_weights)
         elif method == 'sparse':
             nodes_list, weights_list = [], []
-            for multi_index in multi_indices:
-                pass
+            # TODO use sparse quadrature
         else:
             raise ValueError("Undefined method name:", method)
         return nodes_list, weights_list

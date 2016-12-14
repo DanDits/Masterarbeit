@@ -17,7 +17,6 @@ def discrete_projection_expectancy(trial, max_poly_degree, random_space_quadratu
         check_distribution_assertions(distr)
     chaos = mv.chaos_multify([get_chaos_by_distribution(distr) for distr in distrs], sum_bound)
 
-    # TODO instead of full tensor product try to use a sparse grid quadrature (see xiu book)
     # the symmetrized minimal node approach does not work for quadrature, only for interpolation
     quad_nodes_list, quad_weights_list = chaos.nodes_and_weights(random_space_quadrature_nodes_counts,
                                                                  method='full_tensor')
@@ -34,6 +33,7 @@ def discrete_projection_expectancy(trial, max_poly_degree, random_space_quadratu
     for i, poly in enumerate(basis):
         print("Projection progress:", i, "/", len(basis))
         curr_poly_weight = 0
+        # TODO here instead of using chaos' nodes and weights directly, use chaos' quadrature method (TODO) and sparse!
         for nodes, weights in zip(quad_nodes_list, quad_weights_list):
             trial.set_random_values(nodes)
             configs = kg.make_klein_gordon_wave_linhyp_configs(spatial_domain, [grid_size], trial.alpha,
