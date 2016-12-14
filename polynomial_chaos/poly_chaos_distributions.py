@@ -3,6 +3,8 @@ import polynomial_chaos.poly as poly
 import polynomial_chaos.distributions as distr
 from functools import lru_cache
 from util.analysis import rising_factorial
+from util.quadrature.rules import CentralizedDiamondQuadrature, FullTensorQuadrature, SparseQuadrature
+from util.quadrature.nesting import get_nesting_for_name
 
 
 class PolyChaosDistribution:
@@ -10,12 +12,29 @@ class PolyChaosDistribution:
         self.poly_basis = poly_basis
         self.distribution = distribution
         self.normalization_gamma = normalization_gamma
-        self.nodes_and_weights = poly_basis.nodes_and_weights
+        self.quadrature_rule = None
 
     @lru_cache(maxsize=None)
     def normalized_basis(self, degree):
         norm_factor = 1. / math.sqrt(self.normalization_gamma(degree))
         return lambda x: (self.poly_basis.polys(degree)(x) * norm_factor)
+
+    def init_quadrature_rule(self, method, param):
+        if method == "sparse":
+            nesting = get_nesting_for_name(self.poly_basis.name)
+            level = param
+            self.quadrature_rule = SparseQuadrature(level, nesting, [self.poly_basis.nodes_and_weights])
+        elif method == "full_tensor":
+            orders_1d = param
+            self.quadrature_rule = FullTensorQuadrature([orders_1d], [self])
+        elif method == "centralized":
+            sum_bound, even = param
+            self.quadrature_rule = CentralizedDiamondQuadrature([self], sum_bound, even)
+
+    def integrate(self, function):
+        if self.quadrature_rule is None:
+            raise ValueError("Quadrature rule not yet initialized.")
+        return self.quadrature_rule.apply(function)
 
 
 hermiteChaos = PolyChaosDistribution(poly.make_hermite(),

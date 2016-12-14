@@ -44,6 +44,7 @@ def galerkin_expectancy(trial, max_poly_degree, domain, grid_size, start_time, s
     chaos = pcd.get_chaos_by_distribution(trial.variable_distributions[0])
     basis = [chaos.normalized_basis(i) for i in range(max_poly_degree + 1)]
 
+    # TODO do not use nodes and weights directly but integrate method of chaos
     nodes, weights = chaos.nodes_and_weights(quadrature_nodes_count)
     nodes = nodes.reshape((nodes.shape[0], 1))  # to allow for future multivariate nodes and weights
     weights = weights.reshape((weights.shape[0], 1))

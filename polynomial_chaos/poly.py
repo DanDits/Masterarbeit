@@ -126,7 +126,9 @@ class PolyBasis:
         self.name = name
         self.params = params
         self.polys = polys
-        self.nodes_and_weights = lru_cache(maxsize=None)(nodes_and_weights)
+        self.nodes_and_weights = None
+        if nodes_and_weights is not None:
+            self.nodes_and_weights = lru_cache(maxsize=None)(nodes_and_weights)
 
 
 def make_hermite():

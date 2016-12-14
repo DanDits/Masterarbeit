@@ -1,6 +1,6 @@
 import numpy as np
 from itertools import repeat
-from polynomial_chaos.multivariation import multi_index_bounded_sum_length
+from util.quadrature.helpers import multi_index_bounded_sum_length
 from stochastic_equations.collocation.discrete_projection import discrete_projection_expectancy
 from stochastic_equations.collocation.interpolation import matrix_inversion_expectancy
 import matplotlib.pyplot as plt
@@ -9,11 +9,11 @@ from util.storage import save_fig
 import demo.stochastic_trials as st
 
 
-trial = st.trial_2_2
+trial = st.trial_4
 
 # "High order is not the same as high accuracy. High order translates to high accuracy only when the integrand
 # is very smooth" (http://apps.nrbook.com/empanel/index.html?pg=179#)
-N = list(range(15))  # maximum degree of the polynomial, so N+1 polynomials
+N = list(range(6))  # maximum degree of the polynomial, so N+1 polynomials
 # from n+1 to n+10 notably difference for most examples
 
 # number of nodes in random space, >= N+1, higher CAN give more accuracy (for higher polys)
@@ -34,26 +34,26 @@ spatial_domain = list(repeat([-np.pi, np.pi], spatial_dimension))
 start_time = 0
 stop_time = trial.get_parameter("stop_time", 0.5)
 # if grid_size is bigger this needs to be smaller, especially for higher poly degrees
-delta_time = trial.get_parameter("delta_time", 0.0001)
+delta_time = trial.get_parameter("delta_time", 0.001)
 
 rank_frac = None
 exp_var_results_mi, exp_var_results_dp, rank_fracs = [], [], []
 for n, m, q in zip(N, M, Q):
     print("n,m,q=", n, m, q)
-    result_xs, result_xs_mesh, mi_expectancy, mi_variance, mi_rank_frac = matrix_inversion_expectancy(trial, n, m,
+    """result_xs, result_xs_mesh, mi_expectancy, mi_variance, mi_rank_frac = matrix_inversion_expectancy(trial, n, m,
                                                                                                       spatial_domain,
                                                                                                       grid_size,
                                                                                                       start_time,
                                                                                                       stop_time,
-                                                                                                      delta_time)
-    _, __, dp_expectancy, dp_variance = discrete_projection_expectancy(trial, n, q,
+                                                                                                      delta_time)"""
+    result_xs, result_xs_mesh, dp_expectancy, dp_variance = discrete_projection_expectancy(trial, n, q,
                                                                        spatial_domain, grid_size,
                                                                        start_time, stop_time,
                                                                        delta_time,
-                                                                       expectancy_only=True)
-    exp_var_results_mi.append((n, m, mi_expectancy, mi_variance))
+                                                                       expectancy_only=False)
+    #exp_var_results_mi.append((n, m, mi_expectancy, mi_variance))
     exp_var_results_dp.append((n, q, dp_expectancy, dp_variance))
-    rank_fracs.append(mi_rank_frac)
+    #rank_fracs.append(mi_rank_frac)
 rank_fractions = list(map(lambda frac: 10 ** ((frac - 1) * 10),
                           rank_fracs))  # rescale to make visible in logarithmic scale
 
@@ -72,6 +72,11 @@ elif trial.has_parameter("expectancy_data"):
 trial_variance = None
 if trial.has_parameter("variance"):
     trial_variance = trial.variance(result_xs_mesh, stop_time)
+elif trial.has_parameter("variance_data"):
+    try:
+        trial_variance = np.load(trial.variance)
+    except FileNotFoundError:
+        print("No variance data found, should be here!?")
 
 plt.figure()
 plt.title("Expectancies, spatial grid size={}, {}, T={}".format(grid_size, trial.name, stop_time))
@@ -106,6 +111,7 @@ if ref is not None:
 # plt.ylim((0, 1))
 plt.legend()
 # save_fig(plt.axes(), "../data/interpol_invmat_trial5_512_0.00005.pickle")
+print("Errors dp=", errors_dp)
 if len(errors_dp) > 0 or len(errors_mi) > 0:
     plt.figure()
     plt.title("Collocation interpolation for {}, gridsize={}, dt={}, T={}".format(trial.name, grid_size,

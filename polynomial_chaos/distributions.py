@@ -6,6 +6,7 @@ from scipy.special import gamma
 from scipy.special import beta as beta_func
 from scipy.stats import beta as stats_beta
 from scipy.stats import gamma as stats_gamma
+from util.analysis import mul_prod
 
 
 # See "The Wiener--Askey Polynomial Chaos for Stochastic Differential Equations"
@@ -36,6 +37,25 @@ class Distribution:
         self.weight = weight
         self.support = support
         self.inverse_distribution = inverse_distribution
+
+    @staticmethod
+    def multi_from_univariates(distributions):
+        # generates the product distribution from the given 1d distributions
+        name = ",".join([distr.name for distr in distributions])
+        param = tuple(distr.parameters for distr in distributions)
+        show_name = ", ".join([distr.show_name for distr in distributions])
+        support = tuple(distr.support for distr in distributions)
+
+        def sampler():
+            return [distr.generate() for distr in distributions]
+
+        def weight(xs):
+            return mul_prod(distr.weight(x) for x, distr in zip(xs, distributions))
+
+        def inverse_distr(ys):
+            return [distr.inverse_distribution(y) for y, distr in zip(ys, distributions)]
+
+        return Distribution(name, weight, support, sampler, inverse_distr, show_name, param)
 
     def generate(self):
         return self.sample_generator()

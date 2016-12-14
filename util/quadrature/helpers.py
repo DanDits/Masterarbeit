@@ -1,4 +1,6 @@
 import numpy as np
+from itertools import combinations
+from scipy.misc import comb as stochastic_comb
 
 
 def integer_log(value, base):
@@ -17,6 +19,53 @@ def integer_log(value, base):
         value /= base
         log_check += 1
     return log_check
+
+
+def multi_index_bounded_sum_length(dimension, sum_bound):
+    """
+    See multi_index_bounded_sum. This returns the length of the generator's sequence
+    which is (dimension+sum_bound)!/(dimension!sum_bound!)
+    :param dimension: The dimension of the multi index.
+    :param sum_bound: The bound for the sum.
+    :return: The sequence length
+    """
+    return stochastic_comb(dimension + sum_bound, dimension, exact=True)
+
+
+def multi_index_exact_sum(dimension, sum_value):
+    i = sum_value + dimension
+    current_to_order = []
+    for comb in combinations(range(i - 1), dimension - 1):
+        # imagine i being written as i=1_1_1_..._1 with i times a 1 and (i-1) blanks
+        # replace d-1 blanks (_) with a comma, the rest with a plus to get all possibilities
+        # therefore get all possible i length combinations
+        comb += (i - 1,)  # add a virtual comma after the last 1 to simplify the next loop
+        last_pos = -1
+        index = []
+        for comma_pos in comb:
+            index.append(comma_pos - last_pos - 1)  # each reduced by 1 as we do not want [1,1,2] but [0,0,1]
+            last_pos = comma_pos
+        current_to_order.append(index)
+    return sorted(current_to_order)
+
+
+def multi_index_bounded_sum(dimension, sum_bound):
+    """
+    An iterable generator that returns the multi index i=(i_1,i_2,i_3,...i_dimension)
+    with the i_ being greater than or equal to zero and the sum over all i_ is smaller than or equal to
+    sum_bound. Indices are sorted by sum and for equal summed indices lexicographically.
+    :param dimension: Dimension = length of the index.
+    :param sum_bound: The bound of the sum.
+    :return: A generator for the indices.
+    """
+    d, P = dimension, sum_bound
+    # compute every possible d-length list whose sum is smaller than or equal to P with summands >= 0
+    # it is easier to understand if we imagine we want sums that are smaller than or equal to P+d with summands >=1
+    # (and at the end subtract 1 from each position) that there are (P+d over P)=(P+d)!/(P!d!)
+    for i in range(d, d + P + 1):
+        # compute d-length lists whose sum is exactly equal to i
+        for ind in multi_index_exact_sum(dimension, i - d):  # i-d as the exact_sum function already subtracts 1s
+            yield ind
 
 
 def product_weights(dim_num: int, order_1d: np.array, order_nd: int, nodes_and_weights_1d_funcs):
@@ -153,3 +202,11 @@ def level_to_order_open(level_1d: np.array):
     :return: A integer level containing the orders for each level.
     """
     return 2 ** (level_1d + 1) - 1
+
+if __name__ == "__main__":
+    count = 0
+    dim, bound = 5, 3
+    for current in multi_index_bounded_sum(dim, bound):
+        print(current)
+        count += 1
+    assert count == multi_index_bounded_sum_length(dim, bound)

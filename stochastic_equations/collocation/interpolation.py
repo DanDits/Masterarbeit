@@ -2,7 +2,7 @@ import numpy as np
 from diff_equation.splitting import Splitting
 import diff_equation.klein_gordon as kg
 from polynomial_chaos.poly_chaos_distributions import get_chaos_by_distribution
-from stochastic_equations.collocation.util import check_distribution_assertions
+from stochastic_equations.collocation.coll_util import check_distribution_assertions
 from numpy.linalg import lstsq
 import polynomial_chaos.multivariation as mv
 
@@ -26,6 +26,7 @@ def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_count
         check_distribution_assertions(distr)
     chaos = mv.chaos_multify([get_chaos_by_distribution(distr) for distr in distrs], sum_bound)
 
+    # TODO not possible to get nodes anymore from chaos directly!
     nodes_list = chaos.nodes_and_weights(random_space_nodes_counts, method='centralized')[0]
 
     # for uniform or beta distribution you could also use chebyshev (or slightly worse glenshaw) nodes

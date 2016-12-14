@@ -1,5 +1,6 @@
-import util.sparse_quadrature.rules as rules
-from util.sparse_quadrature.helpers import compositions, level_to_order_open, colexical_vectors, product_weights
+from util.quadrature.helpers import compositions, level_to_order_open, colexical_vectors, product_weights
+from util.quadrature.nesting import Nesting
+
 import numpy as np
 from util.analysis import mul_prod
 from scipy.misc import comb
@@ -124,7 +125,7 @@ def sparse_grid(dim_num: int, level_min2: int, level_max: int, point_num: int, n
 
 # open weakly nested include Gauss Hermite and Gauss Legendre. These can also use the OpenNonNesting but this
 # only results in more required nodes
-class OpenWeaklyNesting(rules.Nesting):
+class OpenWeaklyNesting(Nesting):
     def __init__(self):
         super().__init__("OpenWeakly")
 
@@ -184,7 +185,7 @@ class OpenWeaklyNesting(rules.Nesting):
 # dimension=2: f(x)=x[0]^2*x[1] integrated is 0.3*0.39=0.117
 
 # open non nested rules include Gauss Laguerre
-class OpenNonNesting(rules.Nesting):
+class OpenNonNesting(Nesting):
     def __init__(self):
         super().__init__("OpenNon")
 

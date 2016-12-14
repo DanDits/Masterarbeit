@@ -1,0 +1,18 @@
+Author: Daniel Dittmar
+Date: 14.12.2016
+Contact: dans.ditt@gmail.com
+
+The code in the package 'sparse_quadrature' is based on the code of the library "SANDIA_SPARSE" by John Burkardt found on
+https://people.sc.fsu.edu/~jburkardt/m_src/sandia_sparse/sandia_sparse.html
+
+He notes the reference:
+    Fabio Nobile, Raul Tempone, Clayton Webster,
+    A Sparse Grid Stochastic Collocation Method for Partial Differential
+    Equations with Random Input Data,
+    SIAM Journal on Numerical Analysis,
+    Volume 46, Number 5, 2008, pages 2309-2345.
+
+License:
+So this package 'sparse_quadrature' is redistributed under the same license:
+ This code is distributed under the GNU LGPL license.
+

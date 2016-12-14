@@ -1,5 +1,5 @@
 import unittest
-from util.sparse_quadrature.rules import QuadratureRule
+from util.quadrature.rules import SparseQuadrature
 
 
 class PolyTestCase(unittest.TestCase):
@@ -9,33 +9,33 @@ class PolyTestCase(unittest.TestCase):
         hermite = make_hermite()
         laguerre = make_laguerre(0.3)
         legendre = make_legendre()
-        import util.sparse_quadrature.open_weakly_nested as own
+        import util.quadrature.open_weakly_nested as own
         dim = 2
-        quad = QuadratureRule(5, own.OpenWeaklyNesting(), dim * [hermite.nodes_and_weights])
+        quad = SparseQuadrature(5, own.OpenWeaklyNesting(), dim * [hermite.nodes_and_weights])
         self.assertAlmostEqual(quad.apply(lambda xs: xs[0] ** 4 * xs[1] ** 6), 45., places=10,
                                msg="OWN Hermite")
 
         dim = 2
-        quad = QuadratureRule(5, own.OpenNonNesting(), dim * [laguerre.nodes_and_weights])
+        quad = SparseQuadrature(5, own.OpenNonNesting(), dim * [laguerre.nodes_and_weights])
         self.assertAlmostEqual(quad.apply(lambda xs: xs[0] ** 1 * xs[1] ** 2), 0.117, places=10,
                                msg="ONN Laguerre")
 
         dim = 1
-        quad = QuadratureRule(2, own.OpenWeaklyNesting(), dim * [legendre.nodes_and_weights])
+        quad = SparseQuadrature(2, own.OpenWeaklyNesting(), dim * [legendre.nodes_and_weights])
         self.assertAlmostEqual(quad.apply(lambda xs: xs[0] ** 12), 0.0769230769231, places=10,
                                msg="OWN Legendre")
 
-        quad = QuadratureRule(3, own.OpenWeaklyNesting(), [hermite.nodes_and_weights, legendre.nodes_and_weights])
+        quad = SparseQuadrature(3, own.OpenWeaklyNesting(), [hermite.nodes_and_weights, legendre.nodes_and_weights])
         result_own_hl = quad.apply(lambda xs: xs[0] ** 4 * xs[1] ** 12)
         self.assertAlmostEqual(result_own_hl, 0.2307692307693, places=10,
                                msg="OWN Hermite Legendre")
 
-        quad = QuadratureRule(3, own.OpenWeaklyNesting(), [legendre.nodes_and_weights, hermite.nodes_and_weights])
+        quad = SparseQuadrature(3, own.OpenWeaklyNesting(), [legendre.nodes_and_weights, hermite.nodes_and_weights])
         self.assertAlmostEqual(quad.apply(lambda xs: xs[0] ** 12 * xs[1] ** 4), result_own_hl, places=10,
                                msg="OWN Legendre Hermite = Hermite Legendre!")
 
-        quad = QuadratureRule(4, own.OpenNonNesting(), [hermite.nodes_and_weights, legendre.nodes_and_weights,
-                                                        laguerre.nodes_and_weights])
+        quad = SparseQuadrature(4, own.OpenNonNesting(), [hermite.nodes_and_weights, legendre.nodes_and_weights,
+                                                          laguerre.nodes_and_weights])
         self.assertAlmostEqual(quad.apply(lambda xs: xs[0] ** 4 * xs[1] ** 12 * xs[2] ** 2), 0.090000000000027,
                                places = 10, msg="ONN Hermite Legendre Laguerre")
 
