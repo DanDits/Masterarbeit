@@ -6,10 +6,19 @@ from util.quadrature.helpers import multi_index_bounded_sum
 
 class QuadratureRule:
 
-    def get_nodes_count(self):
-        raise NotImplementedError
+    def apply_to_all_nodes_simultaneously(self, function):
+        return self.get_weights().dot(function(self.get_nodes()))
 
     def apply(self, function):
+        return self.get_weights().dot(np.apply_along_axis(function, 1, self.get_nodes()))
+
+    def get_nodes(self):
+        raise NotImplementedError
+
+    def get_weights(self):
+        raise NotImplementedError
+
+    def get_nodes_count(self):
         raise NotImplementedError
 
 
@@ -24,11 +33,14 @@ class FullTensorQuadrature(QuadratureRule):
         self.nodes = np.array([grid_nodes for grid_nodes in product(*nodes_list)])
         self.weights = np.array([mul_prod(grid_weights) for grid_weights in product(*weights_list)])
 
+    def get_nodes(self):
+        return self.nodes
+
     def get_nodes_count(self):
         return len(self.weights)
 
-    def apply(self, function):
-        return self.weights.dot(np.apply_along_axis(function, 1, self.nodes))
+    def get_weights(self):
+        return self.weights
 
 
 def centralize_index(index, length):
@@ -40,7 +52,7 @@ class CentralizedDiamondQuadrature(QuadratureRule):
     def __init__(self, chaos_list, sum_bound, even):
         nodes_list, weights_list = [], []
         length = sum_bound + 1  # ignore lengths and use sum_bound+1 for every dimension to ensure we can index!
-        nodes_weights_pairs = [chaos.nodes_and_weights(length) for chaos in chaos_list]
+        nodes_weights_pairs = [chaos.poly_basis.nodes_and_weights(length) for chaos in chaos_list]
         # for every multi index we add one nodes tuple to the list, so we will later have the same
         # amount of nodes/weights as we have basis polynomials.
         if even:
@@ -61,11 +73,14 @@ class CentralizedDiamondQuadrature(QuadratureRule):
         self.nodes = np.array(nodes_list)
         self.weights = np.array(weights_list)
 
+    def get_nodes(self):
+        return self.nodes
+
     def get_nodes_count(self):
         return len(self.weights)
 
-    def apply(self, function):
-        return self.weights.dot(np.apply_along_axis(function, 1, self.nodes))
+    def get_weights(self):
+        return self.weights
 
 
 # adapted from code from https://people.sc.fsu.edu/~jburkardt/m_src/sandia_sparse/sandia_sparse.html
@@ -78,8 +93,11 @@ class SparseQuadrature(QuadratureRule):
         self.nodes, self.weights = self.nesting.calculate_nodes_and_weights(self.dim_num, self.level_max,
                                                                             nodes_and_weights_funcs)
 
+    def get_nodes(self):
+        return self.nodes
+
     def get_nodes_count(self):
         return len(self.weights)
 
-    def apply(self, function):
-        return self.weights.dot(np.apply_along_axis(function, 1, self.nodes))
+    def get_weights(self):
+        return self.weights

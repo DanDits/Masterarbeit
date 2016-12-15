@@ -1,34 +1,32 @@
 import numpy as np
-import demo.stochastic_trials as st
-import polynomial_chaos.poly_chaos_distributions as pcd
 from numpy.linalg import eigh
 from scipy.linalg import expm
 from diff_equation.solver_config import SolverConfig
 from diff_equation.pseudospectral_solver import WaveSolverConfig
 from functools import partial
 from diff_equation.splitting import Splitting
+import polynomial_chaos.multivariation as mv
+from polynomial_chaos.poly_chaos_distributions import get_chaos_by_distribution
+from util.quadrature.helpers import multi_index_bounded_sum_length
+from util.quadrature.rules import QuadratureRule
 
 
-# calculates 1d expectancy using quadrature rule defined by chaos' poly basis
-def calculate_expectancy_fast(function, quadrature_nodes, quadrature_weights):
-    return np.inner(quadrature_weights[:, 0], function(quadrature_nodes)[:, 0])
+# TODO currently only for one spatial dimension
 
-
-def calculate_function_expectancy(function, expectancy_params):
-    return calculate_expectancy_fast(function, expectancy_params[0], expectancy_params[1])
-
-
-def get_evaluated_poly(cache, basis, i, expectancy_params):
-    quadrature_nodes = expectancy_params[0]
-    if len(quadrature_nodes) != cache.get("quadrature_nodes_count", 0):
-        cache.clear()  # TODO also same name of nodes as amount alone does not notify if distribution changes e.g.
-        cache["quadrature_nodes_count"] = len(quadrature_nodes)
+def get_evaluated_poly(cache, basis, i, chaos):
+    rule = chaos.quadrature_rule  # type: QuadratureRule
+    if (rule.get_nodes_count() != cache.get("quadrature_nodes_count", 0)
+        or chaos.poly_basis.name != cache.get("poly_basis_name", "")):
+        cache.clear()
+        cache["quadrature_nodes_count"] = rule.get_nodes_count()
+        cache["poly_basis_name"] = chaos.poly_basis.name
         print("CLEARING CACHE!")
     cached_evaluated_polys = cache.get("evaluated_polys")
     if cached_evaluated_polys is None:
         cached_evaluated_polys = []
         cache["evaluated_polys"] = cached_evaluated_polys
     if len(cached_evaluated_polys) <= i:
+        quadrature_nodes = rule.get_nodes()
         for j in range(len(cached_evaluated_polys), i + 1):
             print("NEW IN CACHE:", j)
             cached_evaluated_polys.append(np.apply_along_axis(basis[i], 1, quadrature_nodes))
@@ -36,51 +34,39 @@ def get_evaluated_poly(cache, basis, i, expectancy_params):
 
 
 # max_poly_degree is also called N in comments in order to conform with literature and because it is shorter
-def galerkin_expectancy(trial, max_poly_degree, domain, grid_size, start_time, stop_time, delta_time,
-                        quadrature_nodes_count, wave_weight, cache=None):
+def galerkin_expectancy(trial, max_poly_degree, domain, grid_size, start_time, stop_time, delta_time, wave_weight,
+                        quadrature_method, quadrature_param, cache=None):
     trial.flag_raw_attributes = True
-
+    sum_bound = max_poly_degree
+    distrs = trial.variable_distributions
     # calculate symmetric matrix A where a_ik=E[alpha(y)phi_i(y)phi_k(y)]
-    chaos = pcd.get_chaos_by_distribution(trial.variable_distributions[0])
-    basis = [chaos.normalized_basis(i) for i in range(max_poly_degree + 1)]
+    chaos = mv.chaos_multify([get_chaos_by_distribution(distr) for distr in distrs], sum_bound)
+    chaos.init_quadrature_rule(quadrature_method, quadrature_param)
 
-    # TODO do not use nodes and weights directly but integrate method of chaos
-    nodes, weights = chaos.nodes_and_weights(quadrature_nodes_count)
-    nodes = nodes.reshape((nodes.shape[0], 1))  # to allow for future multivariate nodes and weights
-    weights = weights.reshape((weights.shape[0], 1))
-    expectancy_params = (nodes, weights)
+    poly_count = multi_index_bounded_sum_length(len(distrs), sum_bound)
+    basis = [chaos.normalized_basis(i) for i in range(poly_count)]
+
     if cache is None:
         cache = {}
-    wave_speeds, matrix_s = calculate_wave_speed_transform(trial, basis, max_poly_degree, expectancy_params, cache)
-    function_b = lambda xs: matrix_b(trial, xs, basis, max_poly_degree, expectancy_params, cache)
+    wave_speeds, matrix_s = calculate_wave_speed_transform(trial, basis, max_poly_degree, chaos, cache)
+    function_b = lambda xs: matrix_b(trial, xs, basis, max_poly_degree, chaos, cache)
 
     splitting = make_splitting(domain, grid_size, wave_speeds,
-                               basis, function_b, matrix_s, start_time, trial, expectancy_params, cache, delta_time,
+                               basis, function_b, matrix_s, start_time, trial, chaos, cache, delta_time,
                                wave_weight)
     xs = splitting.solver_configs[0].xs
-
-    exp = None
-    if trial.has_parameter("expectancy"):
-        exp = trial.expectancy(xs, stop_time)
-    elif trial.raw_reference is not None:
-        exp = trial.calculate_expectancy(xs, stop_time, trial.raw_reference)
-    elif trial.has_parameter("expectancy_data"):
-        try:
-            exp = np.load(trial.expectancy_data)  # TODO relativ path wrong here, make demo for galerkin
-        except FileNotFoundError:
-            print("No expectancy data found, should be here!?")
-    return (xs,
-            calculate_expectancy(splitting, chaos.normalization_gamma, stop_time, delta_time),
-            exp)
+    xs_mesh = splitting.solver_configs[0].xs_mesh
+    return (xs, xs_mesh,
+            calculate_expectancy(splitting, chaos.normalization_gamma, stop_time, delta_time))
 
 
-def calculate_expectancy_matrix_sym(expectancy_params, to_expect, max_poly_degree):  # to_expect symmetric in i and k!
+def calculate_expectancy_matrix_sym(chaos, to_expect, max_poly_degree):  # to_expect symmetric in i and k!
     matrix = []
     for i in range(max_poly_degree + 1):
         row = [0] * i  # fill start of row with zeros as we do not want to calculate symmetric entries twice
         # first only calculate upper triangle
         for k in range(i, max_poly_degree + 1):
-            exp_value = calculate_function_expectancy(partial(to_expect, i=i, k=k), expectancy_params)
+            exp_value = chaos.integrate(partial(to_expect, i=i, k=k), function_parameter_is_nodes_matrix=True)
             row.append(exp_value)
         matrix.append(row)
     matrix = np.array(matrix)
@@ -88,19 +74,17 @@ def calculate_expectancy_matrix_sym(expectancy_params, to_expect, max_poly_degre
     return matrix
 
 
-def calculate_wave_speed_transform(trial, basis, max_poly_degree, expectancy_params, cache):
+def calculate_wave_speed_transform(trial, basis, max_poly_degree, chaos, cache):
     # one could use the projected alpha and beta(x) coefficients but
     # if they are no polynomials and the degree is low this leads to negative eigenvalues
-    def transformed_alpha(ys):
-        return [trial.alpha(trial.transform_values(ys))]
 
-    def alpha_expectancy_func(all_ys, i, k):
-        res1 = np.apply_along_axis(transformed_alpha, 1, all_ys)
-        res2 = get_evaluated_poly(cache, basis, i, expectancy_params)
-        res3 = get_evaluated_poly(cache, basis, k, expectancy_params)
+    def alpha_expectancy_func(nodes_matrix, i, k):
+        res1 = np.apply_along_axis(lambda ys: trial.alpha(trial.transform_values(ys)), 1, nodes_matrix)
+        res2 = get_evaluated_poly(cache, basis, i, chaos)
+        res3 = get_evaluated_poly(cache, basis, k, chaos)
         return res1 * res2 * res3
 
-    matrix_a = calculate_expectancy_matrix_sym(expectancy_params, alpha_expectancy_func, max_poly_degree)
+    matrix_a = calculate_expectancy_matrix_sym(chaos, alpha_expectancy_func, max_poly_degree)
 
     # diagonalize A=SDS'
     diag, transform_s = eigh(matrix_a)  # now holds A=S*D*S', S is orthonormal, D a diagonal matrix
@@ -112,18 +96,14 @@ def calculate_wave_speed_transform(trial, basis, max_poly_degree, expectancy_par
 
 
 # calculate symmetric matrix B(x) where b_ik(x)=E[beta(x,y)phi_i(y)phi_k(y)]
-def matrix_b(trial, xs, basis, max_poly_degree, expectancy_params, cache):
-    def transformed_beta(ys):
-        return [trial.beta(xs, trial.transform_values(ys))]
-    # TODO to ensure we get (shape[0],1) everywhere the functions given to apply_along_axis return a single element
-    # TODO list, I guess this hurts performance, can we instead use a vector everywhere (also for evaluated polys)
-    return calculate_expectancy_matrix_sym(expectancy_params,
-                                           lambda all_ys, i, k: (np.apply_along_axis(transformed_beta, 1, all_ys)
-                                                                 * get_evaluated_poly(cache, basis, i,
-                                                                                      expectancy_params)
-                                                                 * get_evaluated_poly(cache, basis, k,
-                                                                                      expectancy_params)),
-                                           max_poly_degree)
+def matrix_b(trial, xs, basis, max_poly_degree, chaos, cache):
+
+    def beta_expectancy_func(nodes_matrix, i, k):
+        res1 = np.apply_along_axis(lambda ys: trial.beta(xs, trial.transform_values(ys)), 1, nodes_matrix)
+        res2 = get_evaluated_poly(cache, basis, i, chaos)
+        res3 = get_evaluated_poly(cache, basis, k, chaos)
+        return res1 * res2 * res3
+    return calculate_expectancy_matrix_sym(chaos, beta_expectancy_func, max_poly_degree)
 
 
 class MultiWaveSolver(SolverConfig):
@@ -183,7 +163,6 @@ class MultiLinearOdeSolver(SolverConfig):
         #                    [ ...                       ]
         starting_value_matrix = np.array(u0s + u0ts)
 
-        # TODO currently only for one spatial dimension (like lots of other code for galerkin...)
         def solution_at(time):
             positions, velocities = [], []
             # as the matrix b is dependent on x, we have to solve it for every x individually
@@ -202,39 +181,42 @@ class MultiLinearOdeSolver(SolverConfig):
         self.solver = solution_at
 
 
-def get_projection_coefficients(function, project_trial, basis, expectancy_params, cache):
-    def transformed_function(ys):
-        return [function(project_trial.transform_values(ys))]
+def get_projection_coefficients(function, project_trial, basis, chaos, cache):
+    def vectorized_func(ys):
+        vec_result = function(project_trial.transform_values(ys))
+        return vec_result
 
-    return [calculate_function_expectancy(lambda all_ys: (np.apply_along_axis(transformed_function, 1, all_ys)
-                                                          * get_evaluated_poly(cache, basis, i, expectancy_params)),
-                                          expectancy_params)
+    def integrate_func(nodes_matrix, i):
+        res1 = np.apply_along_axis(vectorized_func, 1, nodes_matrix)
+        res2 = get_evaluated_poly(cache, basis, i, chaos)
+        return res1 * res2
+    return [chaos.integrate(partial(integrate_func, i=i), function_parameter_is_nodes_matrix=True)
             for i in range(len(basis))]
 
 
 def get_starting_value_coefficients(xs_mesh, starting_value_func, project_trial, matrix_s_transposed,
-                                    basis, expectancy_params, cache):
-    # TODO only for one spatial dimension currently
+                                    basis, chaos, cache):
     coefficients = []
     for x in xs_mesh[0]:
-        current_func = lambda ys: starting_value_func([x], ys)
+        def current_func(ys):
+            return starting_value_func([x], ys)
         # if starting_value_func does not depend on ys, then only the first coeff will be nonzero
-        coeff = get_projection_coefficients(current_func, project_trial, basis, expectancy_params, cache)
-
+        coeff = get_projection_coefficients(current_func, project_trial, basis, chaos, cache)
         coeffs = matrix_s_transposed.dot(coeff)
         coefficients.append(coeffs)
     return list(map(np.array, zip(*coefficients)))  # transpose and convert to vectors, we want a list of length N+1
 
 
 def make_splitting(domain, grid_size, wave_speeds, basis, function_b, matrix_s, start_time, trial,
-                   expectancy_params, cache, delta_time, wave_weight=0.5):
+                   chaos, cache, delta_time, wave_weight=0.5):
     multi_wave_config = MultiWaveSolver(domain, [grid_size], wave_speeds, wave_weight)
     multi_ode_config = MultiLinearOdeSolver(domain, [grid_size], function_b, matrix_s, 1. - wave_weight)
     transposed_s = matrix_s.transpose()
     start_positions = get_starting_value_coefficients(multi_wave_config.xs_mesh, trial.start_position,
-                                                      trial, transposed_s, basis, expectancy_params, cache)
+                                                      trial, transposed_s, basis, chaos, cache)
+
     start_velocities = get_starting_value_coefficients(multi_wave_config.xs_mesh, trial.start_velocity,
-                                                       trial, transposed_s, basis, expectancy_params, cache)
+                                                       trial, transposed_s, basis, chaos, cache)
     splitting = Splitting.make_fast_strang(multi_wave_config, multi_ode_config, "FastStrangGalerkin",
                                            start_time, start_positions, start_velocities, delta_time)
     splitting.matrix_s = matrix_s
@@ -253,50 +235,3 @@ def calculate_expectancy(splitting, normalization_gamma, stop_time, delta_time):
     # in literature this sqrt(gamma(0)) is often forgotten, but this is mainly because it is 1 for most(all?) chaos'
     expectancy = np.sqrt(normalization_gamma(0)) * np.array([coeffs[0] for coeffs in grid_coeffs])
     return expectancy
-
-
-def test(plot=True):
-    from util.analysis import error_l2
-    domain = [(-np.pi, np.pi)]
-    trial = st.trial_discont
-    grid_size = trial.get_parameter("grid_size", 128)
-    start_time = 0.
-    stop_time = trial.get_parameter("stop_time", 0.5)
-    delta_times = [0.1, 0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001]
-    max_poly_degrees = [0, 1, 2, 3, 4, 5, 10, 15, 20]
-    wave_weight = 0.5  # does not seem to have much influence (at least on trial5); but can have on stability as this problem is kinda irregular!
-    quadrature_nodes_count = 50
-    if plot:
-        import matplotlib.pyplot as plt
-        plt.figure()
-        plt.title("Galerkin Error to expectancy for {}, T={}, grid={}, wave_weight={}"
-                  .format(trial.name, stop_time, grid_size, wave_weight))
-        plt.xlabel("1/Delta_time")
-        plt.ylabel("discrete l2 error")
-        plt.xscale('log')
-        plt.yscale('log')
-    cache = {}
-    for max_poly_degree in max_poly_degrees:
-        errors = []
-        for delta_time in delta_times:
-            xs, exp, trial_exp = galerkin_expectancy(trial, max_poly_degree, domain, grid_size,
-                                                     start_time, stop_time, delta_time, quadrature_nodes_count,
-                                                     wave_weight, cache)
-
-            error = error_l2(exp, trial_exp)
-            errors.append(error)
-            print("Degree={}, Q nodes={}, dt={}, error={}".format(max_poly_degree, quadrature_nodes_count,
-                                                                  delta_time, error))
-        print("errors for {}".format(trial.name), errors)
-        if plot:
-            plt.plot(1. / np.array(delta_times), errors, "-", label="max poly degree={}".format(max_poly_degree))
-
-    if plot:
-        plt.ylim((1E-13, 1.))
-        plt.legend()
-        plt.show()
-
-
-#import tests.profile_execute as profile
-#profile.profile_function(partial(test, False), 'galerkin5.dump')
-test()

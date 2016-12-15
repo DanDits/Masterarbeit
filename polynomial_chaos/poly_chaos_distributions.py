@@ -31,9 +31,11 @@ class PolyChaosDistribution:
             sum_bound, even = param
             self.quadrature_rule = CentralizedDiamondQuadrature([self], sum_bound, even)
 
-    def integrate(self, function):
+    def integrate(self, function, function_parameter_is_nodes_matrix=False):
         if self.quadrature_rule is None:
             raise ValueError("Quadrature rule not yet initialized.")
+        if function_parameter_is_nodes_matrix:
+            return self.quadrature_rule.apply_to_all_nodes_simultaneously(function)
         return self.quadrature_rule.apply(function)
 
 

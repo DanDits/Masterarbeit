@@ -9,9 +9,8 @@ from util.quadrature.helpers import multi_index_bounded_sum_length
 from functools import lru_cache
 
 
-def discrete_projection_expectancy(trial, max_poly_degree, random_space_quadrature_nodes_counts, spatial_domain,
-                                   grid_size, start_time, stop_time, delta_time,
-                                   expectancy_only=False, wave_weight=0.5):
+def discrete_projection_expectancy(trial, max_poly_degree, method, method_param, spatial_domain,
+                                   grid_size, start_time, stop_time, delta_time, wave_weight=0.5):
     sum_bound = max_poly_degree
     distrs = trial.variable_distributions
     for distr in distrs:
@@ -19,13 +18,11 @@ def discrete_projection_expectancy(trial, max_poly_degree, random_space_quadratu
     chaos = mv.chaos_multify([get_chaos_by_distribution(distr) for distr in distrs], sum_bound)
 
     # the centralized minimal node approach does not work for quadrature, only for interpolation
-    chaos.init_quadrature_rule("sparse", 2)
+    chaos.init_quadrature_rule(method, method_param)
+    quad_points = chaos.quadrature_rule.get_nodes_count()
 
-    if expectancy_only:
-        poly_count = 1
-    else:
-        poly_count = multi_index_bounded_sum_length(len(distrs), sum_bound)
-        print("Poly count=", poly_count)
+    poly_count = multi_index_bounded_sum_length(len(distrs), sum_bound)
+    print("Poly count=", poly_count)
     basis = [chaos.poly_basis.polys(degree) for degree in range(poly_count)]
 
     poly_weights = []
@@ -33,6 +30,7 @@ def discrete_projection_expectancy(trial, max_poly_degree, random_space_quadratu
     splitting_xs_mesh = None
     solution_shape = None
     debug_counter = 0
+
     @lru_cache(maxsize=None)
     def solution_at_node(nodes):
         nonlocal splitting_xs, splitting_xs_mesh, solution_shape, debug_counter
@@ -66,4 +64,4 @@ def discrete_projection_expectancy(trial, max_poly_degree, random_space_quadratu
     def poly_approximation(y):
         return np.reshape(sum(w * p(y) for w, p in zip(poly_weights, basis)), solution_shape)
 
-    return splitting_xs, splitting_xs_mesh, expectancy, variance
+    return splitting_xs, splitting_xs_mesh, expectancy, variance, quad_points

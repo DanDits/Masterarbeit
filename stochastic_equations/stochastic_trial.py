@@ -77,6 +77,25 @@ class StochasticTrial(Trial):
         """
         self.rvalues = [rvar(distr.generate()) for rvar, distr in zip(self.rvars, self.variable_distributions)]
 
+    def obtain_evaluated_expectancy(self, xs, xs_mesh, time):
+        if self.has_parameter("expectancy"):
+            return self.expectancy(xs_mesh, time)
+        elif self.raw_reference is not None:
+            return self.calculate_expectancy(xs, time, self.raw_reference)
+        elif self.has_parameter("expectancy_data"):
+            try:
+                return np.load(self.expectancy_data)
+            except FileNotFoundError:
+                print("No expectancy data found, should be here!?")
+
+    def obtain_evaluated_variance(self, xs, xs_mesh, time):
+        if self.has_parameter("variance"):
+            return self.variance(xs_mesh, time)
+        elif self.has_parameter("variance_data"):
+            try:
+                return np.load(self.variance_data)
+            except FileNotFoundError:
+                print("No variance data found, should be here!?")
 
 # TODO compare nquad with custom gauss QF, maybe instead use custom QF with >50 nodes
     def calculate_expectancy(self, xs_lines, t, function):

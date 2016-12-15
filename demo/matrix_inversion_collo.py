@@ -1,19 +1,16 @@
 import numpy as np
 from itertools import repeat
 from util.quadrature.helpers import multi_index_bounded_sum_length
-from stochastic_equations.collocation.discrete_projection import discrete_projection_expectancy
 from stochastic_equations.collocation.interpolation import matrix_inversion_expectancy
 import matplotlib.pyplot as plt
 from util.analysis import error_l2
-from util.storage import save_fig
 import demo.stochastic_trials as st
-
 
 trial = st.trial_4
 
 # "High order is not the same as high accuracy. High order translates to high accuracy only when the integrand
 # is very smooth" (http://apps.nrbook.com/empanel/index.html?pg=179#)
-N = list(range(6))  # maximum degree of the polynomial, so N+1 polynomials
+N = list(range(5))  # maximum degree of the univariate polynomial
 # from n+1 to n+10 notably difference for most examples
 
 # number of nodes in random space, >= N+1, higher CAN give more accuracy (for higher polys)
@@ -25,8 +22,6 @@ N = list(range(6))  # maximum degree of the polynomial, so N+1 polynomials
 M = [(int(np.ceil(multi_index_bounded_sum_length(len(trial.variable_distributions), n)
                   ** (1 / len(trial.variable_distributions)))),) * len(trial.variable_distributions)
      for n in N]
-# number of nodes and weights used for discrete projection's quadrature formula
-Q = [(n + 1,) * len(trial.variable_distributions) for n in N]
 
 spatial_dimension = 1
 grid_size = trial.get_parameter("grid_size", 128)
@@ -37,49 +32,27 @@ stop_time = trial.get_parameter("stop_time", 0.5)
 delta_time = trial.get_parameter("delta_time", 0.001)
 
 rank_frac = None
-exp_var_results_mi, exp_var_results_dp, rank_fracs = [], [], []
-for n, m, q in zip(N, M, Q):
-    print("n,m,q=", n, m, q)
-    """result_xs, result_xs_mesh, mi_expectancy, mi_variance, mi_rank_frac = matrix_inversion_expectancy(trial, n, m,
+exp_var_results_mi, rank_fracs = [], []
+for n, m in zip(N, M):
+    print("n,m=", n, m)
+    # TODO matrix_inversion_expectancy currently not usable
+    result_xs, result_xs_mesh, mi_expectancy, mi_variance, mi_rank_frac = matrix_inversion_expectancy(trial, n, m,
                                                                                                       spatial_domain,
                                                                                                       grid_size,
                                                                                                       start_time,
                                                                                                       stop_time,
-                                                                                                      delta_time)"""
-    result_xs, result_xs_mesh, dp_expectancy, dp_variance = discrete_projection_expectancy(trial, n, q,
-                                                                       spatial_domain, grid_size,
-                                                                       start_time, stop_time,
-                                                                       delta_time,
-                                                                       expectancy_only=False)
-    #exp_var_results_mi.append((n, m, mi_expectancy, mi_variance))
-    exp_var_results_dp.append((n, q, dp_expectancy, dp_variance))
-    #rank_fracs.append(mi_rank_frac)
+                                                                                                      delta_time)
+    exp_var_results_mi.append((n, m, mi_expectancy, mi_variance))
+    rank_fracs.append(mi_rank_frac)
 rank_fractions = list(map(lambda frac: 10 ** ((frac - 1) * 10),
                           rank_fracs))  # rescale to make visible in logarithmic scale
 
 print("Plotting:")
-trial_expectancy = None
-if trial.has_parameter("expectancy"):
-    trial_expectancy = trial.expectancy(result_xs_mesh, stop_time)
-elif trial.raw_reference is not None:
-    print("Calculating expectancy")
-    trial_expectancy = trial.calculate_expectancy(result_xs, stop_time, trial.raw_reference)
-elif trial.has_parameter("expectancy_data"):
-    try:
-        trial_expectancy = np.load(trial.expectancy_data)
-    except FileNotFoundError:
-        print("No expectancy data found, should be here!?")
-trial_variance = None
-if trial.has_parameter("variance"):
-    trial_variance = trial.variance(result_xs_mesh, stop_time)
-elif trial.has_parameter("variance_data"):
-    try:
-        trial_variance = np.load(trial.variance)
-    except FileNotFoundError:
-        print("No variance data found, should be here!?")
+trial_expectancy = trial.obtain_evaluated_expectancy(result_xs, result_xs_mesh, stop_time)
+trial_variance = trial.obtain_evaluated_variance(result_xs, result_xs_mesh, stop_time)
 
 plt.figure()
-plt.title("Expectancies, spatial grid size={}, {}, T={}".format(grid_size, trial.name, stop_time))
+plt.title("Expectancies by {}, spatial grid size={}, {}, T={}".format(method, grid_size, trial.name, stop_time))
 errors_mi, errors_variance_mi, errors_dp, errors_variance_dp = [], [], [], []
 for n, m, expectancy, variance in exp_var_results_mi:
     error = -1
@@ -129,4 +102,6 @@ if len(errors_dp) > 0 or len(errors_mi) > 0:
     plt.yscale('log')
     plt.legend()
     plt.xlabel('Maximum polynom degree')
+    for error, n, quad_points in zip(errors_dp, N, sparse_quad_points):
+        plt.text(n, error, "QP={}".format(quad_points))
 plt.show()
