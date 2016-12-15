@@ -201,8 +201,10 @@ def make_jacobi(alpha, beta):
             # uniform distribution so legendre nodes and weights
             return calculate_nodes_and_weights(np.zeros(degree), np.arange(1, degree) ** 2
                                                / (4 * (np.arange(1, degree) ** 2) - 1))
-
-        first_term = ((beta ** 2 - alpha ** 2) / ((2 * np.arange(degree) + alpha + beta)
+        if np.allclose([alpha + beta], [0.]):
+            first_term = np.append((beta - alpha) / 2, np.zeros(degree - 1))
+        else:
+            first_term = ((beta ** 2 - alpha ** 2) / ((2 * np.arange(degree) + alpha + beta)
                                                   * (2 * np.arange(degree) + 2 + alpha + beta)))
 
         if np.allclose([alpha + beta], [-1.]):  # second term would have division by zero in second term for n=1
@@ -229,3 +231,8 @@ def make_jacobi(alpha, beta):
                       params=(alpha, beta))
     return basis
 
+
+# legendre nodes are the same, weights are off by factor 2 due to our scaling by distribution weight
+# laguerre nodes are the same, weights are off by factor gamma(alpha) due to our scaling by distribution weight
+# hermite nodes are off by a factor sqrt(2) as we use e^(x^2/2) instead of e^(x^2), weights are off by factor sqrt(pi)
+# jacobi nodes are same except for EW 0, because we shifted domain from (0,1) to (-1,1)? # TODO explain this

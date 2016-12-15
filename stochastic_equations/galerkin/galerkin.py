@@ -45,11 +45,10 @@ def galerkin_expectancy(trial, max_poly_degree, domain, grid_size, start_time, s
 
     poly_count = multi_index_bounded_sum_length(len(distrs), sum_bound)
     basis = [chaos.normalized_basis(i) for i in range(poly_count)]
-
     if cache is None:
         cache = {}
-    wave_speeds, matrix_s = calculate_wave_speed_transform(trial, basis, max_poly_degree, chaos, cache)
-    function_b = lambda xs: matrix_b(trial, xs, basis, max_poly_degree, chaos, cache)
+    wave_speeds, matrix_s = calculate_wave_speed_transform(trial, basis, poly_count, chaos, cache)
+    function_b = lambda xs: matrix_b(trial, xs, basis, poly_count, chaos, cache)
 
     splitting = make_splitting(domain, grid_size, wave_speeds,
                                basis, function_b, matrix_s, start_time, trial, chaos, cache, delta_time,
@@ -60,12 +59,13 @@ def galerkin_expectancy(trial, max_poly_degree, domain, grid_size, start_time, s
             calculate_expectancy(splitting, chaos.normalization_gamma, stop_time, delta_time))
 
 
-def calculate_expectancy_matrix_sym(chaos, to_expect, max_poly_degree):  # to_expect symmetric in i and k!
+def calculate_expectancy_matrix_sym(chaos, to_expect, poly_count):  # to_expect symmetric in i and k!
     matrix = []
-    for i in range(max_poly_degree + 1):
+
+    for i in range(poly_count):
         row = [0] * i  # fill start of row with zeros as we do not want to calculate symmetric entries twice
         # first only calculate upper triangle
-        for k in range(i, max_poly_degree + 1):
+        for k in range(i, poly_count):
             exp_value = chaos.integrate(partial(to_expect, i=i, k=k), function_parameter_is_nodes_matrix=True)
             row.append(exp_value)
         matrix.append(row)
@@ -74,7 +74,7 @@ def calculate_expectancy_matrix_sym(chaos, to_expect, max_poly_degree):  # to_ex
     return matrix
 
 
-def calculate_wave_speed_transform(trial, basis, max_poly_degree, chaos, cache):
+def calculate_wave_speed_transform(trial, basis, poly_count, chaos, cache):
     # one could use the projected alpha and beta(x) coefficients but
     # if they are no polynomials and the degree is low this leads to negative eigenvalues
 
@@ -84,7 +84,7 @@ def calculate_wave_speed_transform(trial, basis, max_poly_degree, chaos, cache):
         res3 = get_evaluated_poly(cache, basis, k, chaos)
         return res1 * res2 * res3
 
-    matrix_a = calculate_expectancy_matrix_sym(chaos, alpha_expectancy_func, max_poly_degree)
+    matrix_a = calculate_expectancy_matrix_sym(chaos, alpha_expectancy_func, poly_count)
 
     # diagonalize A=SDS'
     diag, transform_s = eigh(matrix_a)  # now holds A=S*D*S', S is orthonormal, D a diagonal matrix
@@ -96,14 +96,14 @@ def calculate_wave_speed_transform(trial, basis, max_poly_degree, chaos, cache):
 
 
 # calculate symmetric matrix B(x) where b_ik(x)=E[beta(x,y)phi_i(y)phi_k(y)]
-def matrix_b(trial, xs, basis, max_poly_degree, chaos, cache):
+def matrix_b(trial, xs, basis, poly_count, chaos, cache):
 
     def beta_expectancy_func(nodes_matrix, i, k):
         res1 = np.apply_along_axis(lambda ys: trial.beta(xs, trial.transform_values(ys)), 1, nodes_matrix)
         res2 = get_evaluated_poly(cache, basis, i, chaos)
         res3 = get_evaluated_poly(cache, basis, k, chaos)
         return res1 * res2 * res3
-    return calculate_expectancy_matrix_sym(chaos, beta_expectancy_func, max_poly_degree)
+    return calculate_expectancy_matrix_sym(chaos, beta_expectancy_func, poly_count)
 
 
 class MultiWaveSolver(SolverConfig):

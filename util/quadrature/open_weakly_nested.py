@@ -93,6 +93,7 @@ def sparse_grid(dim_num: int, level_min2: int, level_max: int, point_num: int, n
                     # bruteforce search range(point_num2) we make the order smarter
                     # this SIGNIFICANTLY improves speed, as np.allclose is in the innermost loop and quite costly
                     for point2 in chain([last_point3 + 1], range(last_point3 + 1), range(last_point3 + 2, point_num2)):
+                        diff = grid_point[:, point2] - grid_point_temp
                         if np.allclose(grid_point[:, point2], grid_point_temp):
                             point3 = point2
                             last_point3 = point3

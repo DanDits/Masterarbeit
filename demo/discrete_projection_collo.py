@@ -6,7 +6,7 @@ from util.analysis import error_l2
 import demo.stochastic_trials as st
 
 
-trial = st.trial_4
+trial = st.trial_6
 
 N = list(range(6))  # maximum degree of the univariate polynomial
 
