@@ -15,12 +15,6 @@ from util.quadrature.rules import QuadratureRule
 
 def get_evaluated_poly(cache, basis, i, chaos):
     rule = chaos.quadrature_rule  # type: QuadratureRule
-    if (rule.get_nodes_count() != cache.get("quadrature_nodes_count", 0)
-        or chaos.poly_basis.name != cache.get("poly_basis_name", "")):
-        cache.clear()
-        cache["quadrature_nodes_count"] = rule.get_nodes_count()
-        cache["poly_basis_name"] = chaos.poly_basis.name
-        print("CLEARING CACHE!")
     cached_evaluated_polys = cache.get("evaluated_polys")
     if cached_evaluated_polys is None:
         cached_evaluated_polys = []
@@ -59,18 +53,27 @@ def galerkin_expectancy(trial, max_poly_degree, domain, grid_size, start_time, s
             calculate_expectancy(splitting, chaos.normalization_gamma, stop_time, delta_time))
 
 
-def calculate_expectancy_matrix_sym(chaos, to_expect, poly_count):  # to_expect symmetric in i and k!
-    matrix = []
+def calculate_expectancy_matrix_sym(chaos, to_expect, to_expect_name, poly_count, cache):  # to_expect symmetric in i and k!
 
+    def get_n_cache(i, k):
+        # assert i <= k
+        if cache.get(to_expect_name) is None:
+            cache[to_expect_name] = dict()
+        coeffs = cache[to_expect_name]
+        combi = (i, k)
+        if combi in coeffs:
+            return coeffs[combi]
+        coeffs[combi] = chaos.integrate(partial(to_expect, i=i, k=k), function_parameter_is_nodes_matrix=True)
+        return coeffs[combi]
+
+    matrix = np.empty((poly_count, poly_count))
     for i in range(poly_count):
-        row = [0] * i  # fill start of row with zeros as we do not want to calculate symmetric entries twice
         # first only calculate upper triangle
         for k in range(i, poly_count):
-            exp_value = chaos.integrate(partial(to_expect, i=i, k=k), function_parameter_is_nodes_matrix=True)
-            row.append(exp_value)
-        matrix.append(row)
-    matrix = np.array(matrix)
-    matrix += np.triu(matrix, 1).transpose()  # make upper triangle matrix symmetric
+            exp_value = get_n_cache(i, k)
+            # we expect the function to be symmetric in i and k
+            matrix[i, k] = exp_value
+            matrix[k, i] = exp_value
     return matrix
 
 
@@ -84,11 +87,15 @@ def calculate_wave_speed_transform(trial, basis, poly_count, chaos, cache):
         res3 = get_evaluated_poly(cache, basis, k, chaos)
         return res1 * res2 * res3
 
-    matrix_a = calculate_expectancy_matrix_sym(chaos, alpha_expectancy_func, poly_count)
+    matrix_a = calculate_expectancy_matrix_sym(chaos, alpha_expectancy_func, "alpha_func", poly_count, cache)
 
     # diagonalize A=SDS'
     diag, transform_s = eigh(matrix_a)  # now holds A=S*D*S', S is orthonormal, D a diagonal matrix
     # eigenvalues in D are positive and bounded by the extrema of alpha(y)
+    if any(diag < 0):
+        # TODO how did we get negative eigenvalues? maybe caching for multivariate different as same index does
+        # TODO not imply same polynomial when sum_bound changed? YES, clear cache for other sum_bound
+        print("Got negative eigenvalues! Matrix:", matrix_a, "poly_count:", poly_count, "Chaos:", chaos.poly_basis.name)
     wave_speeds = np.sqrt(diag)
     # print("DIag:", diag, "Transform:", transform_s)
     # print("Should be zero matrix:", transform_s.dot(np.diag(diag)).dot(transform_s.transpose()) - matrix_a)
@@ -103,7 +110,8 @@ def matrix_b(trial, xs, basis, poly_count, chaos, cache):
         res2 = get_evaluated_poly(cache, basis, i, chaos)
         res3 = get_evaluated_poly(cache, basis, k, chaos)
         return res1 * res2 * res3
-    return calculate_expectancy_matrix_sym(chaos, beta_expectancy_func, poly_count)
+    # TODO not best hashing by converting float to str..
+    return calculate_expectancy_matrix_sym(chaos, beta_expectancy_func, "beta_func" + str(xs), poly_count, cache)
 
 
 class MultiWaveSolver(SolverConfig):
@@ -141,11 +149,13 @@ class MultiLinearOdeSolver(SolverConfig):
         self.base_matrix_z[:self.w_length, self.w_length:] = np.eye(self.w_length) * self.splitting_factor
         self.matrix_z_for_xs = []
         negative_transposed_s = -self.matrix_s.transpose()
+        print("Starting initializing MultiLinear solver...")
         for x in self.xs[0]:
             current_z = np.copy(self.base_matrix_z)
             current_z[self.w_length:, :self.w_length] = negative_transposed_s.dot(self.function_b([x])
                                                                                   .dot(self.matrix_s))
             self.matrix_z_for_xs.append(current_z)
+            print("...progress", len(self.matrix_z_for_xs), "/", len(self.xs[0]))
         self.last_delta_time = 0
         self.matrix_expm_z_dt_for_xs = None
 
@@ -181,7 +191,7 @@ class MultiLinearOdeSolver(SolverConfig):
         self.solver = solution_at
 
 
-def get_projection_coefficients(function, project_trial, basis, chaos, cache):
+def get_projection_coefficients(function, function_name, project_trial, basis, chaos, cache):
     def vectorized_func(ys):
         vec_result = function(project_trial.transform_values(ys))
         return vec_result
@@ -190,18 +200,29 @@ def get_projection_coefficients(function, project_trial, basis, chaos, cache):
         res1 = np.apply_along_axis(vectorized_func, 1, nodes_matrix)
         res2 = get_evaluated_poly(cache, basis, i, chaos)
         return res1 * res2
-    return [chaos.integrate(partial(integrate_func, i=i), function_parameter_is_nodes_matrix=True)
-            for i in range(len(basis))]
+
+    def get_n_cache(i):
+        if cache.get(function_name) is None:
+            cache[function_name] = []
+        coeffs = cache[function_name]
+        if len(coeffs) > i:
+            return coeffs[i]
+        for j in range(len(coeffs), i + 1):
+            coeff = chaos.integrate(partial(integrate_func, i=j), function_parameter_is_nodes_matrix=True)
+            coeffs.append(coeff)
+        return coeffs[i]
+    return [get_n_cache(i) for i in range(len(basis))]
 
 
-def get_starting_value_coefficients(xs_mesh, starting_value_func, project_trial, matrix_s_transposed,
+def get_starting_value_coefficients(xs_mesh, starting_value_func, starting_value_func_name,
+                                    project_trial, matrix_s_transposed,
                                     basis, chaos, cache):
     coefficients = []
-    for x in xs_mesh[0]:
+    for i, x in enumerate(xs_mesh[0]):
         def current_func(ys):
             return starting_value_func([x], ys)
         # if starting_value_func does not depend on ys, then only the first coeff will be nonzero
-        coeff = get_projection_coefficients(current_func, project_trial, basis, chaos, cache)
+        coeff = get_projection_coefficients(current_func, starting_value_func_name + str(i), project_trial, basis, chaos, cache)
         coeffs = matrix_s_transposed.dot(coeff)
         coefficients.append(coeffs)
     return list(map(np.array, zip(*coefficients)))  # transpose and convert to vectors, we want a list of length N+1
@@ -209,13 +230,17 @@ def get_starting_value_coefficients(xs_mesh, starting_value_func, project_trial,
 
 def make_splitting(domain, grid_size, wave_speeds, basis, function_b, matrix_s, start_time, trial,
                    chaos, cache, delta_time, wave_weight=0.5):
+    # TODO we can cache the configs if only the delta_time or stop_time changed
     multi_wave_config = MultiWaveSolver(domain, [grid_size], wave_speeds, wave_weight)
     multi_ode_config = MultiLinearOdeSolver(domain, [grid_size], function_b, matrix_s, 1. - wave_weight)
     transposed_s = matrix_s.transpose()
-    start_positions = get_starting_value_coefficients(multi_wave_config.xs_mesh, trial.start_position,
+    print("Calculating starting position coefficients...")
+    start_positions = get_starting_value_coefficients(multi_wave_config.xs_mesh,
+                                                      trial.start_position, "start_position",
                                                       trial, transposed_s, basis, chaos, cache)
-
-    start_velocities = get_starting_value_coefficients(multi_wave_config.xs_mesh, trial.start_velocity,
+    print("Calculating starting velocity coefficients...")
+    start_velocities = get_starting_value_coefficients(multi_wave_config.xs_mesh,
+                                                       trial.start_velocity, "start_velocity",
                                                        trial, transposed_s, basis, chaos, cache)
     splitting = Splitting.make_fast_strang(multi_wave_config, multi_ode_config, "FastStrangGalerkin",
                                            start_time, start_positions, start_velocities, delta_time)

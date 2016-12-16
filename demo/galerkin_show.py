@@ -9,8 +9,8 @@ trial = st.trial_4
 grid_size = trial.get_parameter("grid_size", 128)
 start_time = 0.
 stop_time = trial.get_parameter("stop_time", 0.5)
-delta_times = [0.001, 0.0001]
-max_poly_degrees = [0, 1, 2, 3, 4, 5]
+delta_times = [0.01, 0.001, 0.0001]
+max_poly_degrees = [0, 1, 2, 3, 4]
 wave_weight = 1.  # does not seem to have much influence (at least on trial5); but can have on stability as this problem is kinda irregular!
 
 plt.figure()
@@ -22,10 +22,11 @@ plt.xscale('log')
 plt.yscale('log')
 cache = {}
 trial_exp = None
-#quadrature_method = "full_tensor"
-#quadrature_param = [50] * len(trial.variable_distributions)
-quadrature_method = "sparse"
-quadrature_param = 3
+quadrature_method = "full_tensor"
+quadrature_param = [5] * len(trial.variable_distributions)
+#quadrature_method = "sparse"
+#quadrature_param = 4
+
 
 
 for max_poly_degree in max_poly_degrees:

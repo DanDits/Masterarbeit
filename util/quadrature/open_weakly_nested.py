@@ -67,7 +67,7 @@ def sparse_grid(dim_num: int, level_min2: int, level_max: int, point_num: int, n
             grid_base2 = calculate_grid_base2(order_1d)
             order_nd = mul_prod(order_1d)
             grid_weights2 = product_weights(dim_num, order_1d, order_nd, nodes_and_weights_funcs)
-            coeff = ((-1) ** ((level_max - level) % 2)) * comb(dim_num - 1, level_max - level)
+            coeff = ((-1) ** ((level_max - level) % 2)) * comb(dim_num - 1, level_max - level, exact=True)
             offset = calculate_offset(order_1d)
             grid_index2 = multigrid_index(dim_num, order_1d, order_nd, offset)
 
@@ -93,7 +93,6 @@ def sparse_grid(dim_num: int, level_min2: int, level_max: int, point_num: int, n
                     # bruteforce search range(point_num2) we make the order smarter
                     # this SIGNIFICANTLY improves speed, as np.allclose is in the innermost loop and quite costly
                     for point2 in chain([last_point3 + 1], range(last_point3 + 1), range(last_point3 + 2, point_num2)):
-                        diff = grid_point[:, point2] - grid_point_temp
                         if np.allclose(grid_point[:, point2], grid_point_temp):
                             point3 = point2
                             last_point3 = point3
@@ -105,17 +104,17 @@ def sparse_grid(dim_num: int, level_min2: int, level_max: int, point_num: int, n
 
 # For open weakly nestings:
 # A table of amount of nodes used for a combination of dimension and level:
-# level\dimension
-#   1   2       3       4       5
-# 0	1	1	    1	    1	    1
-# 1	3	5	    7	    9	    11
-# 2	7	21	    37	    57	    81
-# 3	15	73	    159	    289	    471
-# 4	31	225	    597	    1,265	2,341
-# 5	63	637	    2,031	4,969	10,363
-# 6	127	1,693	6,405	17,945	41,913
-# 7	255	4,289	19,023	60,577	157,583
-# 8	511	10,473	53,829	193,457	557,693
+# level\dimension, in brackets some improvements to the corresponding full tensor (2**(level+1)-1)**dimension
+#   1       2           3               4       5
+# 0	1(-0)	1(-0)	    1(-0)	        1	    1
+# 1	3(-0)	5(-4)	    7(-20)	        9	    11
+# 2	7(-0)	21(-28)	    37(-306)	    57	    81
+# 3	15(-0)	73(-152)	159(-3216)	    289	    471
+# 4	31	    225	        597	            1,265	2,341
+# 5	63	    637	        2,031	        4,969	10,363
+# 6	127	    1,693	    6,405	        17,945	41,913
+# 7	255	    4,289	    19,023	        60,577	157,583
+# 8	511	    10,473	    53,829	        193,457	557,693
 
 # Testing values: Integrating with hermite nodes and weights (so the integral is implicitly over (-Inf,Inf)^dimension):
 # dimension=1: f(x)=1 integrated is exactly 1.

@@ -5,7 +5,6 @@ from util.quadrature.helpers import multi_index_bounded_sum
 
 
 class QuadratureRule:
-
     def apply_to_all_nodes_simultaneously(self, function):
         return self.get_weights().dot(function(self.get_nodes()))
 
@@ -23,10 +22,11 @@ class QuadratureRule:
 
 
 class FullTensorQuadrature(QuadratureRule):
-    def __init__(self, orders_1d, chaos_list):
-        assert len(orders_1d) == len(chaos_list)
+    def __init__(self, orders_1d, nodes_and_weights_funcs):
+        assert len(orders_1d) == len(nodes_and_weights_funcs)
         # contains [([n11,n12,n13],[w11,w12,w13]), ([n21,n22],[w21,w22])]
-        nodes_weights_pairs = [chaos.poly_basis.nodes_and_weights(order) for order, chaos in zip(orders_1d, chaos_list)]
+        nodes_weights_pairs = [nodes_and_weights(order) for order, nodes_and_weights in zip(orders_1d,
+                                                                                            nodes_and_weights_funcs)]
         nodes_list = [nodes for nodes, _ in nodes_weights_pairs]
         weights_list = [weights for _, weights in nodes_weights_pairs]
         # use full tensor product of all dimensions by using 'product'
@@ -85,7 +85,6 @@ class CentralizedDiamondQuadrature(QuadratureRule):
 
 # adapted from code from https://people.sc.fsu.edu/~jburkardt/m_src/sandia_sparse/sandia_sparse.html
 class SparseQuadrature(QuadratureRule):
-
     def __init__(self, level_max: int, nesting, nodes_and_weights_funcs):
         self.dim_num = len(nodes_and_weights_funcs)
         self.level_max = level_max

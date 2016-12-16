@@ -19,17 +19,31 @@ class PolyChaosDistribution:
         norm_factor = 1. / math.sqrt(self.normalization_gamma(degree))
         return lambda x: (self.poly_basis.polys(degree)(x) * norm_factor)
 
-    def init_quadrature_rule(self, method, param):
+    def get_nodes_and_weights(self, nodes_and_weights_funcs=None):
+        if nodes_and_weights_funcs is None:
+            return [self.poly_basis.nodes_and_weights]
+        return nodes_and_weights_funcs
+
+    def get_nesting(self, sparse_nesting=None):
+        if sparse_nesting is None:
+            return get_nesting_for_name(self.poly_basis.name)
+        return sparse_nesting
+
+    def init_quadrature_rule(self, method, param, nodes_and_weights_funcs=None, sparse_nesting=None):
         if method == "sparse":
-            nesting = get_nesting_for_name(self.poly_basis.name)
+            nesting = self.get_nesting(sparse_nesting)
+            nodes_and_weights_funcs = self.get_nodes_and_weights(nodes_and_weights_funcs)
             level = param
-            self.quadrature_rule = SparseQuadrature(level, nesting, [self.poly_basis.nodes_and_weights])
+            self.quadrature_rule = SparseQuadrature(level, nesting, nodes_and_weights_funcs)
         elif method == "full_tensor":
             orders_1d = param
-            self.quadrature_rule = FullTensorQuadrature([orders_1d], [self])
+            nodes_and_weights_funcs = self.get_nodes_and_weights(nodes_and_weights_funcs)
+            self.quadrature_rule = FullTensorQuadrature(orders_1d, nodes_and_weights_funcs)
         elif method == "centralized":
             sum_bound, even = param
-            self.quadrature_rule = CentralizedDiamondQuadrature([self], sum_bound, even)
+            self.quadrature_rule = CentralizedDiamondQuadrature(self.chaos_list, sum_bound, even)
+        else:
+            raise ValueError("Unknown quadrature method:" + method)
 
     def integrate(self, function, function_parameter_is_nodes_matrix=False):
         if self.quadrature_rule is None:

@@ -7,12 +7,6 @@ from numpy.linalg import lstsq
 import polynomial_chaos.multivariation as mv
 
 
-# nodes in interval (-1,1), increasingly dense at boundary
-def glenshaw_curtis_nodes(size):
-    size += 2  # as we do not want first and last point which would be -1 and 1
-    return -np.cos(np.pi * ((np.arange(2, size) - 1) / (size - 1)))
-
-
 # nodes in interval (-1,1), increasingly dense at boundary. Minimize polynomial prod(x-node_i) in [-1,1]
 def chebyshev_nodes(size):
     return np.cos(np.pi * (np.arange(1, size + 1) * 2 - 1) / (2 * size))

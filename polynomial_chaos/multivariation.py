@@ -4,7 +4,6 @@ from functools import lru_cache
 from polynomial_chaos.poly_chaos_distributions import PolyChaosDistribution
 from polynomial_chaos.poly import PolyBasis
 from polynomial_chaos.distributions import Distribution
-from util.quadrature.rules import FullTensorQuadrature, CentralizedDiamondQuadrature, SparseQuadrature
 from util.quadrature.nesting import get_nesting_for_multiple_names
 from util.quadrature.helpers import multi_index_bounded_sum
 
@@ -14,18 +13,15 @@ class MultivariatePolyChaosDistribution(PolyChaosDistribution):
         super().__init__(poly_basis, distribution, normalization_gamma)
         self.chaos_list = chaos_list
 
-    def init_quadrature_rule(self, method, param):
-        if method == "sparse":
-            nesting = get_nesting_for_multiple_names([chaos.poly_basis.name for chaos in self.chaos_list])
-            nodes_and_weights_funcs = [chaos.poly_basis.nodes_and_weights for chaos in self.chaos_list]
-            level = param
-            self.quadrature_rule = SparseQuadrature(level, nesting, nodes_and_weights_funcs)
-        elif method == "full_tensor":
-            orders_1d = param
-            self.quadrature_rule = FullTensorQuadrature(orders_1d, self.chaos_list)
-        elif method == "centralized":
-            sum_bound, even = param
-            self.quadrature_rule = CentralizedDiamondQuadrature(self.chaos_list, sum_bound, even)
+    def get_nodes_and_weights(self, nodes_and_weights_funcs=None):
+        if nodes_and_weights_funcs is None:
+            return [chaos.poly_basis.nodes_and_weights for chaos in self.chaos_list]
+        return nodes_and_weights_funcs
+
+    def get_nesting(self, sparse_nesting=None):
+        if sparse_nesting is None:
+            return get_nesting_for_multiple_names([chaos.poly_basis.name for chaos in self.chaos_list])
+        return sparse_nesting
 
 
 def poly_basis_multify(basis_list, multi_indices):

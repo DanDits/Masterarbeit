@@ -1,12 +1,14 @@
 import unittest
-from util.quadrature.rules import SparseQuadrature
+from util.quadrature.rules import SparseQuadrature, FullTensorQuadrature
 import util.quadrature.nesting as nst
+from polynomial_chaos.poly import make_hermite, make_laguerre, make_legendre, make_jacobi
+import numpy as np
+from polynomial_chaos.poly_chaos_distributions import legendreChaos
 
 
 class QuadratureTestCase(unittest.TestCase):
 
     def testSparseQuadrature(self):
-        from polynomial_chaos.poly import make_hermite, make_laguerre, make_legendre, make_jacobi
         hermite = make_hermite()
         laguerre = make_laguerre(0.3)
         legendre = make_legendre()
@@ -49,6 +51,22 @@ class QuadratureTestCase(unittest.TestCase):
         dim = 2
         quad = SparseQuadrature(3, nst.get_nesting_for_name("Jacobi"), dim * [jacobi.nodes_and_weights])
         self.assertAlmostEqual(quad.apply(lambda xs: xs[0] ** 2 * xs[1] ** 2), 0.25 * 0.25, places=12, msg="Jacobi 2d")
+
+    def testFullTensorQuadrature(self):
+
+        chaos_list = [legendreChaos, legendreChaos, legendreChaos]
+        nodes_and_weights_funcs = [chaos.poly_basis.nodes_and_weights for chaos in chaos_list]
+        quad = FullTensorQuadrature([4, 4, 3], nodes_and_weights_funcs)
+        self.assertAlmostEqual(quad.apply(lambda xs: np.sin(xs[0] + 0.5) * np.cos(xs[1] + 1) * xs[2] ** 4),
+                               0.0366831, places=7, msg="Legendre^3 simple")
+
+        quad = FullTensorQuadrature([7, 7, 7], nodes_and_weights_funcs)
+        self.assertAlmostEqual(quad.apply(lambda xs: np.sin(xs[0] + 0.5) * np.cos(xs[1] + 1) * xs[2] ** 4),
+                               0.0366831, places=7, msg="Legendre^3 simple big")
+
+        quad = FullTensorQuadrature([7, 7, 7], nodes_and_weights_funcs)
+        self.assertAlmostEqual(quad.apply(lambda xs: np.sin(xs[0] + xs[1] + xs[2] + 0.5) * xs[2] ** 4),
+                               0.0451753, places=7, msg="Legendre^3 connected")
 
 if __name__ == "__main__":
     tc = QuadratureTestCase()
