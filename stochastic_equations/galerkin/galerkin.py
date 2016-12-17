@@ -42,7 +42,7 @@ def galerkin_expectancy(trial, max_poly_degree, domain, grid_size, start_time, s
     if cache is None:
         cache = {}
     wave_speeds, matrix_s = calculate_wave_speed_transform(trial, basis, poly_count, chaos, cache)
-    function_b = lambda xs: matrix_b(trial, xs, basis, poly_count, chaos, cache)
+    function_b = lambda xs, i: matrix_b(trial, xs, i, basis, poly_count, chaos, cache)
 
     splitting = make_splitting(domain, grid_size, wave_speeds,
                                basis, function_b, matrix_s, start_time, trial, chaos, cache, delta_time,
@@ -103,15 +103,19 @@ def calculate_wave_speed_transform(trial, basis, poly_count, chaos, cache):
 
 
 # calculate symmetric matrix B(x) where b_ik(x)=E[beta(x,y)phi_i(y)phi_k(y)]
-def matrix_b(trial, xs, basis, poly_count, chaos, cache):
+def matrix_b(trial, xs, x_number, basis, poly_count, chaos, cache):
+    beta_value_key = "beta_value" + str(x_number)
+    cached_beta_x = cache.get(beta_value_key)
 
     def beta_expectancy_func(nodes_matrix, i, k):
-        res1 = np.apply_along_axis(lambda ys: trial.beta(xs, trial.transform_values(ys)), 1, nodes_matrix)
+        nonlocal cached_beta_x
+        cached_beta_x = np.apply_along_axis(lambda ys: trial.beta(xs, trial.transform_values(ys)), 1, nodes_matrix)
+        if cached_beta_x is None:
+            cache[beta_value_key] = cached_beta_x
         res2 = get_evaluated_poly(cache, basis, i, chaos)
         res3 = get_evaluated_poly(cache, basis, k, chaos)
-        return res1 * res2 * res3
-    # TODO not best hashing by converting float to str..
-    return calculate_expectancy_matrix_sym(chaos, beta_expectancy_func, "beta_func" + str(xs), poly_count, cache)
+        return cached_beta_x * res2 * res3
+    return calculate_expectancy_matrix_sym(chaos, beta_expectancy_func, "beta_func" + str(x_number), poly_count, cache)
 
 
 class MultiWaveSolver(SolverConfig):
@@ -150,9 +154,9 @@ class MultiLinearOdeSolver(SolverConfig):
         self.matrix_z_for_xs = []
         negative_transposed_s = -self.matrix_s.transpose()
         print("Starting initializing MultiLinear solver...")
-        for x in self.xs[0]:
+        for i, x in enumerate(self.xs[0]):
             current_z = np.copy(self.base_matrix_z)
-            current_z[self.w_length:, :self.w_length] = negative_transposed_s.dot(self.function_b([x])
+            current_z[self.w_length:, :self.w_length] = negative_transposed_s.dot(self.function_b([x], i)
                                                                                   .dot(self.matrix_s))
             self.matrix_z_for_xs.append(current_z)
             print("...progress", len(self.matrix_z_for_xs), "/", len(self.xs[0]))

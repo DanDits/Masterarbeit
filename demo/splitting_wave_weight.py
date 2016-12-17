@@ -6,20 +6,20 @@ import matplotlib.pyplot as plt
 import diff_equation.klein_gordon as kg
 
 dimension = 1
-grid_size_N = 64 if dimension >= 2 else 128
+grid_size_N = 2048 * 2
 domain = list(repeat([-np.pi, np.pi], dimension))
 
 
 wave_weights = np.arange(0., 1.001, 0.02)
 trials = [ds.trial_1, ds.trial_2, ds.trial_3, ds.trial_frog]
 start_time = 0.
-delta_time = 0.001
+delta_time = 0.01
 stop_time = 1
 
 xs_mesh = None
 
 plt.figure()
-plt.title("Error per wave weight, dt={}, T={}".format(delta_time, stop_time))
+plt.title("Error per wave weight, dt={}, T={}, grid size={}".format(delta_time, stop_time, grid_size_N))
 plt.xlabel("Wave weight")
 plt.ylabel("Error")
 plt.yscale('log')
