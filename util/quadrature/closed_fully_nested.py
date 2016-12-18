@@ -74,27 +74,21 @@ def levels_index(dim_num: int, level_max: int, point_num: int):
     grid_index = np.zeros((dim_num, point_num), dtype=int)
     grid_base = np.zeros((dim_num, point_num), dtype=int)
 
-    print("PointNum=", point_num, "Dim_num=", dim_num, "LevelMax=", level_max)
     point_num2 = 0
     for level in range(level_max + 1):
         for level_1d in compositions(level, dim_num):
-            print("Current level=", level_1d)
             order_1d = level_to_order_closed(level_1d)
             order_nd = mul_prod(order_1d)
-            print("Current order=", order_1d, "Current order_nd=", order_nd)
             grid_index2 = multigrid_index(dim_num, order_1d, order_nd)
             prev_shape = grid_index2.shape
             grid_index2 = multigrid_scale_closed(dim_num, level_max, level_1d, grid_index2)
             grid_level = abscissa_level_closed_nd(level_max, dim_num, order_nd, grid_index2)
-            print("Grid shape=", grid_index.shape, "Grid_index2 shape=", grid_index2.shape, "Prevshape=", prev_shape)
-            print("Grid levels=", grid_level, "Current level=", level)
             for point in range(order_nd):
                 if grid_level[point] == level:
                     point_num2 += 1
                     assert point_num2 <= point_num
                     grid_base[:, point_num2 - 1] = order_1d
                     grid_index[:, point_num2 - 1] = grid_index2[:, point]
-    print("Point_num2=", point_num2)
     assert point_num2 == point_num
     return grid_index, grid_base
 

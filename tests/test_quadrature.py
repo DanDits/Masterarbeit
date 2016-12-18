@@ -107,6 +107,33 @@ class QuadratureTestCase(unittest.TestCase):
                                        msg="GC sparse quad on level={} with count = {}, n={} polynomial exactness"
                                        .format(level, count, n))
 
+
+        # sparse test nd
+        from util.quadrature.helpers import multi_index_bounded_sum
+        from util.analysis import mul_prod
+        for level in range(5):
+            for dim in range(1, 4):
+                quad = SparseQuadrature(level, nesting, [nodes_and_weights] * dim)
+                for ind in multi_index_bounded_sum(dim, level + 1):
+                    result = quad.apply(lambda xs: mul_prod(x ** i for x, i in zip(xs, ind)))
+                    if any(i % 2 == 1 for i in ind):
+                        wanted = 0.
+                    else:
+                        wanted = mul_prod(2./(i+1) for i in ind)
+                    self.assertAlmostEqual(result, wanted, places=10,
+                                           msg="CG sparse {}d on level={}, ind={}, quadpoints={}"
+                                           .format(dim, level, ind, quad.get_nodes_count()))
+
+    def testTransformedGlenshawCurtisQuadrature(self):
+        import util.quadrature.glenshaw_curtis as gc
+        nodes_and_weights = gc.nodes_and_weights
+        from util.quadrature.closed_fully_nested import ClosedFullNesting
+        nesting = ClosedFullNesting()
+        # TODO first test beta distribution which also lives on -1,1 and simply multiply quad weights by
+        # beta pdf at node points, so we pretend we integrate a function which is multiplied by the distribution's weight
+
+        # TODO later try gaussian (scale nodes by 1/(1-y^2)) and gamma (scale nodes by 2/(1-y)). How to handle edge nodes
+        # which are exactly -1 or +1?
 if __name__ == "__main__":
     tc = QuadratureTestCase()
     tc.testGlenshawCurtisQuadrature()

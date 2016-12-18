@@ -12,7 +12,7 @@ setting4 = (lambda xs: xs[0] ** 4 * xs[1] ** 12, 0.2307692307693, 2, chaos)
 chaos = mv.chaos_multify([pcd.hermiteChaos] * 2, 3)
 setting5 = (lambda xs: xs[0] ** 4 * xs[1] ** 6, 45., 2, chaos)
 chaos = mv.chaos_multify([pcd.legendreChaos] * 2, 1)
-setting6 = (lambda xs: 1./(1 + 25*xs[0]**2)/(1 + 225*xs[1]**2), 0.27468 * 0.10028, 2, chaos)  # runge function
+setting6 = (lambda xs: 1./(1 + 25*xs[0]**2)/(1 + 225*xs[1]**2), 0.27468 * 0.10028, 2, chaos)  # runge function 2d
 chaos = mv.chaos_multify([pcd.legendreChaos] * 2, 1)
 setting7 = (lambda xs: np.sin(3 * xs[0] + np.cos(xs[1])), 0.0347458, 2, chaos)
 
