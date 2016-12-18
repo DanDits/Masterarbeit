@@ -14,8 +14,6 @@ N = list(range(6))  # maximum degree of the univariate polynomial
 Q = [(n + 1,) * len(trial.variable_distributions) for n in N]
 # for method sparse: level used, will result in about 2^(level+1) quadrature nodes
 L = [n for n in N]
-# for method centralized: bound of sum and if even option is to be used
-S = [(n + 1, False) for n in N]
 
 spatial_dimension = 1
 grid_size = trial.get_parameter("grid_size", 128)
@@ -27,7 +25,7 @@ delta_time = trial.get_parameter("delta_time", 0.001)
 
 exp_var_results, quad_points = {}, {}
 
-methods = ["sparse", "full_tensor", "centralized"]
+methods = ["sparse", "full_tensor"]
 trial_expectancy, trial_variance = None, None
 
 for method in methods:
@@ -79,7 +77,7 @@ for method, marker in zip(methods, ["-D", "-o", "-x"]):
 
         for error, n, q in zip(errors_var, N, quad_points[method]):
             plt.text(n, error, "Q={}".format(q))"""
-print(quad_points)
+print("Quadrature points:", quad_points)
 plt.yscale('log')
 plt.legend()
 plt.xlabel('Maximum univariate polynom degree')

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import diff_equation.klein_gordon as kg
 
 dimension = 1
-grid_size_N = 2048 * 2
+grid_size_N = 2 ** 16
 domain = list(repeat([-np.pi, np.pi], dimension))
 
 

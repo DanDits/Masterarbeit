@@ -203,6 +203,11 @@ def level_to_order_open(level_1d: np.array):
     """
     return 2 ** (level_1d + 1) - 1
 
+
+def level_to_order_closed(level_1d: np.array):
+    return np.where(level_1d == 0, 1, (2 ** level_1d) + 1)
+
+
 if __name__ == "__main__":
     count = 0
     dim, bound = 5, 3

@@ -35,7 +35,7 @@ def discrete_projection_expectancy(trial, max_poly_degree, method, method_param,
     def solution_at_node(nodes):
         nonlocal splitting_xs, splitting_xs_mesh, solution_shape, debug_counter
         debug_counter += 1
-        print(debug_counter)
+        print("...Node counter", debug_counter)
         trial.set_random_values(nodes)
         configs = kg.make_klein_gordon_wave_linhyp_configs(spatial_domain, [grid_size], trial.alpha,
                                                            trial.beta, wave_weight)

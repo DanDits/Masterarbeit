@@ -91,10 +91,13 @@ if trial.has_parameter("do_animate"):
 wave_config.solve(show_times)
 
 if show_errors and has_reference(trial, dimension):
+    print("Showing error...")
     errors = [error_l2(y, reference(trial, wave_config.xs_mesh, t)) for t, y in wave_config.timed_solutions()]
     plt.figure()
+    print("Errors=", errors)
     plt.plot(wave_config.times(), errors, label="Errors in discrete L2 norm")
     plt.xlabel("Time")
+    plt.yscale('log')
     plt.ylabel("Error")
 
 if dimension == 1:

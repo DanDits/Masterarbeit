@@ -4,6 +4,7 @@ import util.quadrature.nesting as nst
 from polynomial_chaos.poly import make_hermite, make_laguerre, make_legendre, make_jacobi
 import numpy as np
 from polynomial_chaos.poly_chaos_distributions import legendreChaos
+from itertools import product
 
 
 class QuadratureTestCase(unittest.TestCase):
@@ -68,6 +69,44 @@ class QuadratureTestCase(unittest.TestCase):
         self.assertAlmostEqual(quad.apply(lambda xs: np.sin(xs[0] + xs[1] + xs[2] + 0.5) * xs[2] ** 4),
                                0.0451753, places=7, msg="Legendre^3 connected")
 
+    def testGlenshawCurtisQuadrature(self):
+        import util.quadrature.glenshaw_curtis as gc
+        nodes_and_weights = gc.nodes_and_weights
+        from util.quadrature.closed_fully_nested import ClosedFullNesting
+        nesting = ClosedFullNesting()
+
+        # 1d polynomial exactness
+        count = 10  # exact if polynomials are degree < count
+        quad = FullTensorQuadrature([count], [nodes_and_weights])
+        for n in range(count):
+            result = quad.apply(lambda xs: xs[0] ** n)
+            wanted = 2. / (n + 1) if n % 2 == 0 else 0.
+            self.assertAlmostEqual(result, wanted, places=10, msg="GC quad with count = {}, n={} polynomial exactness"
+                                   .format(count, n))
+
+        # 2d test
+        count = 8  # exact if univariate polynomials of degree < count
+        for n, m in product(range(count), repeat=2):
+            quad = FullTensorQuadrature([count, count], [nodes_and_weights] * 2)
+            result = quad.apply(lambda xs: xs[0] ** n * xs[1] ** m)
+            if n % 2 == 1 or m % 2 == 1:
+                wanted = 0.
+            else:
+                wanted = 2./(n+1) * 2./(m+1)
+            self.assertAlmostEqual(result, wanted, places=10,
+                                   msg="GC quad with count = {}, 2d poly exactness, n={}, m={}".format(count, n, m))
+
+        # sparse test 1d
+        for level in range(4):
+            quad = SparseQuadrature(level, nesting, [nodes_and_weights])
+            count = quad.get_nodes_count()
+            for n in range(count):
+                result = quad.apply(lambda xs: xs[0] ** n)
+                wanted = 2. / (n + 1) if n % 2 == 0 else 0.
+                self.assertAlmostEqual(result, wanted, places=10,
+                                       msg="GC sparse quad on level={} with count = {}, n={} polynomial exactness"
+                                       .format(level, count, n))
+
 if __name__ == "__main__":
     tc = QuadratureTestCase()
-    tc.testSparseQuadrature()
+    tc.testGlenshawCurtisQuadrature()

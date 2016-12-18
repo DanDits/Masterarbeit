@@ -31,8 +31,8 @@ def get_weights(order):
 def nodes_and_weights(n1):
     """ Computes the Clenshaw Curtis nodes and weights """
     if n1 == 1:
-        x = 0
-        w = 2
+        x = np.array([0.])
+        w = np.array([2.])
     elif n1 == 2:
         x = np.array([-1., 1.])
         w = np.array([1., 1.])
