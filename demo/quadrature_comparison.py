@@ -18,31 +18,43 @@ setting7 = (lambda xs: np.sin(3 * xs[0] + np.cos(xs[1])), 0.0347458, 2, chaos)
 
 setting = setting6
 visualize_quad = False
-nodes_counts_sparse, nodes_counts_full = [], []
-error_sparse, error_full = [], []
-for level in range(10):
+nodes_counts_sparse, nodes_counts_full, nodes_counts_sparse_gc = [], [], []
+error_sparse, error_full, error_sparse_gc = [], [], []
+for level in range(8):
+    print("current level=", level)
     chaos = setting[3]
+
     chaos.init_quadrature_rule("sparse", level)
     nodes_count = chaos.quadrature_rule.get_nodes_count()
     nodes_counts_sparse.append(nodes_count)
     sparse_result = chaos.integrate(setting[0])
     error_sparse.append(abs(sparse_result - setting[1]))
+
+    chaos.init_quadrature_rule("sparse_gc", level)
+    nodes_count = chaos.quadrature_rule.get_nodes_count()
+    nodes_counts_sparse_gc.append(nodes_count)
+    sparse_gc_result = chaos.integrate(setting[0])
+    error_sparse_gc.append(abs(sparse_gc_result - setting[1]))
+
     dim = setting[2]
-    nodes_count_full = [int(nodes_count ** (1./dim))] * dim
-    nodes_counts_full.append(mul_prod(nodes_count_full))
-    chaos.init_quadrature_rule("full_tensor", nodes_count_full)
+    current_count = [int(nodes_count ** (1./dim))] * dim
+    chaos.init_quadrature_rule("full_tensor", current_count)
+    nodes_counts_full.append(chaos.quadrature_rule.get_nodes_count())
     full_result = chaos.integrate(setting[0])
     error_full.append(abs(setting[1] - full_result))
 
-    nodes_count_full = [count + 1 for count in nodes_count_full]
-    nodes_counts_full.append(mul_prod(nodes_count_full))
-    chaos.init_quadrature_rule("full_tensor", nodes_count_full)
+    current_count = [count + 1 for count in current_count]
+    chaos.init_quadrature_rule("full_tensor", current_count)
+    nodes_counts_full.append(chaos.quadrature_rule.get_nodes_count())
     full_result = chaos.integrate(setting[0])
     error_full.append(abs(setting[1] - full_result))
 
 import matplotlib.pyplot as plt
 print(nodes_counts_sparse)
 plt.figure()
+plt.xlabel("Number of quadrature nodes")
+plt.ylabel("Error of quadrature")
+plt.plot(nodes_counts_sparse_gc, error_sparse_gc, "o-", label="Sparse GC")
 plt.plot(nodes_counts_sparse, error_sparse, "o-", label="Sparse")
 plt.plot(nodes_counts_full, error_full, "o-", label="FullTensor")
 plt.legend(loc='best')

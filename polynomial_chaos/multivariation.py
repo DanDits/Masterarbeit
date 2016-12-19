@@ -13,15 +13,14 @@ class MultivariatePolyChaosDistribution(PolyChaosDistribution):
         super().__init__(poly_basis, distribution, normalization_gamma)
         self.chaos_list = chaos_list
 
-    def get_nodes_and_weights(self, nodes_and_weights_funcs=None):
-        if nodes_and_weights_funcs is None:
-            return [chaos.poly_basis.nodes_and_weights for chaos in self.chaos_list]
-        return nodes_and_weights_funcs
+    def get_distributions(self):
+        return [chaos.distribution for chaos in self.chaos_list]
 
-    def get_nesting(self, sparse_nesting=None):
-        if sparse_nesting is None:
-            return get_nesting_for_multiple_names([chaos.poly_basis.name for chaos in self.chaos_list])
-        return sparse_nesting
+    def get_nodes_and_weights(self):
+        return [chaos.poly_basis.nodes_and_weights for chaos in self.chaos_list]
+
+    def get_nesting(self):
+        return get_nesting_for_multiple_names([chaos.poly_basis.name for chaos in self.chaos_list])
 
 
 def poly_basis_multify(basis_list, multi_indices):

@@ -10,6 +10,7 @@ def get_nodes(order):
     return np.cos((order - 1 - np.arange(order)) * np.pi / (order - 1))
 
 
+# direct implementation to compute weights which is O(n^2)
 def get_weights(order):
     if order == 1:
         return np.ones(1) * 2.0

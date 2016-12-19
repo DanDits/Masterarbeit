@@ -49,17 +49,17 @@ def centralize_index(index, length):
 
 
 class CentralizedDiamondQuadrature(QuadratureRule):
-    def __init__(self, chaos_list, sum_bound, even):
+    def __init__(self, nodes_and_weights_funcs, sum_bound, even):
         nodes_list, weights_list = [], []
         length = sum_bound + 1  # ignore lengths and use sum_bound+1 for every dimension to ensure we can index!
-        nodes_weights_pairs = [chaos.poly_basis.nodes_and_weights(length) for chaos in chaos_list]
+        nodes_weights_pairs = [nodes_and_weights_func(length) for nodes_and_weights_func in nodes_and_weights_funcs]
         # for every multi index we add one nodes tuple to the list, so we will later have the same
         # amount of nodes/weights as we have basis polynomials.
         if even:
-            indices = list(multi_index_bounded_sum(len(chaos_list),
+            indices = list(multi_index_bounded_sum(len(nodes_and_weights_funcs),
                                                    sum_bound + 1 if sum_bound % 2 == 1 else sum_bound))
         else:
-            indices = multi_index_bounded_sum(len(chaos_list), sum_bound)
+            indices = multi_index_bounded_sum(len(nodes_and_weights_funcs), sum_bound)
 
         for multi_index in indices:
             current_nodes, current_weights = [], []

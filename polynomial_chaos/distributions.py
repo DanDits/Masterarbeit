@@ -116,7 +116,7 @@ def make_beta(alpha, beta):
         return beta_01() * 2 - 1  # scaling from [0,1] to [-1,1]
     return Distribution("Beta",
                         lambda x: (((1 - x) ** alpha) * ((1 + x) ** beta) / (2 ** (alpha + beta + 1))
-                                   / beta_func(alpha + 1, beta + 1) if -1 <= x <= 1 else 0),
+                                   / beta_func(alpha + 1, beta + 1) if -1. < x < 1. else 0.),
                         (-1, 1),
                         generator,
                         # switched notation in stats, so a=beta+1 is by purpose

@@ -6,14 +6,17 @@ from util.analysis import error_l2
 import demo.stochastic_trials as st
 
 
-trial = st.trial_6
+trial = st.trial_4
 
-N = list(range(6))  # maximum degree of the univariate polynomial
+N = [8] * 100  # maximum degree of the univariate polynomial
 
 # for method full_tensor: number of nodes and weights used for discrete projection's quadrature formula per dimension
-Q = [(n + 1,) * len(trial.variable_distributions) for n in N]
-# for method sparse: level used, will result in about 2^(level+1) quadrature nodes
-L = [n for n in N]
+dim = len(trial.variable_distributions)
+Q = [(n + 1,) * dim for n in range(6)]
+# for method sparse: level used, will result in about 2^(level+1)+1 quadrature nodes
+L = [n for n in range(7)]
+# for method sparse_gc: level used, will result in 2^level-1 quadrature nodes
+L_gc = [n+1 for n in range(8)]
 
 spatial_dimension = 1
 grid_size = trial.get_parameter("grid_size", 128)
@@ -25,16 +28,11 @@ delta_time = trial.get_parameter("delta_time", 0.001)
 
 exp_var_results, quad_points = {}, {}
 
-methods = ["sparse", "full_tensor"]
+methods = ["sparse", "full_tensor", "sparse_gc"]
+all_params = [L, Q, L_gc]
 trial_expectancy, trial_variance = None, None
 
-for method in methods:
-    if method == "sparse":
-        method_params = L
-    elif method == "full_tensor":
-        method_params = Q
-    else:
-        method_params = S
+for method, method_params in zip(methods, all_params):
     exp_var_results[method] = []
     quad_points[method] = []
     for n, param in zip(N, method_params):
@@ -60,17 +58,18 @@ for method, marker in zip(methods, ["-D", "-o", "-x"]):
         if trial_expectancy is not None:
             error = error_l2(trial_expectancy, expectancy)
             errors_exp.append(error)
-            print("Error expectancy dp", n, param, "=", error)
+            print("Error expectancy dp", method, n, param, "=", error)
         if trial_variance is not None:
             error_var = error_l2(trial_variance, variance)
             errors_var.append(error_var)
-            print("Error variance dp", n, param, "=", error_var)
+            print("Error variance dp", method, n, param, "=", error_var)
 
     if len(errors_exp) > 0 or len(errors_var) > 0:
-        if len(errors_exp) == len(N):
-            plt.plot(N, errors_exp, marker, color="b", label="Errors of {} to expectancy".format(method))
-        if len(errors_var) == len(N):
-            plt.plot(N, errors_var, marker, color="r", label="Errors of {} to variance".format(method))
+        x_values = quad_points[method]
+        if len(errors_exp) == len(x_values):
+            plt.plot(x_values, errors_exp, marker, color="b", label="Errors of {} to expectancy".format(method))
+        if len(errors_var) == len(x_values):
+            plt.plot(x_values, errors_var, marker, color="r", label="Errors of {} to variance".format(method))
 
         """for error, n, q in zip(errors_exp, N, quad_points[method]):
             plt.text(n, error, "Q={}".format(q))
@@ -79,6 +78,6 @@ for method, marker in zip(methods, ["-D", "-o", "-x"]):
             plt.text(n, error, "Q={}".format(q))"""
 print("Quadrature points:", quad_points)
 plt.yscale('log')
-plt.legend()
-plt.xlabel('Maximum univariate polynom degree')
+plt.legend(loc='best')
+plt.xlabel('Quadrature points')
 plt.show()
