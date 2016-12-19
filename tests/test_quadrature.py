@@ -126,14 +126,75 @@ class QuadratureTestCase(unittest.TestCase):
 
     def testTransformedGlenshawCurtisQuadrature(self):
         import util.quadrature.glenshaw_curtis as gc
-        nodes_and_weights = gc.nodes_and_weights
         from util.quadrature.closed_fully_nested import ClosedFullNesting
         nesting = ClosedFullNesting()
-        # TODO first test beta distribution which also lives on -1,1 and simply multiply quad weights by
-        # beta pdf at node points, so we pretend we integrate a function which is multiplied by the distribution's weight
+        from polynomial_chaos.poly_chaos_distributions import make_jacobiChaos
+        jacobi = make_jacobiChaos(0.5, 1.5)
+        nodes_and_weights = gc.calculate_transformed_nodes_and_weights(jacobi.distribution)
+        count = 50  # as the polynomial exactness is now not implicitly true as we just transform the unweighted
+        # integral, we need much higher order to ensure convergence as the weight is not a polynomial
+        quad = FullTensorQuadrature([count], [nodes_and_weights])
+        self.assertAlmostEqual(quad.apply(lambda xs: xs[0] ** 2), 0.25, places=5, msg="CG transformed Jacobi")
 
-        # TODO later try gaussian (scale nodes by 1/(1-y^2)) and gamma (scale nodes by 2/(1-y)). How to handle edge nodes
-        # which are exactly -1 or +1?
+        # sparse 1d
+        quad = SparseQuadrature(6, nesting, [nodes_and_weights])  # level 5 would be 2**5+1=33 nodes, but we need 50 for 5 digit accuracy
+        self.assertAlmostEqual(quad.apply(lambda xs: xs[0] ** 2), 0.25, places=5, msg="CG transformed Jacobi sparse")
+
+        # sparse 2d
+        quad = SparseQuadrature(6, nesting, [nodes_and_weights] * 2)
+        result = quad.apply(lambda xs: 1)
+        wanted = 1.
+        self.assertAlmostEqual(result, wanted, places=3, msg="CG transformed Jacobi sparse 2d")
+
+    # test gaussian on transformed support (-Inf,Inf)
+    def testTransformedGaussian(self):
+        import util.quadrature.glenshaw_curtis as gc
+        from polynomial_chaos.poly_chaos_distributions import hermiteChaos
+        from util.quadrature.closed_fully_nested import ClosedFullNesting
+        nesting = ClosedFullNesting()
+        count = 30
+        gc_hermite_nodes_and_weights = gc.calculate_transformed_nodes_and_weights(hermiteChaos.distribution)
+        quad = FullTensorQuadrature([count], [gc_hermite_nodes_and_weights])
+        result = quad.apply(lambda xs: 1)
+        wanted = 1.
+        self.assertAlmostEqual(result, wanted, places=5, msg="GC hermite simple")
+
+        # 1d sparse
+        quad = SparseQuadrature(6, nesting, [gc_hermite_nodes_and_weights])
+        self.assertAlmostEqual(quad.apply(lambda xs: np.sin(xs[0]) ** 2), 0.432332, places=5,
+                               msg="CG Hermite sparse 1d")
+
+        # 2d sparse
+        quad = SparseQuadrature(8, nesting, 2 * [gc_hermite_nodes_and_weights])
+        self.assertAlmostEqual(quad.apply(lambda xs: xs[0] ** 4 * xs[1] ** 2), 3., places=1,
+                               msg="CG Hermite sparse 2d high poly")
+
+    # test gamma on transformed support (0,Inf)
+    def testTransformedLaguerre(self):
+        from polynomial_chaos.poly_chaos_distributions import make_laguerreChaos
+        laguerre = make_laguerreChaos(0.9)
+        import util.quadrature.glenshaw_curtis as gc
+
+        # this highly depends on laguerre's alpha parameter: around 1. it is fine, towards 0. or above 2.
+        # the error increases rapidly. For lower than 1. this is because we implicitly drop the node at -1 which
+        # would result in evaluating the weight function at 0. which is not possible due to 0.^(alpha-1) in weight func
+        count = 100
+        gc_laguerre_nodes_and_weights = gc.calculate_transformed_nodes_and_weights(laguerre.distribution)
+        quad = FullTensorQuadrature([count], [gc_laguerre_nodes_and_weights])
+        result = quad.apply(lambda xs: 1)
+        wanted = 1.
+        self.assertAlmostEqual(result, wanted, places=3, msg="GC laguerre simple")
+
+        laguerre = make_laguerreChaos(0.3)
+        # it seems like integrating polynomials this way performs much worse than something periodic
+        gc_laguerre_nodes_and_weights = gc.calculate_transformed_nodes_and_weights(laguerre.distribution)
+        count = 50
+        quad = FullTensorQuadrature([count], [gc_laguerre_nodes_and_weights])
+        result = quad.apply(lambda xs: np.sin(xs[0]) ** 2)
+        wanted = 0.128709
+        self.assertAlmostEqual(result, wanted, places=5)
+
+
 if __name__ == "__main__":
     tc = QuadratureTestCase()
-    tc.testGlenshawCurtisQuadrature()
+    tc.testTransformedLaguerre()

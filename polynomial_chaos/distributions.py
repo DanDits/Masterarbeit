@@ -89,7 +89,7 @@ def make_gamma(shape, rate):
     gamma_shape = gamma(shape)
     return Distribution("Gamma",
                         lambda x: ((rate ** shape) * (x ** (shape - 1)) * math.exp(-rate * x) / gamma_shape
-                                   if x >= 0 else 0.),
+                                   if x > 0. else 0.),
                         (0, inf),
                         partial(random.gammavariate, shape, 1. / rate),
                         inverse_distribution=partial(stats_gamma.ppf, a=shape, rate=1./rate),
