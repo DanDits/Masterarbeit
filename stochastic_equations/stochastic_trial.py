@@ -86,7 +86,7 @@ class StochasticTrial(Trial):
             try:
                 return np.load(self.expectancy_data)
             except FileNotFoundError:
-                print("No expectancy data found, should be here!?")
+                print("No expectancy data found, should be here!?", self.expectancy_data)
 
     def obtain_evaluated_variance(self, xs, xs_mesh, time):
         if self.has_parameter("variance"):

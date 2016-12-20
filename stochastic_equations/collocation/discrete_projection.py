@@ -48,8 +48,8 @@ def discrete_projection_expectancy(trial, max_poly_degree, method, method_param,
             splitting_xs_mesh = splitting.get_xs_mesh()
             solution_shape = last_solution.shape
         sol = last_solution.real.flatten()
-        if method == "sparse" and np.any(np.isnan(sol)):
-            print("Solution at node", nodes, "is nan")
+        if method == "sparse" and not np.all(np.isfinite(sol)):
+            print("Solution at node", nodes, "is not finite:", sol)
         return sol
 
     for i, poly in enumerate(basis):

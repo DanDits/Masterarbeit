@@ -91,6 +91,19 @@ def make_jacobiChaos(alpha, beta):  # alpha, beta > -1
 # ("Hypergeometric", "Hahn")
 
 
+def get_chaos_name_by_distribution(find_distr):
+    if find_distr.name == "Gaussian":
+        return "Hermite"
+    elif find_distr.name == "Uniform":
+        return "Legendre"
+    elif find_distr.name == "Gamma":
+        return "Laguerre"
+    elif find_distr.name == "Beta":
+        return "Jacobi"
+    else:
+        raise ValueError("Unknown distribution:", find_distr.name)
+
+
 def get_chaos_by_distribution(find_distr):
     if find_distr.name == "Gaussian":
         chaos = hermiteChaos

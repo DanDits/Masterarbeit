@@ -74,4 +74,5 @@ def matrix_inversion_expectancy(trial, max_poly_degree, quadrature_method, quadr
     # Var[w_N]=E[(w_N)^2]-E[w_N]^2
     variance = np.reshape(np.sum(weights ** 2, axis=0) - (chaos.normalization_gamma(0) * (weights[0, :] ** 2)),
                           solution_shape)
-    return splitting_xs, splitting_xs_mesh, expectancy, variance, rank
+    return (splitting_xs, splitting_xs_mesh, expectancy, variance, rank,
+            poly_count, chaos.quadrature_rule.get_nodes_count())

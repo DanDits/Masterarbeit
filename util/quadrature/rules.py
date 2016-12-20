@@ -48,6 +48,8 @@ def centralize_index(index, length):
     return center + index // 2 + 1 if index % 2 == 1 else center - index // 2
 
 
+# this is no real quadrature formula, it just behaves as one, its main purpose is to use its nodes
+# as they offer great performance for multivariate matrix inversion collocation
 class CentralizedDiamondQuadrature(QuadratureRule):
     def __init__(self, nodes_and_weights_funcs, sum_bound, even):
         nodes_list, weights_list = [], []
@@ -83,7 +85,8 @@ class CentralizedDiamondQuadrature(QuadratureRule):
         return self.weights
 
 
-# adapted from code from https://people.sc.fsu.edu/~jburkardt/m_src/sandia_sparse/sandia_sparse.html
+# implementation for weakly and fully nested grids inspired and adapted
+# from code from https://people.sc.fsu.edu/~jburkardt/m_src/sandia_sparse/sandia_sparse.html
 class SparseQuadrature(QuadratureRule):
     def __init__(self, level_max: int, nesting, nodes_and_weights_funcs):
         self.dim_num = len(nodes_and_weights_funcs)

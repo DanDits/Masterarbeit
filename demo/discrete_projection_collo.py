@@ -17,6 +17,8 @@ Q = [(n + 1,) * dim for n in range(7)]
 L = [n for n in range(5)]
 # for method sparse_gc: level used, will result in 2^level-1 quadrature nodes
 L_gc = [n+1 for n in range(6)]
+# TODO think of different choices for N and quad params, here quad params can be arbitrary big, but should be big enough to integrate polys depending on n well
+# TODO visualize on x axis the poly count and maybe make a subplot for the amount of quad nodes
 
 spatial_dimension = 1
 grid_size = trial.get_parameter("grid_size", 128)
@@ -28,8 +30,9 @@ delta_time = trial.get_parameter("delta_time", 0.001)
 
 exp_var_results, quad_points = {}, {}
 
-methods = ["sparse", "full_tensor", "sparse_gc"]
+methods = ["sparse"]
 all_params = [L, Q, L_gc]
+method_markers = ["-o", "-D", "-x"]
 trial_expectancy, trial_variance = None, None
 
 for method, method_params in zip(methods, all_params):
@@ -51,7 +54,7 @@ if trial_variance is None:
 plt.figure()
 plt.title("Discrete projection colloc. for {}, gridsize={}, dt={}, T={}".format(trial.name, grid_size,
                                                                                 delta_time, stop_time))
-for method, marker in zip(methods, ["-D", "-o", "-x"]):
+for method, marker in zip(methods, method_markers):
     errors_exp, errors_var = [], []
     for n, param, expectancy, variance in exp_var_results[method]:
         if np.any(np.isnan(expectancy)):

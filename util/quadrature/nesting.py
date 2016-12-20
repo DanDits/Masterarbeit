@@ -1,3 +1,4 @@
+from itertools import count
 
 
 class Nesting:
@@ -14,6 +15,9 @@ class Nesting:
         # another big speedup could be achieved by precalculating and caching the results of nodes_and_weights
         point_num = self.calculate_point_num(dim_num, level_max)
         return self.calculate_sparse_grid(dim_num, level_max, point_num, nodes_and_weights_funcs)
+
+    def get_minimum_level_with_point_num(self, dim_num: int, point_num: int):
+        return next(l for l in count() if self.calculate_point_num(dim_num, l) >= point_num)
 
 
 from util.quadrature.open_weakly_nested import OpenWeaklyNesting, OpenNonNesting

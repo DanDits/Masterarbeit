@@ -149,4 +149,6 @@ trial_discont_simple = StochasticTrial([distributions.make_uniform(-1, 1)],
                                        lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
                                        name="TrialDiscontSimple") \
     .add_parameters("beta", lambda xs, ys: 2 + np.sin(xs[0] + ys[0]) if ys[0] > 0. else 2 + np.cos(xs[0] + ys[0]),
-                    "alpha", lambda ys: 2. if ys[0] > 0. else 1.)
+                    "alpha", lambda ys: 2. if ys[0] > 0. else 1.,
+                    "expectancy_data", "../data/qmc_exp, 100000, TrialDiscontSimple, 0.5, 128.npy",
+                    "variance_data", "../data/qmc_var, 100000, TrialDiscontSimple, 0.5, 128.npy")
