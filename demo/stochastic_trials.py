@@ -94,6 +94,7 @@ trial_4 = StochasticTrial([distributions.gaussian, distributions.make_uniform(-1
 # unstable for N=512,dt=0.001:  Degree 6
 #              N=128,dt=0.001:  Degree 15
 #              N=128,dt=0.0001: Degree>29
+# accuracy of expectancy data for MI(dt=0.001): 4.27996312063e-05 at degree=37, high condition all the time, unstable after degree=40
 trial_5 = StochasticTrial([distributions.gaussian],
                           lambda xs, ys: np.cos(sum(xs)),
                           lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
@@ -119,6 +120,8 @@ trial_6 = StochasticTrial([distributions.make_beta(1.5, 4.5), distributions.make
                     "grid_size", 128,
                     "stop_time", 0.5)
 
+# accuracy of expectancy data for MI(dt=0.001) around degree=8: 6.3483685515377584e-06, for Galerkin(?): 6.2370461164611651e-06
+# accuracy of variance data for MI(dt=0.001) around degree=8: 5.86310961747e-07
 trial_7 = StochasticTrial([distributions.make_beta(0.5, 0.5)],
                           lambda xs, ys: np.cos(sum(xs)),
                           lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
@@ -127,14 +130,23 @@ trial_7 = StochasticTrial([distributions.make_beta(0.5, 0.5)],
                     "alpha", lambda ys: 1 + np.exp(ys[0]),
                     "grid_size", 128,
                     "stop_time", 0.5,
-                    "expectancy_data", "../data/qmc_exp, 100000, Trial7, 0.5, 128.npy",  # accuracy: 6.2370461164611651e-06
+                    "expectancy_data", "../data/qmc_exp, 100000, Trial7, 0.5, 128.npy",
                     "variance_data", "../data/qmc_var, 100000, Trial7, 0.5, 128.npy")
 
+# accuracy of expectancy data for Galerkin: 0.006854368887610221, too many QP decrease again?! for MI: 1.1360616011928265e-05, zigzac, convergent for uneven poly degrees, unstable before fully converged around degree 60
+# accuracy of variance data for MI(dt=0.001): 7.38374747346e-05, zigzac, convergent for uneven degrees, same behavior as expectancy
 trial_discont = StochasticTrial([distributions.make_uniform(-1, 1)],
                                 lambda xs, ys: np.cos(sum(xs)),
                                 lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
                                 name="TrialDiscont") \
     .add_parameters("beta", lambda xs, ys: 100 * np.cos(ys[0]) ** 2 + 1 if ys[0] > 0. else 1.5 + np.sin(3 * ys[0]),
                     "alpha", lambda ys: 2 + ys[0] if ys[0] > 0. else 0.5,
-                    "expectancy_data", "../data/qmc_exp, 100000, TrialDiscont, 0.5, 128.npy", # accuracy: 0.006854368887610221 with galerkin, too many QP decrease again?!
+                    "expectancy_data", "../data/qmc_exp, 100000, TrialDiscont, 0.5, 128.npy",
                     "variance_data", "../data/qmc_var, 100000, TrialDiscont, 0.5, 128.npy")
+
+trial_discont_simple = StochasticTrial([distributions.make_uniform(-1, 1)],
+                                       lambda xs, ys: np.cos(sum(xs)),
+                                       lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
+                                       name="TrialDiscontSimple") \
+    .add_parameters("beta", lambda xs, ys: 2 + np.sin(xs[0] + ys[0]) if ys[0] > 0. else 2 + np.cos(xs[0] + ys[0]),
+                    "alpha", lambda ys: 2. if ys[0] > 0. else 1.)

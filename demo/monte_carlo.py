@@ -23,7 +23,7 @@ do_quasi_monte_carlo = True
 # the factor of the step number between two consecutive solutions used to estimate order of convergence
 order_factor = 10  # >=2, integer
 
-trial = st.trial_7
+trial = st.trial_discont_simple
 
 splitting_xs, splitting_xs_mesh, expectancy, variance, expectancy_errors, variance_errors, \
     solutions, solutions_for_order_estimate = \

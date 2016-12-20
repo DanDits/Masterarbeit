@@ -4,6 +4,11 @@ from polynomial_chaos.distributions import Distribution
 from functools import lru_cache
 
 
+# nodes in interval (-1,1), increasingly dense at boundary. Minimize polynomial prod(x-node_i) in [-1,1]
+def chebyshev_nodes(size):
+    return np.cos(np.pi * (np.arange(1, size + 1) * 2 - 1) / (2 * size))
+
+
 def get_nodes(order):
     if order == 1:
         return np.zeros(1)

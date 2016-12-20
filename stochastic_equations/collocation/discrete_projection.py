@@ -47,10 +47,13 @@ def discrete_projection_expectancy(trial, max_poly_degree, method, method_param,
             splitting_xs = splitting.get_xs()
             splitting_xs_mesh = splitting.get_xs_mesh()
             solution_shape = last_solution.shape
-        return last_solution.real.flatten()
+        sol = last_solution.real.flatten()
+        if method == "sparse" and np.any(np.isnan(sol)):
+            print("Solution at node", nodes, "is nan")
+        return sol
 
     for i, poly in enumerate(basis):
-        print("Integrationg poly of degree", i)
+        print("Integrationg poly with number", i)
         def to_integrate(nodes):
             return solution_at_node(tuple(nodes)) * poly(nodes)
         curr_poly_weight = chaos.integrate(to_integrate)

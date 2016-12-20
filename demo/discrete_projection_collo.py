@@ -12,11 +12,11 @@ N = [8] * 100  # maximum degree of the univariate polynomial
 
 # for method full_tensor: number of nodes and weights used for discrete projection's quadrature formula per dimension
 dim = len(trial.variable_distributions)
-Q = [(n + 1,) * dim for n in range(6)]
+Q = [(n + 1,) * dim for n in range(7)]
 # for method sparse: level used, will result in about 2^(level+1)+1 quadrature nodes
-L = [n for n in range(7)]
+L = [n for n in range(5)]
 # for method sparse_gc: level used, will result in 2^level-1 quadrature nodes
-L_gc = [n+1 for n in range(8)]
+L_gc = [n+1 for n in range(6)]
 
 spatial_dimension = 1
 grid_size = trial.get_parameter("grid_size", 128)
@@ -54,6 +54,10 @@ plt.title("Discrete projection colloc. for {}, gridsize={}, dt={}, T={}".format(
 for method, marker in zip(methods, ["-D", "-o", "-x"]):
     errors_exp, errors_var = [], []
     for n, param, expectancy, variance in exp_var_results[method]:
+        if np.any(np.isnan(expectancy)):
+            print("Expectancy contains NaN:", expectancy)
+        if np.any(np.isnan(variance)):
+            print("Variance contains NaN:", variance)
         error = -1
         if trial_expectancy is not None:
             error = error_l2(trial_expectancy, expectancy)

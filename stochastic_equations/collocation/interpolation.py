@@ -5,29 +5,25 @@ from polynomial_chaos.poly_chaos_distributions import get_chaos_by_distribution
 from stochastic_equations.collocation.coll_util import check_distribution_assertions
 from numpy.linalg import lstsq
 import polynomial_chaos.multivariation as mv
+from util.quadrature.helpers import multi_index_bounded_sum_length
 
 
-# nodes in interval (-1,1), increasingly dense at boundary. Minimize polynomial prod(x-node_i) in [-1,1]
-def chebyshev_nodes(size):
-    return np.cos(np.pi * (np.arange(1, size + 1) * 2 - 1) / (2 * size))
-
-
-def matrix_inversion_expectancy(trial, max_poly_degree, random_space_nodes_counts, spatial_domain, grid_size,
-                                start_time, stop_time, delta_time, wave_weight=0.5):
+def matrix_inversion_expectancy(trial, max_poly_degree, quadrature_method, quadrature_param, spatial_domain, grid_size,
+                                start_time, stop_time, delta_time, wave_weight=1.):
     sum_bound = max_poly_degree
     distrs = trial.variable_distributions
     for distr in distrs:
         check_distribution_assertions(distr)
     chaos = mv.chaos_multify([get_chaos_by_distribution(distr) for distr in distrs], sum_bound)
 
-    # TODO not possible to get nodes anymore from chaos directly!
-    nodes_list = chaos.nodes_and_weights(random_space_nodes_counts, method='centralized')[0]
+    chaos.init_quadrature_rule(quadrature_method, quadrature_param)
+    nodes_list = chaos.quadrature_rule.get_nodes()
 
     # for uniform or beta distribution you could also use chebyshev (or slightly worse glenshaw) nodes
     # not always optimal performance, but pretty good
     # nodes_list = [[node] for node in chebyshev_nodes(random_space_nodes_counts[0])]  # if 1d
 
-    poly_count = mv.multi_index_bounded_sum_length(len(distrs), sum_bound)
+    poly_count = multi_index_bounded_sum_length(len(distrs), sum_bound)
     basis = [chaos.normalized_basis(degree) for degree in range(poly_count)]
 
     solution_at_nodes = []  # used to build right hand side (simultaneously at every grid point)
