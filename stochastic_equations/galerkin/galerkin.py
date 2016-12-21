@@ -93,8 +93,6 @@ def calculate_wave_speed_transform(trial, basis, poly_count, chaos, cache):
     diag, transform_s = eigh(matrix_a)  # now holds A=S*D*S', S is orthonormal, D a diagonal matrix
     # eigenvalues in D are positive and bounded by the extrema of alpha(y)
     if any(diag < 0):
-        # TODO how did we get negative eigenvalues? maybe caching for multivariate different as same index does
-        # TODO not imply same polynomial when sum_bound changed? YES, clear cache for other sum_bound
         print("Got negative eigenvalues! Matrix:", matrix_a, "poly_count:", poly_count, "Chaos:", chaos.poly_basis.name)
     wave_speeds = np.sqrt(diag)
     # print("DIag:", diag, "Transform:", transform_s)

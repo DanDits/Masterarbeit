@@ -194,7 +194,70 @@ class QuadratureTestCase(unittest.TestCase):
         wanted = 0.128709
         self.assertAlmostEqual(result, wanted, places=5)
 
+    def testSciQuadVersusQuadrature(self):
+        from scipy.integrate import nquad
+        from util.quadrature.open_weakly_nested import OpenWeaklyNesting
+        # use domain (-Inf,Inf) and Gaussian weight
+        from polynomial_chaos.poly_chaos_distributions import hermiteChaos
+
+        # continuous function
+        def to_integrate_weighted(x, y):
+            return np.sin(x + 3) * (np.cos(y) ** 2) * hermiteChaos.distribution.weight(x) * hermiteChaos.distribution.weight(y)
+
+        def to_integrate(xs):
+            return np.sin(xs[0] + 3) * (np.cos(xs[1]) ** 2)
+
+        result_sciquad = nquad(to_integrate_weighted, [(-np.Inf, np.Inf)] * 2)[0]
+        count = 15
+        quad = FullTensorQuadrature([count] * 2, hermiteChaos.get_nodes_and_weights() * 2)
+        result_full_quad = quad.apply(to_integrate)
+        nesting = OpenWeaklyNesting()
+        quad = SparseQuadrature(4, nesting, hermiteChaos.get_nodes_and_weights() * 2)
+        result_sparse_quad = quad.apply(to_integrate)
+
+        from polynomial_chaos.multivariation import chaos_multify
+        chaos = chaos_multify([hermiteChaos] * 2, 1)
+        chaos.init_quadrature_rule("sparse_gc", 8)
+        result_sparse_gc_quad = chaos.integrate(to_integrate)
+        self.assertAlmostEqual(result_sciquad, result_full_quad, places=11)
+        self.assertAlmostEqual(result_sciquad, result_sparse_quad, places=5)
+        self.assertAlmostEqual(result_sciquad, result_sparse_gc_quad, places=4)
+
+    def testSciQuadVersusQuadratureBeta(self):
+        from scipy.integrate import nquad
+        from util.quadrature.open_weakly_nested import OpenNonNesting
+        # use domain (-1,1) and Beta weight
+        from polynomial_chaos.poly_chaos_distributions import make_jacobiChaos, legendreChaos
+
+        chaos = make_jacobiChaos(0., 0.)  # theoretically almost equivalent to legendreChaos
+        # except the gamma distribution can't handle the edge points -1 and 1 for alpha or beta <= 0., which results
+        # in worse results for sparse_gc then we observe for higher values of alpha and beta
+
+        # continuous function
+        def to_integrate_weighted(x, y):
+            return np.sin(x + 3) * (np.cos(y) ** 2) * chaos.distribution.weight(x) * chaos.distribution.weight(y)
+
+        def to_integrate(xs):
+            return np.sin(xs[0] + 3) * (np.cos(xs[1]) ** 2)
+
+        result_sciquad = nquad(to_integrate_weighted, [(-1, 1)] * 2)[0]
+        count = 15
+        quad = FullTensorQuadrature([count] * 2, chaos.get_nodes_and_weights() * 2)
+        result_full_quad = quad.apply(to_integrate)
+        nesting = OpenNonNesting()
+        quad = SparseQuadrature(3, nesting, chaos.get_nodes_and_weights() * 2)
+        # level 4: 225=15**2 nodes, 12 places; level 3: 95 nodes, 9 places for jacobi(0.2,3.)
+        result_sparse_quad = quad.apply(to_integrate)
+
+        from polynomial_chaos.multivariation import chaos_multify
+        chaos = chaos_multify([chaos] * 2, 1)
+        chaos.init_quadrature_rule("sparse_gc", 6)  # level 6: 312 nodes, still worse by a lot
+        result_sparse_gc_quad = chaos.integrate(to_integrate)
+        print(result_sciquad, result_full_quad, result_sparse_quad, result_sparse_gc_quad, sep='\n')
+        self.assertAlmostEqual(result_sciquad, result_full_quad, places=12)
+        self.assertAlmostEqual(result_sciquad, result_sparse_quad, places=8)
+        self.assertAlmostEqual(result_sciquad, result_sparse_gc_quad, places=2)
 
 if __name__ == "__main__":
     tc = QuadratureTestCase()
-    tc.testTransformedLaguerre()
+    tc.testSciQuadVersusQuadrature()

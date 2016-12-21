@@ -97,7 +97,6 @@ class StochasticTrial(Trial):
             except FileNotFoundError:
                 print("No variance data found, should be here!?")
 
-# TODO compare nquad with custom gauss QF, maybe instead use custom QF with >50 nodes
     def calculate_expectancy(self, xs_lines, t, function):
         """
         This very far from efficient method calculates the expectancy of a given function(x-coordinates, time, ys) at

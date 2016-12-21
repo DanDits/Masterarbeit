@@ -71,6 +71,7 @@ def matrix_inversion_expectancy(trial, max_poly_degree, quadrature_method, quadr
     # E[w_N]=sum_0^N(weight_k*E[phi_k])=weight_0*E[1*phi_0]=weight_0*E[phi_0*phi_0]*sqrt(gamma_0)=weight_0*sqrt(gamma_0)
     expectancy = np.reshape(weights[0, :], solution_shape) * np.sqrt(chaos.normalization_gamma(0))
 
+    # TODO here and at discrete projection and galerkin use np.var to calculate variances instead? (also np.mean?)
     # Var[w_N]=E[(w_N)^2]-E[w_N]^2
     variance = np.reshape(np.sum(weights ** 2, axis=0) - (chaos.normalization_gamma(0) * (weights[0, :] ** 2)),
                           solution_shape)
