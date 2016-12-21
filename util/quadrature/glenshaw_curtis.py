@@ -78,8 +78,8 @@ def calculate_transformed_nodes_and_weights(distribution: Distribution):
             # this substitution introduces a factor pi/2*(tan^2(pi/2x)+1)
             # and also a scaling of the nodes by tan(pi/2x)
             nodes, weights = nodes_and_weights(order)
-            # we cannot really delete the first and last node, but we set it to something harmless
-            # and zero out their weight
+            # we cannot really delete the first and last node (using order + 2 and removing -1,1 would destroy nesting)
+            # but we set it to something harmless and zero out their weight
             nodes[0] = 0.
             nodes[-1] = 0.
             weights[0] = 0.

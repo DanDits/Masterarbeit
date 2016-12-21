@@ -253,7 +253,7 @@ class QuadratureTestCase(unittest.TestCase):
         chaos = chaos_multify([chaos] * 2, 1)
         chaos.init_quadrature_rule("sparse_gc", 6)  # level 6: 312 nodes, still worse by a lot
         result_sparse_gc_quad = chaos.integrate(to_integrate)
-        print(result_sciquad, result_full_quad, result_sparse_quad, result_sparse_gc_quad, sep='\n')
+        # print(result_sciquad, result_full_quad, result_sparse_quad, result_sparse_gc_quad, sep='\n')
         self.assertAlmostEqual(result_sciquad, result_full_quad, places=12)
         self.assertAlmostEqual(result_sciquad, result_sparse_quad, places=8)
         self.assertAlmostEqual(result_sciquad, result_sparse_gc_quad, places=2)

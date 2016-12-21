@@ -121,6 +121,7 @@ trial_6 = StochasticTrial([distributions.make_beta(1.5, 4.5), distributions.make
                     "stop_time", 0.5)
 
 # accuracy of expectancy data for MI(dt=0.001) around degree=8: 6.3483685515377584e-06, for Galerkin(?): 6.2370461164611651e-06
+# for DP on level 3: 6.25059233427e-06
 # accuracy of variance data for MI(dt=0.001) around degree=8: 5.86310961747e-07
 trial_7 = StochasticTrial([distributions.make_beta(0.5, 0.5)],
                           lambda xs, ys: np.cos(sum(xs)),

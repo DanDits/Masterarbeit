@@ -67,4 +67,4 @@ def discrete_projection_expectancy(trial, max_poly_degree, method, method_param,
     def poly_approximation(y):
         return np.reshape(sum(w * p(y) for w, p in zip(poly_weights, basis)), solution_shape)
 
-    return splitting_xs, splitting_xs_mesh, expectancy, variance, quad_points
+    return splitting_xs, splitting_xs_mesh, expectancy, variance, quad_points, len(basis)
