@@ -1,6 +1,7 @@
 from itertools import zip_longest
 from math import isinf, pi
 import numpy as np
+from numpy.fft import fftfreq
 
 
 class SolverConfig:
@@ -26,11 +27,12 @@ class SolverConfig:
         factors = []
         for interval, grid_points in zip_longest(self.intervals, self.grid_points_list,
                                                  fillvalue=self.grid_points_list[-1]):
+            assert grid_points % 2 == 0
             scale = 2 * pi / (interval[1] - interval[0])
             # the ordering of this numpy array is defined by the ordering of python's fft's result
             # (see its documentation)
-            factor = (1j * scale * np.append(np.arange(0, grid_points / 2 + 1),
-                                             np.arange(- grid_points / 2 + 1, 0))) ** power
+            # we apply the scale ourselves as we also need it to be imaginary and not divided by length
+            factor = (fftfreq(grid_points) * (1j * scale * grid_points)) ** power
             factors.append(factor)
         self.pseudospectral_factors_power = power
         self.pseudospectral_factors_mesh = np.meshgrid(*factors, sparse=True)
