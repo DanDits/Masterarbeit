@@ -16,19 +16,14 @@ setting6 = (lambda xs: 1./(1 + 25*xs[0]**2)/(1 + 225*xs[1]**2), 0.27468 * 0.1002
 chaos = mv.chaos_multify([pcd.legendreChaos] * 2, 1)
 setting7 = (lambda xs: np.sin(3 * xs[0] + np.cos(xs[1])), 0.0347458, 2, chaos)
 
-setting = setting6
-visualize_quad = False
+setting = setting7
+visualize_quad = True
 nodes_counts_sparse, nodes_counts_full, nodes_counts_sparse_gc = [], [], []
 error_sparse, error_full, error_sparse_gc = [], [], []
-for level in range(8):
+level = 6
+for level in range(level + 1):
     print("current level=", level)
     chaos = setting[3]
-
-    chaos.init_quadrature_rule("sparse", level)
-    nodes_count = chaos.quadrature_rule.get_nodes_count()
-    nodes_counts_sparse.append(nodes_count)
-    sparse_result = chaos.integrate(setting[0])
-    error_sparse.append(abs(sparse_result - setting[1]))
 
     chaos.init_quadrature_rule("sparse_gc", level)
     nodes_count = chaos.quadrature_rule.get_nodes_count()
@@ -49,6 +44,12 @@ for level in range(8):
     full_result = chaos.integrate(setting[0])
     error_full.append(abs(setting[1] - full_result))
 
+    chaos.init_quadrature_rule("sparse", level)
+    nodes_count = chaos.quadrature_rule.get_nodes_count()
+    nodes_counts_sparse.append(nodes_count)
+    sparse_result = chaos.integrate(setting[0])
+    error_sparse.append(abs(sparse_result - setting[1]))
+
 import matplotlib.pyplot as plt
 print(nodes_counts_sparse)
 plt.figure()
@@ -65,9 +66,9 @@ nodes = chaos.quadrature_rule.get_nodes()
 weights = chaos.quadrature_rule.get_weights()
 if nodes.shape[1] == 2 and visualize_quad:
     plt.figure()
+    plt.title("Sparse nodes distribution in 2d (level={}, count={})"
+              .format(level, chaos.quadrature_rule.get_nodes_count()))
+    print("Nodes=", nodes)
     plt.plot(nodes[:, 0], nodes[:, 1], ".")
-    plt.figure()
     print("Weights=", len(weights))
-    sq = int(np.sqrt(len(weights)))
-    plt.pcolormesh(weights.reshape((sq, sq)))
 plt.show()

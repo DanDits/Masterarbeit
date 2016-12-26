@@ -40,12 +40,13 @@ headsepline, % Uncomment to get a line under the header
 
 \usepackage[utf8]{inputenc} % Required for inputting international characters
 \usepackage[T1]{fontenc} % Output font encoding for international characters
-\usepackage{todonotes} % Hints for TODOs in text (also missing figures,...)
+\usepackage{todonotes} % Hints for TO-DOs in text (also missing figures,...)
 \usepackage{palatino} % Use the Palatino font by default
 
-\usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles APA)
+% biber and biblatex need to be compatibile (see "Compatibility matrix").. which is kinda strange and needs maybe manual installation of one of the packages
+\usepackage[backend=biber,style=numeric,natbib=true]{biblatex} 
 
-\addbibresource{example.bib} % The filename of the bibliography
+\addbibresource{lit.bib} % The filename of the bibliography
 
 \usepackage[autostyle=true]{csquotes} % Required to generate language-dependent quotes in the bibliography
 
@@ -254,7 +255,7 @@ $\omega$ & angular frequency & \si{\radian} \\
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
-
+% \nocite{*}  % uncomment if we do not cite everything but want to include full .bib file
 \printbibliography[heading=bibintoc]
 
 %----------------------------------------------------------------------------------------
