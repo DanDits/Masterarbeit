@@ -4,4 +4,47 @@
 
 \label{Chapter1} % For referencing the chapter elsewhere, use \ref{Chapter1} 
 
-Wieners Hermite Chaos \autocite{norbertwiener1938}
+\section{Die Klein-Gordon-Gleichung}
+Die für diese Arbeit grundlegende Gleichung ist die lineare Klein-Gordon-Gleichung in der Form
+\begin{align}
+\label{kgg}
+\dtt{u}(t,x)&=\alpha \Laplace_x u(t,x) - \beta(x)u(t,x), \: t>0, \, x\in \Torus^d\\
+u(0,x)&=u_0(x), \: x\in \Torus^d\\
+\dt{u}(0,x)&=v_0(x), \: x\in \Torus^d
+\end{align}
+Bevor wir Abhängigkeiten von einer Zufallsvariablen hinzufügen, ist es hilfreich, die Gleichung für deterministische Parameter besser zu verstehen. Diese Mühe ist nicht vergebens, da einige numerische Verfahren zur Bestimmung der Lösung der zufallsabhängigen Gleichung stark auf einem robusten Löser der deterministischen Gleichung basieren.
+\subsection{(Physikalische) Definitionen}
+Diese ist eine relativistische Feldgleichung, welche die Kinematik von spin-freien Teilchen, wie dem Pion, beschreibt. Auch das 2012 entdeckte Higgs-Boson ist ein spin-freies Teilchen, es ist jedoch noch unklar, ob es in das Standardmodell der Teilchenphysik hineinpasst.\autocite{kleingordon2016}\\
+Dabei ist
+\begin{itemize}
+\item $\Torus=\R/(2\pi\Z)$ der skalierte eindimensionale Torus. Wir werden ab sofort die vereinfachte Darstellung $\Torus^d=(-\pi,\pi)^d$ mit periodischen Randbedingungen verwenden. Die Abweichung vom Einheitstorus $(0,1)^d$ ermöglicht das direkte Verwenden der schnellen Fouriertransformation ohne weitere Skalierung, ist jedoch keine Beschränkung der Allgemeinheit. 
+\item $\absolute{u(t,x)}^2$ physikalisch als Ladungsdichte des Teilchens zum Zeitpunkt $t$ und Ort $x$ interpretierbar. 
+\item $\alpha>0$ das Quadrat der Wellengeschwindigkeit.
+\item $\beta(x)>0, \forall x\in \Torus^d,$ in der physikalischen Interpretation das Quadrat aus einer Kombination von Wellengeschwindigkeit, Masse und plankschem Wirkungsquantum.
+\end{itemize}
+Wir betrachten im Gegensatz zur physikalischen Darstellung nur reellwertige Funktionen $u$, $u_0$ und $v_0$ und fordern (implizit), dass die Anfangswerte $u_0$ und $v_0$ periodisch in $(-\pi,\pi)$ sind. \todo{(Reelle) Existenztheorie?}
+
+\subsection{Exakte Lösungen}
+Für spezielle Konfigurationen der Parameter und Anfangswerte können wir exakte Lösungen angeben. Diese sind hilfreich, um die Korrektheit von Implementierungen schnell und zuverlässig testen zu können. Außerdem zeigen sich so schnell die Grenzen und eventuelle Schwächen der Verfahren für gut gestellte Probleme auf.\\[1cm]
+Mithilfe des Separationsansatzes $u(t,x)=g(x)f(t)$ ergibt sich aus (\ref{kgg}) 
+\begin{equation*}
+(\alpha\Laplace g(x)-\beta(x)g(x))f(t) = g(x)f''(t)
+\end{equation*}
+womit sich aus Lösungen von
+\begin{align*}
+\alpha\Laplace g(x)-\beta(x)g(x)&=\lambda g(x), \: \lambda\in\R\\
+\mu f(t)&=f''(t), \: \mu\in \R
+\end{align*}
+Lösungen der KGG ergeben. Für $\beta(x) \equiv \beta>\absolute{\lambda}$ ergibt sich die klassische Wellengleichung $\Laplace g(x)=\frac{\beta + \lambda}{\alpha}g(x)$ mit periodischen Randbedingungen und eine lineare gewöhnliche Differentialgleichung.\\Die Anfangswerte $u_0$ und $v_0$ der KGG werden dann entsprechend passend gewählt.\\[1cm]
+Beispiele für exakte Lösungen ($d=1$) sind
+\begin{align*}
+u(t,x)&=\sin(\lambda x)(c_1 \sin(\mu t) + c_2 \cos(\mu t)), \, \mu^2=\beta+\alpha \lambda^2\\ 
+u(t,x)&=(c_1 \sin(\lambda x) + c_2 \cos(\lambda x))\sin(\mu t), \, \mu^2=\beta+\alpha \lambda^2\\
+u(t,x)&=\exp(-\cos(x))\sin(\mu t), \, \beta(x)=\mu^2+\cos(x)+\sin^2(x), \, \mu \in \R
+\end{align*}
+wobei $\lambda\in \pi\Z$ um die Periodizität zu gewährleisten; $c_1, c_2 \in \R$ beliebig.\\
+Weitere nicht-periodische Lösungen finden sich in \autocite{andreipolyanin2004}.
+
+\section{Operator Splitting}
+Um einen Ansatz für numerische Approximationen an die Lösung der KGG zu erhalten bietet sich ein klassischer Operator Splitting Ansatz an. Dabei wiederholen wir an dieser Stelle zuerst kurz die relevante Approximationstheorie und diskutieren mögliche Varianten.
+\todo[inline]{Operator Splitting Theorie; Strang Splitting; Unsere Anwendung auf KGG; WaveSolver und LinhypSolver; Stabilität ohne CFL für $w=1$?}

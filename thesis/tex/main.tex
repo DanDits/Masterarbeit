@@ -43,6 +43,8 @@ headsepline, % Uncomment to get a line under the header
 \usepackage{todonotes} % Hints for TO-DOs in text (also missing figures,...)
 \usepackage{palatino} % Use the Palatino font by default
 
+\usepackage{amsmath,amssymb,amsthm}
+
 % biber and biblatex need to be compatibile (see "Compatibility matrix").. which is kinda strange and needs maybe manual installation of one of the packages
 \usepackage[backend=biber,style=numeric,natbib=true]{biblatex} 
 
@@ -87,6 +89,8 @@ headsepline, % Uncomment to get a line under the header
 \hypersetup{pdfauthor=\authorname} % Set the PDF's author to your name
 \hypersetup{pdfkeywords=\keywordnames} % Set the PDF's keywords to your keywords
 }
+
+\include{defs}
 
 \begin{document}
 
@@ -210,14 +214,12 @@ Für die Unterstützung bei meiner Masterarbeit und für zahlreiche hilfreiche R
 %----------------------------------------------------------------------------------------
 
 \begin{symbols}{lll} % Include a list of Symbols (a three column table)
-
-$a$ & distance & \si{\meter} \\
-$P$ & power & \si{\watt} (\si{\joule\per\second}) \\
-%Symbol & Name & Unit \\
-
+$t$ & Zeit & Einheitslose nicht-negative reelle Variable\\
+$x$ & Ort & Einheitslose (mehrdimensionale) reelle Ortsvariable\\
 \addlinespace % Gap to separate the Roman symbols from the Greek
+$\Laplace$ & Laplace& Laplace Operator $\Laplace u(x_1,x_2)=\partial^2_{x_1}u(x_1,x_2)+\partial^2_{x_2}u(x_1,x_2)$ \\
 
-$\omega$ & angular frequency & \si{\radian} \\
+%Symbol & Name & Description \\
 
 \end{symbols}
 
