@@ -12,10 +12,10 @@ from util.analysis import error_l2_relative
 import diff_equation.klein_gordon as kg
 from util.trial import Trial
 
-dimension = 1
+dimension = 2
 grid_size_N = 64 if dimension >= 2 else 128
 domain = list(repeat([-pi, pi], dimension))
-delta_time = 0.0001
+delta_time = 0.001
 save_every_x_solution = 1
 plot_solutions_count = 5
 start_time = 0.
@@ -81,7 +81,7 @@ trial_frog = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
                    lambda xs: 2 * np.exp(-np.cos(sum(xs))),
                    lambda xs, t: np.sin(2 * t) * np.exp(-np.cos(sum(xs))),
                    "TrialFrog") \
-    .add_parameters("beta", lambda xs: 4 + np.cos(sum(xs)) + np.sin(sum(xs)) ** 2,
+    .add_parameters("beta", lambda xs: 4 + len(xs) * (np.cos(sum(xs)) + np.sin(sum(xs)) ** 2),
                     "alpha", lambda: 1,
                     "offset", 1)
 y_frog_2 = 3  # > 2
@@ -121,7 +121,7 @@ trial_bessel = Trial(lambda xs: (bessel_A * bessel_first(0, bessel_xi(xs, 0))
                     "alpha", lambda: bessel_alpha ** 2)
 
 if __name__ == "__main__":
-    trial = trial_3
+    trial = trial_frog
 
     trial.error_function = error_l2_relative
     offset_wave_solver = None

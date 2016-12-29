@@ -44,7 +44,9 @@ headsepline, % Uncomment to get a line under the header
 \usepackage{palatino} % Use the Palatino font by default
 
 \usepackage{amsmath,amssymb,amsthm}
-
+\usepackage{mathtools}
+\usepackage{tikz}
+\usetikzlibrary{matrix}
 % biber and biblatex need to be compatibile (see "Compatibility matrix").. which is kinda strange and needs maybe manual installation of one of the packages
 \usepackage[backend=biber,style=numeric,natbib=true]{biblatex} 
 
@@ -183,8 +185,8 @@ headsepline, % Uncomment to get a line under the header
 
 \begin{acknowledgements}
 \addchaptertocentry{\acknowledgementname} % Add the acknowledgements to the table of contents
-Hiermit danke ich allen, die mir während meines Studiums hilfreich zur Seite standen und mich immer unterstützt haben; im Speziellen danke ich meine Eltern und Großeltern für finanzielle und moralische Unterstützung.\\ 
-Für die Unterstützung bei meiner Masterarbeit und für zahlreiche hilfreiche Ratschläge danke ich insbesondere meinem Betreuer Herr Jahnke. \todo{weitere Korrekturleser o.ö.?}
+Hiermit danke ich allen, die mir während meines Studiums hilfreich zur Seite standen und mich immer unterstützt haben; im Speziellen danke ich meine Eltern und Großeltern für ihre uneingeschränkte Unterstützung und meinem Bruder Fabian.\\ 
+Für die Unterstützung bei meiner Masterarbeit und für zahlreiche hilfreiche Ratschläge danke ich insbesondere meinem Betreuer Herr Jahnke. \todo{weitere Korrekturleser o.ä.?}
 \end{acknowledgements}
 
 %----------------------------------------------------------------------------------------
@@ -217,7 +219,8 @@ Für die Unterstützung bei meiner Masterarbeit und für zahlreiche hilfreiche R
 $t$ & Zeit & Einheitslose nicht-negative reelle Variable\\
 $x$ & Ort & Einheitslose (mehrdimensionale) reelle Ortsvariable\\
 \addlinespace % Gap to separate the Roman symbols from the Greek
-$\Laplace$ & Laplace& Laplace Operator $\Laplace u(x_1,x_2)=\partial^2_{x_1}u(x_1,x_2)+\partial^2_{x_2}u(x_1,x_2)$ \\
+$\partial_x$ & Ableitung nach x & $\partial_x u(x,y)=u_x(x,y)=\frac{d}{dx}u(x,y)$ für $u\colon\R^2\to \R$ stetig differenzierbar\\ 
+$\Laplace$ & Laplace& Laplace Operator im Ort $\Laplace u(x_1,x_2)=u_{x_1x_1}(x_1,x_2)+u_{x_2x_2}(x_1,x_2)$ \\
 
 %Symbol & Name & Description \\
 
