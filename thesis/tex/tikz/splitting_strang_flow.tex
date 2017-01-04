@@ -1,0 +1,15 @@
+\begin{tikzpicture}
+  \matrix (m) [matrix of math nodes,row sep=3em,column sep=4em,minimum width=2em]
+  {
+  	 \, & y_{\frac{3}{4}} & y_1\\
+     \, & y_{\frac{2}{4}} & \, \\
+     y_0 & y_{\frac{1}{4}} & \,\\};
+  \path[-stealth]
+    (m-3-1.east|-m-3-2) edge node [below] {$\varphi_{\deltathalf}^A$} (m-3-2)
+    (m-3-2) edge node [right] {$\varphi_{\deltathalf}^B$} (m-2-2)
+    (m-3-1) edge [dashed] node [above left] {$\Phi_{\deltat}$} (m-2-2)
+    
+    (m-1-2.east|-m-1-3) edge node [above] {$\varphi_{\deltathalf}^A$} (m-1-3)
+    (m-2-2) edge node [left] {$\varphi_{\deltathalf}^B$} (m-1-2)
+    (m-2-2) edge [dashed] node [below right] {$\Phi_{\deltat}^*$} (m-1-3);
+\end{tikzpicture}

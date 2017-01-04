@@ -93,7 +93,8 @@ Diese zentrale Idee werden wir verwenden, um die KGG
 \end{equation*}
 zu splitten. Dabei wird der Operator $\alpha\Laplace$ in $A$ einfließen und $-\beta(x)$ in $B$. Man beachte jedoch, dass die zeitliche Ableitung zweiter Ordnung von $u$ eine Umschreibung in ein System erster Ordnung erfordert, bevor ein Splittingansatz sinnvoll ist.
 
-\subsection{Lie-Trotter und Strang Splitting}
+\subsection{Lie-Trotter Splitting}
+\label{seclietrotter}
 Wir beginnen mit einer rigerosen Einführung in Splitting Verfahren. Als zentrales Ergebnis werden wir dabei das Strang Splitting erhalten, welches einen Fehler $\mathcal{O}(\deltat^2)$ in Abhängigkeit von der Zeitschrittweite $\deltat$ besitzt.\\
 Die folgende Einführung ist angelehnt an \autocite{patrickdiplom}, welche wiederum aus \autocite[Kapitel II.3 bis II.5]{HairerLubichWanner} übernommen wurde.
 \begin{mathdef}[Fluss einer Differentialgleichung]
@@ -136,7 +137,7 @@ Ist insbesondere $\Phi_{\deltat}$ symmetrisch, so ist wegen $C(y_0)=(-1)^pC(y_0)
 \end{maththeorem}
 Nun zerlegen wir die ursprüngliche Gleichung (\ref{orddgl}) in zwei Teile
 \[\partial_t \, y=f(y)=A(y)+B(y) \]
-Das Aufteilen ist hierbei nicht eindeutig! Eine Möglichkeit im zweidimensionalen wäre zum Beispiel: $A=\text{P}_{(1,0)^T}f,\,B=\text{P}_{(0,1)^T}f$, wobei $\text{P}_v$ die Projektion auf $\text{span}(v)$ darstellt. Häufig --ebenso wie in unserem Fall der KGG-- ist die natürliche Aufteilung der Summe die Methode der Wahl.\\
+Das Aufteilen ist hierbei nicht eindeutig! Eine Möglichkeit im zweidimensionalen wäre zum Beispiel: $A=\text{P}_{(1,0)^T}f,\,B=\text{P}_{(0,1)^T}f$, wobei $\text{P}_v$ die Projektion auf $\text{span}(v)$ darstellt. Häufig --ebenso wie in unserem Fall der KGG-- ist die bereits vorhandene natürliche Aufteilung der Summe die Methode der Wahl.\\
 Sind nun $\varphi_{\deltat}^A$ und $\varphi_{\deltat}^B$ die exakten Flüsse der Systeme
 \begin{align}
 \partial_t \, y&=A(y)\quad \text{und} \label{splitsimple1}\\ 
@@ -151,12 +152,15 @@ Hierzu starten wir von einem gegebenen Anfangswert $y_0$ und lösen das System (
 \hfill%
 \begin{minipage}{0.7\textwidth}
 Die Reihenfolge $A\to B$ ist willkürlich und kann auch umgekehrt werden. Tatsächlich sind die resultierenden Verfahren zueinander adjungiert wegen (\ref{adjlemma}) und der Tatsache, dass der exakte Fluss wegen $y_1=\varphi_{-\deltat}^{-1}(y_0)=\varphi_{\deltat}^*(y_0)=\varphi_{\deltat}(y_0)$ als symmetrisches Einschrittverfahren auffassbar ist. Kurz:\\
-$\Phi_{\deltat}=\varphi_{\deltat}^B \circ \varphi_{\deltat}^A$\\
-$\Phi_{\deltat}^*=\varphi_{\deltat}^A \circ \varphi_{\deltat}^B$ 
+\begin{align}
+\label{liesplittings}
+\Phi_{\deltat}=\varphi_{\deltat}^B \circ \varphi_{\deltat}^A\\
+\Phi_{\deltat}^*=\varphi_{\deltat}^A \circ \varphi_{\deltat}^B\nonumber
+\end{align} 
 \end{minipage}
-\todo[inline]{how to get strang, visualize with tikz and why strang is order2, also fast strang}
 
 \begin{maththeorem}[Ordnung des Lie-Trotter Splittings]
+\label{lieorder1}
 Das Lie-Trotter Splitting $\Phi_{\deltat}=\varphi_{\deltat}^B \circ \varphi_{\deltat}^A$ und sein adjungiertes $\Phi_{\deltat}^*=\varphi_{\deltat}^A \circ \varphi_{\deltat}^B$ sind von Ordnung $p=1$.
 \end{maththeorem}
 \begin{proof}
@@ -174,3 +178,49 @@ Diese vergleichen wir nun mit der Taylorreihe des Splittings
 \end{align*}
 so bekommen wir den Fehler $\varphi_{\deltat}(y_0)-\left(\varphi_{\deltat}^B \circ \varphi_{\deltat}^A\right)(y_0)=\mathcal{O}(\deltat^2)$ und die Ordnung $p=1$. Mit Satz \ref{adjfloworder} ist das adjungierte Verfahren ebenfalls von Ordnung $p=1$.
 \end{proof}
+
+\subsection{Strang Splitting}
+\label{secstrang}
+Durch geschicktes Kombinieren der Einschrittverfahren $\Phi_{\deltat}$ und $\Phi_{\deltat}^*$ mit verschiedenen Schrittweiten lassen sich Splitting Verfahren beliebiger Ordnung konstruieren. Dies ist vergleichbar mit der Konstruktion von Mehrschrittverfahren höherer Ordnung.\todo{Schaue ins NumSkript und vergleiche}\\
+Wir haben Interesse daran, ein Verfahren $\Phi_{\deltat}^S$ mit Ordnung $p=2$ zu gewinnen, welches möglichst den selben Zeitaufwand wie das Lie-Trotter Splitting besitzt. Hierzu verwenden wir den Ansatz \[\Phi_{\deltat}^S=\Phi_{\deltathalf}^*\circ\Phi_{\deltathalf}\]
+Wir erkennen sofort, dass es sich hierbei um ein symmetrisches Verfahren handelt. Als Komposition von Verfahren mit Ordnung 1 (siehe Satz \ref{lieorder1}) ist es ebenfalls mindestens von Ordnung 1. Als zusätzlich symmetrisches Verfahren gilt mit Satz \ref{adjfloworder}, dass das Verfahren mindestens von Ordnung 2 ist.\\
+Dieses sogenannte \emph{Strang Splitting} lässt sich unter Verwendung der aufgeteilten Flüsse (\ref{liesplittings}) auch darstellen als 
+
+\noindent\begin{minipage}{0.3\textwidth}
+\input{tikz/splitting_strang_flow}
+\end{minipage}%
+\hfill%
+\begin{minipage}{0.7\textwidth}
+\begin{align}
+\Phi_{\deltat}^S&=\varphi_{\deltathalf}^A\circ\varphi_{\deltathalf}^B\circ\varphi_{\deltathalf}^B\circ\varphi_{\deltathalf}^A\nonumber\\
+&=\varphi_{\deltathalf}^A\circ\varphi_{\deltat}^B\circ\varphi_{\deltathalf}^A
+\end{align}
+\end{minipage}
+Für einen Schritt ist also nur der anderthalbfache Aufwand nötig wie beim Lie-Trotter Splitting, aber man gewinnt bereits eine Ordnung dazu. Unter Umständen kann dies sogar noch verbessert werden:\\
+Gegeben sei ein Anfangswert $y_0$ für das System (\ref{orddgl}). Ist man an einer Approximation $y_T$ der Lösung $y(T)$ zu einem Zeitpunkt $T=n\deltat>0$ interessiert, so gilt unter Verwendung des Strang Splitting Verfahrens
+\begin{align*}
+y_T&=\underbrace{\Phi_{\deltat}^S\circ\dots\circ\Phi_{\deltat}^S}_{n\text{ mal}}(y_0)\\
+&=\left(\varphi_{\deltathalf}^A\circ\varphi_{\deltat}^B\circ\varphi_{\deltathalf}^A\right)\circ\left(
+\varphi_{\deltathalf}^A\circ\varphi_{\deltat}^B\circ\varphi_{\deltathalf}^A\right)\circ\dots\circ\left(
+\varphi_{\deltathalf}^A\circ\varphi_{\deltat}^B\circ\varphi_{\deltathalf}^A\right)\\
+&=\varphi_{\deltathalf}^A\circ\varphi_{\deltat}^B\circ\left(\varphi_{\deltat}^A\circ\varphi_{\deltat}^B\right)\circ\left(\varphi_{\deltat}^A\circ\varphi_{\deltat}^B\right)\circ\dots\circ\left(\varphi_{\deltat}^A\circ\varphi_{\deltat}^B\right)\circ\varphi_{\deltathalf}^A\\
+&=\varphi_{\deltathalf}^A\circ\varphi_{\deltat}^B\circ
+\underbrace{\Phi_{\deltat}^*\circ\dots\circ\Phi_{\deltat}^*}_{n-1\text{ mal}}\circ\,\varphi_{\deltathalf}^A
+\end{align*}
+Durch das Kombinieren der äußeren Halbschritte bekommt man also nun eine Darstellung des Strang Splittings, die nur einen zusätzlichen Fluss berechnen muss und trotzdem Ordnung $p=2$ besitzt. Man muss hierbei allerdings auf Zwischenergebnisse verzichten, da diese eine weitere Anwendung von $\varphi_{\deltathalf}^A$ benötigen würden.\\[0.5cm]
+Bisher sind wir davon ausgegangen, dass sich die Flüsse $\varphi_{\deltat}^A$ btw. $\varphi_{\deltat}^B$ exakt berechnen lassen. Dies ist in den seltensten Fällen der Fall und man verwendet stattdessen approximative Verfahren $\Phi_{\deltat}^A$ bzw. $\Phi_{\deltat}^B$. 
+\begin{maththeorem}
+Sind die Verfahren ebenfalls von Ordnung $p$, d.h. falls 
+\begin{align*}
+\Phi_{\deltat}^A(y(t))=\varphi_{\deltat}^A(y(t))+\mathcal{O}(\deltat^{p+1})\\
+\Phi_{\deltat}^B(y(t))=\varphi_{\deltat}^B(y(t))+\mathcal{O}(\deltat^{p+1})
+\end{align*}
+so gelten Satz \ref{adjfloworder}, Satz \ref{lieorder1} und alle entsprechenden Aussagen aus Kapitel \ref{seclietrotter} und Kapitel \ref{secstrang} für $\Phi_{\deltat}^A$ und $\Phi_{\deltat}^B$ anstelle von $\varphi_{\deltat}^A$ und $\varphi_{\deltat}^B$.\\
+Insbesondere ist das Strang Splitting immer noch von Ordnung 2, wenn alle verwendeten Approximationen von Ordnung 2 sind.
+\end{maththeorem}
+\begin{proof}[Beweisidee]
+Am Beispiel von $\varphi_{\deltat}^A$ und $p=1$:\\
+Man verwendet die Darstellung $\varphi_{\deltat}^A(y_0)=y_0+\deltat f^A(y_0)+\mathcal{O}(\deltat^2)$ und ersetzt $\varphi_{\deltat}^A$ durch $\Phi_{\deltat}^A$. Die Vorgehensweise in den Beweisen muss dann höchstens minimal angepasst werden.
+\end{proof}
+
+\todo[inline]{Einführung in PolyChaos in neuer Section}
