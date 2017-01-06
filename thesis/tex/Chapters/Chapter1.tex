@@ -1,8 +1,8 @@
 % Chapter 1
 
-\chapter{Einführung} % Main chapter title
-In diesem Kapitel werden wir die zu untersuchende Klein-Gordon-Gleichung (KGG) vorstellen und uns mit den zugehörigen häufig verwendeten Parametern vertraut machen. Anschließend gewinnen wir einen numerischen Lösungsansatz aus der Idee des Operatorsplittings. Die in dieser Arbeit untersuchte \emph{uncertainty} in Gestalt von Zufallsvariablen wird allerdings erst in den folgenden Kapiteln explizit auftauchen.
-\label{Chapter1} % For referencing the chapter elsewhere, use \ref{Chapter1} 
+\chapter{Einführung}
+In diesem Kapitel werden wir die zu untersuchende Klein-Gordon-Gleichung (KGG) vorstellen und uns mit den zugehörigen häufig verwendeten Parametern vertraut machen. Anschließend gewinnen wir einen numerischen Lösungsansatz aus der Idee des Operatorsplittings. Um dann später die Zufallsabhängigkeit einführen zu können, benötigen wir die Theorie des General Polynomial Chaos. Die in dieser Arbeit untersuchte \emph{uncertainty} in Gestalt von Zufallsvariablen wird allerdings erst in den folgenden Kapiteln in die KGG einfließen.
+\label{Chapter1}
 
 \section{Die Klein-Gordon-Gleichung}
 Die für diese Arbeit grundlegende Gleichung ist die lineare Klein-Gordon-Gleichung in der Form
@@ -70,7 +70,7 @@ Weitere --allerdings nicht-periodische-- Lösungen finden sich in \autocite{andr
 
 \section{Operator Splitting}
 Um einen Ansatz für numerische Approximationen an die Lösung der KGG zu erhalten bietet sich ein klassischer Operator Splitting Ansatz an. Dabei wiederholen wir an dieser Stelle zuerst kurz die relevante Approximationstheorie und diskutieren mögliche Varianten.
-\todo[inline]{Operator Splitting Theorie; Strang Splitting; Unsere Anwendung auf KGG; WaveSolver und LinhypSolver; Stabilität ohne CFL für $w=1$?}
+\todo[inline]{Späteres Kapitel: Unsere Anwendung auf KGG; WaveSolver und LinhypSolver; Stabilität ohne CFL für $w=1$ (hat das was mit der NichtSymmetrie des Strang Splittings zu tun?}
 \todo[inline]{Benötige Buch: Geometric Numerical Integration
 Structure-Preserving Algorithms for Ordinary Differential Equations, Springer, Kap II.3 bis II.5}
 \subsection{Generelle Idee}
@@ -101,7 +101,7 @@ Die folgende Einführung ist angelehnt an \autocite{patrickdiplom}, welche wiede
 Der Fluss $\varphi_t$ einer reversiblen Differentialgleichung
 \begin{equation}
 \label{orddgl}
-\partial_t \, y=f(y),\quad y(0)\:\text{ gegeben}
+\dt{y}=f(y),\quad y(0)\:\text{ gegeben}
 \end{equation}
 mit $f\colon \R^d\to\R^d$ ist die injektive Abbildung, die einem gegebenen $y_0$ die exakte Lösung $y(t)$ zum Zeitpunkt $t$ zuordnet, wobei $y(0)=y_0$. Also gilt
 \begin{equation*}
@@ -136,12 +136,12 @@ erfüllt. Dann ist das adjungierte Verfahren $\Phi_{\deltat}^*$ ebenfalls von Or
 Ist insbesondere $\Phi_{\deltat}$ symmetrisch, so ist wegen $C(y_0)=(-1)^pC(y_0)$ die Ordnung $p$ gerade.
 \end{maththeorem}
 Nun zerlegen wir die ursprüngliche Gleichung (\ref{orddgl}) in zwei Teile
-\[\partial_t \, y=f(y)=A(y)+B(y) \]
+\[\dt{y}=f(y)=A(y)+B(y) \]
 Das Aufteilen ist hierbei nicht eindeutig! Eine Möglichkeit im zweidimensionalen wäre zum Beispiel: $A=\text{P}_{(1,0)^T}f,\,B=\text{P}_{(0,1)^T}f$, wobei $\text{P}_v$ die Projektion auf $\text{span}(v)$ darstellt. Häufig --ebenso wie in unserem Fall der KGG-- ist die bereits vorhandene natürliche Aufteilung der Summe die Methode der Wahl.\\
 Sind nun $\varphi_{\deltat}^A$ und $\varphi_{\deltat}^B$ die exakten Flüsse der Systeme
 \begin{align}
-\partial_t \, y&=A(y)\quad \text{und} \label{splitsimple1}\\ 
-\partial_t \, y&=B(y) \label{splitsimple2}
+\dt{y}&=A(y)\quad \text{und} \label{splitsimple1}\\ 
+\dt{y}&=B(y) \label{splitsimple2}
 \end{align}
 so gewinnen wir daraus ein Verfahren zur Lösung der ursprünglichen Gleichung.\\
 Hierzu starten wir von einem gegebenen Anfangswert $y_0$ und lösen das System (\ref{splitsimple1}) um einen Zwischenwert $y_{\onehalf}$ zu erhalten. Verwenden wir diesen als neuen Startwert für das System (\ref{splitsimple2}), so erhalten wir einen daraus einen Wert $y_1$, welcher eine Approximation an die Lösung $\varphi_{\deltat}(y_0)$ des ursprünglichen Systems ist.\\[1cm]
@@ -151,7 +151,7 @@ Hierzu starten wir von einem gegebenen Anfangswert $y_0$ und lösen das System (
 \end{minipage}%
 \hfill%
 \begin{minipage}{0.7\textwidth}
-Die Reihenfolge $A\to B$ ist willkürlich und kann auch umgekehrt werden. Tatsächlich sind die resultierenden Verfahren zueinander adjungiert wegen (\ref{adjlemma}) und der Tatsache, dass der exakte Fluss wegen $y_1=\varphi_{-\deltat}^{-1}(y_0)=\varphi_{\deltat}^*(y_0)=\varphi_{\deltat}(y_0)$ als symmetrisches Einschrittverfahren auffassbar ist. Kurz:\\
+Die Reihenfolge $A\to B$ ist willkürlich und kann auch umgekehrt werden. Tatsächlich sind die resultierenden Verfahren zueinander adjungiert wegen (\ref{adjlemma}) und der Tatsache, dass der exakte Fluss wegen $y_1=\varphi_{-\deltat}^{-1}(y_0)=\varphi_{\deltat}^*(y_0)=\varphi_{\deltat}(y_0)$ als symmetrisches Einschrittverfahren auffassbar ist.Kurz:\\
 \begin{align}
 \label{liesplittings}
 \Phi_{\deltat}=\varphi_{\deltat}^B \circ \varphi_{\deltat}^A\\
@@ -164,7 +164,9 @@ Die Reihenfolge $A\to B$ ist willkürlich und kann auch umgekehrt werden. Tatsä
 Das Lie-Trotter Splitting $\Phi_{\deltat}=\varphi_{\deltat}^B \circ \varphi_{\deltat}^A$ und sein adjungiertes $\Phi_{\deltat}^*=\varphi_{\deltat}^A \circ \varphi_{\deltat}^B$ sind von Ordnung $p=1$.
 \end{maththeorem}
 \begin{proof}
-Die Taylorreihe von $\varphi_{\deltat}$ lässt sich darstellen als 
+Die Taylorreihe von $\varphi_{\deltat}$ lässt sich wegen 
+\[\varphi_{\deltat}(y_0)=y(\deltat)=y(0)+\deltat \underbrace{y^\prime(0)}_{=f(y_0)}
++\frac{\deltat^2}{2}\underbrace{y^{\prime\prime}(0)}_{=f^\prime(y_0)y^\prime(0)=f^\prime(y_0)f(y_0)}+\mathcal{O}(\deltat^3)\] darstellen als 
 \[\varphi_{\deltat}(y_0)=y_0+\deltat f(y_0)+\frac{\deltat^2}{2}f^\prime(y_0)f(y_0)+\mathcal{O}(\deltat^3)\]
 Diese vergleichen wir nun mit der Taylorreihe des Splittings
 \begin{align*}
@@ -176,7 +178,7 @@ Diese vergleichen wir nun mit der Taylorreihe des Splittings
 &=y_0+\deltat f(y_0)+\frac{\deltat^2}{2}f^\prime(y_0)f(y_0)\\
 &\quad+\frac{\deltat^2}{2}\left(f^{\prime B}(y_0)f^A(y_0)-f^{\prime A}(y_0)f^B(y_0)\right)+\mathcal{O}(\deltat^3)
 \end{align*}
-so bekommen wir den Fehler $\varphi_{\deltat}(y_0)-\left(\varphi_{\deltat}^B \circ \varphi_{\deltat}^A\right)(y_0)=\mathcal{O}(\deltat^2)$ und die Ordnung $p=1$. Mit Satz \ref{adjfloworder} ist das adjungierte Verfahren ebenfalls von Ordnung $p=1$.
+so bekommen wir --falls $f^A$, $f^{\prime A}$, $f^B$ und $f^{\prime B}$ hinreichend glatt-- den Fehler $\varphi_{\deltat}(y_0)-\left(\varphi_{\deltat}^B \circ \varphi_{\deltat}^A\right)(y_0)=\mathcal{O}(\deltat^2)$ und die Ordnung $p=1$. Mit Satz \ref{adjfloworder} ist das adjungierte Verfahren ebenfalls von Ordnung $p=1$.
 \end{proof}
 
 \subsection{Strang Splitting}
@@ -220,7 +222,74 @@ Insbesondere ist das Strang Splitting immer noch von Ordnung 2, wenn alle verwen
 \end{maththeorem}
 \begin{proof}[Beweisidee]
 Am Beispiel von $\varphi_{\deltat}^A$ und $p=1$:\\
-Man verwendet die Darstellung $\varphi_{\deltat}^A(y_0)=y_0+\deltat f^A(y_0)+\mathcal{O}(\deltat^2)$ und ersetzt $\varphi_{\deltat}^A$ durch $\Phi_{\deltat}^A$. Die Vorgehensweise in den Beweisen muss dann höchstens minimal angepasst werden.
+Man verwendet die Darstellung $\varphi_{\deltat}^A(y_0)=y_0+\deltat f^A(y_0)+\mathcal{O}(\deltat^2)$ und ersetzt $\varphi_{\deltat}^A$ durch $\Phi_{\deltat}^A$. Die Vorgehensweise in den Beweisen muss dann höchstens minimal angepasst werden.\\
+Man beachte hierbei, dass nun $\Phi_{\deltat}^A$ im Gegensatz zu $\varphi_{\deltat}^A$ nicht mehr symmetrisch ist. Die Argumentation über die Ordnung von symmetrischen Verfahren kann also nicht direkt verwendet werden, um $p=2$ für das Strang Splittings zu begründen. Außerdem kann dies die Möglichkeit, das Strang Splitting durch Kombination der Halbschritte zu beschleunigen, zunichte machen.
 \end{proof}
 
-\todo[inline]{Einführung in PolyChaos in neuer Section}
+\section{General Polynomial Chaos}
+Die Entstehung des \emph{general Polynomial Chaos}(gPC) ist eine Geschichte über den Versuch, stochastische Abhängigkeit und Integrationstheorie zu kombinieren. Sie wurzelte in der Arbeit von Wiener (\autocite{norbertwiener1938}), wo er das \emph{homogene Chaos} einführte, um die Entwicklung von Unsicherheit in einem dynamischen, chaotischen, physikalischen System zu konkretisieren. Dies erklärt auch den Ursprung der Bezeichnung "`Chaos"' im Kontext der chaotischen Brownschen Bewegung im Wiener-Prozess.\\
+Ghanem verwendete dann Hermite Polynome um mithilfe dieser Orthogonalbasis gaußsche Prozesse darzustellen. Dies wendete er erfolgreich auf einige Probleme aus den Ingenieurswissenschaften an, ein Überblick wird in (\autocite{GhaSpa91}) gegeben.\\
+Xiu verallgemeinerte in seiner Arbeit (\autocite{xiu2002}) diesen Ansatz auf andere Kombinationen aus Stochastischer Verteilung und Polynombasis. Gemäß dem Askey Schema (siehe Abbildung \ref{askeyscheme}) werden Beziehungen einiger bekannter Orthonormalbasen verdeutlicht. Man beobachtet außerdem, dass einige Gewichte den Dichtefunktionen von bekannten Verteilungen entsprechen und möchte nun zu einer gegebenen Verteilung die bestmögliche Polynombasis verwenden. An Modellproblemen demonstrierte er jeweils optimale exponentielle Konvergenz für die verschiedenen Paarungen.\\
+\begin{figure}
+\center
+\includegraphics[width=0.8\linewidth]{Figures/askeyscheme.png}
+\caption{Askey Schema; Ein Pfeil symbolisiert den Übergang einer Basis in eine andere durch Grenzwertbildung eines Parameters; Quelle: \autocite{webaskey}}
+\label{askeyscheme}
+\end{figure}
+\begin{mathbsp}[Grenzwertbildung im Askey Schema]
+Es gilt für die Jacobi Polynome $P_n^{(\alpha,\beta)}(x)$ und die Hermite Polynome $H_n(x)$ die Beziehung
+\[\lim\limits_{\alpha\to\infty}\alpha^{-\onehalf n}P_n^{(\alpha,\alpha)}\left(\frac{x}{\sqrt{\alpha}}\right)=\frac{H_n(x)}{2^nn!}\]
+Für eine genauere Betrachtung der Beziehungen der hypergeometrischen Polynome im Askey Schema sei auf \autocite{koekoekswart98} verwiesen.
+\end{mathbsp}
+
+Im Folgenden werden wir eine Einführung in das von uns verwendete gPC geben. Dabei werden wir auf diskrete Verteilungen (wie die Poisson-Verteilung) verzichten, es sei jedoch bemerkt, dass dies keine Einschränkung der Methode ist, sondern lediglich die Notation vereinfacht. Konkret werden wir uns mit Laguerre-, Jacobi-, Hermite- und Legendre-Polynomen beschäftigen, wobei letztere ein Spezialfall der Jacobipolynome darstellen. 
+\todo[inline]{Einführung in PolyChaos; zeige Konvergenz in L2 der poly expansion und dass besser für entsprechende PolyBasis aber auch funktional für andere mithilfe von experiment}
+\subsection{Orthogonale Polynome und Approximationstheorie}
+Wir beginnen mit grundlegender Notation und Namensgebung um das zentrale Werkzeug der Polynomapproximation festzulegen. Später werden diese Polynome verwendet, um die Zufallsabhängigkeit der auftretenden Funktionen auf natürliche Weise darzustellen, indem das Orthogonalitätsmaß der Dichtefunktion entspricht.
+\begin{mathdef}
+Ein allgemeines Polynom $Q$ vom Grad $n$ lässt sich darstellen als
+\[Q_n(x)=q_nx^n+q_{n-1}^{n-1}+\dots+q_1x+q_0,\quad q_n\ne 0\]
+Wir bezeichnen mit 
+\[P_n(x)=\frac{Q_n(x)}{q_n}\]
+die \emph{monic} Version des Polynoms $Q$, also mit führendem Koeffizienten gleich 1.\\
+ Ein System $\left\lbrace Q_n(x),\: n\in\mathcal{N}\right\rbrace$ von Polynomen mit $\mathcal{N}=\N_0=\N\cup\lbrace 0\rbrace$ oder $\mathcal{N}=\lbrace 0,1,\dots,N-1,N\rbrace$ heißt Orthogonalsystem, wenn bezüglich eines reellen positiven Maßes $\alpha$ die Orthogonalitätsbedingung
+ \[\langle Q_n(x),Q_m(x)\rangle =\int_S Q_n(x)Q_m(x)d\alpha(x)=\gamma_n\delta_{mn},\quad m,n\in\mathcal{N}\]
+ erfüllt ist. Dabei ist $\delta_{mn}$ das Kronecker-Delta, $S$ der nicht notwendigerweise endliche Träger des Maßes $\alpha$ und $y_n>0$ die Normalisierungskonstanten. Es gilt 
+ \[\gamma_n=\int_S Q_n^2(x)d\alpha(x),\quad n\in\mathcal{N}\] und O.B.d.A. werden wir in folgenden Kapiteln stets von $\gamma_n=1$ ausgehen. In diesem Fall nennt man das System ein Orthonormalsystem.
+\end{mathdef}
+\begin{mathbsp}[Hermite-Chaos]
+Ist $S=(-\infty,\infty)$, $w(x)=\frac{1}{\sqrt{2\pi}}e^{-\frac{x^2}{2}}$ die Dichtefunktion des Gauss-Verteilung und verwenden wir diese als Dichte des Maßes $\alpha$, so sind die Hermite Polynome
+\[H_0(x)\equiv 1,\quad H_1(x)=x,\quad H_2(x)=x^2-1,\quad H_n(x)=xH_{n-1}(x)-(n-1)H_{n-2}(x)\]
+ein passendes Orthogonalsystem mit $\gamma_n=n!$.\\
+Man beachte, dass diese Definition der Hermite Polynome leicht von der in der Literatur üblichen abweicht. Dies ist der Tatsache geschuldet, dass dort die entsprechende Gewichtsfunktion einen zusätzlichen Faktor $\sqrt{2}$ besitzt. Sie stellt somit keine Dichte einer Wahrscheinlichkeitsverteilung dar und ist für unsere Zwecke unpraktisch und wird nicht verwendet. 
+\end{mathbsp}
+
+Eine wichtige Eigenschaft von Orthogonalsystemen von Polynomen ist eine besondere Art der rekursiven Darstellung, wie wir sie bereits bei den Hermite Polynomen gesehen haben.
+\begin{maththeorem}[Drei Term Rekursion]
+Ein Orthogonalsystem $\left\lbrace Q_n(x),\: n\in\N_0\right\rbrace$ von Polynomen erfüllt eine drei Term Rekursion
+\begin{eqnarray}
+Q_n(x)=(a_nx+b_n)Q_{n-1}(x)-c_nQ_{n-2}(x),\quad n\in\N\\
+Q_{-1}(x)\equiv 0, Q_0(x)\equiv 1\nonumber
+\end{eqnarray}
+wobei $a_n=\frac{k_n}{k_{n-1}}$, $b_n\in\R$ und $c_n=-\frac{a_n}{a_{n-1}}\cdot \frac{\gamma_n}{\gamma_{n-1}}$.
+Dabei ist $k_n\neq 0$ der führende Faktor und $\gamma_n>0$ der Normalisierungsfaktor des Polynoms $Q_n$ . 
+\todo[inline]{erkläre/beweise wie man daraus auf Nullstellenberechnung kommt später für Nodes/weights}
+\end{maththeorem}
+\begin{proof}
+Es gilt $\text{deg}(Q_n)=n,\forall n\in\N_0$. Für $a_n=\frac{k_n}{k_{n-1}}$ ist $Q_n(x)-a_nxQ_{n-1}(x)$ ein Polynom vom Grad $\le n-1$. Dieses lässt sich also schreiben als
+\[Q_n(x)-a_nxQ_{n-1}(x)=\sum_{m=0}^{n-1}c_mQ_m(x)\]
+Für $k\le n-1$ folgt also aus der Orthogonalität bezüglich des Skalarproduktes $\langle\cdot,\cdot\rangle$
+\begin{equation*}
+\langle Q_n(x)-a_nxQ_{n-1}(x),Q_k(x)\rangle=\sum_{m=0}^{n-1}c_m\langle Q_m(x),Q_k(x)\rangle=c_k\langle Q_k(x),Q_k(x)\rangle=c_k\gamma_k
+\end{equation*}
+und durch Verwenden von $\langle Q_n(x),Q_k(x)\rangle = 0$ und Umstellen
+\[ -a_n\langle Q_{n-1}(x),xQ_k(x)\rangle=c_k\gamma_k\]
+Somit folgt für $k<n-2$ wegen $\text{deg}(xQ_k(x))<n-1$ dass $c_k=0$. Damit erfüllen die Polynome eine 3 Term Rekursion
+\[Q_n(x)-a_nxQ_{n-1}(x)=c_{n-1}Q_{n-1}(x)+c_{n-2}Q_{n-2}(x)\]
+Weiterhin gilt \[c_{n-2}\gamma_{n-2}=-a_n\langle Q_{n-1}(x),xQ_{n-2}(x)\rangle=-a_n\frac{k_{n-2}}{k_{n-1}}\gamma_{n-1}\]
+\end{proof}
+Diese und noch viele weitere Eigenschaften von den verschiedenen Orthogonalsystemen von Polynomen finden sich in \autocite{weborthopoly} und in vielen weiteren Werken über Polynome. Beispielsweise lässt sich auch die Umkehrung zeigen (unter milden Anforderungen an die Koeffizienten): Zu jeder durch eine drei Term Rekursion definierte Menge an Polynomen existiert ein Maß $\alpha$, bezüglich dessen die Polynome ein Orthogonalsystem bilden (Satz von Favard).
+\begin{maththeorem}
+\todo[inline]{Using \autocite{GolubWelsch} (and own notes for D) show how to calculate roots and therefore gauss quadrature}
+\end{maththeorem}
+\todo[inline]{Zeige Approximationstheorie Ergebnisse: Punktweise Konvergenz (gibbs), L2 Konvergenz, order!=accuracy (siehe code zitat)}
