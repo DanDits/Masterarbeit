@@ -226,10 +226,10 @@ Man verwendet die Darstellung $\varphi_{\deltat}^A(y_0)=y_0+\deltat f^A(y_0)+\ma
 Man beachte hierbei, dass nun $\Phi_{\deltat}^A$ im Gegensatz zu $\varphi_{\deltat}^A$ nicht mehr symmetrisch ist. Die Argumentation über die Ordnung von symmetrischen Verfahren kann also nicht direkt verwendet werden, um $p=2$ für das Strang Splittings zu begründen. Außerdem kann dies die Möglichkeit, das Strang Splitting durch Kombination der Halbschritte zu beschleunigen, zunichte machen.
 \end{proof}
 
-\section{General Polynomial Chaos}
+\section{Erster Einblick in das Polynomial Chaos}
 Die Entstehung des \emph{general Polynomial Chaos}(gPC) ist eine Geschichte über den Versuch, stochastische Abhängigkeit und Integrationstheorie zu kombinieren. Sie wurzelte in der Arbeit von Wiener (\autocite{norbertwiener1938}), wo er das \emph{homogene Chaos} einführte, um die Entwicklung von Unsicherheit in einem dynamischen, chaotischen, physikalischen System zu konkretisieren. Dies erklärt auch den Ursprung der Bezeichnung "`Chaos"' im Kontext der chaotischen Brownschen Bewegung im Wiener-Prozess.\\
 Ghanem verwendete dann Hermite Polynome um mithilfe dieser Orthogonalbasis gaußsche Prozesse darzustellen. Dies wendete er erfolgreich auf einige Probleme aus den Ingenieurswissenschaften an, ein Überblick wird in (\autocite{GhaSpa91}) gegeben.\\
-Xiu verallgemeinerte in seiner Arbeit (\autocite{xiu2002}) diesen Ansatz auf andere Kombinationen aus Stochastischer Verteilung und Polynombasis. Gemäß dem Askey Schema (siehe Abbildung \ref{askeyscheme}) werden Beziehungen einiger bekannter Orthonormalbasen verdeutlicht. Man beobachtet außerdem, dass einige Gewichte den Dichtefunktionen von bekannten Verteilungen entsprechen und möchte nun zu einer gegebenen Verteilung die bestmögliche Polynombasis verwenden. An Modellproblemen demonstrierte er jeweils optimale exponentielle Konvergenz für die verschiedenen Paarungen.\\
+Xiu verallgemeinerte in seiner Arbeit (\autocite{xiu2002}) diesen Ansatz auf andere Kombinationen aus Stochastischer Verteilung und Polynombasis. Gemäß dem Askey Schema (siehe Abbildung \ref{askeyscheme}) werden Beziehungen einiger bekannter Polynom Orthonormalbasen verdeutlicht. Man beobachtet außerdem, dass einige Gewichte den Dichtefunktionen von bekannten Verteilungen entsprechen und möchte nun zu einer gegebenen Verteilung die bestmögliche Polynombasis verwenden. An Modellproblemen demonstrierte Xiu jeweils optimale exponentielle Konvergenz für die verschiedenen Paarungen.\\
 \begin{figure}
 \center
 \includegraphics[width=0.8\linewidth]{Figures/askeyscheme.png}
@@ -244,7 +244,7 @@ Für eine genauere Betrachtung der Beziehungen der hypergeometrischen Polynome i
 
 Im Folgenden werden wir eine Einführung in das von uns verwendete gPC geben. Dabei werden wir auf diskrete Verteilungen (wie die Poisson-Verteilung) verzichten, es sei jedoch bemerkt, dass dies keine Einschränkung der Methode ist, sondern lediglich die Notation vereinfacht. Konkret werden wir uns mit Laguerre-, Jacobi-, Hermite- und Legendre-Polynomen beschäftigen, wobei letztere ein Spezialfall der Jacobipolynome darstellen. 
 \todo[inline]{Einführung in PolyChaos; zeige Konvergenz in L2 der poly expansion und dass besser für entsprechende PolyBasis aber auch funktional für andere mithilfe von experiment}
-\subsection{Orthogonale Polynome und Approximationstheorie}
+\subsection{Orthogonale Polynome}
 Wir beginnen mit grundlegender Notation und Namensgebung um das zentrale Werkzeug der Polynomapproximation festzulegen. Später werden diese Polynome verwendet, um die Zufallsabhängigkeit der auftretenden Funktionen auf natürliche Weise darzustellen, indem das Orthogonalitätsmaß der Dichtefunktion entspricht.
 \begin{mathdef}
 Ein allgemeines Polynom $Q$ vom Grad $n$ lässt sich darstellen als
@@ -266,30 +266,104 @@ Man beachte, dass diese Definition der Hermite Polynome leicht von der in der Li
 
 Eine wichtige Eigenschaft von Orthogonalsystemen von Polynomen ist eine besondere Art der rekursiven Darstellung, wie wir sie bereits bei den Hermite Polynomen gesehen haben.
 \begin{maththeorem}[Drei Term Rekursion]
-Ein Orthogonalsystem $\left\lbrace Q_n(x),\: n\in\N_0\right\rbrace$ von Polynomen erfüllt eine drei Term Rekursion
+\label{threetermexist}
+Ein Orthogonalsystem $\left\lbrace Q_n(x),\: n\in\N_0\right\rbrace$ von Polynomen erfüllt eine Drei Term Rekursion
 \begin{eqnarray}
 Q_n(x)=(a_nx+b_n)Q_{n-1}(x)-c_nQ_{n-2}(x),\quad n\in\N\\
 Q_{-1}(x)\equiv 0, Q_0(x)\equiv 1\nonumber
 \end{eqnarray}
-wobei $a_n=\frac{k_n}{k_{n-1}}$, $b_n\in\R$ und $c_n=-\frac{a_n}{a_{n-1}}\cdot \frac{\gamma_n}{\gamma_{n-1}}$.
+wobei $a_n=\frac{k_n}{k_{n-1}}\neq 0$, $b_n\in\R$ und $c_n=\frac{a_n}{a_{n-1}}\cdot \frac{\gamma_n}{\gamma_{n-1}}$.
 Dabei ist $k_n\neq 0$ der führende Faktor und $\gamma_n>0$ der Normalisierungsfaktor des Polynoms $Q_n$ . 
-\todo[inline]{erkläre/beweise wie man daraus auf Nullstellenberechnung kommt später für Nodes/weights}
 \end{maththeorem}
 \begin{proof}
 Es gilt $\text{deg}(Q_n)=n,\forall n\in\N_0$. Für $a_n=\frac{k_n}{k_{n-1}}$ ist $Q_n(x)-a_nxQ_{n-1}(x)$ ein Polynom vom Grad $\le n-1$. Dieses lässt sich also schreiben als
-\[Q_n(x)-a_nxQ_{n-1}(x)=\sum_{m=0}^{n-1}c_mQ_m(x)\]
+\[Q_n(x)-a_nxQ_{n-1}(x)=\sum_{m=0}^{n-1}r_mQ_m(x)\]
 Für $k\le n-1$ folgt also aus der Orthogonalität bezüglich des Skalarproduktes $\langle\cdot,\cdot\rangle$
 \begin{equation*}
-\langle Q_n(x)-a_nxQ_{n-1}(x),Q_k(x)\rangle=\sum_{m=0}^{n-1}c_m\langle Q_m(x),Q_k(x)\rangle=c_k\langle Q_k(x),Q_k(x)\rangle=c_k\gamma_k
+\langle Q_n(x)-a_nxQ_{n-1}(x),Q_k(x)\rangle=\sum_{m=0}^{n-1}r_m\langle Q_m(x),Q_k(x)\rangle=r_k\langle Q_k(x),Q_k(x)\rangle=r_k\gamma_k
 \end{equation*}
 und durch Verwenden von $\langle Q_n(x),Q_k(x)\rangle = 0$ und Umstellen
-\[ -a_n\langle Q_{n-1}(x),xQ_k(x)\rangle=c_k\gamma_k\]
-Somit folgt für $k<n-2$ wegen $\text{deg}(xQ_k(x))<n-1$ dass $c_k=0$. Damit erfüllen die Polynome eine 3 Term Rekursion
-\[Q_n(x)-a_nxQ_{n-1}(x)=c_{n-1}Q_{n-1}(x)+c_{n-2}Q_{n-2}(x)\]
-Weiterhin gilt \[c_{n-2}\gamma_{n-2}=-a_n\langle Q_{n-1}(x),xQ_{n-2}(x)\rangle=-a_n\frac{k_{n-2}}{k_{n-1}}\gamma_{n-1}\]
+\[ -a_n\langle Q_{n-1}(x),xQ_k(x)\rangle=r_k\gamma_k\]
+Somit folgt für $k<n-2$ wegen $\text{deg}(xQ_k(x))<n-1$ dass $r_k=0$. Damit erfüllen die Polynome eine Drei Term Rekursion
+\[Q_n(x)-a_nxQ_{n-1}(x)=r_{n-1}Q_{n-1}(x)+r_{n-2}Q_{n-2}(x)\]
+Nun definieren wir $b_n=r_{n-1}$, $c_n=-r_{n-2}$ und berechnen schlussendlich
+\[r_{n-2}\gamma_{n-2}=\langle -a_nxQ_{n-1}(x),Q_{n-2}(x)\rangle =-a_n\langle Q_{n-1}(x),xQ_{n-2}(x)\rangle=-a_n\frac{k_{n-2}}{k_{n-1}}\gamma_{n-1}\]
 \end{proof}
-Diese und noch viele weitere Eigenschaften von den verschiedenen Orthogonalsystemen von Polynomen finden sich in \autocite{weborthopoly} und in vielen weiteren Werken über Polynome. Beispielsweise lässt sich auch die Umkehrung zeigen (unter milden Anforderungen an die Koeffizienten): Zu jeder durch eine drei Term Rekursion definierte Menge an Polynomen existiert ein Maß $\alpha$, bezüglich dessen die Polynome ein Orthogonalsystem bilden (Satz von Favard).
-\begin{maththeorem}
-\todo[inline]{Using \autocite{GolubWelsch} (and own notes for D) show how to calculate roots and therefore gauss quadrature}
+Diese und noch viele weitere Eigenschaften von den verschiedenen Orthogonalsystemen von Polynomen finden sich in \autocite{weborthopoly} und in vielen weiteren Werken über Polynome. Beispielsweise lässt sich auch die Umkehrung zeigen (unter milden Anforderungen an die Koeffizienten): Zu jeder durch eine drei Term Rekursion definierte Menge an Polynomen existiert ein Maß $\alpha$, bezüglich dessen die Polynome ein Orthogonalsystem bilden (Satz von Favard).\\[0.3cm]
+Die auftretenden Integrale in den Skalarprodukten werden wir später mit Gauss-Quadraturformeln approximieren. An dieser und an anderen Stellen werden wir später die Nullstellen der Polynome als Stützstellen benötigen. Basierend auf den Koeffizienten der Drei Term Rekursion entwickelten Golub und Welsch in \autocite{GolubWelsch} einen effizienten stabilen Algorithmus, der für die Berechnung der Nullstellen mit der Berechnung der Eigenwerte einer symmetrischen Tridiagonalmatrix auskommt.
+
+\begin{maththeorem}[Golub Welsch Algorithmus]
+Ist $\left\lbrace Q_i(x),\: i=0,\dots,n\right\rbrace$ ein Orthogonalsystem von Polynomen welches die Drei Term Rekursion
+\begin{eqnarray}
+\label{threetermgolub}
+Q_i(x)=(a_ix+b_i)Q_{i-1}(x)-c_iQ_{i-2}(x),\quad i=1,\dots , n\\
+Q_{-1}(x)\equiv 0, Q_0(x)\equiv 1\nonumber
+\end{eqnarray}
+erfüllt für $a_i>0,c_i>0$, so gilt:
+\begin{align*}
+Q_n(x_j)=0\: \equivalent \: &x_j\text{ ist Eigenwert von }J=\begin{pmatrix}
+\alpha_1 & \beta_1 &  &  &  \\ 
+\beta_1 & \alpha_2 & \beta_2 & & \text{\huge0} \\ 
+ & \beta_2 & \ddots & \ddots &  \\ 
+ &  & \ddots & & \beta_{n-1} \\
+\text{\huge0} &  &  & \beta_{n-1} & \alpha_n
+\end{pmatrix},\quad j=1,\dots,n\\
+&\text{ mit } \alpha_i=-\frac{b_i}{a_i},\quad \beta_i=\sqrt{\frac{c_{i+1}}{a_ia_{i+1}}},\quad i=1,\dots,n
+\end{align*}
+Die Eigenwerte der symmetrischen Tridiagonalmatrix sind reell und lassen sich mit spezialisierten Algorithmen effizient berechnen. Insbesondere sind alle Nullstellen des Polynoms $Q_n$ reell.
 \end{maththeorem}
-\todo[inline]{Zeige Approximationstheorie Ergebnisse: Punktweise Konvergenz (gibbs), L2 Konvergenz, order!=accuracy (siehe code zitat)}
+\begin{proof}
+Zuerst schreiben wir die Rekursionen (\ref{threetermgolub}) für $i=1,\dots,n$ in Matrixform und teilen zeilenweise durch $a_i$ und sortieren den Term $xQ_{i-1}$ auf die linke Seite
+\begin{equation*}
+x\cdot
+\underbrace{\begin{pmatrix}Q_0(x)\\ Q_1(x) \\ \vdots \\ \\ \vdots \\ Q_{n-1}(x)\end{pmatrix}}_{=Q(x)}
+=\underbrace{\begin{pmatrix}
+-\frac{b_1}{a_1} & \frac{1}{a_1} &  &  &  \\ 
+\frac{c_2}{a_2} & -\frac{b_2}{a_2} & \frac{1}{a_2} & & \text{\huge0} \\ 
+ & \frac{c_3}{a_3} & \ddots & \ddots &  \\ 
+ &  & \ddots & & \frac{1}{a_{n-1}} \\
+\text{\huge0} &  &  & \frac{c_n}{a_n} & -\frac{b_n}{a_n}
+\end{pmatrix}}_{=T}
+\begin{pmatrix}Q_0(x)\\ Q_1(x) \\ \vdots \\ \\ \vdots \\ Q_{n-1}(x)\end{pmatrix} 
++\begin{pmatrix}0 \\ 0 \\ \vdots \\ \vdots \\ 0 \\ \frac{Q_{n}(x)}{a_n}\end{pmatrix} 
+\end{equation*}
+In kompakter Form lässt sich dies darstellen als
+\[xQ(x)=TQ(x)+\frac{1}{a_n}Q_n(x)e_n\]
+wobei $e_n=(0,\dots,0,1)^T$ der n-te Einheitsvektor ist. Hieran erkennt man sofort, dass $Q_n(x_j)=0\equivalent x_j\text{ ist Eigenwert von }T$.\\
+Weiterhin erhalten wir aus Satz \ref{threetermexist}, dass $\frac{c_i}{a_i}=\frac{1}{a_{i-1}}\frac{\gamma_i}{\gamma_{i-1}}$ und somit wäre $T=J$ bereits symmetrisch, wenn die $Q_i$ eine Orthonormalbasis bilden.\\
+Andernfalls führen wir eine Äquivalenztransformation durch mit der Diagonalmatrix $D=\text{diag}\left((d_1,\dots,d_n)^T\right)$, so dass $J=DTD^{-1}$. Koeffizientenvergleich ergibt die Bedingung $d_{i+1}=d_i\sqrt{\frac{a_{i+1}}{c_{i+1}a_i}}$; mit einer möglichen Wahl $d_1=1$ des freien Parameters $d_1$ erhalten wir somit die gewünschte symmetrische Matrix.
+\end{proof}
+Wir bemerken zusätzlich ohne Beweis, dass das Polynom $Q_n$ für $n\ge 1$ insgesamt $n$ verschiedene reelle Nullstellen besitzt. Dies ist eine fundamentale Aussage über Orthogonalpolynome und lässt sich induktiv einsehen unter Ausnutzung von $n$ Vorzeichenwechseln, die durch die Orthogonalität vorhanden sein müssen.
+
+\subsection{Polynomiale Approximationstheorie}
+Es gibt sehr viele Ergebnisse über die Approximation von Funktionen $f\colon \R\to\R$ durch Polynome $p\in\Poly_n$. Um ein Gefühl für die Mächtigkeit --aber auch für die Grenzen-- von polynomialer Approximation zu bekommen, werden an dieser Stelle einige zentrale Sätze genannt. Auf Beweise werden wir größtenteils verzichten, jedoch basierend auf \autocite{Trefethen} eine Diskussion der Interpretation dieser Ergebnisse aus dem numerischen Blickwinkel der Interpolation und Quadratur geben.
+\begin{maththeorem}[Weierstrass]
+Ist $I$ ein beschränktes Intervall und $f\in C^0(\bar{I})$ stetig, dann gibt es für jedes $\epsilon >0$ ein $n\in\N$ und $p\in\Poly_n$, so dass
+\[|f(x)-p(x)|<\epsilon,\quad \forall x\in\bar{I}\]
+\end{maththeorem}
+Folglich gilt für die \emph{gleichmäßige Bestapproximation} $\phi_n$, welche zu $f\in C^0(\bar{I})$ eine eindeutige Lösung $\phi_n(f)\in\Poly_n$ mit minimaler Maximumsnorm ergibt, die Aussage
+\[\lim\limits_{n\to\infty}\norm{f-\phi_n(f)}_\infty=0\] 
+Dieses Ergebnis sieht sehr vielversprechend aus, jedoch wurde von Faber in \autocite{faber14} gezeigt, dass es kein Interpolationsschema gibt, das für alle stetigen Funktionen auf diese Weise konvergiert. Doch dieser vermeindliche Rückschlag ist in der Praxis selten von Bedeutung! Problematisch sind Interpolationsschemata, die beispielsweise auf gleichverteilten Knotenpunkten basieren und dann unter dem Runge-Phänomen leiden, welches bei Funktionen wie $f(x)=\frac{1}{1+x^2}$ an den Rändern für eine schlechte Approximationsgüte sorgt. Erfüllt $f$ jedoch minimale Glattheitsanforderungen (wie bereits Lipschitzstetigkeit) und verwendet man Chebyshev Interpolationspunkte, so ist die Approximationsgüte bereits bereits für kleines $n$ gesichert.\\[0.3cm]
+Im Folgenden lösen wir uns von dem beschränkten Intervall $I$ und lassen auch $I=\R$ oder $I=[0,\infty)$ zu. Außerdem wird die Bestapproximation bezüglich der Maximumsnorm später von wenig Nutzen sein. Daher führen wir zuerst einen neuen normierten Raum ein:
+\begin{mathdef}
+Sei $w\colon I\to\R_{>0}$ ein Gewicht, dann definieren wir den gewichteten $L^2$ Raum als
+\begin{equation*}
+L_w^2(I)\coloneqq \left\lbrace v\colon I\to\R | \int_Iv^2(x)w(x)dx<\infty\right\rbrace
+\end{equation*}
+mit dem inneren Produkt 
+\[\langle u,v\rangle_{L_w^2(I)}=\int_I u(x)v(x)w(x)dx,\quad u,v\in L_w^2(I)\]
+und zugehöriger Norm
+\[\norm{u}_{L_w^2(I)}=\left(\int_I u^2(x)w(x)dx\right)^{\onehalf}\]
+\end{mathdef}
+Der Begriff der Bestapproximation lässt sich auch auf diesen neuen Raum erweitern. Dazu verwenden wir eine orthogonale Projektion auf eine orthogonale Polynombasis und erhalten eine einfache Darstellung des Bestapproximationsoperators.
+\begin{maththeorem}
+Ist $N\in\N_0$ und $\lbrace Q_k(x)\rbrace_{k=0}^N\subset \Poly_N$ ein Orthonormalsystem bezüglich des positiven Gewichtes $w(\cdot)$, also 
+\[\langle Q_m(x),Q_n(x)\rangle_{L_w^2(I)}=\norm{Q_m}^2_{L_w^2(I)}\delta_{m,n},\quad, 0\le m,n\le N\]
+so gilt für den Projektionsoperator $P_N\colon L_w^2(I)\to \Poly_N$ definiert durch 
+\[P_Nf\coloneqq \sum_{k=0}^N\hat{f}_kQ_k(x),\quad \hat{f}_k\coloneqq \frac{1}{\norm{Q_k}_{L_w^2(I)}^2}\langle f,Q_k\rangle_{L_w^2(I)},\qquad f\in L^2_w(I),\]
+die Bestapproximationsaussage
+\[\norm{f-P_Nf}_{L_w^2(I)}=\inf\limits_{\psi\in\Poly_N}\norm{f-\psi}_{L_w^2(I)}\]
+\end{maththeorem}
+Dies entspricht der Fourier-Entwicklung im Hilbertraum. Entsprechend nennt man die Koeffizienten $\hat{f}_k$ die (verallgemeinerten) Fourier Koeffizienten. Die Projektion ist eine Orthogonalprojektion in dem Sinne, dass der Fehler $f-P_Nf$ senkrecht zum Polynomraum $\Poly_N$ ist.\\
+Man beachte, dass der Name "`Bestapproximation"' sich strikt auf die verwendete Norm bezieht. Punktweise Aussagen lassen sich somit im Allgemeinen nicht treffen. Vergleicht man beispielsweise die Bestapproximation und die Chebyshev Interpolation vom Grad $N=100$ von der Funktion $f(x)=|x-\frac{1}{4}|$ in $[-1,1]$, so ist der maximale Fehler der Bestapproximation zwar geringer, aber tritt an $N+2$ Punkten auf, wohingegen der Fehler der Chebyshev Fehler zu den Rändern hin abnimmt.\todo{Plotte Bild aus Myth4}
+\todo[inline]{Zeige Approximationstheorie Ergebnisse: L2 Konvergenz (Satz 3.5 Xiu) er zeigt auch explizit für Legendre, order!=accuracy (siehe code zitat), Fehler für Interpolation/Quadratur mit Gauss erst später dann}
