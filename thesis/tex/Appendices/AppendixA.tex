@@ -1,0 +1,56 @@
+% Appendix A
+
+\chapter{Orthogonale Polynome im Askey Schema} % Main appendix title
+
+\label{AppendixA} % For referencing this appendix elsewhere, use \ref{AppendixA}
+
+Wir präsentieren hier eine Auswahl der von uns verwendeten Orthogonalpolynome, insbesondere ihre Definition, Darstellung als Drei Term Rekursion, Gewichtsfunktion und ihre Beziehung zu stochastischen Verteilungen. Für weitere Eigenschaften wie Darstellung als Differentialgleichung oder Rodriguez Formel sei beispielsweise auf den Anhang von \autocite{dongbinxiu2010} verwiesen.\\
+Eine schöne Übersichtstabelle findet sich unter \url{http://dlmf.nist.gov/18.3}, man beachte, dass dort die verwendeten Polynome und Gewichte teilweise von unserer Notation abweichen. Dies ist der Tatsache geschuldet, dass die Beziehung zu Verteilungen und entsprechende Normierungsanforderungen keine Rolle spielen. Ebenso gibt es verschiedene Varianten die untere Grenze für die Parameter $\alpha$ und $\beta$ der Jacobi und Laguerre Polynome zu definieren.\\
+Benötigt man Referenzwerte für Nullstellen und Gewichte einer zugehörigen Gauss Quadratur, so findet sich unter\\\url{http://keisan.casio.com/exec/system/1281279441} ein Onlinerechner. Hierbei sei wieder auf abweichende Notation hingewiesen, insbesondere die fehlende Normierung der Gewichte um einen Faktor.\\
+Um die Polynome möglichst kompakt darzustellen zu können, werden folgende Definitionen nützlich sein.
+\begin{mathdef}[Pochhammer Symbol]
+Das Pochhammer Symbol $(a)_n$ für $a\in\R$ und $n\in\N_0$ sei definiert durch
+\todo[inline]{Seltsam: bei Xiu ist für null das gleich a; es fehlt außerdem Fall n minus1. Checke wie das mit Definition von F zusammen passt wo es auch viel verwendet wird}
+\[(a)_n=\frac{\Gamma(a+n)}{\Gamma(a)}=
+   \begin{cases}
+   1, &n=0\\
+   a(a+1)\dots (a+n-1), &n\in\N
+   \end{cases}
+   \]
+Beachte, dass dies auch \emph{steigende Fakultät} genannt wird und nicht mit der \emph{fallenden Fakultät} verwechselt werden sollte, wie das Symbol auch manchmal verwendet wird.
+\end{mathdef}
+\todo[inline]{Before using it here, explain somewhere the Pochhammer Symbol and function F}
+
+\section{Hermite Polynome und Gauß Verteilung}
+Träger:
+\[I=\R\]
+Definition:
+\[H_n(x)=\left((2x)^n\right)_2 F_0\left(-\frac{n}{2},-\frac{n-1}{2};\, ;-\frac{2}{x^2}\right)\]
+Drei Term Rekursion:
+\[H_{n}(x)=xH_{n-1}(x)-(n-1)H_{n-2}(x)\]
+Gewichtsfunktion:
+\[w(x)=\frac{1}{\sqrt{2\pi}}e^{-\frac{x^2}{2}}\]
+Normalisierungsfaktor:
+\[\gamma_n=n!\]
+Stochastische Verteilung:
+\begin{center}
+normalisierte Gauß Verteilung mit Dichtefunktion $\rho(x)=w(x)$
+\end{center}
+
+\section{Laguerre Polynome und Gamma Verteilung}
+Träger:
+\[I=(0,\infty)\]
+Definition:
+\[L_n^{(\alpha)}(x)=\left(\frac{(\alpha)_n}{n!}\right)_1 F_0\left(-n;\alpha;x\right),\quad \alpha>0\]
+Drei Term Rekursion:
+\[L_{n}^{(\alpha)}(x)=\frac{2n-2+\alpha -x}{n}L_{n-1}^{(\alpha)}(x)-\frac{n-1+\alpha - 1}{n}L_{n-2}^{(\alpha)}(x)\]
+Gewichtsfunktion:
+\[w(x)=\frac{x^{\alpha-1}e^{-x}}{\Gamma(\alpha)}\]
+Normalisierungsfaktor:
+\[\gamma_n=\frac{(\alpha)_n}{n!}\]
+Stochastische Verteilung:
+\begin{center}
+Gamma Verteilung mit $\alpha>0,\beta=1$ und Dichtefunktion
+\[\rho(x)=\frac{x^{\alpha-1}e^{-\frac{x}{\beta}}}{\beta^{\alpha}\Gamma(\alpha)}\]
+\end{center}
+

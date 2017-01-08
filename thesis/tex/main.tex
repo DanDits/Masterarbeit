@@ -42,7 +42,7 @@ headsepline, % Uncomment to get a line under the header
 \usepackage[T1]{fontenc} % Output font encoding for international characters
 \usepackage{todonotes} % Hints for TO-DOs in text (also missing figures,...)
 \usepackage{palatino} % Use the Palatino font by default
-
+\PassOptionsToPackage{hyphens}{url}\usepackage{hyperref}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{mathtools}
 \usepackage{tikz}
@@ -90,6 +90,7 @@ headsepline, % Uncomment to get a line under the header
 \hypersetup{pdftitle=\ttitle} % Set the PDF's title to your title
 \hypersetup{pdfauthor=\authorname} % Set the PDF's author to your name
 \hypersetup{pdfkeywords=\keywordnames} % Set the PDF's keywords to your keywords
+\hypersetup{colorlinks=false} % Links in pdf but not in printed
 }
 
 \include{defs}
