@@ -70,7 +70,7 @@ Weitere --allerdings nicht-periodische-- Lösungen finden sich in \autocite{andr
 
 \section{Operator Splitting}
 Um einen Ansatz für numerische Approximationen an die Lösung der KGG zu erhalten bietet sich ein klassischer Operator Splitting Ansatz an. Dabei wiederholen wir an dieser Stelle zuerst kurz die relevante Approximationstheorie und diskutieren mögliche Varianten.
-\todo[inline]{Späteres Kapitel: Unsere Anwendung auf KGG; WaveSolver und LinhypSolver; Stabilität ohne CFL für $w=1$ (hat das was mit der NichtSymmetrie des Strang Splittings zu tun?}
+\todo[inline]{Späteres Kapitel: Unsere Anwendung auf KGG; WaveSolver und LinhypSolver; Stabilität ohne CFL für $w=1$}
 \todo[inline]{Benötige Buch: Geometric Numerical Integration
 Structure-Preserving Algorithms for Ordinary Differential Equations, Springer, Kap II.3 bis II.5}
 \subsection{Generelle Idee}
@@ -151,7 +151,7 @@ Hierzu starten wir von einem gegebenen Anfangswert $y_0$ und lösen das System (
 \end{minipage}%
 \hfill%
 \begin{minipage}{0.7\textwidth}
-Die Reihenfolge $A\to B$ ist willkürlich und kann auch umgekehrt werden. Tatsächlich sind die resultierenden Verfahren zueinander adjungiert wegen (\ref{adjlemma}) und der Tatsache, dass der exakte Fluss wegen $y_1=\varphi_{-\deltat}^{-1}(y_0)=\varphi_{\deltat}^*(y_0)=\varphi_{\deltat}(y_0)$ als symmetrisches Einschrittverfahren auffassbar ist.Kurz:\\
+Die Reihenfolge $A\to B$ ist willkürlich und kann auch umgekehrt werden. Tatsächlich sind die resultierenden Verfahren zueinander adjungiert wegen (\ref{adjlemma}) und der Tatsache, dass der exakte Fluss wegen $y_1=\varphi_{-\deltat}^{-1}(y_0)=\varphi_{\deltat}^*(y_0)=\varphi_{\deltat}(y_0)$ als symmetrisches Einschrittverfahren auffassbar ist. Kurz:\\
 \begin{align}
 \label{liesplittings}
 \Phi_{\deltat}=\varphi_{\deltat}^B \circ \varphi_{\deltat}^A\\
@@ -250,7 +250,7 @@ Wir beginnen mit grundlegender Notation und Namensgebung um das zentrale Werkzeu
 Ein allgemeines Polynom $Q$ vom Grad $n$ lässt sich darstellen als
 \[Q_n(x)=q_nx^n+q_{n-1}^{n-1}+\dots+q_1x+q_0,\quad q_n\ne 0\]
 Wir bezeichnen mit 
-\[P_n(x)=\frac{Q_n(x)}{q_n}\]
+\[\frac{Q_n(x)}{q_n}\]
 die \emph{monic} Version des Polynoms $Q$, also mit führendem Koeffizienten gleich 1.\\
  Ein System $\left\lbrace Q_n(x),\: n\in\mathcal{N}\right\rbrace$ von Polynomen mit $\mathcal{N}=\N_0=\N\cup\lbrace 0\rbrace$ oder $\mathcal{N}=\lbrace 0,1,\dots,N-1,N\rbrace$ heißt Orthogonalsystem, wenn bezüglich eines reellen positiven Maßes $\alpha$ die Orthogonalitätsbedingung
  \[\langle Q_n(x),Q_m(x)\rangle =\int_S Q_n(x)Q_m(x)d\alpha(x)=\gamma_n\delta_{mn},\quad m,n\in\mathcal{N}\]
@@ -293,6 +293,7 @@ Diese und noch viele weitere Eigenschaften von den verschiedenen Orthogonalsyste
 Die auftretenden Integrale in den Skalarprodukten werden wir später mit Gauss-Quadraturformeln approximieren. An dieser und an anderen Stellen werden wir später die Nullstellen der Polynome als Stützstellen benötigen. Basierend auf den Koeffizienten der Drei Term Rekursion entwickelten Golub und Welsch in \autocite{GolubWelsch} einen effizienten stabilen Algorithmus, der für die Berechnung der Nullstellen mit der Berechnung der Eigenwerte einer symmetrischen Tridiagonalmatrix auskommt.
 
 \begin{maththeorem}[Golub Welsch Algorithmus]
+\label{golubwelschalg}
 Ist $\left\lbrace Q_i(x),\: i=0,\dots,n\right\rbrace$ ein Orthogonalsystem von Polynomen welches die Drei Term Rekursion
 \begin{eqnarray}
 \label{threetermgolub}
@@ -371,7 +372,7 @@ Als Beispiel vergleichen wir die Bestapproximation bezüglich der Maximumsnorm u
 \begin{figure}[ht]
  \center
  \includegraphics[width=\linewidth]{Figures/polynomial_approx_comparison.png}
- \caption{Visualisierung der Fehler verschiedener Approximationen, angelehnt an \autocite{Trefethen}. Hierbei wurde die Bestapproximation mithilfe des \emph{Remez} Algorithmus aus dem Chebfun Projekt (http://www.chebfun.org/) berechnet. }
+ \caption{Visualisierung der Fehler verschiedener Approximationen, angelehnt an \autocite{Trefethen}. Hierbei wurde die Bestapproximation mithilfe des \emph{Remez} Algorithmus aus dem Chebfun Projekt (http://www.chebfun.org/) berechnet. Der Fehler der Chebyshev Approximation nimmt zu den Rändern hin stark ab.}
  \label{polyapproxcomp}
 \end{figure}
 \end{mathbsp}
@@ -383,7 +384,17 @@ Für jedes $f\in L_w^2(I)$ gilt
 Die Konvergenzordnung ist hierbei abhängig von der Regularität von $f$ und der Art der für die Projektion verwendeten Orthogonalpolynome. Man nennt diese Art der Konvergenz in der Literatur auch \emph{Spektrale Konvergenz}, da die Konvergenzrate abhängig von der Glattheit der Funktion ist. Man muss also aufpassen eine hohe Approximationsordnung nicht mit einer hohen Approximationsgenauigkeit zu verwechseln.\\
 Für das Beispiel der Legendre Polynome, also mit konstanter Gewichtsfunktion $w$, zeigt Xiu in \autocite[Theorem 3.6]{dongbinxiu2010} folgendes Ergebnis
 \begin{maththeorem}
-Für jedes $f\in H_w^p[-1,1]\coloneqq \left\lbrace v\colon I\to\R | \frac{d^mv}{dx^m}\in L_w^2(I),0\le m\le p\right\rbrace$ mit $p\ge 0$ gibt es eine Konstante $C$ unabhängig von $N$, so dass
+\label{spectralconvth}
+Für jedes $f\in H_w^p[-1,1]\coloneqq \left\lbrace v\colon I\to\R | \frac{d^mv}{dx^m}\in L_w^2(I),0\le m\le p\right\rbrace$ mit $p\ge 0, w\equiv 1$ gibt es eine Konstante $C$ unabhängig von $N$, so dass
 \[\norm{f-P_Nf}_{L_w^2[-1,1]}\le CN^{-p}\norm{f}_{H_w^p[-1,1]}\]
 \end{maththeorem}
-\todo[inline]{plotte nur mal Beispiele für Legendre Konvergenz, Fehler für Interpolation/Quadratur mit Gauss erst später dann}
+\begin{mathbsp}
+Als Veranschaulichung von Satz \ref{spectralconvth} approximieren wir verschiedene Funktionen $f\colon [-1,1]\to\R$ durch die orthogonale Projektion $P_Nf$ für steigendes $N\in\N$. In Abbildung \ref{figurespectralconverg} sind dafür die Fehler der Approximationen dargestellt. Dabei sind die $f$ unterschiedlich glatt und man erkennt unterschiedliche Konvergenzordnungen. Insbesondere erahnt man für die analytische Funktion $f(x)=\sin(\pi x)$ exponentielle Konvergenz in $N$. Da der General-Purpose Integrator, der für die Berechnung der Fourierkoeffizienten verwendet wurde für zu hohe Polynomgrade versagt, bricht die Darstellung an der entsprechenden Stelle ab.
+\begin{figure}[h]
+\includegraphics[width=\textwidth]{Figures/spectral_convergence_legendre.png}
+\caption{Spektrale Konvergenz von Funktionen verschiedener Glattheit mithilfe von Legendre Polynomen und Gewichtsfunktion $w\equiv \onehalf$ auf $[-1,1]$.}
+\label{figurespectralconverg}
+\end{figure}
+\end{mathbsp}
+
+\todo[inline]{Fehler bzw. Polynomiale Exaktheit für Interpolation/Quadratur mit Gauss erst später dann}

@@ -4,28 +4,32 @@
 
 \label{AppendixA} % For referencing this appendix elsewhere, use \ref{AppendixA}
 
-Wir präsentieren hier eine Auswahl der von uns verwendeten Orthogonalpolynome, insbesondere ihre Definition, Darstellung als Drei Term Rekursion, Gewichtsfunktion und ihre Beziehung zu stochastischen Verteilungen. Für weitere Eigenschaften wie Darstellung als Differentialgleichung oder Rodriguez Formel sei beispielsweise auf den Anhang von \autocite{dongbinxiu2010} verwiesen.\\
+Wir präsentieren hier eine Auswahl der von uns verwendeten Orthogonalpolynome, insbesondere ihre Definition, Darstellung als Drei Term Rekursion, Gewichtsfunktion und ihre Beziehung zu stochastischen Verteilungen. Für weitere Eigenschaften wie die Darstellung als Lösung einer Differentialgleichung oder die Rodriguez Formel sei beispielsweise auf den Anhang von \autocite{dongbinxiu2010} verwiesen.\\
 Eine schöne Übersichtstabelle findet sich unter \url{http://dlmf.nist.gov/18.3}, man beachte, dass dort die verwendeten Polynome und Gewichte teilweise von unserer Notation abweichen. Dies ist der Tatsache geschuldet, dass die Beziehung zu Verteilungen und entsprechende Normierungsanforderungen keine Rolle spielen. Ebenso gibt es verschiedene Varianten die untere Grenze für die Parameter $\alpha$ und $\beta$ der Jacobi und Laguerre Polynome zu definieren.\\
 Benötigt man Referenzwerte für Nullstellen und Gewichte einer zugehörigen Gauss Quadratur, so findet sich unter\\\url{http://keisan.casio.com/exec/system/1281279441} ein Onlinerechner. Hierbei sei wieder auf abweichende Notation hingewiesen, insbesondere die fehlende Normierung der Gewichte um einen Faktor.\\
 Um die Polynome möglichst kompakt darzustellen zu können, werden folgende Definitionen nützlich sein.
 \begin{mathdef}[Pochhammer Symbol]
-Das Pochhammer Symbol $(a)_n$ für $a\in\R$ und $n\in\N_0$ sei definiert durch
-\todo[inline]{Seltsam: bei Xiu ist für null das gleich a; es fehlt außerdem Fall n minus1. Checke wie das mit Definition von F zusammen passt wo es auch viel verwendet wird}
+Das Pochhammer Symbol $(a)_n$ für $a\in\R$ und $n\in\lbrace -1,0,1,2,\dots\rbrace$ sei definiert durch
 \[(a)_n=\frac{\Gamma(a+n)}{\Gamma(a)}=
    \begin{cases}
-   1, &n=0\\
+   1, &n=-1\text{ oder } n=0\\
    a(a+1)\dots (a+n-1), &n\in\N
    \end{cases}
    \]
-Beachte, dass dies auch \emph{steigende Fakultät} genannt wird und nicht mit der \emph{fallenden Fakultät} verwechselt werden sollte, wie das Symbol auch manchmal verwendet wird.
+Beachte, dass dies auch \emph{steigende Fakultät} genannt wird und nicht mit der \emph{fallenden Fakultät} verwechselt werden sollte, wie das Symbol auch manchmal verwendet wird. Die Notation ist in der Literatur nicht einheitlich!
 \end{mathdef}
-\todo[inline]{Before using it here, explain somewhere the Pochhammer Symbol and function F}
 
+\begin{mathdef}[Hypergeometrische Funktion]
+Zu $r,s\in\N_0$ ist die hypergeometrische Funktion $_rF_s$ definiert durch
+\[_rF_s(a_1,\dots,a_r;b_1,\dots,b_s;z)\coloneqq \sum_{k=0}^\infty \frac{(a_1)_k\dots (a_r)_kz^k}{(b_1)_k\dots(b_s)_kk!}\]
+\end{mathdef}
+Für weitere Polynome aus dem Askey Schema (siehe Abbildung \ref{askeyscheme}), insbesondere diese mit diskreten Verteilungen, sei wieder beispielsweise auf \autocite{dongbinxiu2010} verwiesen. \\
+Für eine Methode zum Berechnen der Nullstellen aus der Drei Term Rekursion steht der Golub Welsch Algorithmus (vgl. \ref{golubwelschalg}) zur Verfügung.
 \section{Hermite Polynome und Gauß Verteilung}
 Träger:
 \[I=\R\]
 Definition:
-\[H_n(x)=\left((2x)^n\right)_2 F_0\left(-\frac{n}{2},-\frac{n-1}{2};\, ;-\frac{2}{x^2}\right)\]
+\[H_n(x)=(2x)^n\cdot {_2F_0}\left(-\frac{n}{2},-\frac{n-1}{2};\, ;-\frac{2}{x^2}\right)\]
 Drei Term Rekursion:
 \[H_{n}(x)=xH_{n-1}(x)-(n-1)H_{n-2}(x)\]
 Gewichtsfunktion:
@@ -41,7 +45,7 @@ normalisierte Gauß Verteilung mit Dichtefunktion $\rho(x)=w(x)$
 Träger:
 \[I=(0,\infty)\]
 Definition:
-\[L_n^{(\alpha)}(x)=\left(\frac{(\alpha)_n}{n!}\right)_1 F_0\left(-n;\alpha;x\right),\quad \alpha>0\]
+\[L_n^{(\alpha)}(x)=\frac{(\alpha)_n}{n!}\cdot {_1F_0}\left(-n;\alpha;x\right),\quad \alpha>0\]
 Drei Term Rekursion:
 \[L_{n}^{(\alpha)}(x)=\frac{2n-2+\alpha -x}{n}L_{n-1}^{(\alpha)}(x)-\frac{n-1+\alpha - 1}{n}L_{n-2}^{(\alpha)}(x)\]
 Gewichtsfunktion:
@@ -54,3 +58,49 @@ Gamma Verteilung mit $\alpha>0,\beta=1$ und Dichtefunktion
 \[\rho(x)=\frac{x^{\alpha-1}e^{-\frac{x}{\beta}}}{\beta^{\alpha}\Gamma(\alpha)}\]
 \end{center}
 
+\section{Jacobi Polynome und Beta Verteilung}
+Träger:
+\[I=(-1,1)\]
+Definition:
+\[P_n^{(\alpha, \beta)}(x)=\frac{(\alpha + 1)_n}{n!}\cdot {_2F_1}\left(-n,n+\alpha+\beta+1;\alpha+1;\frac{1-x}{2}\right),\quad \alpha,\beta>-1\]
+Drei Term Rekursion:
+\begin{center}
+Zum Abkürzen sei für $n\in\N\quad f_n \coloneqq \frac{(2n + \alpha + \beta - 1)(2n + \alpha + \beta)}{2n(n + \alpha + \beta)}$
+\begin{align*}
+P_n^{(\alpha, \beta)}(x)&=\left(f_nx-\frac{f_n(\beta^2-\alpha^2)}{(2n + \alpha + \beta - 2)(2n + \alpha +\beta)}\right)P_{n-1}^{(\alpha, \beta)}(x)\\
+&\quad-\frac{2f_n(n + \alpha - 1)(n + \beta - 1)}{(2n + \alpha + \beta - 2)(2n + \alpha + \beta - 1)}P_{n-2}^{(\alpha, \beta)}(x)
+\end{align*}
+Man beachte, dass dies einige Definitionslücken aufweist:
+\begin{itemize}
+\item Für $\alpha=\beta=0$ stimmen die Jacobi Polynome exakt mit den Legendre Polynomen überein und die Betaverteilung mit der Gleichverteilung (siehe \ref{seclegendre}).
+\item Für $\alpha+\beta=0,n=1$ gilt $P_1^{(\alpha,\beta)}(x)=x-\frac{\beta-\alpha}{2}$
+\item Für $\alpha+\beta=-1,n=1$ gilt $P_1^{(\alpha,\beta)}(x)=\frac{x}{2}-\frac{\beta-\alpha}{2}$
+\end{itemize}
+\end{center}
+Gewichtsfunktion:
+\[w(x)=\frac{\Gamma(\alpha+\beta+2)}{2^{\alpha+\beta+1}\Gamma(\alpha+1)\Gamma(\beta+1)}(1-x)^\alpha(1+x)^\beta\]
+Normalisierungsfaktor:
+\[\gamma_n=\frac{(\alpha+1)_n(\beta+1)_n}{n!(2n+\alpha+\beta+1)(\alpha+\beta+2)_{n-1}}\]
+Stochastische Verteilung:
+\begin{center}
+Beta Verteilung auf $(-1,1)$ mit $\alpha,\beta>-1$ und Dichtefunktion
+\[\rho(x)=\frac{(1 - x)^\alpha(1 + x)^\beta}{2^{\alpha + \beta + 1}B(\alpha+1,\beta+1)}=w(x),\quad B\text{ ist Eulersche Betafunktion}\]
+\end{center}
+
+\section{Legendre Polynome und Gleichverteilung}
+\label{seclegendre}
+Als wichtiger Spezialfall der Jacobi Polynome seien die Legendre Polynome an dieser Stelle explizit erwähnt.\\
+Träger:
+\[I=[-1,1]\]
+Definition:
+\[L_n(x)={_2F_1}\left(-n,n+1;1;\frac{1-x}{2}\right)\]
+Drei Term Rekursion:
+\[L_{n}(x)=x\frac{2n-1}{n}L_{n-1}(x)-\frac{n-1}{n}L_{n-2}(x)\]
+Gewichtsfunktion:
+\[w(x)\equiv \onehalf\]
+Normalisierungsfaktor:
+\[\gamma_n=\frac{1}{2n+1}\]
+Stochastische Verteilung:
+\begin{center}
+Gleichverteilung auf $[-1,1]$ mit Dichtefunktion $\rho(x)=w(x)$
+\end{center}
