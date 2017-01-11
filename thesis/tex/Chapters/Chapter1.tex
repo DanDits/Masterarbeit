@@ -18,11 +18,11 @@ Bevor wir Abhängigkeiten von einer Zufallsvariablen hinzufügen, ist es hilfrei
 Die KGG ist eine relativistische Feldgleichung, welche die Kinematik von spin-freien Teilchen, wie dem Pion, beschreibt. Auch das 2012 entdeckte Higgs-Boson ist ein spin-freies Teilchen, es ist jedoch noch unklar, ob es wirklich das von dem Standardmodell der Teilchenphysik vorgesagte ist und sich vom Standardmodell beschreiben lässt \autocite{cern2016}.\\
 Dabei ist
 \begin{itemize}
-\item $\Torus=\R/(2\pi\Z)$ der skalierte eindimensionale Torus. Wir werden ab sofort die vereinfachte Darstellung $\Torus^d=(-\pi,\pi)^d$ mit periodischen Randbedingungen verwenden. Die Abweichung vom Einheitstorus $(0,1)^d$ ermöglicht das direkte Verwenden der schnellen Fouriertransformation ohne weitere Skalierung, ist jedoch keine Beschränkung der Allgemeinheit. 
-\item die periodische Randbedingung eine vereinfachte Beschreibung des Verhaltens der Lösung ohne Einflüsse von Rändern. Solche Einflüsse, wie sie beispielsweise bei Dirichlet oder Neumann Randwerten auftreten, werden vernachlässigt und die Lösung als auf einem großen Träger lebend betrachtet.
+\item $\Torus=\R/(2\pi\Z)$ der skalierte eindimensionale Torus. Wir werden ab sofort die vereinfachte Darstellung $\Torus^d=(-\pi,\pi)^d$ mit periodischen Randbedingungen verwenden. Diese Skalierung des Torus ermöglicht das direkte Verwenden der schnellen Fouriertransformation ohne weitere Skalierung, ist jedoch keine Beschränkung der Allgemeinheit. 
+\item die periodische Randbedingung eine vereinfachte Beschreibung des Verhaltens der Lösung ohne Einflüsse von Rändern. Solche Einflüsse, wie sie beispielsweise bei Dirichlet- oder Neumann-Randwerten auftreten, werden vernachlässigt und die Lösung als auf einem großen Träger lebend betrachtet.
 \item $\absolute{u(t,x)}^2$ physikalisch als Ladungsdichte des Teilchens zum Zeitpunkt $t$ und Ort $x$ interpretierbar \autocite{kleingordon2016}. 
 \item $\alpha>0$ das Quadrat der Wellengeschwindigkeit.
-\item $\beta(x)>0, \forall x\in \Torus^d,$ in der physikalischen Interpretation das Quadrat aus einer Kombination von Wellengeschwindigkeit, Masse und plankschem Wirkungsquantum. Die Abhängigkeit vom Ort ist hier eine künstliche Schwierigkeit und nicht Teil der ursprünglichen Herleitung.
+\item $\beta(x)>0, \forall x\in \Torus^d,$ in der physikalischen Interpretation das Quadrat aus einer Kombination von Wellengeschwindigkeit, Masse und planckschem Wirkungsquantum. Die Abhängigkeit des Potentialteils der KGG vom Ort $x$ ist dabei eine Verallgemeinerung der klassischen Gleichung.
 \end{itemize}
 Wir betrachten im Gegensatz zur physikalischen Darstellung nur reellwertige Funktionen $u$, $u_0$ und $v_0$ und fordern (implizit), dass die Anfangswerte $u_0$ und $v_0$ periodisch in $(-\pi,\pi)$ sind. \todo{(Reelle) Existenztheorie?}
 
@@ -37,14 +37,14 @@ womit sich aus Lösungen von
 \alpha\Laplace g(x)-\beta(x)g(x)&=\lambda g(x), \: \lambda\in\R\\
 \mu f(t)&=f''(t), \: \mu\in \R
 \end{align*}
-Lösungen der KGG ergeben. Für $\beta(x) \equiv \beta>\absolute{\lambda}$ ergibt sich die klassische Wellengleichung $\Laplace g(x)=\frac{\beta + \lambda}{\alpha}g(x)$ mit periodischen Randbedingungen und eine lineare gewöhnliche Differentialgleichung.\\Die Anfangswerte $u_0$ und $v_0$ der KGG werden dann entsprechend passend gewählt.\\[1cm]
+Lösungen der KGG ergeben. Für $\beta(x) \equiv \beta>\absolute{\lambda}$ ergibt sich das Eigenwertproblem $\Laplace g(x)=\frac{\beta + \lambda}{\alpha}g(x)$ mit periodischen Randbedingungen und eine lineare gewöhnliche Differentialgleichung.\\Die Anfangswerte $u_0$ und $v_0$ der KGG werden dann entsprechend passend gewählt.\\[1cm]
 Beispiele für exakte Lösungen ($d=1$) sind
 \begin{align*}
-u(t,x)&=\sin(\lambda x)(c_1 \sin(\mu t) + c_2 \cos(\mu t)), \, \mu^2=\beta+\alpha \lambda^2\\ 
-u(t,x)&=(c_1 \sin(\lambda x) + c_2 \cos(\lambda x))\sin(\mu t), \, \mu^2=\beta+\alpha \lambda^2\\
-u(t,x)&=\exp(-\cos(x))\sin(\mu t), \, \beta(x)=\mu^2+\cos(x)+\sin^2(x), \, \mu \in \R
+u(t,x)&=\sin(\lambda x)(c_1 \sin(\mu t) + c_2 \cos(\mu t)), \quad \mu^2=\beta+\alpha \lambda^2\\ 
+u(t,x)&=(c_1 \sin(\lambda x) + c_2 \cos(\lambda x))\sin(\mu t), \quad \mu^2=\beta+\alpha \lambda^2\\
+u(t,x)&=\exp(-\cos(x))\sin(\mu t), \quad \beta(x)=\mu^2+\cos(x)+\sin^2(x), \, \mu \in \R
 \end{align*}
-wobei $\lambda\in \pi\Z$ um die Periodizität zu gewährleisten; $c_1, c_2 \in \R$ beliebig.\\
+wobei $\lambda\in \pi\Z$ um die Periodizität zu gewährleisten und $c_1, c_2 \in \R$ frei wählbare Skalierungsfaktoren.\\
 Diese lassen sich auch auf höhere Dimensionen erweitern, beispielsweise
 \begin{eqnarray}
 u(t,x)=\exp(-\cos(x_1+\dots+x_d))\sin(\mu t)\\
@@ -68,20 +68,20 @@ u(t,x)=\exp(-\cos(x_1+\dots+x_d))\sin(\mu t)\\
 
 Weitere --allerdings nicht-periodische-- Lösungen finden sich in \autocite{andreipolyanin2004}.
 
-\section{Operator Splitting}
-Um einen Ansatz für numerische Approximationen an die Lösung der KGG zu erhalten bietet sich ein klassischer Operator Splitting Ansatz an. Dabei wiederholen wir an dieser Stelle zuerst kurz die relevante Approximationstheorie und diskutieren mögliche Varianten.
+\section{Operatorsplitting}
+Um einen Ansatz für numerische Approximationen an die Lösung der KGG zu erhalten bietet sich ein klassischer Operatorsplitting-Ansatz an. Dabei wiederholen wir an dieser Stelle zuerst kurz die relevante Approximationstheorie und diskutieren mögliche Varianten.
 \todo[inline]{Späteres Kapitel: Unsere Anwendung auf KGG; WaveSolver und LinhypSolver; Stabilität ohne CFL für $w=1$}
 \subsection{Generelle Idee}
 Angenommen wir stehen vor dem Problem die Differentialgleichung 
 \begin{equation}
 \label{gencompdgl}
-\dt{u}(t)=(A+B)u(t), \, t>0, \quad u(0)=u_0
+\dt{u}(t)=(L+R)u(t), \, t>0, \quad u(0)=u_0
 \end{equation}
-zu lösen. Dabei ist im einfachsten Fall $u$ eine vektorwertige Funktion und $A$ bzw. $B$ zwei Matrizen.\\
-Sind aufgrund der Struktur der Matrizen --beispielsweise könnte $A$ eine obere und $B$ eine untere Dreiecksmatrix sein-- die Gleichungen 
+zu lösen. Dabei ist im einfachsten Fall $u$ eine vektorwertige Funktion und $L$ bzw. $R$ zwei Matrizen.\\
+Sind aufgrund der Struktur der Matrizen --beispielsweise könnte $L$ eine untere und $R$ eine obere Dreiecksmatrix sein-- die Gleichungen 
 \begin{align*}
-\dt{v}(t)&=Av(t), \quad v(0)=v_0\\
-\dt{w}(t)&=Bw(t), \quad w(0)=w_0
+\dt{v}(t)&=Lv(t), \quad v(0)=v_0\\
+\dt{w}(t)&=Rw(t), \quad w(0)=w_0
 \end{align*}
 deutlich einfacher zu lösen als die Gleichung (\ref{gencompdgl}), so lässt sich aus den Lösungen $v$ und $w$ dennoch eine Approximation an $u$ gewinnen.\\
 Wir \emph{teilen} (engl. split) die Gleichung also in zwei neue Gleichungen auf. Häufig lässt sich dann eine der gewonnen Gleichungen sogar exakt lösen. Dieser Ansatz funktioniert auch für (nicht-lineare) Operatoren anstelle von Matrizen.\\
@@ -89,11 +89,11 @@ Diese zentrale Idee werden wir verwenden, um die KGG
 \begin{equation*}
 \dtt{u}(t,x)=\alpha\Laplace u(t,x)-\beta(x)u(t,x)
 \end{equation*}
-zu splitten. Dabei wird der Operator $\alpha\Laplace$ in $A$ einfließen und $-\beta(x)$ in $B$. Man beachte jedoch, dass die zeitliche Ableitung zweiter Ordnung von $u$ eine Umschreibung in ein System erster Ordnung erfordert, bevor ein Splittingansatz sinnvoll ist.
+zu splitten. Dabei wird der Operator $\alpha\Laplace$ in $L$ einfließen und $-\beta(x)$ in $R$. Man beachte jedoch, dass die zeitliche Ableitung zweiter Ordnung von $u$ eine Umschreibung in ein System erster Ordnung erfordert, bevor ein Splittingansatz sinnvoll ist.
 
-\subsection{Lie-Trotter Splitting}
+\subsection{Lie-Trotter-Splitting}
 \label{seclietrotter}
-Wir beginnen mit einer rigerosen Einführung in Splitting Verfahren. Als zentrales Ergebnis werden wir dabei das Strang Splitting erhalten, welches einen Fehler $\mathcal{O}(\deltat^2)$ in Abhängigkeit von der Zeitschrittweite $\deltat$ besitzt.\\
+Wir beginnen mit einer rigerosen Einführung in Splittingverfahren. Als zentrales Ergebnis werden wir dabei das Strang-Splitting erhalten, welches einen Fehler $\mathcal{O}(\deltat^2)$ in Abhängigkeit von der Zeitschrittweite $\deltat$ besitzt.\\
 Die folgende Einführung ist angelehnt an \autocite{patrickdiplom}, welche wiederum aus \autocite[Kapitel II.3 bis II.5]{HairerLubichWanner} übernommen wurde.
 \begin{mathdef}[Fluss einer Differentialgleichung]
 Der Fluss $\varphi_t$ einer reversiblen Differentialgleichung
@@ -107,7 +107,7 @@ mit $f\colon \R^d\to\R^d$ ist die injektive Abbildung, die einem gegebenen $y_0$
 \end{equation*}
 \end{mathdef}
 
-Um Splitting Verfahren von möglichst höher Ordnung zu bekommen ist es wichtig, die einzelnen Teilverfahren bestmöglich zu kombinieren. Hierbei spielt das adjungierte Verfahren eine wichtige Rolle, da es dabei hilft, symmetrisierte Verfahren mit gerader Ordnung zu gewinnen.
+Um Splittingverfahren von möglichst höher Ordnung zu bekommen ist es wichtig, die einzelnen Teilverfahren bestmöglich zu kombinieren. Hierbei spielt das adjungierte Verfahren eine wichtige Rolle, da es dabei hilft, symmetrisierte Verfahren mit gerader Ordnung zu gewinnen.
 \begin{mathdef}[Adjungiertes Verfahren]
 Ist $\Phi_{\deltat}\colon\R^d\to\R^d$ ein Einschrittverfahren so definieren wir das adjungierte Verfahren $\Phi_{\deltat}^*$ als das Inverse des Einschrittverfahrens mit negativer Schrittweite $\deltat$, also \[\Phi_{\deltat}^*\coloneqq\Phi_{-\deltat}^{-1}\]
 Das bedeutet, dass $y_1=\Phi_{\deltat}^*(y_0)$ implizit durch $\Phi_{-\deltat}(y_1)=y_0$ definiert wird.\\
@@ -122,7 +122,8 @@ Ohne Beweis sei bemerkt, dass $(\Phi_{\deltat}^*)^*=\Phi_{\deltat}$ und
 \end{equation}
 
 \begin{mathdef}[Konsistenzordnung]
-Wir sagen, dass eine numerische Methode zum Lösen von (\ref{orddgl}) (konsistenz) von Ordnung $p$ ist, wenn der lokale Fehler \[\Phi_{\deltat}(y(t))=\varphi_{\deltat}(y(t))+\mathcal{O}(\deltat^{p+1})\] erfüllt (für $y(\cdot)$ hinreichend glatt).
+Wir sagen, dass eine numerische Methode zum Lösen von (\ref{orddgl}) (konsistent) von Ordnung $p$ ist, wenn der lokale Fehler für hinreichend glattes $y$
+\[\Phi_{\deltat}(y(t))=\varphi_{\deltat}(y(t))+\mathcal{O}(\deltat^{p+1})\] erfüllt.
 \end{mathdef}
 \begin{maththeorem}[Ordnung des adjungierten Verfahrens, vgl. 
 {\autocite[Theorem II.3.2]{HairerLubichWanner}}]
@@ -157,9 +158,9 @@ Die Reihenfolge $A\to B$ ist willkürlich und kann auch umgekehrt werden. Tatsä
 \end{align} 
 \end{minipage}
 
-\begin{maththeorem}[Ordnung des Lie-Trotter Splittings]
+\begin{maththeorem}[Ordnung des Lie-Trotter-Splittings]
 \label{lieorder1}
-Das Lie-Trotter Splitting $\Phi_{\deltat}=\varphi_{\deltat}^B \circ \varphi_{\deltat}^A$ und sein adjungiertes $\Phi_{\deltat}^*=\varphi_{\deltat}^A \circ \varphi_{\deltat}^B$ sind von Ordnung $p=1$.
+Das Lie-Trotter-Splitting $\Phi_{\deltat}=\varphi_{\deltat}^B \circ \varphi_{\deltat}^A$ und sein adjungiertes $\Phi_{\deltat}^*=\varphi_{\deltat}^A \circ \varphi_{\deltat}^B$ sind von Ordnung $p=1$.
 \end{maththeorem}
 \begin{proof}
 Die Taylorreihe von $\varphi_{\deltat}$ lässt sich wegen 
@@ -176,12 +177,12 @@ Diese vergleichen wir nun mit der Taylorreihe des Splittings
 &=y_0+\deltat f(y_0)+\frac{\deltat^2}{2}f^\prime(y_0)f(y_0)\\
 &\quad+\frac{\deltat^2}{2}\left(f^{\prime B}(y_0)f^A(y_0)-f^{\prime A}(y_0)f^B(y_0)\right)+\mathcal{O}(\deltat^3)
 \end{align*}
-so bekommen wir --falls $f^A$, $f^{\prime A}$, $f^B$ und $f^{\prime B}$ hinreichend glatt-- den Fehler $\varphi_{\deltat}(y_0)-\left(\varphi_{\deltat}^B \circ \varphi_{\deltat}^A\right)(y_0)=\mathcal{O}(\deltat^2)$ und die Ordnung $p=1$. Mit Satz \ref{adjfloworder} ist das adjungierte Verfahren ebenfalls von Ordnung $p=1$.
+so bekommen wir für hinreichend glatte Funktionen $f^A$, $f^{\prime A}$, $f^B$ und $f^{\prime B}$ den Fehler \[\varphi_{\deltat}(y_0)-\left(\varphi_{\deltat}^B \circ \varphi_{\deltat}^A\right)(y_0)=\mathcal{O}(\deltat^2)\] und die Ordnung $p=1$. Mit Satz \ref{adjfloworder} ist das adjungierte Verfahren ebenfalls von Ordnung $p=1$.
 \end{proof}
 
-\subsection{Strang Splitting}
+\subsection{Strang-Splitting}
 \label{secstrang}
-Durch geschicktes Kombinieren der Einschrittverfahren $\Phi_{\deltat}$ und $\Phi_{\deltat}^*$ mit verschiedenen Schrittweiten lassen sich Splitting Verfahren beliebiger Ordnung konstruieren.
+Durch geschicktes Kombinieren der Einschrittverfahren $\Phi_{\deltat}$ und $\Phi_{\deltat}^*$ mit verschiedenen Schrittweiten lassen sich Splittingverfahren beliebiger Ordnung konstruieren.
 \begin{maththeorem}[vgl. {\autocite[Theorem II.4.1ff]{HairerLubichWanner}}]
 Ist $\Phi_{\deltat}$ ein Einschrittverfahren von Ordnung $p$ so ist die Zerlegung
 \[\Psi_{\deltat}=\Phi_{a_s\deltat}\circ \Phi_{b_s\deltat}^*\circ\dots\circ\Phi_{b_2\deltat}^*\circ\Phi_{a_1\deltat}\circ\Phi_{b_1\deltat}^*\]
@@ -191,9 +192,9 @@ von Ordnung $p+1$, wenn
 \sum_{j=1}^sa_j^{p+1}+(-1)^pb_j^{p+1}&=0
 \end{align*}
 \end{maththeorem}
-Ohne das allgemeine Ergebnis zu verwenden wollen wir nun dennoch ein Verfahren $\Phi_{\deltat}^S$ mit Ordnung $p=2$ gewinnen. Dieses sollte möglichst den selben Zeitaufwand wie das Lie-Trotter Splitting besitzen. Hierzu verwenden wir den Ansatz \[\Phi_{\deltat}^S=\Phi_{\deltathalf}^*\circ\Phi_{\deltathalf}\]
+Ohne das allgemeine Ergebnis zu verwenden wollen wir nun dennoch ein Verfahren $\Phi_{\deltat}^S$ mit Ordnung $p=2$ gewinnen. Dieses sollte möglichst den selben Zeitaufwand wie das Lie-Trotter-Splitting besitzen. Hierzu verwenden wir den Ansatz \[\Phi_{\deltat}^S=\Phi_{\deltathalf}^*\circ\Phi_{\deltathalf}\]
 Wir erkennen sofort, dass es sich hierbei um ein symmetrisches Verfahren handelt. Als Komposition von Verfahren mit Ordnung 1 (siehe Satz \ref{lieorder1}) ist es ebenfalls mindestens von Ordnung 1. Als zusätzlich symmetrisches Verfahren gilt mit Satz \ref{adjfloworder}, dass das Verfahren mindestens von Ordnung 2 ist.\\
-Dieses sogenannte \emph{Strang Splitting} lässt sich unter Verwendung der aufgeteilten Flüsse (\ref{liesplittings}) auch darstellen als 
+Dieses sogenannte \emph{Strang-Splitting} lässt sich unter Verwendung der aufgeteilten Flüsse (\ref{liesplittings}) auch darstellen als 
 
 \noindent\begin{minipage}{0.3\textwidth}
 \input{tikz/splitting_strang_flow}
@@ -205,8 +206,8 @@ Dieses sogenannte \emph{Strang Splitting} lässt sich unter Verwendung der aufge
 &=\varphi_{\deltathalf}^A\circ\varphi_{\deltat}^B\circ\varphi_{\deltathalf}^A
 \end{align}
 \end{minipage}
-Für einen Schritt ist also nur der anderthalbfache Aufwand nötig wie beim Lie-Trotter Splitting, aber man gewinnt bereits eine Ordnung dazu. Unter Umständen kann dies sogar noch verbessert werden:\\
-Gegeben sei ein Anfangswert $y_0$ für das System (\ref{orddgl}). Ist man an einer Approximation $y_T$ der Lösung $y(T)$ zu einem Zeitpunkt $T=n\deltat>0$ interessiert, so gilt unter Verwendung des Strang Splitting Verfahrens
+Für einen Schritt ist also nur der anderthalbfache Aufwand nötig wie beim Lie-Trotter-Splitting, aber man gewinnt bereits eine Ordnung dazu. Unter Umständen kann dies sogar noch verbessert werden:\\
+Gegeben sei ein Anfangswert $y_0$ für das System (\ref{orddgl}). Ist man an einer Approximation $y_T$ der Lösung $y(T)$ zu einem Zeitpunkt $T=n\deltat>0$ interessiert, so gilt unter Verwendung des Strang-Splittingverfahrens
 \begin{align*}
 y_T&=\underbrace{\Phi_{\deltat}^S\circ\dots\circ\Phi_{\deltat}^S}_{n\text{ mal}}(y_0)\\
 &=\left(\varphi_{\deltathalf}^A\circ\varphi_{\deltat}^B\circ\varphi_{\deltathalf}^A\right)\circ\left(
@@ -216,7 +217,7 @@ y_T&=\underbrace{\Phi_{\deltat}^S\circ\dots\circ\Phi_{\deltat}^S}_{n\text{ mal}}
 &=\varphi_{\deltathalf}^A\circ\varphi_{\deltat}^B\circ
 \underbrace{\Phi_{\deltat}^*\circ\dots\circ\Phi_{\deltat}^*}_{n-1\text{ mal}}\circ\,\varphi_{\deltathalf}^A
 \end{align*}
-Durch das Kombinieren der äußeren Halbschritte bekommt man also nun eine Darstellung des Strang Splittings, die nur einen zusätzlichen Fluss berechnen muss und trotzdem Ordnung $p=2$ besitzt. Man muss hierbei allerdings auf Zwischenergebnisse verzichten, da diese eine weitere Anwendung von $\varphi_{\deltathalf}^A$ benötigen würden.\\[0.5cm]
+Durch das Kombinieren der äußeren Halbschritte bekommt man also nun eine Darstellung des Strang-Splittings, die nur einen zusätzlichen Fluss berechnen muss und trotzdem Ordnung $p=2$ besitzt. Man muss hierbei allerdings auf Zwischenergebnisse verzichten, da diese eine weitere Anwendung von $\varphi_{\deltathalf}^A$ benötigen würden.\\[0.5cm]
 Bisher sind wir davon ausgegangen, dass sich die Flüsse $\varphi_{\deltat}^A$ btw. $\varphi_{\deltat}^B$ exakt berechnen lassen. Dies ist in den seltensten Fällen der Fall und man verwendet stattdessen approximative Verfahren $\Phi_{\deltat}^A$ bzw. $\Phi_{\deltat}^B$. 
 \begin{maththeorem}
 Sind die Verfahren ebenfalls von Ordnung $p$, d.h. falls 
@@ -225,15 +226,16 @@ Sind die Verfahren ebenfalls von Ordnung $p$, d.h. falls
 \Phi_{\deltat}^B(y(t))=\varphi_{\deltat}^B(y(t))+\mathcal{O}(\deltat^{p+1})
 \end{align*}
 so gelten Satz \ref{adjfloworder}, Satz \ref{lieorder1} und alle entsprechenden Aussagen aus Kapitel \ref{seclietrotter} und Kapitel \ref{secstrang} für $\Phi_{\deltat}^A$ und $\Phi_{\deltat}^B$ anstelle von $\varphi_{\deltat}^A$ und $\varphi_{\deltat}^B$.\\
-Insbesondere ist das Strang Splitting immer noch von Ordnung 2, wenn alle verwendeten Approximationen von Ordnung 2 sind.
+Insbesondere ist das Strang-Splitting immer noch von Ordnung 2, wenn alle verwendeten Approximationen von Ordnung 2 sind.
 \end{maththeorem}
 \begin{proof}[Beweisidee]
 Am Beispiel von $\varphi_{\deltat}^A$ und $p=1$:\\
 Man verwendet die Darstellung $\varphi_{\deltat}^A(y_0)=y_0+\deltat f^A(y_0)+\mathcal{O}(\deltat^2)$ und ersetzt $\varphi_{\deltat}^A$ durch $\Phi_{\deltat}^A$. Die Vorgehensweise in den Beweisen muss dann höchstens minimal angepasst werden.\\
-Man beachte hierbei, dass nun $\Phi_{\deltat}^A$ im Gegensatz zu $\varphi_{\deltat}^A$ nicht mehr symmetrisch ist. Die Argumentation über die Ordnung von symmetrischen Verfahren kann also nicht direkt verwendet werden, um $p=2$ für das Strang Splittings zu begründen. Außerdem kann dies die Möglichkeit, das Strang Splitting durch Kombination der Halbschritte zu beschleunigen, zunichte machen.
+Man beachte hierbei, dass nun $\Phi_{\deltat}^A$ im Gegensatz zu $\varphi_{\deltat}^A$ nicht mehr symmetrisch ist. Die Argumentation über die Ordnung von symmetrischen Verfahren kann also nicht direkt verwendet werden, um $p=2$ für das Strang-Splittings zu begründen. Außerdem kann dies die Möglichkeit, das Strang-Splitting durch Kombination der Halbschritte zu beschleunigen, zunichte machen.
 \end{proof}
 
 \section{Erster Einblick in das Polynomial Chaos}
+\todo[inline]{Diese Einführung erst nachdem wir kurz gesagt haben was Polynomial Chaos eigentlich ist. Vllt auch etwas kürzen? So versteht das jemand beim ersten Mal lesen nicht.}
 Die Entstehung des \emph{general Polynomial Chaos}(gPC) ist eine Geschichte über den Versuch, stochastische Abhängigkeit und Integrationstheorie zu kombinieren. Sie wurzelte in der Arbeit von Wiener (\autocite{norbertwiener1938}), wo er das \emph{homogene Chaos} einführte, um die Entwicklung von Unsicherheit in einem dynamischen, chaotischen, physikalischen System zu konkretisieren. Dies erklärt auch den Ursprung der Bezeichnung "`Chaos"' im Kontext der chaotischen Brownschen Bewegung im Wiener-Prozess.\\
 Ghanem verwendete dann Hermite Polynome um mithilfe dieser Orthogonalbasis gaußsche Prozesse darzustellen. Dies wendete er erfolgreich auf einige Probleme aus den Ingenieurswissenschaften an, ein Überblick wird in (\autocite{GhaSpa91}) gegeben.\\
 Xiu verallgemeinerte in seiner Arbeit (\autocite{xiu2002}) diesen Ansatz auf andere Kombinationen aus Stochastischer Verteilung und Polynombasis. Gemäß dem Askey Schema (siehe Abbildung \ref{askeyscheme}) werden Beziehungen einiger bekannter Polynom Orthonormalbasen verdeutlicht. Man beobachtet außerdem, dass einige Gewichte den Dichtefunktionen von bekannten Verteilungen entsprechen und möchte nun zu einer gegebenen Verteilung die bestmögliche Polynombasis verwenden. An Modellproblemen demonstrierte Xiu jeweils optimale exponentielle Konvergenz für die verschiedenen Paarungen.\\
@@ -256,7 +258,7 @@ Ein allgemeines Polynom $Q$ vom Grad $n$ lässt sich darstellen als
 \[Q_n(x)=q_nx^n+q_{n-1}^{n-1}+\dots+q_1x+q_0,\quad q_n\ne 0\]
 Wir bezeichnen mit 
 \[\frac{Q_n(x)}{q_n}\]
-die \emph{monic} Version des Polynoms $Q$, also mit führendem Koeffizienten gleich 1.\\
+die normierte (engl. \emph{monic}) Version des Polynoms $Q$, also mit führendem Koeffizienten gleich 1.\\
  Ein System $\left\lbrace Q_n(x),\: n\in\mathcal{N}\right\rbrace$ von Polynomen mit $\mathcal{N}=\N_0=\N\cup\lbrace 0\rbrace$ oder $\mathcal{N}=\lbrace 0,1,\dots,N-1,N\rbrace$ heißt Orthogonalsystem, wenn bezüglich eines reellen positiven Maßes $\alpha$ die Orthogonalitätsbedingung
  \[\langle Q_n(x),Q_m(x)\rangle =\int_S Q_n(x)Q_m(x)d\alpha(x)=\gamma_n\delta_{mn},\quad m,n\in\mathcal{N}\]
  erfüllt ist. Dabei ist $\delta_{mn}$ das Kronecker-Delta, $S$ der nicht notwendigerweise endliche Träger des Maßes $\alpha$ und $y_n>0$ die Normalisierungskonstanten. Es gilt 
@@ -264,16 +266,19 @@ die \emph{monic} Version des Polynoms $Q$, also mit führendem Koeffizienten gle
 \end{mathdef}
 Das Hermite Chaos ist ein motivierendes Beispiel dafür, dass solche Verflechtungen von Polynombasis und stochastischer Verteilung natürlicherweise existieren.
 \begin{mathbsp}[Hermite Chaos]
-Ist $S=(-\infty,\infty)$, $w(x)=\frac{1}{\sqrt{2\pi}}e^{-\frac{x^2}{2}}$ die Dichtefunktion des Gauss Verteilung und verwenden wir diese als Dichte des Maßes $\alpha$, so sind die Hermite Polynome
+Ist $S=(-\infty,\infty)$, $w(x)=\frac{1}{\sqrt{2\pi}}e^{-\frac{x^2}{2}}$ die Dichtefunktion des Gauss-Verteilung und verwenden wir diese als Dichte des Maßes $\alpha$, so sind die Hermite Polynome
 \[H_0(x)\equiv 1,\quad H_1(x)=x,\quad H_2(x)=x^2-1,\quad H_n(x)=xH_{n-1}(x)-(n-1)H_{n-2}(x)\]
-ein passendes Orthogonalsystem mit $\gamma_n=n!$.\\
+ein Orthogonalsystem bezüglich $\langle\cdot,\cdot\rangle_{L_w^2(S)}$ mit Normalisierungskonstanten $\gamma_n=n!$.\\
+Der Erwartungswert der Gauss-Verteilung
+\[\E_w[Z]= \int_{-\infty}^\infty Z(x)w(x)dx\] erfüllt also die entscheidende Beziehung des Polynomial Chaos
+\[\langle H_n,H_m\rangle_{L_w^2(S)} =\E_w \left[H_nH_m\right]=\gamma_n\delta_{nm}\]
 Man beachte, dass diese Definition der Hermite Polynome leicht von der in der Literatur üblichen abweicht. Dies ist der Tatsache geschuldet, dass dort die entsprechende Gewichtsfunktion einen zusätzlichen Faktor $\sqrt{2}$ besitzt. Sie stellt somit keine Dichte einer Wahrscheinlichkeitsverteilung dar und ist für unsere Zwecke unpraktisch und wird nicht verwendet. 
 \end{mathbsp}
 Wir werden in dieser Arbeit auf Polynombasen, die diskreten Verteilungen entsprechen, verzichten. Es sei jedoch bemerkt, dass dies keine Einschränkung der Methode ist, sondern lediglich die Notation vereinfacht. Konkret werden wir uns mit Laguerre-, Jacobi-, Hermite- und Legendre-Polynomen beschäftigen, wobei letztere ein Spezialfall der Jacobipolynome darstellen. Details und Eigenschaften sind im Anhang \ref{AppendixA} zu finden.\\[0.3cm]
 Eine wichtige Eigenschaft von Orthogonalsystemen von Polynomen ist eine besondere Art der rekursiven Darstellung, wie wir sie bereits bei den Hermite Polynomen gesehen haben.
 \begin{maththeorem}[Drei Term Rekursion]
 \label{threetermexist}
-Ein Orthogonalsystem $\left\lbrace Q_n(x),\: n\in\N_0\right\rbrace$ von Polynomen erfüllt eine Drei Term Rekursion
+Ein Orthogonalsystem $\left\lbrace Q_n(x),\: n\in\N_0\right\rbrace$ von Polynomen erfüllt eine Drei-Term-Rekursion
 \begin{eqnarray}
 Q_n(x)=(a_nx+b_n)Q_{n-1}(x)-c_nQ_{n-2}(x),\quad n\in\N\\
 Q_{-1}(x)\equiv 0, Q_0(x)\equiv 1\nonumber
@@ -290,17 +295,17 @@ Für $k\le n-1$ folgt also aus der Orthogonalität bezüglich des Skalarprodukte
 \end{equation*}
 und durch Verwenden von $\langle Q_n(x),Q_k(x)\rangle = 0$ und Umstellen
 \[ -a_n\langle Q_{n-1}(x),xQ_k(x)\rangle=r_k\gamma_k\]
-Somit folgt für $k<n-2$ wegen $\text{deg}(xQ_k(x))<n-1$ dass $r_k=0$. Damit erfüllen die Polynome eine Drei Term Rekursion
+Somit folgt für $k<n-2$ wegen $\text{deg}(xQ_k(x))<n-1$ dass $r_k=0$. Damit erfüllen die Polynome eine Drei-Term-Rekursion
 \[Q_n(x)-a_nxQ_{n-1}(x)=r_{n-1}Q_{n-1}(x)+r_{n-2}Q_{n-2}(x)\]
 Nun definieren wir $b_n=r_{n-1}$, $c_n=-r_{n-2}$ und berechnen schlussendlich
 \[r_{n-2}\gamma_{n-2}=\langle -a_nxQ_{n-1}(x),Q_{n-2}(x)\rangle =-a_n\langle Q_{n-1}(x),xQ_{n-2}(x)\rangle=-a_n\frac{k_{n-2}}{k_{n-1}}\gamma_{n-1}\]
 \end{proof}
-Diese und noch viele weitere Eigenschaften von den verschiedenen Orthogonalsystemen von Polynomen finden sich in \autocite{weborthopoly} und in vielen weiteren Werken über Polynome. Beispielsweise lässt sich auch die Umkehrung zeigen (unter milden Anforderungen an die Koeffizienten): Zu jeder durch eine drei Term Rekursion definierte Menge an Polynomen existiert ein Maß $\alpha$, bezüglich dessen die Polynome ein Orthogonalsystem bilden (Satz von Favard).\\[0.3cm]
-Die auftretenden Integrale in den Skalarprodukten werden wir später mit Gauss-Quadraturformeln approximieren. An dieser und an anderen Stellen werden wir später die Nullstellen der Polynome als Stützstellen benötigen. Basierend auf den Koeffizienten der Drei Term Rekursion entwickelten Golub und Welsch in \autocite{GolubWelsch} einen effizienten stabilen Algorithmus, der für die Berechnung der Nullstellen mit der Berechnung der Eigenwerte einer symmetrischen Tridiagonalmatrix auskommt.
+Diese und noch viele weitere Eigenschaften von den verschiedenen Orthogonalsystemen von Polynomen finden sich in \autocite{weborthopoly} und in vielen weiteren Werken über Polynome. Beispielsweise lässt sich auch die Umkehrung zeigen (unter milden Anforderungen an die Koeffizienten): Zu jeder durch eine Drei-Term-Rekursion definierte Menge an Polynomen existiert ein Maß $\alpha$, bezüglich dessen die Polynome ein Orthogonalsystem bilden (Satz von Favard).\\[0.3cm]
+Die auftretenden Integrale in den Skalarprodukten werden wir später mit Gauss-Quadraturformeln approximieren. An dieser und an anderen Stellen werden wir später die Nullstellen der Polynome als Stützstellen benötigen. Basierend auf den Koeffizienten der Drei-Term-Rekursion entwickelten Golub und Welsch in \autocite{GolubWelsch} einen effizienten stabilen Algorithmus, der für die Berechnung der Nullstellen mit der Berechnung der Eigenwerte einer symmetrischen Tridiagonalmatrix auskommt.
 
 \begin{maththeorem}[Golub Welsch Algorithmus]
 \label{golubwelschalg}
-Ist $\left\lbrace Q_i(x),\: i=0,\dots,n\right\rbrace$ ein Orthogonalsystem von Polynomen welches die Drei Term Rekursion
+Ist $\left\lbrace Q_i(x),\: i=0,\dots,n\right\rbrace$ ein Orthogonalsystem von Polynomen welches die Drei-Term-Rekursion
 \begin{eqnarray}
 \label{threetermgolub}
 Q_i(x)=(a_ix+b_i)Q_{i-1}(x)-c_iQ_{i-2}(x),\quad i=1,\dots , n\\
