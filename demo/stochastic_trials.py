@@ -13,7 +13,7 @@ trial_1 = StochasticTrial([distributions.make_uniform(-1, 1)],
                           random_variables=[lambda y: (right_1 - left_1) / 2 * (y + 1) + left_1],
                           name="Trial1") \
     .add_parameters("beta", lambda xs, ys: ys[0] ** 2 - ys[0],  # y^2 - alpha(y)
-                    "alpha", lambda ys: ys[0],
+                    "alpha", lambda ys: ys[0],  # in higher space dimensions this would need to be multplied by dim!
                     # at t=0.5: 0.624096 sin(x)
                     "expectancy", lambda xs, t: (2 / (t * (right_1 - left_1)) * np.sin(sum(xs))
                                                  * (np.sin(right_1 * t) - np.sin(left_1 * t))),

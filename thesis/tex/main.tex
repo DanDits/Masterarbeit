@@ -47,6 +47,20 @@ headsepline, % Uncomment to get a line under the header
 \usepackage{mathtools}
 \usepackage{tikz}
 \usetikzlibrary{matrix}
+\usepackage{algorithm} % basic pseudocode package
+\usepackage{algorithmicx} % For pseudocode, algorithm environment
+\usepackage{algpseudocode} % defines stuff like\Procedure for algorithmicx
+\algtext*{EndWhile}% Remove "end while" text
+\algtext*{EndIf}% Remove "end if" text
+\algtext*{EndFor}
+\algtext*{EndProcedure}
+\algtext*{EndFunction}
+\makeatletter 
+ \renewcommand{\ALG@name}{Algorithmus} %change "Algorithm" to "Algorithmus"
+\makeatother  
+\renewcommand{\listalgorithmname}{Liste der Pseudocodes}
+
+  
 % biber and biblatex need to be compatibile (see "Compatibility matrix").. which is kinda strange and needs maybe manual installation of one of the packages
 \usepackage[backend=biber,style=numeric,natbib=true]{biblatex} 
 

@@ -113,14 +113,65 @@ In Analogie zur Klein-Gordon-Gleichung (\ref{kgg}) definieren wir für einen Wah
 \begin{align}
 \label{skgg}
 \dtt{u}(t,x,y)&=\alpha(y) \Laplace_x u(t,x,y) - \beta(x,\omega)u(t,x,y), \: t>0, \, x\in \Torus^d\\
-u(0,x,y)&=u_0(x), \: x\in \Torus^d\\
-\dt{u}(0,x,y)&=v_0(x), \: x\in \Torus^d
+u(0,x,y)&=u_0(x,y), \: x\in \Torus^d\\
+\dt{u}(0,x,y)&=v_0(x,y), \: x\in \Torus^d
 \end{align}
 Die Lösung \[u(t,x,y)\colon [0,T]\times\Torus^d\times \R^N\to\R\] ist also eine zufallsabhängige Größe.\\
 Dabei ist die grundlegende Annahme, dass (\ref{skgg}) $P$-fast-sicher wohl gestellt ist, d.h. die Menge an Punkten $\omega$ für welche die partielle Differentialgleichung mit fixem $y=Y(\omega)$ keine eindeutige Lösung besitzt ist eine Nullmenge bezüglich des Wahrscheinlichkeitmaßes $P$.\\
 Ab sofort werden wir --wie in Kapitel \ref{secfiniteparam} diskutiert-- stets annehmen, dass die Komponenten $Y_i$ von $Y$ stochastisch unabhängige Zufallsvariablen mit bekannter Verteilung sind.
-\todo[inline]{Beispiel einer sKGG mit bekanntem Erwartungswert und Varianz, zeige dass das nicht Lösung der Gleichung mit entsprechendem Erwartungswert als Parameter ist}
+\begin{mathbsp}
+Sei $Y=(Y_1)$ eine eindimensionale und in $(2,3)$ gleichverteilte Zufallsvariable. Dann gilt für $t>0$, $d\in\N$, $x=(x_1,\dots$, $x_d)\in\Torus^d$, $\hat{x}\coloneqq \sum_{i=1}^d x_i$ und $y=Y(\omega)$
+\begin{align*}
+u(t,x,y)&=2\cos(ty)\sin(\hat{x})\\
+u_0(x,y)&=2\sin(\hat{x})\\
+v_0(x,y)&\equiv 0
+\end{align*}
+löst die stochastische KGG (\ref{skgg}) für $\alpha(y)=\frac{y}{d}$ und $\beta(x,y)=y^2-y$\\
+Für den Erwartungswert und Varianz von $u$ gelten
+\begin{align*}
+\E[u(t,x,y)]&=\int_2^3u(t,x,y)dy=\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\\
+\text{var}(u(t,x,y))&=\frac{1}{t}\sin^2(\hat{x})\left(2t + \sin(6t) - \sin(4t)\right)- \left(\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\right)^2
+\end{align*}
+Um einen potentiellen Denkfehler zu vermeiden, weisen wir an dieser Stelle explizit darauf hin, dass 
+\[\E[u(t,x,y)]=\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\neq 2\sin(\hat{x})\cos(\frac{5}{2}t)=u(t,x,\E[Y])\]
+Dies erkennt man beispielsweise am Zeitpunkt $t=\frac{\pi}{2}$, wo gilt
+\[\E[u(t,x,y)]=-\sin(\hat{x})\pi \neq -\sin(\hat{x})\sqrt{2}=u(t,x,\E[Y])\]
+Der Erwartungswert ist linear, die Abhängigkeiten von $y$ sind es aber nicht. Diese erste fehlgeschlagene Idee den Erwartungswert durch das Lösen eines deterministischen Systems zu erhalten, ist jedoch nicht vollends vergebens. Wir werden am Beispiel der Monte-Carlo-Methode sehen, dass wir dazu allerdings weit mehr als ein System lösen müssen.
+\end{mathbsp}
+Wir geben ein weiteres Referenzbeispiel an, wo nun auch die Ortsabhängigkeit von $\beta$ benutzt wird und auch ein Anfangswert abhängig von der Zufallsvariablen ist.
+\begin{mathdef}
+Sei $Y=(Y_1)$ eine eindimensionale und in $(10,50)$ gleichverteilte Zufallsvariable. Dann gilt für $t>0$, $d=1$, $x\in\Torus$ und $y=Y(\omega)$
+\begin{align*}
+u(t,x,y)&=\frac{\cos(t)}{\sin(x) + y}\\
+u_0(x,y)&=\frac{1}{\sin(x) + y}\\
+v_0(x,y)&\equiv 0
+\end{align*}
+löst die stochastische KGG (\ref{skgg}) für \[\alpha(y)=y-2\text{  und  }\beta(x,y)=1 + (y-2)\left(\frac{\sin(x)}{\sin(x) + y}+ \frac{2\cos^2(x)}{(\sin(x) + y)^2}\right)\]
+Für den Erwartungswert von $u$ gilt
+\[\E[u(t,x,y)]=\frac{\cos(t)}{40}(\log(\sin(x) + 50)- \log(\sin(x) + 10))\]
+\end{mathdef}
 \section{Die Monte-Carlo-Methode} % offizieller Name; auch: Monte-Carlo-Simulation
-% TODO running mean und variance mit Beweis
+Die Monte-Carlo-Methode (auch: Monte-Carlo-Simulation) ist ein in vielen Disziplinen bekanntes Verfahren, welches auf wiederholtem Durchführen von "`Zufallsexperimenten"' in sehr großer Zahl basiert. So können analytisch nicht --oder nur sehr aufwändig-- lösbare Probleme auf Basis des Gesetz der großen Zahlen approximiert werden.\\
+Die Grundstruktur des Algorithmus, angewandt auf die stochastische KGG zur Berechnung des Erwartungswertes und der Varianz, ist beschrieben durch Algorithmus \ref{algmc}.
+\begin{algorithm}
+    \caption{Monte-Carlo}
+    \label{algmc}
+    \begin{algorithmic}[1] % The number tells where the line numbering should start
+        \Function{MonteCarloKGG}{$u_0,v_0,\alpha,\beta,Y,max\_runs$} 
+            \State $r\gets 0$
+            \While{$r<max\_runs$} \Comment{Stoppen nach fixer Anzahl Durchläufen}
+                \State $y \gets Y(\omega)$ \Comment{Generiere zufälliges $y$ nach geg. Verteilung}
+                \State Berechne deterministische Parameter $u_0(x,y)$, $v_0(x,y)$, $\alpha(y)$ und $\beta(x,y)$
+                \State Löse KGG (\ref{skgg}) mit deterministischen Parametern
+                \State Speichere Lösung der KGG
+                \State $r\gets r+1$
+            \EndWhile
+            \State $e\gets$ Mittelwert der gespeicherten Lösungen
+            \State $v\gets$ Schätzung der Varianz der gespeicherten Lösungen
+            \State \textbf{return} $e, v$\Comment{Geschätzter Erwartungswert und Varianz}
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+\todo[inline]{Diskutiere MonteCarloKGG: Vollständig parallel; (noch) kein det. Löser, aber angenommen wir haben einen; Lösung speichern?; Wie Mittelwert (noch ok), aber wie Varianz Schätzen? Speicherplatz Problem-> running mean und variance mit Beweis; wie $y$ generieren (besser: Quasi-Monte-Carlo)}
 \subsection{Konvergenzaussagen} % TODO Grundlagen wie zentrale Grenzwertsatz
 \subsection{Quasi-Monte-Carlo} % TODO Zeige bessere Konvergenzordnung (empirisch)
