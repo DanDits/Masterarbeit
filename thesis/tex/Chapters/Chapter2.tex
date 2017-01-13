@@ -45,6 +45,7 @@ und die Varianz von $Y$ als
 \end{mathdef}
 Ohne Beweis präsentieren wir die Inversionsmethode. Diese ist nützlich, um aus Zufallsvariablen einer bestimmten Verteilung Zufallsvariablen einer anderen Verteilung zu gewinnen. In der Numerik ist dies ist essentiell für die Generation von Pseudozufallszahlen von beliebigen Verteilungen, aber auch für die "`stochastische Normierung"' von verschiedenen Zufallsvariablen zu einem gemeinsamen Wahrscheinlichkeitsraum, auf dem dann Erwartungswerte berechnet werden können.
 \begin{maththeorem}[Inversionsmethode]
+\label{thinversionsmethode}
 Ist $Y$ eine reelle Zufallsvariable mit Verteilungsfunktion $F_Y$, so definieren wir deren Quantilfunktion als
 \[F_Y^{-1}(p)\coloneqq \inf\lbrace y\in\R |\: F_Y(y)\ge p\rbrace,\quad p\in\R\]
 Dann gilt
@@ -129,13 +130,13 @@ v_0(x,y)&\equiv 0
 löst die stochastische KGG (\ref{skgg}) für $\alpha(y)=\frac{y}{d}$ und $\beta(x,y)=y^2-y$\\
 Für den Erwartungswert und Varianz von $u$ gelten
 \begin{align*}
-\E[u(t,x,y)]&=\int_2^3u(t,x,y)dy=\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\\
-\text{var}(u(t,x,y))&=\frac{1}{t}\sin^2(\hat{x})\left(2t + \sin(6t) - \sin(4t)\right)- \left(\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\right)^2
+\E[u(t,x,Y)]&=\int_2^3u(t,x,y)dy=\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\\
+\text{var}(u(t,x,Y))&=\frac{1}{t}\sin^2(\hat{x})\left(2t + \sin(6t) - \sin(4t)\right)- \left(\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\right)^2
 \end{align*}
 Um einen potentiellen Denkfehler zu vermeiden, weisen wir an dieser Stelle explizit darauf hin, dass 
-\[\E[u(t,x,y)]=\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\neq 2\sin(\hat{x})\cos(\frac{5}{2}t)=u(t,x,\E[Y])\]
+\[\E[u(t,x,Y)]=\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\neq 2\sin(\hat{x})\cos(\frac{5}{2}t)=u(t,x,\E[Y])\]
 Dies erkennt man beispielsweise am Zeitpunkt $t=\frac{\pi}{2}$, wo gilt
-\[\E[u(t,x,y)]=-\sin(\hat{x})\pi \neq -\sin(\hat{x})\sqrt{2}=u(t,x,\E[Y])\]
+\[\E[u(t,x,Y)]=-\sin(\hat{x})\pi \neq -\sin(\hat{x})\sqrt{2}=u(t,x,\E[Y])\]
 Der Erwartungswert ist linear, die Abhängigkeiten von $y$ sind es aber nicht. Diese erste fehlgeschlagene Idee den Erwartungswert durch das Lösen eines deterministischen Systems zu erhalten, ist jedoch nicht vollends vergebens. Wir werden am Beispiel der Monte-Carlo-Methode sehen, dass wir dazu allerdings weit mehr als ein System lösen müssen.
 \end{mathbsp}
 Wir geben ein weiteres Referenzbeispiel an, wo nun auch die Ortsabhängigkeit von $\beta$ benutzt wird und auch ein Anfangswert abhängig von der Zufallsvariablen ist.
@@ -148,12 +149,12 @@ v_0(x,y)&\equiv 0
 \end{align*}
 löst die stochastische KGG (\ref{skgg}) für \[\alpha(y)=y-2\text{  und  }\beta(x,y)=1 + (y-2)\left(\frac{\sin(x)}{\sin(x) + y}+ \frac{2\cos^2(x)}{(\sin(x) + y)^2}\right)\]
 Für den Erwartungswert von $u$ gilt
-\[\E[u(t,x,y)]=\frac{\cos(t)}{40}(\log(\sin(x) + 50)- \log(\sin(x) + 10))\]
+\[\E[u(t,x,Y)]=\frac{\cos(t)}{40}(\log(\sin(x) + 50)- \log(\sin(x) + 10))\]
 \end{mathdef}
 \section{Die Monte-Carlo-Methode} % offizieller Name; auch: Monte-Carlo-Simulation
 Die Monte-Carlo-Methode (auch: Monte-Carlo-Simulation) ist ein in vielen Disziplinen bekanntes Verfahren, welches auf wiederholtem Durchführen von "`Zufallsexperimenten"' in sehr großer Zahl basiert. So können analytisch nicht --oder nur sehr aufwändig-- lösbare Probleme auf Basis des Gesetz der großen Zahlen approximiert werden.\\
 Die Grundstruktur des Algorithmus, angewandt auf die stochastische KGG zur Berechnung des Erwartungswertes und der Varianz, ist beschrieben durch Algorithmus \ref{algmc}.
-\begin{algorithm}
+\begin{algorithm}[ht]
     \caption{Monte-Carlo}
     \label{algmc}
     \begin{algorithmic}[1] % The number tells where the line numbering should start
@@ -172,6 +173,66 @@ Die Grundstruktur des Algorithmus, angewandt auf die stochastische KGG zur Berec
         \EndFunction
     \end{algorithmic}
 \end{algorithm}
-\todo[inline]{Diskutiere MonteCarloKGG: Vollständig parallel; (noch) kein det. Löser, aber angenommen wir haben einen; Lösung speichern?; Wie Mittelwert (noch ok), aber wie Varianz Schätzen? Speicherplatz Problem-> running mean und variance mit Beweis; wie $y$ generieren (besser: Quasi-Monte-Carlo)}
-\subsection{Konvergenzaussagen} % TODO Grundlagen wie zentrale Grenzwertsatz
-\subsection{Quasi-Monte-Carlo} % TODO Zeige bessere Konvergenzordnung (empirisch)
+Doch die Pseudocode Beschreibung von der Funktion \emph{MonteCarloKGG} wirft einige neue Fragen auf:
+\begin{enumerate}
+\item Wie generieren wir die Zufallszahlen numerisch? \label{mcgeneraterandom}
+\item Wie groß muss \emph{\texttt{max\_runs}} sein, d.h. wie schnell konvergiert die Methode?
+\item Ist der determinische Löser schnell genug für viele Durchläufe? Wie können wir den Algorithmus beschleunigen?
+\item Wie speichern wir die vielen Zwischenergebnisse? \label{mcsaveresults}
+\item Wie berechnen wir den Mittelwert und wie schätzen wir die Varianz? \label{mcestimations}
+\end{enumerate}
+Im Folgenden werden wir die obigen Fragen ausführlich diskutieren und verschiedene Möglichkeiten aufzeigen, sie zu beantworten.
+\subsection{Generierung von Pseudozufallszahlen}
+Eine Antwort auf Frage \ref{mcgeneraterandom} zur Generierung von $y$ ist durch das Schlagwort "`Pseudozufallszahlen"' direkt gegeben. Hierzu bietet jede wissenschaftliche Programmiersprache die Möglichkeit, Zahlen zu generieren, die zwar deterministisch erzeugt sind, jedoch viele Eigenschaften von Zufallszahlen erfüllen. Dabei wird häufig eine große Menge von bekannten Verteilungen unterstützt. Ist dies nicht der Fall und man hat beispielsweise nur gleichverteilte Zahlen zur Verfügung, so kann man dennoch mithilfe der Inversionsmethode (siehe Satz \ref{thinversionsmethode}) Pseudozufallszahlen mit jeder beliebigen Verteilungsfunktion erzeugen.\\
+Dies ist jedoch weder die einzige noch die beste Möglichkeit für die Generierung.
+\subsubsection*{Quasi-Monte-Carlo-Methode}% TODO Zeige bessere Konvergenzordnung (empirisch)
+
+\subsection{Approximation von Erwartungswert und Varianz}
+Bevor wir den Kern der Schleife betrachten, wollen wir uns zuerst mit den eng miteinander zusammenhängenden Fragen \ref{mcsaveresults} und \ref{mcestimations} beschäftigen. Die Frage, wie wir die einzelnen Zwischenergebnisse verwenden, um eine Approximation an den Erwartungswert und die Varianz zu erhalten, hat wiederum eine offensichtliche Antwort.
+\subsubsection*{Verarbeitung am Ende}
+Gegeben sei ein Zeitpunkt $T>0$ und die stochastische KGG (\ref{skgg}) zu einer Zufallsvariablen $Y$ und gesucht seien $\E[u(T,x,Y)]$ und $\text{var}(u(T,x,Y))$. Sind für $i=1,\dots,R$ die deterministischen Lösungen $u_i(T,x,y_i)$ gespeichert, so verwenden wir als Approximationen
+\begin{align*}
+\E[u(T,x,Y)]&\approx \frac{1}{R}\sum_{i=1}^R u_i(T,x,y_i)\eqqcolon m_R\\
+\text{var}(u(T,x,Y)) &\approx \frac{1}{R-1}\sum_{i=1}^R(u_i(T,x,y_i)-m_R)^2
+\end{align*}
+Wieso diese Approximationen sinnvoll sind, zeigt sich teilweise aus dem zentralen Grenzwertsatz \ref{thzentralgrenzwert}. Es folgt für unabhängige Stichproben $y_i$ die Aussage \[\sqrt{R}(m_R-\E[u(T,x,Y)])\xrightarrow{R\to\infty}\mathcal{N}(0,\text{var}(u(T,x,Y)))\]
+und schlussendlich 
+\[m_R=\E[u(T,x,Y)] + \mathcal{O}\left(\frac{1}{\sqrt{R}}\right)\]
+In welchem Konvergenz Sinne die letzte Aussage zu verstehen ist und welche Faktoren dabei in den letzten Term einfließen, sei an dieser Stelle nicht weiter ausgeführt. Wir werden diese Konvergenzordnung in Beispielen jedoch empirisch bestätigen.\todo{Beispiel}\\[0.2cm]
+Die für die Approximation der Varianz verwendete Darstellung nennt man auch \emph{korrigierte Stichprobenvarianz}. Sie ist ein erwartungstreuer Schätzer der Varianz einer Stichprobe und ein Werkzeug aus der Statistik, welches wir hier nicht weiter erläutern werden.
+\subsubsection*{Fortlaufende Berechnung}
+Die Verarbeitung am Ende besitzt zwei große Nachteile:
+\begin{itemize}
+\item Sämtliche Zwischenergebnisse müssen gespeichert werden. Für die Mittelwertbildung alleine wäre dies zwar nicht nötig, jedoch für die Approximation der Varianz. An einer Beispielsrechnung soll der benötigte Arbeitsspeicher kurz verdeutlicht werden: Wird der Raum in 256 Punkten diskretisiert und benötigt jeder Punkt 8 Byte Speicher und führt man (durchaus realistisch) $R=100000$ Simulationen durch, so ergibt sich bereits ein Speicherbedarf von $\frac{256*100000*8\text{B}}{1024^2}\approx 200\text{MB}$. Dies ist also bereits für eine räumliche Dimension ein nicht unerheblicher Aufwand.
+\item Die Methode zur Approximation der Varianz ist nicht stabil und stark anfällig für numerische Rechenfehler, insbesondere Überläufe (vgl. \autocite{cook08}). Aus diesem Grunde schlug Welford in \autocite{welford62} eine alternative Berechnungsmethode vor, welche wir im folgenden erklären werden.
+\end{itemize}
+\begin{maththeorem}
+\label{thiterativemk}
+Für $x_1,\dots,x_k\in\R$ und $m_k=\frac{1}{k}\sum_{j=1}^kx_j$ gilt für $k\in\N$ die iterative Darstellung
+\[m_k=m_{k-1}+\frac{x_k-m_{k-1}}{k},\quad \text{mit }\: m_0=0\]
+\end{maththeorem}
+\begin{proof}
+Wir zeigen mithilfe vollständiger Induktion die äquivalente Aussage, dass die Rekursion mit der Darstellung $m_k=\frac{1}{k}\sum_{j=1}^kx_j$ übereinstimmt.\\
+I.A. ($k=1$): \[m_1=0+\frac{x_1-0}{1}=x_1=\sum_{j=1}^1x_j\quad\surd\]
+I.S. ($k\leadsto k+1$):
+\begin{align*}
+m_{k+1}&\stackrel{Def}{=}m_k+\frac{x_{k+1}-m_k}{k+1}\\
+&\stackrel{IV}{=}\frac{1}{k}\sum_{j=1}^kx_j+\frac{x_{k+1}}{k+1}-\frac{1}{k(k+1)}\sum_{j=1}^kx_j
+\end{align*}
+Multiplizieren wir nun mit $k(k+1)$ so erhalten wir
+\begin{align*}
+k(k+1)m_{k+1}&=(k+1)\sum_{j=1}^kx_j+kx_{k+1}-\sum_{j=1}^kx_j\\
+&=k\sum_{j=1}^{k+1}x_j\\
+\implies m_{k+1}&=\frac{1}{k+1}\sum_{j=1}^{k+1}x_j
+\end{align*}
+\end{proof}
+Wir haben nun also eine iterative Methode zur Berechnung des Mittelwertes gewonnen, die nur den vorherigen Mittelwert, die neue Stichprobe und die Anzahl an Stichproben benötigt. Diese Methode ist robust gegen Überläufe und numerisch stabil. Viel wichtiger ist jedoch die iterative Berechnung des Varianzschätzers, welche auf ähnlichen Ideen basiert. Die Äquivalenz zur ursprünglichen Methode ist dabei allerdings schwieriger zu erkennen.
+\begin{maththeorem}
+Für $x_1,\dots,x_k\in\R$, $m_k$ wie in Satz \ref{thiterativemk} und $s_k=\sum_{j=1}^k(x_j-m_k)^2$ gilt für $k\in\N$ die iterative Darstellung
+\[s_k=s_{k-1}+(x_k-m_k)(x_k-m_{k-1}),\quad\text{mit }s_0=0\]
+\end{maththeorem}
+\begin{proof}
+\todo[inline]{proof}
+\end{proof}
+\todo[inline]{Diskutiere MonteCarloKGG: Vollständig parallel; (noch) kein det. Löser, aber angenommen wir haben einen; wie $y$ generieren (besser: Quasi-Monte-Carlo)}
+
