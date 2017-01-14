@@ -990,6 +990,8 @@ def halton_tests():
 
 
 if (__name__ == '__main__'):
-    timestamp()
-    halton_tests()
-    timestamp()
+    # timestamp()
+    # halton_tests()
+    # timestamp()
+    for i in range(10):
+        print(halton(i, 1))

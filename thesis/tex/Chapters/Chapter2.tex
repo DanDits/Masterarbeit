@@ -140,7 +140,7 @@ Dies erkennt man beispielsweise am Zeitpunkt $t=\frac{\pi}{2}$, wo gilt
 Der Erwartungswert ist linear, die Abhängigkeiten von $y$ sind es aber nicht. Diese erste fehlgeschlagene Idee den Erwartungswert durch das Lösen eines deterministischen Systems zu erhalten, ist jedoch nicht vollends vergebens. Wir werden am Beispiel der Monte-Carlo-Methode sehen, dass wir dazu allerdings weit mehr als ein System lösen müssen.
 \end{mathbsp}
 Wir geben ein weiteres Referenzbeispiel an, wo nun auch die Ortsabhängigkeit von $\beta$ benutzt wird und auch ein Anfangswert abhängig von der Zufallsvariablen ist.
-\begin{mathdef}
+\begin{mathbsp}
 Sei $Y=(Y_1)$ eine eindimensionale und in $(10,50)$ gleichverteilte Zufallsvariable. Dann gilt für $t>0$, $d=1$, $x\in\Torus$ und $y=Y(\omega)$
 \begin{align*}
 u(t,x,y)&=\frac{\cos(t)}{\sin(x) + y}\\
@@ -150,7 +150,7 @@ v_0(x,y)&\equiv 0
 löst die stochastische KGG (\ref{skgg}) für \[\alpha(y)=y-2\text{  und  }\beta(x,y)=1 + (y-2)\left(\frac{\sin(x)}{\sin(x) + y}+ \frac{2\cos^2(x)}{(\sin(x) + y)^2}\right)\]
 Für den Erwartungswert von $u$ gilt
 \[\E[u(t,x,Y)]=\frac{\cos(t)}{40}(\log(\sin(x) + 50)- \log(\sin(x) + 10))\]
-\end{mathdef}
+\end{mathbsp}
 \section{Die Monte-Carlo-Methode} % offizieller Name; auch: Monte-Carlo-Simulation
 Die Monte-Carlo-Methode (auch: Monte-Carlo-Simulation) ist ein in vielen Disziplinen bekanntes Verfahren, welches auf wiederholtem Durchführen von "`Zufallsexperimenten"' in sehr großer Zahl basiert. So können analytisch nicht --oder nur sehr aufwändig-- lösbare Probleme auf Basis des Gesetz der großen Zahlen approximiert werden.\\
 Die Grundstruktur des Algorithmus, angewandt auf die stochastische KGG zur Berechnung des Erwartungswertes und der Varianz, ist beschrieben durch Algorithmus \ref{algmc}.
@@ -177,7 +177,7 @@ Doch die Pseudocode Beschreibung von der Funktion \emph{MonteCarloKGG} wirft ein
 \begin{enumerate}
 \item Wie generieren wir die Zufallszahlen numerisch? \label{mcgeneraterandom}
 \item Wie groß muss \emph{\texttt{max\_runs}} sein, d.h. wie schnell konvergiert die Methode?
-\item Ist der determinische Löser schnell genug für viele Durchläufe? Wie können wir den Algorithmus beschleunigen?
+\item Ist der determinische Löser schnell genug für viele Durchläufe? Wie können wir den Algorithmus beschleunigen?\label{mcalgspeed}
 \item Wie speichern wir die vielen Zwischenergebnisse? \label{mcsaveresults}
 \item Wie berechnen wir den Mittelwert und wie schätzen wir die Varianz? \label{mcestimations}
 \end{enumerate}
@@ -185,10 +185,16 @@ Im Folgenden werden wir die obigen Fragen ausführlich diskutieren und verschied
 \subsection{Generierung von Pseudozufallszahlen}
 Eine Antwort auf Frage \ref{mcgeneraterandom} zur Generierung von $y$ ist durch das Schlagwort "`Pseudozufallszahlen"' direkt gegeben. Hierzu bietet jede wissenschaftliche Programmiersprache die Möglichkeit, Zahlen zu generieren, die zwar deterministisch erzeugt sind, jedoch viele Eigenschaften von Zufallszahlen erfüllen. Dabei wird häufig eine große Menge von bekannten Verteilungen unterstützt. Ist dies nicht der Fall und man hat beispielsweise nur gleichverteilte Zahlen zur Verfügung, so kann man dennoch mithilfe der Inversionsmethode (siehe Satz \ref{thinversionsmethode}) Pseudozufallszahlen mit jeder beliebigen Verteilungsfunktion erzeugen.\\
 Dies ist jedoch weder die einzige noch die beste Möglichkeit für die Generierung.
-\subsubsection*{Quasi-Monte-Carlo-Methode}% TODO Zeige bessere Konvergenzordnung (empirisch)
+\subsubsection*{Quasi-Monte-Carlo-Methode}
+\begin{figure}
+\includegraphics[width=\textwidth]{Figures/halton_numbers.png}
+\label{fig:halton_numbers}
+\caption{Darstellung der ersten 200 Halton Zahlen im zweidimensionalen und im Vergleich 200 gleichverteilte Pseudozufallszahlen. Die Halton Sequenz deckt die Fläche dabei viel gleichmäßiger ab.}
+\end{figure}
+\todo[inline]{Erkläre alternative Generierung, später zeige bessere Konvergenzordnung (empirisch); Problem bei höherer Dimension: Lineare Korrelation, verhalten sich nicht mehr wie Zufallszahlen, dann besser: Sobol Sequenz vgl Quelle: \autocite{halton60}}
 
 \subsection{Approximation von Erwartungswert und Varianz}
-Bevor wir den Kern der Schleife betrachten, wollen wir uns zuerst mit den eng miteinander zusammenhängenden Fragen \ref{mcsaveresults} und \ref{mcestimations} beschäftigen. Die Frage, wie wir die einzelnen Zwischenergebnisse verwenden, um eine Approximation an den Erwartungswert und die Varianz zu erhalten, hat wiederum eine offensichtliche Antwort.
+Bevor wir den Kern der Schleife betrachten, wollen wir uns zuerst mit den eng miteinander zusammenhängenden Fragen \ref{mcsaveresults} und \ref{mcestimations} beschäftigen. Diese Fragen über die Verwendung der einzelnen Zwischenergebnisse zur Approximation des Erwartungswertes und der Varianz können wiederum vielseitig beantwortet werden.
 \subsubsection*{Verarbeitung am Ende}
 Gegeben sei ein Zeitpunkt $T>0$ und die stochastische KGG (\ref{skgg}) zu einer Zufallsvariablen $Y$ und gesucht seien $\E[u(T,x,Y)]$ und $\text{var}(u(T,x,Y))$. Sind für $i=1,\dots,R$ die deterministischen Lösungen $u_i(T,x,y_i)$ gespeichert, so verwenden wir als Approximationen
 \begin{align*}
@@ -232,7 +238,26 @@ Für $x_1,\dots,x_k\in\R$, $m_k$ wie in Satz \ref{thiterativemk} und $s_k=\sum_{
 \[s_k=s_{k-1}+(x_k-m_k)(x_k-m_{k-1}),\quad\text{mit }s_0=0\]
 \end{maththeorem}
 \begin{proof}
-\todo[inline]{proof}
+Es gilt für $j<k$ wegen $m_k=\frac{k-1}{k}m_{k-1}+\frac{1}{k}x_k$
+\begin{align}
+x_j-m_k&=x_j-m_{k-1}+\frac{1}{k}m_{k-1}-\frac{1}{k}x_k \nonumber\\
+\label{eqn:mcvar1}
+&=x_j-m_{k-1}-\frac{1}{k}(x_k-m_{k-1})\tag{*}\\
+\label{eqn:mcvar2}
+x_k-m_k&=\frac{k-1}{k}(x_k-m_{k-1})\tag{**}
+\end{align}
+Dann gilt für $k\in\N$
+\begin{align*}
+s_k&=\sum_{j=1}^k(x_j-m_k)^2\stackrel{(\ref{eqn:mcvar2})}{=}\sum_{j=1}^{k-1}(x_j-m_k)^2+\frac{(k-1)^2}{k^2}(x_k-m_{k-1})^2\\
+&\stackrel{(\ref{eqn:mcvar1})}{=}\sum_{j=1}^{k-1}(x_j-m_{k-1})^2-\frac{2}{k}(x_k-m_{k-1})\sum_{j=1}^{k-1}(x_j-m_{k-1})+\frac{k-1}{k^2}(x_k-m_{k-1})^2\\
+&\quad +\frac{(k-1)^2}{k^2}(x_k-m_{k-1})^2\\
+&=s_{k-1}-\frac{2}{k}(x_k-m_{k-1})\underbrace{\left((k-1)m_{k-1}-(k-1)m_{k-1}\right)}_{=0}+\underbrace{\frac{(k-1)^2+k-1}{k^2}}_{=\frac{k-1}{k}}(x_k-m_{k-1})^2\\
+&=s_{k-1}+\frac{k-1}{k}(x_k-m_{k-1})\underbrace{(x_k-m_{k-1})}_{\stackrel{(\ref{eqn:mcvar2})}{=}\frac{k}{k-1}(x_k-m_k)}=s_{k-1}+(x_k-m_{k-1})(x_k-m_k)
+\end{align*}
 \end{proof}
-\todo[inline]{Diskutiere MonteCarloKGG: Vollständig parallel; (noch) kein det. Löser, aber angenommen wir haben einen; wie $y$ generieren (besser: Quasi-Monte-Carlo)}
+Teilen wir nun $s_k$ noch durch $k-1$, so erhalten wir wieder die korrigierte Stichprobenvarianz. Wir benötigen dafür nur den vorherigen Wert $s_{k-1}$, die beiden letzten Mittelwerte, die neuste Stichprobe $x_k$ und die Stichprobenanzahl.
+\subsection{Numerische Ergebnisse}
+Man bemerkt schon an der Pseudocode Darstellung der Monte-Carlo-Methode, dass das Bottleneck des Algorithmus in der Berechnung der Lösung der deterministischen KGG liegt. Der Zeitaufwand für alle anderen Operationen ist in Relation dazu vernachlässigbar klein. Ein großer Vorteil des Algorithmus ist seine \emph{embarrassingly parallel} Eigenschaft: Es ist quasi kein Aufwand nötig die Schleife zu parallelisieren und somit skaliert er perfekt mit der Anzahl an zur Verfügung stehenden Prozessoren. Dies ist eine erste Antwort auf Frage \ref{mcalgspeed}, jedoch sollte klar sein, dass das Lösen des deterministischen Systems dennoch so effizient wie möglich passieren muss. Ein Löser, der nur 0.1 Sekunden für ein einziges System benötigt und $R=100000$ Durchgänge erledigt, läuft bereits etwa 3 Stunden ohne Parallelisierung.\\
+
+\todo[inline]{Bilder: Konvergenzordnung von MC anhand von bsp1 und 2; Zeige was R=100000 so bedeutet im Vergleich zu R=317=sqrt(100000); zeige Vorteil von Quasi MC; Erwähne Vorteil dass Konvergenz unabhäng von Dim. von y (zeige entsprechendes BSP)}
 
