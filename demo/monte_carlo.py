@@ -16,14 +16,14 @@ domain = list(repeat([-np.pi, np.pi], dimension))
 delta_time = 0.001
 start_time = 0.
 stop_time = 0.5
-save_last_solution = True
+save_last_solution = False
 simulations_count = 100000
 do_quasi_monte_carlo = True
 
 # the factor of the step number between two consecutive solutions used to estimate order of convergence
 order_factor = 10  # >=2, integer
 
-trial = st.trial_discont_simple
+trial = st.trial_1
 
 splitting_xs, splitting_xs_mesh, expectancy, variance, expectancy_errors, variance_errors, \
     solutions, solutions_for_order_estimate = \
@@ -61,16 +61,20 @@ elif dimension == 2:
 if len(expectancy_errors) > 0 or len(variance_errors) > 0:
     plt.figure()
     plt.title("{}MonteCarlo estimation, {}, dt={}".format("Quasi" if do_quasi_monte_carlo else "",
-                                                          trial.name, delta_time))
+                                                          trial.name, delta_time),
+              fontsize="x-large")
     if len(expectancy_errors) > 0:
-        plt.plot(range(len(expectancy_errors)), expectancy_errors, label="Expectancy")
+        Ns = np.array(range(len(expectancy_errors)))
+        plt.plot(Ns, expectancy_errors, label="Expectancy")
+        plt.plot(Ns, 0.08 * Ns ** (-0.5), label="Reference $N^{-0.5}$")
     if len(variance_errors) > 0:
-        plt.plot(range(len(expectancy_errors)), variance_errors, label="Variance")
-    plt.xlabel("Simulation")
-    plt.ylabel("Error")
+        plt.plot(range(len(variance_errors)), variance_errors, label="Variance")
+
+    plt.xlabel("Simulation", fontsize="x-large")
+    plt.ylabel("Error", fontsize="x-large")
     plt.xscale('log')
     plt.yscale('log')
-    plt.legend()
+    plt.legend(loc='best', fontsize="x-large")
 
 if len(solutions_for_order_estimate) == 3:
     if expectancy is None:
