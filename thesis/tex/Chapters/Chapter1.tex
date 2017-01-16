@@ -1,7 +1,7 @@
 % Chapter 1
 
 \chapter{Einführung}
-In diesem Kapitel werden wir die zu untersuchende Klein-Gordon-Gleichung (KGG) vorstellen und uns mit den zugehörigen häufig verwendeten Parametern vertraut machen. Anschließend gewinnen wir einen numerischen Lösungsansatz aus der Idee des Operatorsplittings. Um dann später die Zufallsabhängigkeit einführen zu können, benötigen wir die Theorie des General Polynomial Chaos. Die in dieser Arbeit untersuchte \emph{uncertainty} in Gestalt von Zufallsvariablen wird allerdings erst in den folgenden Kapiteln in die KGG einfließen.
+In diesem Kapitel werden wir die zu untersuchende Klein-Gordon-Gleichung (KGG) vorstellen und uns mit den zugehörigen häufig verwendeten Parametern vertraut machen. Anschließend gewinnen wir einen numerischen Lösungsansatz aus der Idee des Operatorsplittings. Die in dieser Arbeit untersuchte \emph{uncertainty} in Gestalt von Zufallsvariablen wird allerdings erst in den folgenden Kapiteln in die KGG einfließen. Zuletzt beschreibt dieses Kapitel relevante Ergebnisse aus der polynomialen Approximationstheorie und bietet einen ersten Einblick in die Beziehung von orthogonalen Polynomen und stochastischen Verteilungen.
 \label{Chapter1}
 
 \section{Die Klein-Gordon-Gleichung}
@@ -234,23 +234,78 @@ Man verwendet die Darstellung $\varphi_{\deltat}^A(y_0)=y_0+\deltat f^A(y_0)+\ma
 Man beachte hierbei, dass nun $\Phi_{\deltat}^A$ im Gegensatz zu $\varphi_{\deltat}^A$ nicht mehr symmetrisch ist. Die Argumentation über die Ordnung von symmetrischen Verfahren kann also nicht direkt verwendet werden, um $p=2$ für das Strang-Splittings zu begründen. Außerdem kann dies die Möglichkeit, das Strang-Splitting durch Kombination der Halbschritte zu beschleunigen, zunichte machen.
 \end{proof}
 
-\section{Erster Einblick in das Polynomial Chaos}
-\todo[inline]{Diese Einführung erst nachdem wir kurz gesagt haben was Polynomial Chaos eigentlich ist. Vllt auch etwas kürzen? So versteht das jemand beim ersten Mal lesen nicht.}
-Die Entstehung des \emph{general Polynomial Chaos}(gPC) ist eine Geschichte über den Versuch, stochastische Abhängigkeit und Integrationstheorie zu kombinieren. Sie wurzelte in der Arbeit von Wiener (\autocite{norbertwiener1938}), wo er das \emph{homogene Chaos} einführte, um die Entwicklung von Unsicherheit in einem dynamischen, chaotischen, physikalischen System zu konkretisieren. Dies erklärt auch den Ursprung der Bezeichnung "`Chaos"' im Kontext der chaotischen Brownschen Bewegung im Wiener-Prozess.\\
-Ghanem verwendete dann Hermite Polynome um mithilfe dieser Orthogonalbasis gaußsche Prozesse darzustellen. Dies wendete er erfolgreich auf einige Probleme aus den Ingenieurswissenschaften an, ein Überblick wird in (\autocite{GhaSpa91}) gegeben.\\
-Xiu verallgemeinerte in seiner Arbeit (\autocite{xiu2002}) diesen Ansatz auf andere Kombinationen aus Stochastischer Verteilung und Polynombasis. Gemäß dem Askey Schema (siehe Abbildung \ref{askeyscheme}) werden Beziehungen einiger bekannter Polynom Orthonormalbasen verdeutlicht. Man beobachtet außerdem, dass einige Gewichte den Dichtefunktionen von bekannten Verteilungen entsprechen und möchte nun zu einer gegebenen Verteilung die bestmögliche Polynombasis verwenden. An Modellproblemen demonstrierte Xiu jeweils optimale exponentielle Konvergenz für die verschiedenen Paarungen.\\
-\begin{figure}
-\center
-\includegraphics[width=0.8\linewidth]{Figures/askeyscheme.png}
-\caption{Askey Schema; Ein Pfeil symbolisiert den Übergang einer Basis in eine andere durch Grenzwertbildung eines Parameters; Quelle: \autocite{webaskey}}
-\label{askeyscheme}
-\end{figure}
-\begin{mathbsp}[Grenzwertbildung im Askey Schema]
-Es gilt für die Jacobi Polynome $P_n^{(\alpha,\beta)}(x)$ und die Hermite Polynome $H_n(x)$ die Beziehung
-\[\lim\limits_{\alpha\to\infty}\alpha^{-\onehalf n}P_n^{(\alpha,\alpha)}\left(\frac{x}{\sqrt{\alpha}}\right)=\frac{H_n(x)}{2^nn!}\]
-Für eine genauere Betrachtung der Beziehungen der hypergeometrischen Polynome im Askey Schema sei auf \autocite{koekoekswart98} verwiesen.
-\end{mathbsp}
-Im Mittelpunkt der Theorie des gPC stehen orthgonale Polynombasen. Die Verflechtung mit der Stochastik geschieht dann auf natürliche Weise durch die passende Wahl des zugrunde liegenden Skalarproduktes.
+\subsection{Numerischer Löser der KGG}
+\todo[inline]{Erkläre Löser, dazu für wave teil: periodische RB-> Fourier, für linhyp: explizite Lösung; Wie Gleichung in gleichung 1. Ordnung erst umschreiben (weight w); wieso nur stabil für w=1?; zeige verschiedene Kombinationen von RStrang, FStrang,... und zeige Konvergenzordnung p=1 und p=2}
+Dieser Abschnitt ist das wichtige Fundament, auf dem viele numerischen Lösungsverfahren basieren werden. Um ein Operator Splitting auf die KGG anwenden zu können, muss diese zuerst in eine Gleichung mit Zeitableitung erster Ordnung in der Form von (\ref{orddgl}) umgeschrieben werden. Formal:
+\begin{align}
+\dtt{u}(t,x)&=\alpha \Laplace u(t,x) - \beta(x)u(t,x)\nonumber\\
+\iff
+\dt{\begin{pmatrix}
+u\\
+v
+\end{pmatrix}}(t,x)&=
+\begin{pmatrix}
+0 & I\\
+\alpha \Laplace - \beta(x) & 0\\
+\end{pmatrix}
+\begin{pmatrix}u\\v\end{pmatrix}(t,x)\\
+&=\left[\begin{pmatrix} 0 & wI\\ \alpha \Laplace & 0\end{pmatrix} 
++ \begin{pmatrix} 0 & (1-w)I\\ -\beta(x) & 0\end{pmatrix}\right]
+\begin{pmatrix}u\\v\end{pmatrix}(t,x)
+\end{align}
+Doch bevor wir dies als Grundlage für ein Splitting verwenden, müssen wir den Operator $\Laplace$ genauer untersuchen.
+\subsubsection*{Fourier Pseudo-Spectral Methode für Laplace Operator}
+Wir betrachten das Teilproblem der Wellengleichung mit periodischen Randbedingungen auf $(-\pi,\pi)^d$ der Dimension $d\in\N$ und dem Quadrat der Wellengeschwindigkeit $c^2=\alpha>0$
+\begin{equation}
+\label{eqn:waveperiodic}
+\begin{split}
+\dtt{u}(t,x)&=c^2 \Laplace u(t,x), \quad t>0, x\in\Torus^d\\
+u(0,x)&=g(x), \quad x\in\Torus^d\\
+\dt{u}(0,x)&=h(x),\quad x\in\Torus^d\\
+u, \dt{u}&\text{ periodisch in }x
+\end{split}
+\end{equation}
+Im Folgenden zeigen wir eine Darstellung der exakten Lösung von (\ref{eqn:waveperiodic}) für $d=1$.\\
+Es gilt für die Fourier-Approximation von $u$ für jedes $t>0$ und $N\in\N$
+\begin{equation}
+u(t,x)\approx \sum_{k=-N}^N\fourier{u}_k(t)e^{ikx}, \quad x\in\Torus^d
+\end{equation}
+für gewisse Koeffizienten $\fourier{u}_k(t)=\int_{-\pi}^\pi u(t,x)e^{ikx}dx\in\Complex$. Setzen wir die Fourier-Approximation als exakte Lösung der Wellengleichung (\ref{eqn:waveperiodic}) ein, so erhalten wir 
+\[\sum_{k=-N}^N\fourier{u}_k^{\prime\prime}(t)e^{ikx}=c^2\sum_{k=-N}^N-k^2\fourier{u}_k(t)e^{ikx}\]
+Da die $e^{ik\cdot}$ eine Basis bilden müssen wir also für $k=-N,\dots,N$ die gewöhnliche Differentialgleichung
+\begin{align*}
+\fourier{u}_k^{\prime\prime}(t)&=-c^2k^2\fourier{u}_k(t)\\
+\fourier{u}_k(0)&=\fourier{g}_k\\
+\fourier{u}_k^\prime &=\fourier{h}_k
+\end{align*}
+lösen, wobei $\fourier{g}_k$ bzw. $\fourier{h}_k$ der $k$-te Fourier-Koeffizient von $g$ bzw. $h$ ist. Aus der charakteristischen Gleichung folgt für zwei Konstanten $c_{1,k},c_{2,k}$ sofort die allgemeine Lösung 
+\[\fourier{u}_k(t)=c_{1,k}\cos(c|k|t)+c_{2,k}\sin(c|k|t)\]
+und unter Berücksichtigung der Anfangswerte
+\begin{align*}
+\fourier{u}_k(t)&=\fourier{g}_k \cos(c|k|t)+\fourier{h}_kt \sinc(c|k|t)\\
+\fourier{u}^\prime_k(t)&=-c|k|\fourier{g}_k\sin(c|k|t)+\fourier{h}_k\cos(c|k|t)\\
+\end{align*}
+Diese Darstellung ist insbesondere auch für $k=0$ gültig, wo der Fourierkoeffizient linear in $t$ wächst.\\
+Formalisieren wir nun die diskrete Fouriertransformation, die wir verwenden möchten, um eine Approximation an die Fourier-Koeffizienten $\fourier{g}_k$ bzw. $\fourier{h}_k$ zu erhalten.
+\begin{mathdef}[Diskrete Fourier-Transformation]
+Die lineare Abbildung $\mathcal{F}\colon\Complex^N\to\Complex^N$ definiert durch
+\[\mathcal{F}x=\fourier{x},\qquad\text{mit}\quad \fourier{x}_k=\sum_{j=0}^{N-1}e^{-2\pi i\frac{jk}{N}}x_j\]
+heißt diskrete Fourier-Transformation.
+\end{mathdef}
+Diese Form der Darstellung erlaubt eine Berechnung der Abbildung in $\mathcal{O}(N\log N)$ Schritten, bekannt unter dem Namen \emph{Fast Fourier Transform}(fft). Dies ist essentiell, um eine schnelle Berechnung der Lösung der KGG zu gewährleisten. Es gilt $\mathcal{F}_N\overline{\mathcal{F}}_N=NI$ und somit hat die inverse Fourier-Transformation beinahe die selbe Gestalt wie die Fourier-Transformation selbst und kann ebenso schnell berechnet werden.\\[0.2cm]
+Zusammengefasst gilt also für die Lösung von (\ref{eqn:waveperiodic}) an den Stellen $x_j=-\pi+2\pi\frac{j}{2N}\in [-\pi,pi)$ für $j=0,\dots,2N-1$ die Darstellung
+\begin{align*}
+u(t,x_j)&=\mathcal{F}^{-1}\left[\mathcal{F}g\odot \big(\cos(c|k|t)\big)_{k=-N}^N + \mathcal{F}h\odot \big(\sinc(c|k|t)\big)_{k=-N}^N\right]_j\\
+\dt{u}(t,x_j)&=\mathcal{F}^{-1}\left[\mathcal{F}g \odot -c\big(|k|\sin(c|k|t)\big)_{k=-N}^N+\mathcal{F}h\odot \big(\cos(c|k|t)\big)_{k=-N}^N\right]_j
+\end{align*}
+Dabei bedeutet $\odot$ die punktweise Multiplikation der Vektoren. Man beachte, dass die Sortierung der Fourier-Koeffizienten in verschiedenen Programmiersprachen verschiedenen Notationen folgt und entsprechend die Indizierung angepasst werden muss. Beispielsweise gilt für die Python3 Bibliothek \emph{numpy} durch die entsprechende Funktion \emph{numpy.fft.fftfreq(8)*8} die Konvention
+\[[ 0,  1,  2,  3, -4, -3, -2, -1]\]
+wobei Matlab die ähnliche Konvention
+\[[ 0,  1,  2,  3, 4, -3, -2, -1]\]
+verwendet.\\
+Obige Erläuterungen waren für eine räumliche Dimension $d=1$. Will man nun den Ansatz auf mehrere Dimensionen erweitern, so erhält man ein sehr ähnliches Ergebnis.\todo[inline]{Schreibe hin dass vorheriges Ergebnis mit betrag k ersetzt durch sqrt(k1hoch2+...+kdhoch2) gilt, alles andere wie Indizierung und FFT enstprechend auch mehrdimensional.}
+\section{Polynome und Verteilungen}
+Die Theorie des general Polynomial Chaos ist die Grundlage für später vorgestellte Verfahren zum Lösen von der stochastischen Klein-Gordon-Gleichung. Im Mittelpunkt dieser Theorie stehen orthogonale Polynombasen. Die Verflechtung mit der Stochastik geschieht dann auf natürliche Weise durch die passende Wahl des zugrunde liegenden Skalarproduktes.
 \subsection{Orthogonale Polynome}
 Wir beginnen mit grundlegender Notation und Namensgebung um das zentrale Werkzeug der Polynomapproximation festzulegen. Später werden diese Polynome verwendet, um die Zufallsabhängigkeit der auftretenden Funktionen darzustellen, indem das Orthogonalitätsmaß der Dichtefunktion entspricht.
 \begin{mathdef}

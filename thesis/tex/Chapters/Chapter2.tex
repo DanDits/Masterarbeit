@@ -121,6 +121,7 @@ Die Lösung \[u(t,x,y)\colon [0,T]\times\Torus^d\times \R^N\to\R\] ist also eine
 Dabei ist die grundlegende Annahme, dass (\ref{skgg}) $P$-fast-sicher wohl gestellt ist, d.h. die Menge an Punkten $\omega$ für welche die partielle Differentialgleichung mit fixem $y=Y(\omega)$ keine eindeutige Lösung besitzt ist eine Nullmenge bezüglich des Wahrscheinlichkeitmaßes $P$.\\
 Ab sofort werden wir --wie in Kapitel \ref{secfiniteparam} diskutiert-- stets annehmen, dass die Komponenten $Y_i$ von $Y$ stochastisch unabhängige Zufallsvariablen mit bekannter Verteilung sind.
 \begin{mathbsp}
+\label{bsp:trial1}
 Sei $Y=(Y_1)$ eine eindimensionale und in $(2,3)$ gleichverteilte Zufallsvariable. Dann gilt für $t>0$, $d\in\N$, $x=(x_1,\dots$, $x_d)\in\Torus^d$, $\hat{x}\coloneqq \sum_{i=1}^d x_i$ und $y=Y(\omega)$
 \begin{align*}
 u(t,x,y)&=2\cos(ty)\sin(\hat{x})\\
@@ -285,6 +286,19 @@ s_k&=\sum_{j=1}^k(x_j-m_k)^2\stackrel{(\ref{eqn:mcvar2})}{=}\sum_{j=1}^{k-1}(x_j
 Teilen wir nun $s_k$ noch durch $k-1$, so erhalten wir wieder die korrigierte Stichprobenvarianz. Wir benötigen dafür nur den vorherigen Wert $s_{k-1}$, die beiden letzten Mittelwerte, die neuste Stichprobe $x_k$ und die Stichprobenanzahl.
 \subsection{Numerische Ergebnisse}
 Man bemerkt schon an der Pseudocode Darstellung der Monte-Carlo-Methode, dass das Bottleneck des Algorithmus in der Berechnung der Lösung der deterministischen KGG liegt. Der Zeitaufwand für alle anderen Operationen ist in Relation dazu vernachlässigbar klein. Ein großer Vorteil des Algorithmus ist seine \emph{embarrassingly parallel} Eigenschaft: Es ist quasi kein Aufwand nötig die Schleife zu parallelisieren und somit skaliert er perfekt mit der Anzahl an zur Verfügung stehenden Prozessoren. Dies ist eine erste Antwort auf Frage \ref{mcalgspeed}, jedoch sollte klar sein, dass das Lösen des deterministischen Systems dennoch so effizient wie möglich passieren muss. Ein Löser, der nur 0.1 Sekunden für ein einziges System benötigt und $R=100000$ Durchgänge erledigt, läuft bereits etwa 3 Stunden ohne Parallelisierung.\\
-
+\subsubsection*{Konvergenz}
+Anhand von Abbildung \ref{fig:mc_convergence_trial1} erkennen wir für Beispiel \ref{bsp:trial1} die (probabilistische) Konvergenz des Erwartungswertes und der Varianz mit ungefährer Ordnung $0.5$ für die Monte-Carlo-Methode. Vergleichen wir dazu die Quasi-Monte-Carlo-Methode anhand desselben Beispiels in Abbildung \ref{fig:quasi_mc_convergence_trial1}, so erkennen wir eine bessere Konvergenzordnung und ein weniger chaotisches Verhalten des Fehlers.\\
+Diese schlechte Konvergenzordnung macht das Verfahren sehr unattraktiv. Wir benötigen selbst für das simple Beispiel \ref{bsp:trial1} und die Quasi-Monte-Carlo-Methode bereits $R=100000$ Durchläufe für einen Fehler des Erwartungswertes in die Größenordnung $10^{-5}$.
+\begin{figure}
+\includegraphics[width=\textwidth]{Figures/mc_convergence_trial1.png}
+\caption{Konvergenz des Erwartungswertes und der Varianz von Beispiel \ref{bsp:trial1} mithilfe der Monte-Carlo-Methode zum Zeitpunkt $T=0.5$. Ordnungsplot mit Referenzlinie $0.08\frac{1}{\sqrt{R}}$ der erwarteten Ordnung.}
+\label{fig:mc_convergence_trial1}
+\end{figure}\\
+\begin{figure}
+\includegraphics[width=\textwidth]{Figures/quasi_mc_convergence_trial1.png}
+\caption{Konvergenz des Erwartungswertes und der Varianz von Beispiel \ref{bsp:trial1} mithilfe der Quasi-Monte-Carlo-Methode zum Zeitpunkt $T=0.5$. Ordnungsplot mit Referenzlinie $0.08\frac{1}{\sqrt{R}}$.}
+Einen Vorteil allerdings bietet das Verfahren: Unabhängig von der Größe des Zufallsvektors $Y$ erhalten wir jeweils dieselbe Konvergenzordnung und benötigen bis auf die Generierung der Komponenten keinen zeitlichen Mehraufwand für die Ausführung des Algorithmus im Vergleich zu eindimensionalen Zufallsvektoren. Diese Eigenschaft wird von keinem anderen Verfahren, das wir noch vorstellen werden geteilt. Im Gegenteil nämlich wird der Rechenaufwand exponentiell in der Größe des Zufallsvektors steigen. 
+\label{fig:quasi_mc_convergence_trial1}
+\end{figure}
 \todo[inline]{Bilder: Konvergenzordnung von MC anhand von bsp1 und 2; Zeige bessere Ordnung und Fehlerverhalten von qMC; Zeige Konvergenzordnung von Varianz; Zeige was R=100000 so bedeutet im Vergleich zu R=317=sqrt(100000); Erwähne Vorteil dass Konvergenz unabhäng von Dim. von y (zeige entsprechendes BSP)}
 
