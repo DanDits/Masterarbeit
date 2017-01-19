@@ -253,113 +253,15 @@ v
 \begin{pmatrix}u\\v\end{pmatrix}(t,x)
 \end{align}
 für ein Gewicht $w\in [0,1]$. Doch bevor wir dies als Grundlage für ein Splitting verwenden, müssen wir den Operator $\Laplace$ genauer untersuchen.
-\subsubsection*{Fourier Pseudo-Spectral Methode für Laplace Operator}
-Wir betrachten das Teilproblem der Wellengleichung mit periodischen Randbedingungen auf $(-\pi,\pi)^d$ der Dimension $d\in\N$ und dem Quadrat der Wellengeschwindigkeit $c^2>0$
+\subsubsection*{Ortsdiskretisierung durch Fourier Pseudo-Spectral Methode}
+Um einen numerischen Zugang zum Laplace Operator $\Laplace$ zu bekommen, benötigen wir zuerst eine Diskretisierung des Ortes $x_j=-\pi+2\pi\frac{j}{N}\in [-\pi,\pi)$ für $j=0,\dots,N-1$ und $N\in\N$. Da wir periodische Lösungen $u$ der KGG suchen, bietet es sich an, die endliche Fourier-Approximation von $u$ zu verwenden. Wir werden den Ansatz zuerst ausführlich für $d=1$ erläutern und später die Verallgemeinerung auf höhere Dimensionen aufzeigen.\\
+Die Fourier-Approximation ist für jedes $t>0$, $N\in 2\N$ und eine Indexmenge $\mathcal{I}_N=\left\lbrace -\frac{N}{2},\dots,-1,0,1,\dots,\frac{N}{2}-1\right\rbrace$ definiert durch
 \begin{equation}
-\label{eqn:waveperiodic}
-\begin{split}
-\dtt{u}(t,x)&=c^2 \Laplace u(t,x), \quad t>0, x\in\Torus^d\\
-u(0,x)&=g(x), \quad x\in\Torus^d\\
-\dt{u}(0,x)&=h(x),\quad x\in\Torus^d\\
-u, \dt{u}&\text{ periodisch in }x
-\end{split}
+\label{eqn:fourier_approx}
+u(t,x)\approx \sum_{k\in\mathcal{I}_N}\fourier{u}_k(t)e^{ikx}, \quad x\in\Torus^d
 \end{equation}
-Man beachte, dass dann insbesondere $g$ und $h$ periodisch in $x$ sein müssen.
-Im Folgenden zeigen wir eine Darstellung der exakten Lösung von (\ref{eqn:waveperiodic}) für $d=1$.\\
-Es gilt für die Fourier-Approximation von $u$ für jedes $t>0$ und $N\in\N$
-\begin{equation}
-u(t,x)\approx \sum_{k=-N}^N\fourier{u}_k(t)e^{ikx}, \quad x\in\Torus^d
-\end{equation}
-für gewisse Koeffizienten $\fourier{u}_k(t)=\frac{1}{2\pi}\int_{-\pi}^\pi u(t,x)e^{-ikx}dx\in\Complex$. Setzen wir die Fourier-Approximation als exakte Lösung der Wellengleichung (\ref{eqn:waveperiodic}) ein, so erhalten wir 
-\[\sum_{k=-N}^N\fourier{u}_k^{\prime\prime}(t)e^{ikx}=c^2\sum_{k=-N}^N-k^2\fourier{u}_k(t)e^{ikx}\]
-Da die $e^{ik\cdot}$ eine Basis des Fourier-Raums bilden, müssen wir also für $k=-N,\dots,N$ die gewöhnliche Differentialgleichung
-\begin{equation}
-\label{eqn:fourier_dgl}
-\begin{split}
-\fourier{u}_k^{\prime\prime}(t)&=-c^2k^2\fourier{u}_k(t)\\
-\fourier{u}_k(0)&=\fourier{g}_k\\
-\fourier{u}_k^\prime(0) &=\fourier{h}_k
-\end{split}
-\end{equation}
-lösen, wobei $\fourier{g}_k$ bzw. $\fourier{h}_k$ der $k$-te Fourier-Koeffizient von $g$ bzw. $h$ ist. Aus der charakteristischen Gleichung folgt für zwei Konstanten $c_{1,k},c_{2,k}$ sofort die allgemeine Lösung 
-\[\fourier{u}_k(t)=c_{1,k}\cos(c|k|t)+c_{2,k}\sin(c|k|t)\]
-und unter Berücksichtigung der Anfangswerte
-\begin{align*}
-\fourier{u}_k(t)&=\fourier{g}_k \cos(c|k|t)+\fourier{h}_kt \sinc(c|k|t)\\
-\fourier{u}^\prime_k(t)&=-c|k|\fourier{g}_k\sin(c|k|t)+\fourier{h}_k\cos(c|k|t)\\
-\end{align*}
-Diese Darstellung ist insbesondere auch für $k=0$ gültig, wo der Fourierkoeffizient linear in $t$ wächst.\\
-Formalisieren wir nun die diskrete Fouriertransformation, die wir verwenden möchten, um eine Approximation an die Fourier-Koeffizienten $\fourier{g}_k$ bzw. $\fourier{h}_k$ zu erhalten.
-\begin{mathdef}[Diskrete Fourier-Transformation]
-Die lineare Abbildung $\mathcal{F}\colon\Complex^N\to\Complex^N$ definiert durch
-\[\mathcal{F}x=\fourier{x},\qquad\text{mit}\quad \fourier{x}_k=\sum_{j=0}^{N-1}e^{-2\pi i\frac{jk}{N}}x_j\]
-heißt diskrete Fourier-Transformation.
-\end{mathdef}
-Es existiert eine schnelle Berechnung der Abbildung in $\mathcal{O}(N\log N)$ Schritten anstelle der direkten Implementierung in $\mathcal{O}(N^2)$ Schritten, bekannt unter dem Namen \emph{Fast Fourier Transform}(fft). Da diese auf der Annahme $2N=2^p$ für ein $p\in\N$ basiert, werden wir in Zukunft nur noch solche Approximationen verwenden. Dies ist essentiell, um eine schnelle Berechnung der Lösung der KGG zu gewährleisten. Es gilt $\mathcal{F}_N\overline{\mathcal{F}}_N=NI$ und somit hat die inverse Fourier-Transformation beinahe die selbe Gestalt wie die Fourier-Transformation selbst und kann ebenso schnell berechnet werden.\\[0.2cm]
-Zusammengefasst gilt also für die Lösung von (\ref{eqn:waveperiodic}) an den Stellen $x_j=-\pi+2\pi\frac{j}{2N}\in [-\pi,pi)$ für $j=0,\dots,2N-1$ die Darstellung
-\begin{align*}
-u(t,x_j)&=\left(\mathcal{F}^{-1}\left[\mathcal{F}g\odot \big(\cos(c|k|t)\big)_{k=-N}^N + \mathcal{F}h\odot \big(\sinc(c|k|t)\big)_{k=-N}^N\right]\right)_j\\
-\dt{u}(t,x_j)&=\mathcal{F}^{-1}\left[\mathcal{F}g \odot -c\big(|k|\sin(c|k|t)\big)_{k=-N}^N+\mathcal{F}h\odot \big(\cos(c|k|t)\big)_{k=-N}^N\right]_j
-\end{align*}
-Dabei ist $\odot$ die punktweise Multiplikation der Vektoren. Man beachte, dass die Sortierung der Fourier-Koeffizienten in verschiedenen Programmiersprachen verschiedenen Notationen folgt und entsprechend die Indizierung angepasst werden muss. Beispielsweise gilt für die Python3 Bibliothek \emph{numpy} durch die entsprechende Funktion \emph{numpy.fft.fftfreq(8)*8} die Konvention
-\[[ 0,  1,  2,  3, -4, -3, -2, -1]\]
-wobei Matlab die ähnliche Konvention
-\[[ 0,  1,  2,  3, 4, -3, -2, -1]\]
-verwendet.\\[0.3cm]
-Obige Erläuterungen waren für eine räumliche Dimension $d=1$. Will man nun den Ansatz auf mehrere Dimensionen erweitern, so erhält man ein sehr ähnliches Ergebnis.
-Führt man die Fourier-Transformation in jeder Dimension durch, so ergibt sich für $d=2$ die Approximation
-\[u(t,x)\approx\sum_{k_1=-N}^N\fourier{u}_{k_1}(t,x_2)e^{ik_1x_1}=\sum_{k_1=-N}^N\sum_{k_2=-N}^N\fourier{u}_{k_1,k_2}(t)e^{i(k_1x_1+k_xx_2)}\]
-und analog zu den gewöhnlichen Differentialgleichungen (\ref{eqn:fourier_dgl}) die gewöhnlichen Differentialgleichungen
-\[\fourier{u}^{\prime\prime}_{k_1,k_2}(t)=-c^2(k_1^2+k_2^2)\fourier{u}_{k_1,k_2}(t),\quad k_1,k_2=-N,\dots,N\]
-Ersetzt man also in obigen Ausführungen für $d=1$ sämtliche $|k|$ durch \[\norm{k}_2=\sqrt{k_1^2+\dots+k_d^2}\]so erhält man eine Darstellung der Lösung für beliebige Dimensionen $d\in\N$.
-\subsubsection*{Method of lines für zweiten Teil des Splittings}
-Einen Löser für den zweiten Teil des Splittings für die KGG zu bekommen ist hingegen deutlich einfacher. Wir suchen für $t>0$, $\beta(x)>0$ und eine Konstante $c>0$ die Lösung der Differentialgleichung
-\begin{equation}
-\begin{split}
-\dtt{u}(t,x)&=-c\beta(x)u(t,x),\quad x\in\Torus^d\\
-u(0,x)&=g(x),\quad x\in\Torus^d\\
-\dt{u}(0,x)&=\frac{h(x)}{c},\quad x\in\Torus^d\\
-u, \dt{u}& \text{ periodisch in }x
-\end{split}
-\end{equation}
-Die Einführung der Konstanten $c$ ist dabei hilfreich, um später das Gewicht $w$ des Splittings ohne weitere Schwierigkeit darzustellen.\\
-Mithilfe der Darstellung als Gleichung erster Ordnung in der Form
-\begin{equation}
-\label{eqn:split2_firstorder}
-\dt{\begin{pmatrix}u\\v\end{pmatrix}}(t,x)=
-\underbrace{
-\begin{pmatrix}
-0 & cI\\
-- \beta(x) & 0\\
-\end{pmatrix}}_{=M(x)}
-\begin{pmatrix}u\\v\end{pmatrix}(t,x)
-\end{equation}
-erhalten wir für festes $x\in\R$ die explizite Lösung mithilfe der Matrixexponentialfunktion
-\[\begin{pmatrix}u\\v\end{pmatrix}(t,x)=e^{M(x)t}\begin{pmatrix}g(x)\\h(x)\end{pmatrix}=
-\begin{pmatrix}
-\cos(\sqrt{c\beta(x)}t) & \sqrt{\frac{c}{\beta(x)}}\sin(\sqrt{c\beta(x)}t)\\
--\sqrt{\frac{\beta(x)}{c}}\sin(\sqrt{c\beta(x)}t) & \cos(\sqrt{c\beta(x)}t)\\
-\end{pmatrix}
-\begin{pmatrix}g(x)\\h(x)\end{pmatrix}\]
-Mithilfe der \emph{method of lines}, d.h. punktweiser Auswertung der Lösung für alle benötigten $x$, bekommt man somit eine numerische Lösung.
-\subsubsection*{Splitting für die KGG}
-Verwenden wir nun das formale Splitting (\ref{eqn:formalsplit_kgg}) so erhalten wir für ein Gewicht $w\in [0,1]$ die Differentialgleichungen
-\begin{equation}
-\label{eqn:kgg_split1}
-\begin{pmatrix}u\\v\end{pmatrix}(t,x)\\
-=\begin{pmatrix} 0 & wI\\ \alpha \Laplace & 0\end{pmatrix} 
-\begin{pmatrix}u\\v\end{pmatrix}(t,x)
-\end{equation}
-und
-\begin{equation}
-\label{eqn:kgg_split2}
-\begin{pmatrix}u\\v\end{pmatrix}(t,x)\\
-=\begin{pmatrix} 0 & (1-w)I\\ -\beta(x) & 0\end{pmatrix}
-\begin{pmatrix}u\\v\end{pmatrix}(t,x)
-\end{equation}
-Die Differentialgleichung (\ref{eqn:kgg_split1}) entspricht dabei dem System (\ref{eqn:waveperiodic}), für das wir mithilfe der Fourier Pseudo-Spectral Methode eine numerische Lösung bekommen.
-Die Differentialgleichung (\ref{eqn:kgg_split2}) lösen wir mithilfe der Darstellung (\ref{eqn:split2_firstorder}) und zugehöriger Matrixexponentialfunktion.\\
-Beachte, dass nur das zweite Einschrittverfahren exakt ist. Für das erste benötigen wir gewisse Anforderungen an die Glattheit von $u$ in $x$. Dabei ist bereits $u$ stetig und stückweise stetig differenzierbar in $x$ ausreichend für die gleichförmige Konvergenz der Fourierapproximation. 
+wobei für die Fourier-Koeffizienten $\fourier{u}_k(t)=\frac{1}{2\pi}\int_{-\pi}^\pi u(t,x)e^{-ikx}dx\in\Complex$ gilt. \\
+Um die Konvergenz der Fourier-Approximation einer Funktion zu erhalten, benötigen wir gewisse Anforderungen an die Glattheit der Funktion. Dabei ist bereits Stetigkeit und stückweise stetige Differenzierbarkeit ausreichend für eine gleichförmige Konvergenz. 
 \begin{mathbsp}
 Als Demonstration der Konvergenz der Fourierapproximation und der Möglichkeit, Ableitungen im Fourierraum durchzuführen, seien an dieser Stelle zwei Beispiele gemacht.\\
 Wir betrachten zu einer periodischen Funktion $f\colon\Torus\to\R$ die diskrete Fourierapproximation
@@ -378,6 +280,91 @@ für die Beispiele $f_1(x)=-\sin(x)e^{-\sin(x)}$ und $f_2(x)=|x|$.
 Wir erkennen, dass die analytische Funktion $f_1$ eine exponentielle Konvergenz aufweist und bereits für $2N=64$ Punkte im Bereich der Maschinengenauigkeit liegt. Rechenfehler sorgen für größeres $N$ für eine Aufsummierung von kleinen Überschwingungen und einen langsam wachsenden Fehler.\\
 Die stetige Funktion $f_2$ mit stückweise stetiger nicht-periodischer Ableitung leidet bei der Approximation unter dem Gibbs-Phänomen und deutlich langsamerer Konvergenz.
 \end{mathbsp}
+
+Formalisieren wir nun die diskrete Fouriertransformation, die wir verwenden möchten, um eine Approximation an die Fourier-Koeffizienten zu erhalten.
+\begin{mathdef}[Diskrete Fourier-Transformation]
+Die lineare Abbildung $\mathcal{F}_N\colon\Complex^N\to\Complex^N$ definiert durch
+\[\mathcal{F}_Nz=\fourier{z},\qquad\text{mit}\quad \fourier{z}_k=\sum_{j=0}^{N-1}e^{-2\pi i\frac{jk}{N}-ik\pi}z_j\]
+heißt diskrete Fourier-Transformation.
+\end{mathdef}
+Es existiert eine schnelle Berechnung der Abbildung in $\mathcal{O}(N\log N)$ Schritten --anstelle der direkten Implementierung in $\mathcal{O}(N^2)$ Schritten-- bekannt unter dem Namen \emph{Fast Fourier Transform}(fft). Da diese auf der Annahme $N=2^p$ für ein $p\in\N$ basiert, werden wir in Zukunft nur noch solche Approximationen verwenden. Dies ist essentiell, um eine schnelle Berechnung der Lösung der KGG zu gewährleisten. Es gilt $\mathcal{F}_N\overline{\mathcal{F}}_N=NI$ und somit hat die inverse Fourier-Transformation beinahe die selbe Gestalt wie die Fourier-Transformation selbst und kann ebenso schnell berechnet werden.\\
+Im Folgenden nehmen wir an, die Fourier-Approximation (\ref{eqn:fourier_approx}) von $u$ sei exakt und berechnen für den $j$-ten Punkt $x_j$ der Diskretisierung
+\begin{equation}
+\label{eqn:laplace_approxu}
+\Laplace u(t,x_j)=\sum_{k\in\mathcal{I}_N}\fourier{u}_k(t)\Laplace e^{ikx_j}=\sum_{k\in\mathcal{I}_N}-k^2\fourier{u}_k(t)e^{ikx_j}
+\end{equation}
+Betrachten wir nun $(\Laplace u(t,x_j))_{j=0,\dots,N-1}^T$ für den Vektor $u(t)_N=(u(t,x_j))_{j=0,\dots,N-1}^T$ so gilt
+\[(\Laplace u(t,x_j))_{j=0,\dots,N-1}^T\approx \mathcal{F}_N^{-1}\left(\big(-k^2\big)_{k\in\mathcal{I}_N}\odot\mathcal{F}_Nu(t)_N\right)\]
+wobei $\odot$ die komponentenweise Multiplikation der Vektoren bezeichnet.\\
+Damit erhalten wir für $\beta_N=(\beta(x_j))_{j=0,\dots,N-1}$ die im Ort diskretisierte KGG
+\begin{equation}
+\label{eqn:kgg_discretespace}
+\dtt{u}_N(t)=\alpha \mathcal{F}_N^{-1}\left(\big(-k^2\big)_{k\in\mathcal{I}_N}\odot\mathcal{F}_Nu(t)_N\right) -\beta_N\odot u_N(t)
+\end{equation}
+Diese werden wir nun in ein System erster Ordnung umschreiben um anschließend ein Splitting darauf anzuwenden. 
+
+Es gilt für $t>0$, $v_N(t)\coloneqq \dt u_N(t)$ und ein Gewicht $w\in [0,1]$ die zu (\ref{eqn:kgg_discretespace}) äquivalente Darstellung
+\begin{align}
+\label{eqn:kgg_discrete_first_order_part1}
+\dt{\begin{pmatrix}u_N\\v_N\end{pmatrix}}(t)&=
+\begin{pmatrix}0 & wI_N\\ \alpha\mathcal{F}_N^{-1}\left(\big(-k^2\big)_{k\in\mathcal{I}_N}\odot\mathcal{F}_N \cdot\right) & 0\end{pmatrix}
+\begin{pmatrix}u_N\\v_N\end{pmatrix}(t)\\
+\label{eqn:kgg_discrete_first_order_part2}
+&\quad+\begin{pmatrix}0 & (1-w)I_N\\ -\diag({\beta_N}) & 0\end{pmatrix}
+\begin{pmatrix}u_N\\v_N\end{pmatrix}(t)
+\end{align}
+\subsubsection*{Numerischer Fluss des ersten Teils}
+Zuerst betrachten wir den ersten Teil der im Ort diskretisierten KGG (\ref{eqn:kgg_discrete_first_order_part1}) und schreiben diesen für $\fourier{u}_N=\mathcal{F}_Nu_N$ und $\fourier{v}_N=\mathcal{F}_Nv_N$ als
+\begin{align*}
+\dt{\begin{pmatrix}u_N\\v_N\end{pmatrix}}(t)&=
+\begin{pmatrix}0 & wI_N\\ \alpha\mathcal{F}_N^{-1}\left(\big(-k^2\big)_{k\in\mathcal{I}_N}\odot\mathcal{F}_N \cdot\right) & 0\end{pmatrix}
+\begin{pmatrix}u_N\\v_N\end{pmatrix}(t)\\
+\equivalent 
+\dt{\begin{pmatrix}\fourier{u}_N\\\fourier{v}_N\end{pmatrix}}(t)&=
+\begin{pmatrix}0 & wI_N\\ \alpha\diag\big(-k^2\big)_{k\in\mathcal{I}_N} & 0\end{pmatrix}
+\begin{pmatrix}\fourier{u}_N\\\fourier{v}_N\end{pmatrix}(t)
+\end{align*}
+Damit haben wir nun ein System gewöhnlicher Differentialgleichungen der Größe $2N$ im Fourierraum, welches wir explizit über die Matrixexponentialfunktion lösen können:
+\[\begin{pmatrix}\fourier{u}_N\\\fourier{v}_N\end{pmatrix}(t)=\exp\underbrace{\left(t\begin{pmatrix}0 & wI_N\\ \alpha\diag\big(-k^2\big)_{k\in\mathcal{I}_N} & 0\end{pmatrix}\right)}_{=M}
+\begin{pmatrix}\fourier{u}_N\\\fourier{v}_N\end{pmatrix}(0)\]
+Die Blockmatrix $M$ lässt sich in eine äquivalente Blockdiagonalmatrix umformen, indem zueinander gehörende Einträge der $\fourier{u}_N$ und $\fourier{v}_N$ nebeneinander getauscht werden. Die Matrixexponentialfunktion von $M$ lässt sich dann durch die Matrixexponentialfunktion der $2\times 2$ Blöcke $M_k$ berechnen. 
+\[\exp(M_k)=\exp\begin{pmatrix}0 & wt\\ -\alpha k^2t & 0\end{pmatrix}=
+\begin{pmatrix}\cos(t\sqrt{\alpha w}|k|) & \sinc(t\sqrt{\alpha w}|k|)tw\\-\sinc(t\sqrt{\alpha w}|k|)\alpha |k|^2t & \cos(t\sqrt{\alpha w}|k|)\end{pmatrix}\]
+Wir fassen nun die Ergebnisse zum numerischen Fluss des ersten Teil des Splittings (\ref{eqn:kgg_discrete_first_order_part1}) zusammen.\\
+Seien $g$ und $h$ die Anfangswerte, so gilt $\fourier{u}_N(0)=\mathcal{F}_Ng$ und $\fourier{v}_N(0)=\mathcal{F}_Nh$. Die Lösung an den Stellen $x_j=-\pi+2\pi\frac{j}{N}\in [-\pi,\pi)$ für $j=0,\dots,N-1$ lässt sich darstellen als
+\begin{align*}
+u(t,x_j)&=\left(\mathcal{F}^{-1}\left[\mathcal{F}g\odot \big(\cos(t\sqrt{\alpha w}|k|)\big)_{k\in\mathcal{I}_N} + \mathcal{F}h\odot \big(\sinc(t\sqrt{\alpha w}|k|)tw\big)_{k\in\mathcal{I}_N}\right]\right)_j\\
+\dt{u}(t,x_j)&=\mathcal{F}^{-1}\left[\mathcal{F}g \odot \big(-\sinc(t\sqrt{\alpha w}|k|)\alpha|k|^2t\big)_{k\in\mathcal{I}_N}+\mathcal{F}h\odot \big(\cos(t\sqrt{\alpha w}|k|)\big)_{k\in\mathcal{I}_N}\right]_j
+\end{align*}
+Man beachte, dass die Sortierung der Fourier-Koeffizienten in verschiedenen Programmiersprachen verschiedenen Notationen folgt und entsprechend die Indizierung angepasst werden muss. Beispielsweise gilt für die Python3 Bibliothek \emph{numpy} durch die entsprechende Funktion \emph{numpy.fft.fftfreq(8)*8} die Konvention
+\[\mathcal{I}_8=\left( 0,  1,  2,  3, -4, -3, -2, -1\right)\]
+wobei Matlab die ähnliche Konvention
+\[\mathcal{I}_8=\left( 0,  1,  2,  3, 4, -3, -2, -1\right)\]
+verwendet.\\[0.3cm]
+Obige Erläuterungen waren für eine räumliche Dimension $d=1$. Will man nun den Ansatz auf mehrere Dimensionen erweitern, so erhält man ein sehr ähnliches Ergebnis.
+Führt man die Fourier-Transformation in jeder Dimension durch, so ergibt sich für $d=2$ die Approximation
+\[u(t,x)\approx\sum_{k_1\in\mathcal{I}_N}\fourier{u}_{k_1}(t,x_2)e^{ik_1x_1}=\sum_{k_1\in\mathcal{I}_N}\sum_{k_2\in\mathcal{I}_N}\fourier{u}_{k_1,k_2}(t)e^{i(k_1x_1+k_xx_2)}\]
+und analog zu der Approximation (\ref{eqn:laplace_approxu}) erhält man
+\[\Laplace u(t,x)=\sum_{k_1\in\mathcal{I}_N}-k_1^2\fourier{u}_{k_1}(t,x_2)\Laplace e^{ik_1x_1}=\sum_{k_1,k_2\in\mathcal{I}_N}-(k_1^2+k_2^2)\fourier{u}_k(t)e^{i(k_1x_1+k_2x_2)}\]
+Das Vorgehen im mehrdimensionalen unterscheidet sich also nur durch eine aufwändigere Indizierung, ist jedoch im Kern dieselbe. Ersetzt man in obigen Ausführungen für $d=1$ sämtliche $|k|$ durch \[\norm{k}_2=\sqrt{k_1^2+\dots+k_d^2}\]so erhält man, bei passender Indizierung der diskreten Fourier-Approximation, eine Darstellung der Lösung für beliebige Dimensionen $d\in\N$.
+\subsubsection*{Method of lines für zweiten Teil des Splittings}
+Einen Löser für den zweiten Teil (\ref{eqn:kgg_discrete_first_order_part1}) der im Ort diskretisierten KGG zu bekommen ist hingegen deutlich einfacher. Wir suchen für $t>0$, $\beta(x)>0$ und ein Gewicht $\tilde{w}=1-w\in [0,1]$ die Lösung der Differentialgleichung
+\begin{equation*}
+\dt{\begin{pmatrix}u_N\\v_N\end{pmatrix}}(t)=
+\begin{pmatrix}0 & \tilde{w}I_N\\ -\diag({\beta_N}) & 0\end{pmatrix}
+\begin{pmatrix}u_N\\v_N\end{pmatrix}(t)
+\end{equation*}
+Wiederum lässt sich die Lösung der Differentialgleichung mithilfe der Matrixexponentialfunktion darstellen. Die Matrixexponentialfunktion der Blockmatrix wiederum ist äquivalent zu einer umsortierten Blockdiagonalmatrix für welche gilt
+\[\exp\begin{pmatrix}0 & \tilde{w}t\\ -t\beta(x_j) & 0\end{pmatrix}=
+\begin{pmatrix}\cos(t\sqrt{\beta(x_j)\tilde{w}}) & \sinc(t\sqrt{\beta(x_j)\tilde{w}})\tilde{w}t\\
+-\sinc(t\sqrt{\beta(x_j)\tilde{w}})\beta(x_j)t & \cos(t\sqrt{\beta(x_j)\tilde{w}})\end{pmatrix}\]
+Daraus erhalten wir also zu den Anfangswerten $g$ und $h$ für festes $x\in \Torus^d$ die explizite Lösung des zweiten Teil des Splittings durch
+\[\begin{pmatrix}u\\v\end{pmatrix}(t,x)=
+\begin{pmatrix}\cos(t\sqrt{\beta(x_j)\tilde{w}}) & \sinc(t\sqrt{\beta(x_j)\tilde{w}})\tilde{w}t\\
+-\sinc(t\sqrt{\beta(x_j)\tilde{w}})\beta(x_j)t & \cos(t\sqrt{\beta(x_j)\tilde{w}})\end{pmatrix}
+\begin{pmatrix}g\\h\end{pmatrix}(x)\]
+Wir benötigen im Gegensatz zum ersten Teil keine feste Ortsdiskretisierung und bekommen sogar eine exakte Lösung des Teilproblems. Da die Punkte für die verschiedenen Teile des Splittings zusammen passen müssen, sind wir jedoch durch die Anforderung festgelegt, die die Fourierapproximation an die Punkte stellt.\\
+Mithilfe der \emph{method of lines}, d.h. punktweiser Auswertung der Lösung für alle benötigten $x$, bekommt man schlussendlich eine numerische Lösung.
 \subsubsection*{Diskussion der Parameter}
 Wir haben nun also zwei separate Einschrittverfahren, die zusammen mit dem Strang-Splitting Framework einen guten Löser für die KGG ergeben. Dabei ist die Wahl gewisser Parameter jedoch noch unklar:
 \begin{itemize}

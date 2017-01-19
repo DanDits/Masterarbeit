@@ -6,14 +6,14 @@ import matplotlib.pyplot as plt
 import diff_equation.klein_gordon as kg
 
 dimension = 1
-grid_size_N = 2 ** 16
+grid_size_N = 2 ** 5
 domain = list(repeat([-np.pi, np.pi], dimension))
 
 
 wave_weights = np.arange(0., 1.001, 0.02)
 trials = [ds.trial_1, ds.trial_2, ds.trial_3, ds.trial_frog]
 start_time = 0.
-delta_time = 0.01
+delta_time = 0.005
 stop_time = 1
 
 xs_mesh = None
