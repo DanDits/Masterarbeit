@@ -270,11 +270,11 @@ und die approximierte Ableitung $p$-ter Ordnung
 \[\dxp{f}{p}(x)\approx \sum_{k=-N}^N(ik)^p\fourier{f}_ke^{ikx}\]
 für die Beispiele $f_1(x)=-\sin(x)e^{-\sin(x)}$ und $f_2(x)=|x|$.
 \begin{figure}[!htb]
-  \includegraphics[width=0.8\linewidth]{Figures/spectral_derivative_error_cont.png}
+  \includegraphics[width=0.9\linewidth]{Figures/spectral_derivative_error_cont.png}
   \caption{Konvergenz der spektralen Ableitung zweiter Ordnung von $f_1$.}
 \end{figure}
 \begin{figure}[!htb]
-  \includegraphics[width=0.8\linewidth]{Figures/spectral_derivative_error_discont.png}
+  \includegraphics[width=0.9\linewidth]{Figures/spectral_derivative_error_discont.png}
   \caption{Konvergenz der spektralen Ableitung zweiter Ordnung von $f_2$.}
 \end{figure}
 Wir erkennen, dass die analytische Funktion $f_1$ eine exponentielle Konvergenz aufweist und bereits für $2N=64$ Punkte im Bereich der Maschinengenauigkeit liegt. Rechenfehler sorgen für größeres $N$ für eine Aufsummierung von kleinen Überschwingungen und einen langsam wachsenden Fehler.\\
@@ -293,15 +293,15 @@ Im Folgenden nehmen wir an, die Fourier-Approximation (\ref{eqn:fourier_approx})
 \label{eqn:laplace_approxu}
 \Laplace u(t,x_j)=\sum_{k\in\mathcal{I}_N}\fourier{u}_k(t)\Laplace e^{ikx_j}=\sum_{k\in\mathcal{I}_N}-k^2\fourier{u}_k(t)e^{ikx_j}
 \end{equation}
-Betrachten wir nun $(\Laplace u(t,x_j))_{j=0,\dots,N-1}^T$ für den Vektor $u(t)_N=(u(t,x_j))_{j=0,\dots,N-1}^T$ so gilt
-\[(\Laplace u(t,x_j))_{j=0,\dots,N-1}^T\approx \mathcal{F}_N^{-1}\left(\big(-k^2\big)_{k\in\mathcal{I}_N}\odot\mathcal{F}_Nu(t)_N\right)\]
+Betrachten wir nun $(\Laplace u(t,x_j))_{j=0,\dots,N-1}^T$ für den Vektor $u_N(t)=(u(t,x_j))_{j=0,\dots,N-1}^T$ so gilt
+\[(\Laplace u(t,x_j))_{j=0,\dots,N-1}^T\approx \mathcal{F}_N^{-1}\left(\big(-k^2\big)_{k\in\mathcal{I}_N}\odot\mathcal{F}_Nu_N(t)\right)\]
 wobei $\odot$ die komponentenweise Multiplikation der Vektoren bezeichnet.\\
 Damit erhalten wir für $\beta_N=(\beta(x_j))_{j=0,\dots,N-1}$ die im Ort diskretisierte KGG
 \begin{equation}
 \label{eqn:kgg_discretespace}
 \dtt{u}_N(t)=\alpha \mathcal{F}_N^{-1}\left(\big(-k^2\big)_{k\in\mathcal{I}_N}\odot\mathcal{F}_Nu(t)_N\right) -\beta_N\odot u_N(t)
 \end{equation}
-Diese werden wir nun in ein System erster Ordnung umschreiben um anschließend ein Splitting darauf anzuwenden. 
+Diese werden wir nun in ein System erster Ordnung umschreiben, um anschließend ein Splitting darauf anzuwenden. 
 
 Es gilt für $t>0$, $v_N(t)\coloneqq \dt u_N(t)$ und ein Gewicht $w\in [0,1]$ die zu (\ref{eqn:kgg_discretespace}) äquivalente Darstellung
 \begin{align}
@@ -333,8 +333,8 @@ Die Blockmatrix $M$ lässt sich in eine äquivalente Blockdiagonalmatrix umforme
 Wir fassen nun die Ergebnisse zum numerischen Fluss des ersten Teil des Splittings (\ref{eqn:kgg_discrete_first_order_part1}) zusammen.\\
 Seien $g$ und $h$ die Anfangswerte, so gilt $\fourier{u}_N(0)=\mathcal{F}_Ng$ und $\fourier{v}_N(0)=\mathcal{F}_Nh$. Die Lösung an den Stellen $x_j=-\pi+2\pi\frac{j}{N}\in [-\pi,\pi)$ für $j=0,\dots,N-1$ lässt sich darstellen als
 \begin{align*}
-u(t,x_j)&=\left(\mathcal{F}^{-1}\left[\mathcal{F}g\odot \big(\cos(t\sqrt{\alpha w}|k|)\big)_{k\in\mathcal{I}_N} + \mathcal{F}h\odot \big(\sinc(t\sqrt{\alpha w}|k|)tw\big)_{k\in\mathcal{I}_N}\right]\right)_j\\
-\dt{u}(t,x_j)&=\mathcal{F}^{-1}\left[\mathcal{F}g \odot \big(-\sinc(t\sqrt{\alpha w}|k|)\alpha|k|^2t\big)_{k\in\mathcal{I}_N}+\mathcal{F}h\odot \big(\cos(t\sqrt{\alpha w}|k|)\big)_{k\in\mathcal{I}_N}\right]_j
+u(t,x_j)&=\left(\mathcal{F}_N^{-1}\left[\mathcal{F}_Ng\odot \big(\cos(t\sqrt{\alpha w}|k|)\big)_{k\in\mathcal{I}_N} + \mathcal{F}_Nh\odot \big(\sinc(t\sqrt{\alpha w}|k|)tw\big)_{k\in\mathcal{I}_N}\right]\right)_j\\
+\dt{u}(t,x_j)&=\left(\mathcal{F}_N^{-1}\left[\mathcal{F}_Ng \odot \big(-\sinc(t\sqrt{\alpha w}|k|)\alpha|k|^2t\big)_{k\in\mathcal{I}_N}+\mathcal{F}_Nh\odot \big(\cos(t\sqrt{\alpha w}|k|)\big)_{k\in\mathcal{I}_N}\right]\right)_j
 \end{align*}
 Man beachte, dass die Sortierung der Fourier-Koeffizienten in verschiedenen Programmiersprachen verschiedenen Notationen folgt und entsprechend die Indizierung angepasst werden muss. Beispielsweise gilt für die Python3 Bibliothek \emph{numpy} durch die entsprechende Funktion \emph{numpy.fft.fftfreq(8)*8} die Konvention
 \[\mathcal{I}_8=\left( 0,  1,  2,  3, -4, -3, -2, -1\right)\]
@@ -345,10 +345,10 @@ Obige Erläuterungen waren für eine räumliche Dimension $d=1$. Will man nun de
 Führt man die Fourier-Transformation in jeder Dimension durch, so ergibt sich für $d=2$ die Approximation
 \[u(t,x)\approx\sum_{k_1\in\mathcal{I}_N}\fourier{u}_{k_1}(t,x_2)e^{ik_1x_1}=\sum_{k_1\in\mathcal{I}_N}\sum_{k_2\in\mathcal{I}_N}\fourier{u}_{k_1,k_2}(t)e^{i(k_1x_1+k_xx_2)}\]
 und analog zu der Approximation (\ref{eqn:laplace_approxu}) erhält man
-\[\Laplace u(t,x)=\sum_{k_1\in\mathcal{I}_N}-k_1^2\fourier{u}_{k_1}(t,x_2)\Laplace e^{ik_1x_1}=\sum_{k_1,k_2\in\mathcal{I}_N}-(k_1^2+k_2^2)\fourier{u}_k(t)e^{i(k_1x_1+k_2x_2)}\]
+\[\Laplace u(t,x)=\sum_{k_1\in\mathcal{I}_N}-k_1^2\fourier{u}_{k_1}(t,x_2) e^{ik_1x_1}=\sum_{k_1,k_2\in\mathcal{I}_N}-(k_1^2+k_2^2)\fourier{u}_{k_1,k_2}(t)e^{i(k_1x_1+k_2x_2)}\]
 Das Vorgehen im mehrdimensionalen unterscheidet sich also nur durch eine aufwändigere Indizierung, ist jedoch im Kern dieselbe. Ersetzt man in obigen Ausführungen für $d=1$ sämtliche $|k|$ durch \[\norm{k}_2=\sqrt{k_1^2+\dots+k_d^2}\]so erhält man, bei passender Indizierung der diskreten Fourier-Approximation, eine Darstellung der Lösung für beliebige Dimensionen $d\in\N$.
 \subsubsection*{Method of lines für zweiten Teil des Splittings}
-Einen Löser für den zweiten Teil (\ref{eqn:kgg_discrete_first_order_part1}) der im Ort diskretisierten KGG zu bekommen ist hingegen deutlich einfacher. Wir suchen für $t>0$, $\beta(x)>0$ und ein Gewicht $\tilde{w}=1-w\in [0,1]$ die Lösung der Differentialgleichung
+Einen Löser für den zweiten Teil (\ref{eqn:kgg_discrete_first_order_part1}) der im Ort diskretisierten KGG erhält man auf ähnliche Weise. Wir suchen für $t>0$, $\beta(x)>0$ und ein Gewicht $\tilde{w}=1-w\in [0,1]$ die Lösung der Differentialgleichung
 \begin{equation*}
 \dt{\begin{pmatrix}u_N\\v_N\end{pmatrix}}(t)=
 \begin{pmatrix}0 & \tilde{w}I_N\\ -\diag({\beta_N}) & 0\end{pmatrix}
@@ -360,18 +360,88 @@ Wiederum lässt sich die Lösung der Differentialgleichung mithilfe der Matrixex
 -\sinc(t\sqrt{\beta(x_j)\tilde{w}})\beta(x_j)t & \cos(t\sqrt{\beta(x_j)\tilde{w}})\end{pmatrix}\]
 Daraus erhalten wir also zu den Anfangswerten $g$ und $h$ für festes $x\in \Torus^d$ die explizite Lösung des zweiten Teil des Splittings durch
 \[\begin{pmatrix}u\\v\end{pmatrix}(t,x)=
-\begin{pmatrix}\cos(t\sqrt{\beta(x_j)\tilde{w}}) & \sinc(t\sqrt{\beta(x_j)\tilde{w}})\tilde{w}t\\
--\sinc(t\sqrt{\beta(x_j)\tilde{w}})\beta(x_j)t & \cos(t\sqrt{\beta(x_j)\tilde{w}})\end{pmatrix}
+\begin{pmatrix}\cos(t\sqrt{\beta(x)\tilde{w}}) & \sinc(t\sqrt{\beta(x)\tilde{w}})\tilde{w}t\\
+-\sinc(t\sqrt{\beta(x)\tilde{w}})\beta(x)t & \cos(t\sqrt{\beta(x)\tilde{w}})\end{pmatrix}
 \begin{pmatrix}g\\h\end{pmatrix}(x)\]
 Wir benötigen im Gegensatz zum ersten Teil keine feste Ortsdiskretisierung und bekommen sogar eine exakte Lösung des Teilproblems. Da die Punkte für die verschiedenen Teile des Splittings zusammen passen müssen, sind wir jedoch durch die Anforderung festgelegt, die die Fourierapproximation an die Punkte stellt.\\
 Mithilfe der \emph{method of lines}, d.h. punktweiser Auswertung der Lösung für alle benötigten $x$, bekommt man schlussendlich eine numerische Lösung.
-\subsubsection*{Diskussion der Parameter}
-Wir haben nun also zwei separate Einschrittverfahren, die zusammen mit dem Strang-Splitting Framework einen guten Löser für die KGG ergeben. Dabei ist die Wahl gewisser Parameter jedoch noch unklar:
+\subsubsection*{Konkretisierung des Algorithmus}
+Wir haben nun also zwei separate Einschrittverfahren, die zusammen mit dem Strang-Splitting Framework einen guten Löser für die KGG ergeben. Dieses Lösungsverfahren ist für $d=1$ schematisch als Algorithmus \ref{alg:kgg_solver} dargestellt.
+\begin{algorithm}[ht]
+    \caption{Strang-Splitting für KGG}
+    \label{alg:kgg_solver}
+    \begin{algorithmic}[1] % The number tells where the line numbering should start
+        \Function{Strang\_Step\_KGG}{$N,u_0,v_0,\alpha,\beta,w,t$} 
+            \State $x_N\gets (-\pi+\frac{2\pi j}{N})_{j=0,\dots,N-1}^T$
+            \State $g,h\gets u_0(x_N), v_0(x_N)$
+            \State $g,h\gets \text{First\_Part\_Solver}(N, g, h, \alpha, w, \frac{t}{2})$
+            \State $g,h\gets \text{Second\_Part\_Solver}(x_N, g, h, \beta, 1-w, t)$
+            \State $u_1,v_1\gets \text{First\_Part\_Solver}(N, g, h, \alpha, w, \frac{t}{2})$
+            \State \textbf{return} $u_1, v_1$\Comment{Approximation an $u(t,x_N)$ und $\dt{u}(t,x_N)$}
+        \EndFunction
+        
+        \Function{First\_Part\_Solver}{$N,g,h,\alpha,w,t$} 
+        	\State Indexmenge $\mathcal{I}_N$ für Fourierkoeffizienten initialisieren
+        	\State $\fourier{g}\gets \mathcal{F}_Ng$
+        	\State $\fourier{h}\gets \mathcal{F}_Nh$
+        	\State $c\gets \big(\cos(t\sqrt{\alpha w}|k|)\big)_{k\in\mathcal{I}_N}$
+        	\State $s_1\gets \big(\sinc(t\sqrt{\alpha w}|k|)tw\big)_{k\in\mathcal{I}_N}$
+        	\State $s_2\gets \big(-\sinc(t\sqrt{\alpha w}|k|)\alpha|k|^2t\big)_{k\in\mathcal{I}_N}$
+            \State \textbf{return} $\mathcal{F}_N^{-1}\left(\fourier{g}\odot c+\fourier{h}\odot s_1\right),\quad \mathcal{F}_N^{-1}\left(\fourier{g}\odot s_2+\fourier{h}\odot c\right)$
+        \EndFunction
+        \Function{Second\_Part\_Solver}{$x_N,g,h,\beta,\tilde{w},t$} 
+        	\State $\beta_N\gets\beta(x_N)$
+        	\State $c\gets \cos(t\sqrt{\beta_N}\sqrt{\tilde{w}})$
+        	\State $s_1\gets \sinc(t\sqrt{\beta_N}\sqrt{\tilde{w}})\tilde{w}t$
+        	\State $s_2\gets -\sinc(t\sqrt{\beta_N}\sqrt{\tilde{w}})\beta_Nt$
+        	\State \textbf{return} $g\odot c+h\odot s_1,\quad g\odot s_2+h\odot c$
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+
+Dabei ist die Wahl gewisser Parameter jedoch noch unklar:
 \begin{itemize}
-\item Die Anzahl der Fourierpunkte definiert über $N$.
+\item Die Anzahl der Fourierpunkte $N$.
 \item Das Gewicht $w\in[0,1]$ für die Gewichtung des Splittings. 
 \end{itemize}
-\todo[inline]{Diskutiere N, w und zeige auch Konvergenz von Splitting für Strang+Lie anhand von einem Beispiel; CFL Condition ?}
+Um die Zusammenhänge und Probleme besser zu verstehen, werden wir anhand eines Beispiels mit bekannter exakter Lösung verschiedene Kombinationen der Parameter demonstrieren.
+\begin{mathbsp}
+\label{bsp:trialfrog2}
+Seien $c>2$ und $d\neq 0$, dann ist
+\begin{align*}
+u(t,x)&=\frac{\cos(dt)}{\sin(x)+c}\\
+u_0(x)&=\frac{1}{\sin(x)+c}\\
+v_0(x)&\equiv 0\\
+\end{align*}
+eine Lösung der KGG (\ref{kgg}) mit $\alpha=c-2$ und $\beta(x)=d^2+(c-2)\left(\frac{\sin(x)}{\sin(x)+c}+\frac{2\cos^2(x)}{(\sin(x)+c)^2}\right)$. Wir lösen nun die KGG mithilfe verschiedener Splitting Varianten und beobachten in Abbildung \ref{fig:splitting_convergence} eine Konvergenz von Ordnung 2 für das Strang-Splitting und Konvergenz von Ordnung 1 für das Lie-Trotter-Splitting. Die schnelle Variante des Strang-Splittings (FastStrang), bei dem die Halbschritte kombiniert werden, hat dabei exakt den gleichen Fehler wie das normale Strang-Splitting. Die Variante, wo die Reihenfolge der beiden Aufteilungen der Gleichung vertauscht wurde (ReversedStrang) unterscheidet sich nur minimal von der normalen Variante.\\
+Am deutlichsten sticht aber etwas anderes hervor: Wird die Zeitschrittweite $\tau$ zu groß, d.h. ist $1.227\tau>\frac{2\pi}{N}=h$, so ist das Verfahren instabil.
+\begin{figure}[!htb]
+\includegraphics[width=\textwidth]{Figures/splitting_convergence_fix_weight_frog2_cfl.png}
+\caption{Konvergenzordnung für verschiedene Splitting Varianten anhand von Beispiel \ref{bsp:trialfrog2} mit $c=3$, $d=1$, $N=512$, $w=0.5$ zum Zeitpunkt $T=1$.}
+\label{fig:splitting_convergence}
+\end{figure}
+Dabei spielt der Gewichtsfaktor $w$ eine große Rolle. Wäre $w=0$, so entspricht der Löser des ersten Teil des Splittings der Vorschrift
+\begin{align*}
+u(t,x_N)&=\mathcal{F}_N^{-1}\left(\mathcal{F}_Ng(x_N)\right)=g(x_N)=u(0,x_N)\\
+\dt{u}(t,x_N)&=\mathcal{F}_N^{-1}\left(\mathcal{F}_Ng(x_N)\odot \big(-\alpha |k|^2t\big)_{k\in\mathcal{I}_N}\right)+h(x_N)\\
+&=t \alpha \mathcal{F}_N^{-1}\left(\mathcal{F}_N\odot \big(-|k|^2\big)_{k\in\mathcal{I}_N}\right)+h(x_N)\\
+&=t\alpha \Laplace_N g(x_N)+h(x_N)\\
+&\approx t\dtt{u}(0,x_N)+\dt{u}(0,x_N)
+\end{align*}
+Somit wird in diesem Randfall nur die erste Ableitung geändert und dieses Update entspricht einem expliziten Eulerschritt. Wir erhalten eine \emph{Courant-Friedrichs-Lewy-Bedingung} (CFL-Bedingung) der Form $\tilde{c}\tau\le h=\frac{2\pi}{N}$. Im Fall $k=0$ entspricht die CFL-Zahl $\tilde{c}$ der CFL-Zahl des expliziten Eulers. Andernfalls beobachten wir, dass die CFL-Zahl abhängig von $w$ ist und für $w=1$ ein Minimum annimmt. Wie man an Abbildung \ref{fig:splitting_convergence_w1} erkennt, verhält sich für $w=1$ die Gleichung am stabilsten und kann auch für große Zeitschrittweiten sinnvoll gelöst werden. Dies wird eine große Motivation dafür sein, das Gewicht $w=1$ zu wählen.
+
+\begin{figure}[!htb]
+\includegraphics[width=\textwidth]{Figures/splitting_convergence_fix_weight_frog2_cfl_corrected.png}
+\caption{Konvergenzordnung für verschiedene Splitting Varianten anhand von Beispiel \ref{bsp:trialfrog2} mit $c=3$, $d=1$, $N=512$, $w=1$ zum Zeitpunkt $T=1$.}
+\label{fig:splitting_convergence_w1}
+\end{figure}
+Zuletzt sei aber erwähnt, dass die Wahl $w=1$ aus Sicht des minimalen Fehlers selten optimal ist. An Abbildung \ref{fig:splitting_dependence_on_weight} erkennen wir für verschiedene bekannte Lösungen der KGG, dass das Minimum des Fehlers in Abhängigkeit vom Gewicht $w$ sowohl an beiden Rändern, als auch als lokales Minimum auftreten kann. Das genaue Minimum zu bestimmen und dies mit der CFL-Zahl zu kombinieren, um das optimale $w$ zu wählen, kann ein möglicher Ansatz zur Verbesserung des Algorithmus sein. Wir werden dies jedoch nicht weiter verfolgen und uns auf $w=1$ beschränken, da eine Verbesserung des Fehlers dann mit einer Verringerung der Schrittweite $\tau$ immer möglich ist.
+\begin{figure}[!htb]
+\includegraphics[width=\textwidth]{Figures/splitting_error_over_weights.png}
+\caption{Verschiedene Beispiele von bekannten Lösungen der KGG gelöst mit FastStrang. Der Fehler wird dabei in Abhängigkeit des Gewichts $w$ verglichen.}
+\label{fig:splitting_dependence_on_weight}
+\end{figure}
+\end{mathbsp}
 \section{Polynome und Verteilungen}
 Die Theorie des general Polynomial Chaos ist die Grundlage für später vorgestellte Verfahren zum Lösen von der stochastischen Klein-Gordon-Gleichung. Im Mittelpunkt dieser Theorie stehen orthogonale Polynombasen. Die Verflechtung mit der Stochastik geschieht dann auf natürliche Weise durch die passende Wahl des zugrunde liegenden Skalarproduktes.
 \subsection{Orthogonale Polynome}
@@ -530,4 +600,3 @@ Als Veranschaulichung von Satz \ref{spectralconvth} approximieren wir verschiede
 \label{figurespectralconverg}
 \end{figure}
 \end{mathbsp}
-\todo[inline]{Subsection die Löser für determinische KGG erklärt hier?}

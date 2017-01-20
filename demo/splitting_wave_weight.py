@@ -4,9 +4,9 @@ import numpy as np
 from itertools import repeat
 import matplotlib.pyplot as plt
 import diff_equation.klein_gordon as kg
-
+from util.analysis import error_l2_relative
 dimension = 1
-grid_size_N = 2 ** 5
+grid_size_N = 2 ** 7
 domain = list(repeat([-np.pi, np.pi], dimension))
 
 
@@ -19,9 +19,11 @@ stop_time = 1
 xs_mesh = None
 
 plt.figure()
-plt.title("Error per wave weight, dt={}, T={}, grid size={}".format(delta_time, stop_time, grid_size_N))
-plt.xlabel("Wave weight")
-plt.ylabel("Error")
+size = "xx-large"
+plt.title("Verschiedene Lösungen der KGG, $\\tau={}$, $N={}$, $T={}$".format(delta_time, grid_size_N, stop_time),
+          fontsize=size)
+plt.xlabel("Gewicht $w$", fontsize=size)
+plt.ylabel("Relativer Fehler in diskreter L2-Norm", fontsize=size)
 plt.yscale('log')
 for trial in trials:
     errors = []
@@ -33,9 +35,9 @@ for trial in trials:
         splitting.progress(stop_time, delta_time, 0)
         if xs_mesh is None:
             xs_mesh = splitting.get_xs_mesh()
+        trial.error_function = error_l2_relative
         errors.append(trial.error(xs_mesh, splitting.times()[-1], splitting.solutions()[-1]))
 
     plt.plot(wave_weights, errors, label="{}".format(trial.name))
     print(errors)
-plt.legend()
 plt.show()

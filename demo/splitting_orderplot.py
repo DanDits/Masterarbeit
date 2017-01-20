@@ -4,12 +4,13 @@ import numpy as np
 from itertools import repeat
 import matplotlib.pyplot as plt
 from diff_equation.splitting import Splitting
+from util.analysis import error_l2_relative
 
 dimension = 1
-grid_size_N = 64 if dimension >= 2 else 128
+grid_size_N = 64 if dimension >= 2 else 512
 domain = list(repeat([-np.pi, np.pi], dimension))
-trial = ds.trial_1
-wave_weight = 0.5
+trial = ds.trial_frog2
+wave_weight = 0.9
 
 start_time = 0.
 delta_times = np.arange(0.25, 0.0001, -0.0005)
@@ -31,12 +32,7 @@ def make_leapfrog_configs():
 for delta_time in delta_times:
     print(delta_time)
     # each splitting needs its own config, as the splitting re initializes the config's solvers!
-    splittings = [Splitting.make_lie(*make_leapfrog_configs(), "LeapfrogLie",
-                                     start_time, trial.start_position, trial.start_velocity),
-                  Splitting.make_strang(*make_leapfrog_configs(), "LeapfrogStrang",
-                                        start_time, trial.start_position, trial.start_velocity),
-                  Splitting.make_fast_strang(*make_leapfrog_configs(), "LeapfrogFastStrang",
-                                             start_time, trial.start_position, trial.start_velocity, delta_time),
+    splittings = [
                   Splitting.make_lie(*make_wave_linhyp_configs(), "Lie",
                                      start_time, trial.start_position, trial.start_velocity),
                   Splitting.make_strang(*make_wave_linhyp_configs(), "Strang",
@@ -52,16 +48,23 @@ for delta_time in delta_times:
             xs_mesh = splitting.get_xs_mesh()
         if len(errors_per_delta_time) <= i:
             errors_per_delta_time.append([])
+        trial.error_function = error_l2_relative
         errors_per_delta_time[i].append(trial.error(xs_mesh, splitting.times()[-1], splitting.solutions()[-1]))
 
+size = "xx-large"
 plt.figure()
-plt.title("Order plot for error of splittings for {}, grid size {}, wave_weight={}"
-          .format(trial.name, grid_size_N, wave_weight))
-plt.xlabel("1/delta_time")
-plt.ylabel("Error at T={}".format(stop_time))
+print(trial.name)
+plt.title("Konvergenz verschiedener Splittings, $N={}$, $w={}$"
+          .format(grid_size_N, wave_weight),
+          fontsize=size)
+plt.xlabel("$\\frac{1}{\\tau}$", fontsize=size)
+plt.ylabel("Relativer Fehler bei $T={}$".format(stop_time), fontsize=size)
 plt.xscale('log')
 plt.yscale('log')
+dts = [1/delta_time for delta_time in delta_times]
 for splitting, errors in zip(splittings, errors_per_delta_time):
-    plt.plot([1/delta_time for delta_time in delta_times], errors, label=splitting.name)
-plt.legend()
+    plt.plot(dts, errors, label=splitting.name)
+plt.plot(dts, np.array(dts) ** -2, label="Referenz $\\tau^{2}$")
+plt.xlim((dts[0], dts[-1]))
+plt.legend(fontsize=size)
 plt.show()
