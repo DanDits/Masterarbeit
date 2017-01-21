@@ -1,7 +1,7 @@
 % Chapter 2
 
 \chapter{Stochastische Hintergründe}
-In diesem Kapitel werden wir erläutern, wie man stochastische Einflüsse auf die KGG darstellen kann. Anschließend werden wir mit der Monte-Carlo Methode bereits ein erstes Verfahren kennen lernen, um den Erwartungswert und die Varianz der zufallsabhängigen Lösung der KGG zu bestimmen.
+In diesem Kapitel werden wir erläutern, wie man stochastische Einflüsse auf die KGG darstellen kann. Anschließend werden wir mit der Monte-Carlo-Methode bereits ein erstes Verfahren kennen lernen, um den Erwartungswert und die Varianz der zufallsabhängigen Lösung der KGG zu bestimmen.
 
 
 \section{Grundbegriffe}
@@ -41,7 +41,7 @@ Folgende Definitionen werden die später hauptsächlich untersuchten Eigenschaft
 Ist $Y\colon\R\to\R$ eine reelle Zufallsvariable mit Dichte $\rho_Y$ so ist definieren wir den Erwartungswert von $Y$ als
 \[\mu_Y=\E[Y]=\int_{-\infty}^\infty y\rho_Y(y)dy\]
 und die Varianz von $Y$ als 
-\[\mu_Y^2=\text{var}(Y)=\int_{-\infty}^\infty (y-\mu_Y)^2\rho_Y(y)dy\]
+\[\sigma_Y^2=\text{var}(Y)=\int_{-\infty}^\infty (y-\mu_Y)^2\rho_Y(y)dy\]
 \end{mathdef}
 Ohne Beweis präsentieren wir die Inversionsmethode. Diese ist nützlich, um aus Zufallsvariablen einer bestimmten Verteilung Zufallsvariablen einer anderen Verteilung zu gewinnen. In der Numerik ist dies ist essentiell für die Generation von Pseudozufallszahlen von beliebigen Verteilungen, aber auch für die "`stochastische Normierung"' von verschiedenen Zufallsvariablen zu einem gemeinsamen Wahrscheinlichkeitsraum, auf dem dann Erwartungswerte berechnet werden können.
 \begin{maththeorem}[Inversionsmethode]
@@ -64,7 +64,7 @@ und skaliert durch
 Dann konvergiert für $n\to\infty$ die Verteilungsfunktion von $Z_n$ zu einer $\mathcal{N}(0,1)$ verteilten Verteilungsfunktion.
 \end{maththeorem}
 \begin{mathdef}[Zufallsvektoren]
-Wir nennen $Y=(Y_1,\dots,Y_n)$ einen $n$-dimensionalen Zufallsvektor (häufig auch einfach $n$-dimensionale Zufallsvariable), wenn die Komponenten $Y_1,\dots,Y_n\colon\Omega\to\R$ eindimensionale Zufallsvariablen sind. Besitzt jede Komponente $Y_i$ eine Dichte $\rho_{Y_i}$, so ist die gemeinsame Dichte
+Wir nennen $Y=(Y_1,\dots,Y_n)$ einen $n$-dimensionalen Zufallsvektor (häufig auch einfach $n$-dimensionale Zufallsvariable), wenn die Komponenten $Y_1,\dots,Y_n\colon\Omega\to\R$ eindimensionale reelle Zufallsvariablen sind. Besitzt jede Komponente $Y_i$ eine Dichte $\rho_{Y_i}$, so ist die gemeinsame Dichte
 \[\rho_Y=\prod_{i=1}^n \rho_{Y_i}\]
 und die Verteilungsfunktion lässt sich darstellen als
 \[F_Y(y_1,\dots,y_n)=\int_{-\infty}^{y_1}\dots\int_{-\infty}^{y_n}\rho_Y(z_1,\dots,z_n)dy_1\dots dy_n\]
@@ -119,7 +119,7 @@ u(0,x,y)&=u_0(x,y), \: x\in \Torus^d\\
 \end{align}
 Die Lösung \[u(t,x,y)\colon [0,T]\times\Torus^d\times \R^N\to\R\] ist also eine zufallsabhängige Größe.\\
 Dabei ist die grundlegende Annahme, dass (\ref{skgg}) $P$-fast-sicher wohl gestellt ist, d.h. die Menge an Punkten $\omega$ für welche die partielle Differentialgleichung mit fixem $y=Y(\omega)$ keine eindeutige Lösung besitzt ist eine Nullmenge bezüglich des Wahrscheinlichkeitmaßes $P$.\\
-Ab sofort werden wir --wie in Kapitel \ref{secfiniteparam} diskutiert-- stets annehmen, dass die Komponenten $Y_i$ von $Y$ stochastisch unabhängige Zufallsvariablen mit bekannter Verteilung sind.
+Wie bereits in Kapitel \ref{secfiniteparam} diskutiert, werden wir stets annehmen, dass die Komponenten $Y_i$ von $Y$ stochastisch unabhängige Zufallsvariablen mit bekannter Verteilung sind.
 \begin{mathbsp}
 \label{bsp:trial1}
 Sei $Y=(Y_1)$ eine eindimensionale und in $(2,3)$ gleichverteilte Zufallsvariable. Dann gilt für $t>0$, $d\in\N$, $x=(x_1,\dots$, $x_d)\in\Torus^d$, $\hat{x}\coloneqq \sum_{i=1}^d x_i$ und $y=Y(\omega)$
@@ -138,7 +138,7 @@ Um einen potentiellen Denkfehler zu vermeiden, weisen wir an dieser Stelle expli
 \[\E[u(t,x,Y)]=\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\neq 2\sin(\hat{x})\cos(\frac{5}{2}t)=u(t,x,\E[Y])\]
 Dies erkennt man beispielsweise am Zeitpunkt $t=\frac{\pi}{2}$, wo gilt
 \[\E[u(t,x,Y)]=-\sin(\hat{x})\pi \neq -\sin(\hat{x})\sqrt{2}=u(t,x,\E[Y])\]
-Der Erwartungswert ist linear, die Abhängigkeiten von $y$ sind es aber nicht. Diese erste fehlgeschlagene Idee den Erwartungswert durch das Lösen eines deterministischen Systems zu erhalten, ist jedoch nicht vollends vergebens. Wir werden am Beispiel der Monte-Carlo-Methode sehen, dass wir dazu allerdings weit mehr als ein System lösen müssen.
+Der Erwartungswert ist linear, die Abhängigkeiten von $y$ sind es aber nicht. Diese erste fehlgeschlagene Idee den Erwartungswert durch das Lösen eines deterministischen Systems zu erhalten, ist jedoch nicht vollends vergebens. Wir werden am Beispiel der Monte-Carlo-Methode sehen, dass wir dazu allerdings weit mehr als ein deterministisches System lösen müssen.
 \end{mathbsp}
 Wir geben ein weiteres Referenzbeispiel an, wo nun auch die Ortsabhängigkeit von $\beta$ benutzt wird und auch ein Anfangswert abhängig von der Zufallsvariablen ist.
 \begin{mathbsp}
@@ -199,7 +199,7 @@ c_b(n)=\sum_{k=0}^{L-1}d_k(n)b^{-k-1}
 \end{equation*}
 \end{mathdef}
 \begin{mathdef}[Halton-Sequenz]
-Die Halton-Sequenz zu einer Dimension $N\in\N$ ist definiert als die Folge $(c_{p_1}(n),\dots,c_{p_N}(n))_{n\in\N}$, wobei $p_1,\dots,p_N\in\N$ die ersten $N$ Primzahlen sind und $c_p(n)$ die $n$-te Van-der-Corput Zahl.
+Die Halton-Sequenz zu einer Dimension $N\in\N$ ist definiert als die Folge $(c_{p_1}(n),\dots,c_{p_N}(n))_{n\in\N}$, wobei $p_1,\dots,p_N\in\N$ die ersten $N$ Primzahlen sind und $c_p(n)$ die $n$-te Van-der-Corput Zahl zur Basis $p$ ist.
 \end{mathdef}
 \begin{mathbsp}
 Beispielsweise ist für $p=3$ die $n=5$-te Van-der-Corput Zahl gegeben durch 
@@ -212,14 +212,14 @@ Die Halton-Sequenz für $N=2$ Dimensionen beginnt mit den Zahlen
 (c_2(n),c_3(n))_{n\in\N}=\left(\left(\frac{1}{2},\frac{1}{3}\right),\left(\frac{1}{4},\frac{2}{3}\right),\left(\frac{3}{4},\frac{1}{9}\right),\left(\frac{1}{8},\frac{4}{9}\right),\left(\frac{5}{8},\frac{7}{9}\right),\left(\frac{3}{8},\frac{2}{9}\right),\dots\right)
 \end{equation*}
 \end{mathbsp}
-In höheren Dimensionen (ab ungefähr $N=6$) beobachtet man allerdings stärkere lineare Korrelation zwischen den Komponenten, siehe beispielsweise Sequenzen für $p=17$ und $p=19$. Die Komponenten sind also abhängig und somit kein guter Ersatz für Pseudozufallszahlen. Genauere Untersuchungen werden in \autocite{Morokoff1995218} erläutert, wo auch vorgeschlagen wird für höhere Dimensionen die Sobol-Sequenz zu verwenden.\\
+In höheren Dimensionen (ab ungefähr $N=6$) beobachtet man allerdings stärkere lineare Korrelation zwischen den Komponenten, siehe beispielsweise Sequenzen für $p=17$ und $p=19$. Die Komponenten sind also abhängig und somit kein guter Ersatz für Pseudozufallszahlen. Genauere Untersuchungen werden in \autocite{Morokoff1995218} erläutert, wo auch vorgeschlagen wird für höhere Dimensionen die Sobol-Sequenz zu verwenden oder ein gewisses Offset für den Startindex der Halton-Sequenz einzuführen.\\
 Wie man an Abbildung \ref{fig:halton_numbers} erkennt, deckt die Halton-Sequenz die Fläche deutlich gleichmäßiger ab als eine Generierung von der selben Anzahl an Pseudozufallszahlen. Dies ist eine Motivation dafür, bessere Konvergenzeigenschaften zu erwarten.
 \begin{figure}
 \includegraphics[width=\textwidth]{Figures/halton_numbers.png}
 \caption{Darstellung der ersten 200 Halton Zahlen im zweidimensionalen und im Vergleich 200 gleichverteilte Pseudozufallszahlen. Die Halton Sequenz deckt die Fläche dabei viel gleichmäßiger ab.}
 \label{fig:halton_numbers}
 \end{figure}
-Benötigt man wiederum Zufallszahlen mit einer anderen Verteilungsfunktion, so sind diese durch Anwendung der Inversionsmethode \ref{thinversionsmethode} erzeugbar.
+Benötigt man wiederum Zufallszahlen mit einer anderen Verteilungsfunktion, so sind diese durch Anwendung der Inversionsmethode von Satz \ref{thinversionsmethode} erzeugbar.
 
 \subsection{Approximation von Erwartungswert und Varianz}
 Bevor wir den Kern der Schleife betrachten, wollen wir uns zuerst mit den eng miteinander zusammenhängenden Fragen \ref{mcsaveresults} und \ref{mcestimations} beschäftigen. Diese Fragen über die Verwendung der einzelnen Zwischenergebnisse zur Approximation des Erwartungswertes und der Varianz können wiederum vielseitig beantwortet werden.
@@ -237,7 +237,7 @@ Die für die Approximation der Varianz verwendete Darstellung nennt man auch \em
 \subsubsection*{Fortlaufende Berechnung}
 Die Verarbeitung am Ende besitzt zwei große Nachteile:
 \begin{itemize}
-\item Sämtliche Zwischenergebnisse müssen gespeichert werden. Für die Mittelwertbildung alleine wäre dies zwar nicht nötig, jedoch für die Approximation der Varianz. An einer Beispielsrechnung soll der benötigte Arbeitsspeicher kurz verdeutlicht werden: Wird der Raum in 256 Punkten diskretisiert und benötigt jeder Punkt 8 Byte Speicher und führt man (durchaus realistisch) $R=100000$ Simulationen durch, so ergibt sich bereits ein Speicherbedarf von $\frac{256*100000*8\text{B}}{1024^2}\approx 200\text{MB}$. Dies ist also bereits für eine räumliche Dimension ein nicht unerheblicher Aufwand.
+\item Sämtliche Zwischenergebnisse müssen gespeichert werden. Für die Mittelwertbildung alleine wäre dies zwar nicht nötig, jedoch für die Approximation der Varianz. An einer Beispielsrechnung soll der benötigte Arbeitsspeicher kurz verdeutlicht werden: Wird der eindimensionale Raum in 256 Punkten diskretisiert und benötigt jeder Punkt 8 Byte Speicher und führt man (durchaus realistisch) $R=100000$ Simulationen durch, so ergibt sich bereits ein Speicherbedarf von $\frac{256*100000*8\text{B}}{1024^2}\approx 200\text{MB}$. Dies ist also bereits für eine räumliche Dimension ein nicht unerheblicher Aufwand.
 \item Die Methode zur Approximation der Varianz ist nicht stabil und stark anfällig für numerische Rechenfehler, insbesondere Überläufe (vgl. \autocite{cook08}). Aus diesem Grunde schlug Welford in \autocite{welford62} eine alternative Berechnungsmethode vor, welche wir im folgenden erklären werden.
 \end{itemize}
 \begin{maththeorem}
@@ -285,7 +285,7 @@ s_k&=\sum_{j=1}^k(x_j-m_k)^2\stackrel{(\ref{eqn:mcvar2})}{=}\sum_{j=1}^{k-1}(x_j
 \end{proof}
 Teilen wir nun $s_k$ noch durch $k-1$, so erhalten wir wieder die korrigierte Stichprobenvarianz. Wir benötigen dafür nur den vorherigen Wert $s_{k-1}$, die beiden letzten Mittelwerte, die neuste Stichprobe $x_k$ und die Stichprobenanzahl.
 \subsection{Numerische Ergebnisse}
-Man bemerkt schon an der Pseudocode Darstellung der Monte-Carlo-Methode, dass das Bottleneck des Algorithmus in der Berechnung der Lösung der deterministischen KGG liegt. Der Zeitaufwand für alle anderen Operationen ist in Relation dazu vernachlässigbar klein. Ein großer Vorteil des Algorithmus ist seine \emph{embarrassingly parallel} Eigenschaft: Es ist quasi kein Aufwand nötig die Schleife zu parallelisieren und somit skaliert er perfekt mit der Anzahl an zur Verfügung stehenden Prozessoren. Dies ist eine erste Antwort auf Frage \ref{mcalgspeed}, jedoch sollte klar sein, dass das Lösen des deterministischen Systems dennoch so effizient wie möglich passieren muss. Ein Löser, der nur 0.1 Sekunden für ein einziges System benötigt und $R=100000$ Durchgänge erledigt, läuft bereits etwa 3 Stunden ohne Parallelisierung.\\
+Man bemerkt schon an der Pseudocode Darstellung der Monte-Carlo-Methode, dass das Bottleneck des Algorithmus in der Berechnung der Lösung der deterministischen KGG liegt. Der Zeitaufwand für alle anderen Operationen ist in Relation dazu vernachlässigbar klein. Ein großer Vorteil des Algorithmus ist seine \emph{embarrassingly parallel} Eigenschaft: Es ist quasi kein Aufwand nötig die Schleife zu parallelisieren und somit skaliert er perfekt mit der Anzahl an zur Verfügung stehenden Prozessoren. Dies ist eine erste Antwort auf Frage \ref{mcalgspeed}, jedoch sollte klar sein, dass das Lösen des deterministischen Systems dennoch so effizient wie möglich passieren muss. Ein Löser, der nur 0.1 Sekunden für ein einziges System benötigt und $R=100000$ Durchgänge erledigt, läuft ohne Parallelisierung bereits etwa 3 Stunden.\\
 \subsubsection*{Konvergenz}
 Anhand von Abbildung \ref{fig:mc_convergence_trial1} erkennen wir für Beispiel \ref{bsp:trial1} die (probabilistische) Konvergenz des Erwartungswertes und der Varianz mit ungefährer Ordnung $0.5$ für die Monte-Carlo-Methode. Vergleichen wir dazu die Quasi-Monte-Carlo-Methode anhand desselben Beispiels in Abbildung \ref{fig:quasi_mc_convergence_trial1}, so erkennen wir eine bessere Konvergenzordnung und ein weniger chaotisches Verhalten des Fehlers.\\
 Diese schlechte Konvergenzordnung macht das Verfahren sehr unattraktiv. Wir benötigen selbst für das simple Beispiel \ref{bsp:trial1} und die Quasi-Monte-Carlo-Methode bereits $R=100000$ Durchläufe für einen Fehler des Erwartungswertes in die Größenordnung $10^{-5}$.

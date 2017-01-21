@@ -12,7 +12,7 @@ Die für diese Arbeit grundlegende Gleichung ist die lineare Klein-Gordon-Gleich
 u(0,x)&=u_0(x), \: x\in \Torus^d\\
 \dt{u}(0,x)&=v_0(x), \: x\in \Torus^d
 \end{align}
-Im Folgenden werden wir auf den, hier zur Betonung verwendeten, Index $x$ des Laplace Operators $\Laplace_x=\Laplace$ verzichten.\\
+Im Folgenden werden wir auf den, hier zur Betonung verwendeten, Index $x$ des Laplace Operators $\Laplace=\Laplace_x=\frac{\text{d}^2}{\text{d}x^2_1}+\dots+\frac{\text{d}^2}{\text{d}x^2_d}$ verzichten.\\
 Bevor wir Abhängigkeiten von einer Zufallsvariablen hinzufügen, ist es hilfreich, die Gleichung für deterministische Parameter besser zu verstehen. Diese Mühe ist nicht vergebens, da einige numerische Verfahren zur Bestimmung der Lösung der zufallsabhängigen Gleichung stark auf einem robusten und schnellen Löser der deterministischen Gleichung basieren. Dazu seien als Stichworte Monte-Carlo-Verfahren und Collocations-Verfahren genannt, die wir im späteren Verlauf genauer betrachten werden.
 \subsection{(Physikalische) Definitionen}
 Die KGG ist eine relativistische Feldgleichung, welche die Kinematik von spin-freien Teilchen, wie dem Pion, beschreibt. Auch das 2012 entdeckte Higgs-Boson ist ein spin-freies Teilchen, es ist jedoch noch unklar, ob es wirklich das von dem Standardmodell der Teilchenphysik vorgesagte ist und sich vom Standardmodell beschreiben lässt \autocite{cern2016}.\\
@@ -287,7 +287,7 @@ Die lineare Abbildung $\mathcal{F}_N\colon\Complex^N\to\Complex^N$ definiert dur
 \[\mathcal{F}_Nz=\fourier{z},\qquad\text{mit}\quad \fourier{z}_k=\sum_{j=0}^{N-1}e^{-2\pi i\frac{jk}{N}-ik\pi}z_j\]
 heißt diskrete Fourier-Transformation.
 \end{mathdef}
-Es existiert eine schnelle Berechnung der Abbildung in $\mathcal{O}(N\log N)$ Schritten --anstelle der direkten Implementierung in $\mathcal{O}(N^2)$ Schritten-- bekannt unter dem Namen \emph{Fast Fourier Transform}(fft). Da diese auf der Annahme $N=2^p$ für ein $p\in\N$ basiert, werden wir in Zukunft nur noch solche Approximationen verwenden. Dies ist essentiell, um eine schnelle Berechnung der Lösung der KGG zu gewährleisten. Es gilt $\mathcal{F}_N\overline{\mathcal{F}}_N=NI$ und somit hat die inverse Fourier-Transformation beinahe die selbe Gestalt wie die Fourier-Transformation selbst und kann ebenso schnell berechnet werden.\\
+Anstelle die direkte Implementierung von $\mathcal{F}_N$ zu verwenden, welche $\mathcal{O}(N^2)$ Rechenschritte benötigt, werden wir auf die deutlich schnellere Berechnung der Abbildung in $\mathcal{O}(N\log N)$ Schritten zurückgreifen, bekannt unter dem Namen \emph{Fast Fourier Transform}(fft). Da diese auf der Annahme $N=2^p$ für ein $p\in\N$ basiert, werden wir in Zukunft nur noch solche Approximationen verwenden. Dies ist essentiell, um eine schnelle Berechnung der Lösung der KGG zu gewährleisten. Ohne Beweis gilt $\mathcal{F}_N\overline{\mathcal{F}}_N=NI$ und somit hat die inverse Fourier-Transformation beinahe die selbe Gestalt wie die Fourier-Transformation selbst und kann ebenso schnell berechnet werden.\\
 Im Folgenden nehmen wir an, die Fourier-Approximation (\ref{eqn:fourier_approx}) von $u$ sei exakt und berechnen für den $j$-ten Punkt $x_j$ der Diskretisierung
 \begin{equation}
 \label{eqn:laplace_approxu}
@@ -307,7 +307,7 @@ Es gilt für $t>0$, $v_N(t)\coloneqq \dt u_N(t)$ und ein Gewicht $w\in [0,1]$ di
 \begin{align}
 \label{eqn:kgg_discrete_first_order_part1}
 \dt{\begin{pmatrix}u_N\\v_N\end{pmatrix}}(t)&=
-\begin{pmatrix}0 & wI_N\\ \alpha\mathcal{F}_N^{-1}\left(\big(-k^2\big)_{k\in\mathcal{I}_N}\odot\mathcal{F}_N \cdot\right) & 0\end{pmatrix}
+\begin{pmatrix}0 & wI_N\\ \alpha\mathcal{F}_N^{-1}\left(\big(-k^2\big)_{k\in\mathcal{I}_N}\odot\mathcal{F}_N (\cdot )\right) & 0\end{pmatrix}
 \begin{pmatrix}u_N\\v_N\end{pmatrix}(t)\\
 \label{eqn:kgg_discrete_first_order_part2}
 &\quad+\begin{pmatrix}0 & (1-w)I_N\\ -\diag({\beta_N}) & 0\end{pmatrix}
@@ -317,7 +317,7 @@ Es gilt für $t>0$, $v_N(t)\coloneqq \dt u_N(t)$ und ein Gewicht $w\in [0,1]$ di
 Zuerst betrachten wir den ersten Teil der im Ort diskretisierten KGG (\ref{eqn:kgg_discrete_first_order_part1}) und schreiben diesen für $\fourier{u}_N=\mathcal{F}_Nu_N$ und $\fourier{v}_N=\mathcal{F}_Nv_N$ als
 \begin{align*}
 \dt{\begin{pmatrix}u_N\\v_N\end{pmatrix}}(t)&=
-\begin{pmatrix}0 & wI_N\\ \alpha\mathcal{F}_N^{-1}\left(\big(-k^2\big)_{k\in\mathcal{I}_N}\odot\mathcal{F}_N \cdot\right) & 0\end{pmatrix}
+\begin{pmatrix}0 & wI_N\\ \alpha\mathcal{F}_N^{-1}\left(\big(-k^2\big)_{k\in\mathcal{I}_N}\odot\mathcal{F}_N (\cdot )\right) & 0\end{pmatrix}
 \begin{pmatrix}u_N\\v_N\end{pmatrix}(t)\\
 \equivalent 
 \dt{\begin{pmatrix}\fourier{u}_N\\\fourier{v}_N\end{pmatrix}}(t)&=
@@ -371,29 +371,29 @@ Wir haben nun also zwei separate Einschrittverfahren, die zusammen mit dem Stran
     \caption{Strang-Splitting für KGG}
     \label{alg:kgg_solver}
     \begin{algorithmic}[1] % The number tells where the line numbering should start
-        \Function{Strang\_Step\_KGG}{$N,u_0,v_0,\alpha,\beta,w,t$} 
+        \Function{Strang\_Step\_KGG}{$N,u_0,v_0,\alpha,\beta,w,\tau$} 
             \State $x_N\gets (-\pi+\frac{2\pi j}{N})_{j=0,\dots,N-1}^T$
             \State $g,h\gets u_0(x_N), v_0(x_N)$
-            \State $g,h\gets \text{First\_Part\_Solver}(N, g, h, \alpha, w, \frac{t}{2})$
-            \State $g,h\gets \text{Second\_Part\_Solver}(x_N, g, h, \beta, 1-w, t)$
-            \State $u_1,v_1\gets \text{First\_Part\_Solver}(N, g, h, \alpha, w, \frac{t}{2})$
-            \State \textbf{return} $u_1, v_1$\Comment{Approximation an $u(t,x_N)$ und $\dt{u}(t,x_N)$}
+            \State $g,h\gets \text{First\_Part\_Solver}(N, g, h, \alpha, w, \frac{\tau}{2})$
+            \State $g,h\gets \text{Second\_Part\_Solver}(x_N, g, h, \beta, 1-w, \tau)$
+            \State $u_1,v_1\gets \text{First\_Part\_Solver}(N, g, h, \alpha, w, \frac{\tau}{2})$
+            \State \textbf{return} $u_1, v_1$\Comment{Approximation an $u(\tau,x_N)$ und $\dt{u}(\tau,x_N)$}
         \EndFunction
         
-        \Function{First\_Part\_Solver}{$N,g,h,\alpha,w,t$} 
+        \Function{First\_Part\_Solver}{$N,g,h,\alpha,w,\tau$} 
         	\State Indexmenge $\mathcal{I}_N$ für Fourierkoeffizienten initialisieren
         	\State $\fourier{g}\gets \mathcal{F}_Ng$
         	\State $\fourier{h}\gets \mathcal{F}_Nh$
-        	\State $c\gets \big(\cos(t\sqrt{\alpha w}|k|)\big)_{k\in\mathcal{I}_N}$
-        	\State $s_1\gets \big(\sinc(t\sqrt{\alpha w}|k|)tw\big)_{k\in\mathcal{I}_N}$
-        	\State $s_2\gets \big(-\sinc(t\sqrt{\alpha w}|k|)\alpha|k|^2t\big)_{k\in\mathcal{I}_N}$
+        	\State $c\gets \big(\cos(\tau\sqrt{\alpha w}|k|)\big)_{k\in\mathcal{I}_N}$
+        	\State $s_1\gets \big(\sinc(\tau\sqrt{\alpha w}|k|)\tau w\big)_{k\in\mathcal{I}_N}$
+        	\State $s_2\gets \big(-\sinc(\tau\sqrt{\alpha w}|k|)\alpha|k|^2\tau\big)_{k\in\mathcal{I}_N}$
             \State \textbf{return} $\mathcal{F}_N^{-1}\left(\fourier{g}\odot c+\fourier{h}\odot s_1\right),\quad \mathcal{F}_N^{-1}\left(\fourier{g}\odot s_2+\fourier{h}\odot c\right)$
         \EndFunction
-        \Function{Second\_Part\_Solver}{$x_N,g,h,\beta,\tilde{w},t$} 
+        \Function{Second\_Part\_Solver}{$x_N,g,h,\beta,\tilde{w},\tau$} 
         	\State $\beta_N\gets\beta(x_N)$
-        	\State $c\gets \cos(t\sqrt{\beta_N}\sqrt{\tilde{w}})$
-        	\State $s_1\gets \sinc(t\sqrt{\beta_N}\sqrt{\tilde{w}})\tilde{w}t$
-        	\State $s_2\gets -\sinc(t\sqrt{\beta_N}\sqrt{\tilde{w}})\beta_Nt$
+        	\State $c\gets \cos(\tau\sqrt{\beta_N}\sqrt{\tilde{w}})$
+        	\State $s_1\gets \sinc(\tau\sqrt{\beta_N}\sqrt{\tilde{w}})\tilde{w}\tau$
+        	\State $s_2\gets -\sinc(\tau\sqrt{\beta_N}\sqrt{\tilde{w}})\beta_N\tau$
         	\State \textbf{return} $g\odot c+h\odot s_1,\quad g\odot s_2+h\odot c$
         \EndFunction
     \end{algorithmic}
@@ -413,14 +413,20 @@ u(t,x)&=\frac{\cos(dt)}{\sin(x)+c}\\
 u_0(x)&=\frac{1}{\sin(x)+c}\\
 v_0(x)&\equiv 0\\
 \end{align*}
-eine Lösung der KGG (\ref{kgg}) mit $\alpha=c-2$ und $\beta(x)=d^2+(c-2)\left(\frac{\sin(x)}{\sin(x)+c}+\frac{2\cos^2(x)}{(\sin(x)+c)^2}\right)$. Wir lösen nun die KGG mithilfe verschiedener Splitting Varianten und beobachten in Abbildung \ref{fig:splitting_convergence} eine Konvergenz von Ordnung 2 für das Strang-Splitting und Konvergenz von Ordnung 1 für das Lie-Trotter-Splitting. Die schnelle Variante des Strang-Splittings (FastStrang), bei dem die Halbschritte kombiniert werden, hat dabei exakt den gleichen Fehler wie das normale Strang-Splitting. Die Variante, wo die Reihenfolge der beiden Aufteilungen der Gleichung vertauscht wurde (ReversedStrang) unterscheidet sich nur minimal von der normalen Variante.\\
-Am deutlichsten sticht aber etwas anderes hervor: Wird die Zeitschrittweite $\tau$ zu groß, d.h. ist $1.227\tau>\frac{2\pi}{N}=h$, so ist das Verfahren instabil.
+eine Lösung der KGG (\ref{kgg}) mit $\alpha=c-2$ und $\beta(x)=d^2+(c-2)\left(\frac{\sin(x)}{\sin(x)+c}+\frac{2\cos^2(x)}{(\sin(x)+c)^2}\right)$. Wir lösen nun die KGG mithilfe verschiedener Splitting Varianten und beobachten in Abbildung \ref{fig:splitting_convergence}
+\begin{itemize}
+\item für das Strang-Splitting die erwartete Konvergenz von Ordnung 2.
+\item für das Lie-Trotter-Splitting die erwartete Konvergenz von Ordnung 1.
+\item für die schnelle Variante des Strang-Splittings (FastStrang), bei der die äußeren Halbschritte kombiniert werden, exakt den gleichen Fehler wie beim normale Strang-Splitting.
+\item für die umgekehrte Variante des Strang-Splittings (ReversedStrang), wo die Reihenfolge der beiden Aufteilungen der Gleichung vertauscht wurde, eine minimale Abweichung von der normalen Variante.
+\item ein deutliches Problem: Wird die Zeitschrittweite $\tau$ zu groß, d.h. ist $1.227\tau>\frac{2\pi}{N}=h$, so ist das Verfahren instabil!
+\end{itemize}
 \begin{figure}[!htb]
 \includegraphics[width=\textwidth]{Figures/splitting_convergence_fix_weight_frog2_cfl.png}
 \caption{Konvergenzordnung für verschiedene Splitting Varianten anhand von Beispiel \ref{bsp:trialfrog2} mit $c=3$, $d=1$, $N=512$, $w=0.5$ zum Zeitpunkt $T=1$.}
 \label{fig:splitting_convergence}
 \end{figure}
-Dabei spielt der Gewichtsfaktor $w$ eine große Rolle. Wäre $w=0$, so entspricht der Löser des ersten Teil des Splittings der Vorschrift
+Für die beobachtete Instabilität spielt der Gewichtsfaktor $w$ eine große Rolle. Wäre $w=0$, so entspricht der Löser des ersten Teil des Splittings der Vorschrift
 \begin{align*}
 u(t,x_N)&=\mathcal{F}_N^{-1}\left(\mathcal{F}_Ng(x_N)\right)=g(x_N)=u(0,x_N)\\
 \dt{u}(t,x_N)&=\mathcal{F}_N^{-1}\left(\mathcal{F}_Ng(x_N)\odot \big(-\alpha |k|^2t\big)_{k\in\mathcal{I}_N}\right)+h(x_N)\\
@@ -494,7 +500,7 @@ Nun definieren wir $b_n=r_{n-1}$, $c_n=-r_{n-2}$ und berechnen schlussendlich
 \[r_{n-2}\gamma_{n-2}=\langle -a_nxQ_{n-1}(x),Q_{n-2}(x)\rangle =-a_n\langle Q_{n-1}(x),xQ_{n-2}(x)\rangle=-a_n\frac{k_{n-2}}{k_{n-1}}\gamma_{n-1}\]
 \end{proof}
 Diese und noch viele weitere Eigenschaften von den verschiedenen Orthogonalsystemen von Polynomen finden sich in \autocite{weborthopoly} und in vielen weiteren Werken über Polynome. Beispielsweise lässt sich auch die Umkehrung zeigen (unter milden Anforderungen an die Koeffizienten): Zu jeder durch eine Drei-Term-Rekursion definierte Menge an Polynomen existiert ein Maß $\alpha$, bezüglich dessen die Polynome ein Orthogonalsystem bilden (Satz von Favard).\\[0.3cm]
-Die auftretenden Integrale in den Skalarprodukten werden wir später mit Gauss-Quadraturformeln approximieren. An dieser und an anderen Stellen werden wir später die Nullstellen der Polynome als Stützstellen benötigen. Basierend auf den Koeffizienten der Drei-Term-Rekursion entwickelten Golub und Welsch in \autocite{GolubWelsch} einen effizienten stabilen Algorithmus, der für die Berechnung der Nullstellen mit der Berechnung der Eigenwerte einer symmetrischen Tridiagonalmatrix auskommt.
+Die auftretenden Integrale in den Skalarprodukten werden wir später mit Gauss-Quadraturformeln approximieren. Unter anderem dafür werden wir später die Nullstellen der Polynome als Stützstellen benötigen. Basierend auf den Koeffizienten der Drei-Term-Rekursion entwickelten Golub und Welsch in \autocite{GolubWelsch} einen effizienten stabilen Algorithmus, der für die Berechnung der Nullstellen mit der Berechnung der Eigenwerte einer symmetrischen Tridiagonalmatrix auskommt.
 
 \begin{maththeorem}[Golub Welsch Algorithmus]
 \label{golubwelschalg}
@@ -569,7 +575,7 @@ so gilt für den Projektionsoperator $P_N\colon L_w^2(I)\to \Poly_N$ definiert d
 die Bestapproximationsaussage
 \[\norm{f-P_Nf}_{L_w^2(I)}=\inf\limits_{\psi\in\Poly_N}\norm{f-\psi}_{L_w^2(I)}\]
 \end{maththeorem}
-Dies entspricht der Fourier-Entwicklung im Hilbertraum. Entsprechend nennt man die Koeffizienten $\hat{f}_k$ die (verallgemeinerten) Fourier Koeffizienten. Die Projektion ist eine Orthogonalprojektion in dem Sinne, dass der Fehler $f-P_Nf$ senkrecht zum Polynomraum $\Poly_N$ ist.\\
+Dies entspricht der Fourier-Entwicklung im Hilbertraum. Entsprechend nennt man die Koeffizienten $\hat{f}_k$ die (verallgemeinerten) Fourier-Koeffizienten. Die Projektion ist eine Orthogonalprojektion in dem Sinne, dass der Fehler $f-P_Nf$ senkrecht zum Polynomraum $\Poly_N$ ist.\\
 Man beachte, dass der Name "`Bestapproximation"' sich strikt auf die verwendete Norm bezieht. Punktweise Aussagen lassen sich somit im Allgemeinen nicht treffen. 
 \begin{mathbsp}
 Als Beispiel vergleichen wir die Bestapproximation bezüglich der Maximumsnorm und die Chebyshev Interpolation vom Grad $N=100$ von der Funktion $f(x)=|x-\frac{1}{4}|$ in $[-1,1]$. Wie wir an Abbildung \ref{polyapproxcomp} erkennen, ist der maximale Fehler der Bestapproximation zwar geringer, aber tritt an $N+2$ Punkten auf, wohingegen der Fehler der Chebyshev Fehler zu den Rändern hin stark abnimmt. Dies soll verdeutlichen, dass die Bestapproximation nicht immer in jedem Sinne die "`beste"' Approximation darstellt.
@@ -580,12 +586,12 @@ Als Beispiel vergleichen wir die Bestapproximation bezüglich der Maximumsnorm u
  \label{polyapproxcomp}
 \end{figure}
 \end{mathbsp}
-Wie schon bei der Bestapproximation bzgl. der Maximumsnorm erhält man auch für die verallgemeinerte eine Konvergenzaussage. Für unbeschränktes $I$ sind die Beweise sehr aufwändig und beispielsweise in \autocite{CouHil53} zu finden. 
+Wie schon bei der Bestapproximation bzgl. der Maximumsnorm erhält man auch für die verallgemeinerte Bestapproximation eine Konvergenzaussage. Für unbeschränktes $I$ sind die Beweise sehr aufwändig und beispielsweise in \autocite{CouHil53} zu finden. 
 \begin{maththeorem}
 Für jedes $f\in L_w^2(I)$ gilt
 \[\lim\limits_{N\to\infty}\norm{f-P_Nf}_{L_w^2(I)}=0\]
 \end{maththeorem}
-Die Konvergenzordnung ist hierbei abhängig von der Regularität von $f$ und der Art der für die Projektion verwendeten Orthogonalpolynome. Man nennt diese Art der Konvergenz in der Literatur auch \emph{Spektrale Konvergenz}, da die Konvergenzrate abhängig von der Glattheit der Funktion ist. Man muss also aufpassen eine hohe Approximationsordnung nicht mit einer hohen Approximationsgenauigkeit zu verwechseln.\\
+Die Konvergenzordnung ist hierbei abhängig von der Regularität von $f$ und der Art der für die Projektion verwendeten Orthogonalpolynome. Man nennt diese Art der Konvergenz in der Literatur auch \emph{spektrale Konvergenz}, da die Konvergenzrate abhängig von der Glattheit der Funktion ist. Man muss also aufpassen eine hohe Approximationsordnung nicht mit einer hohen Approximationsgenauigkeit zu verwechseln.\\
 Für das Beispiel der Legendre Polynome, also mit konstanter Gewichtsfunktion $w$, zeigt Xiu in \autocite[Theorem 3.6]{dongbinxiu2010} folgendes Ergebnis
 \begin{maththeorem}
 \label{spectralconvth}
