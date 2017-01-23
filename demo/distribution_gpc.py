@@ -6,7 +6,6 @@ from polynomial_chaos.distributions import make_exponential, inverse_gaussian
 
 
 # Setup configurable parameters
-approx_expo = False  # if True approximates exponential distribution, else uniform distribution (in [-1,1])
 approx_orders_P = [1, 3, 5, 7, 9]  # orders to approximate and plot
 
 
@@ -21,12 +20,12 @@ gaussian = gaussian_hermite_chaos.distribution
 hermite_basis = gaussian_hermite_chaos.poly_basis.polys
 hermite_normalization = gaussian_hermite_chaos.normalization_gamma
 
+to_approximate = chaos.make_jacobiChaos(0.2, 3.).distribution
 
 def factors_by_order(order):
     return order + 1  # In one dimensional setting (N=1) it holds M=P+1
 
 dimension_M = factors_by_order(max(approx_orders_P))
-to_approximate = expo if approx_expo else uniform
 
 # Calculate gpc factors
 gpc_factors = [scipy.integrate.quad(lambda y: (to_approximate.inverse_distribution(y)
@@ -55,17 +54,17 @@ for approx_order in approx_orders_P:
     samples = np.vectorize(inverse_gaussian)(uniform_samples)
     output = np.vectorize(lambda y: gpc_approx(y, gpc_factors[:factors_by_order(approx_order)]))(samples)
 
-    # to see the stochastic gibbs effect when approximating the uniform distribution more clear, set bins=100
-    hist, bin_edges = np.histogram(output, bins='auto', density=True)
+    # to see the stochastic gibbs effect when approximating the uniform distribution more clear, set bins=100, else just bins=auto
+    hist, bin_edges = np.histogram(output, bins=50, density=True)
     bin_centers = bin_edges[:-1] + (bin_edges[1:] - bin_edges[:-1]) / 2
 
     # Plotting of the demo approximation
-    plt.plot(bin_centers, hist, label="Hermite approximation of order " + str(approx_order))
+    plt.plot(bin_centers, hist, label="Approximation mit N=" + str(approx_order))
 
 
-plt.title("gPC approximation of a distribution by hermite polynomials")
-plt.plot(bin_centers, np.vectorize(to_approximate.weight)(bin_centers),
-         label="Exact " + str(to_approximate) + " distribution")
-plt.legend()
+plt.title("Schwache gPC Approximation der Beta(0.2,3) Verteilung durch Hermite Chaos")
+plt.plot(bin_centers, np.vectorize(to_approximate.weight)(bin_centers), color=(0.7, 0.2, 0.1), linewidth=2,
+         label="Beta(0.2,3) Verteilung auf $[-1,1]$", )
+plt.legend(loc='best')
 # plt.axis([-6, 14, 0, 1])
 plt.show()
