@@ -210,7 +210,12 @@ def level_to_order_closed(level_1d: np.array):
 
 if __name__ == "__main__":
     count = 0
-    dim, bound = 5, 3
+    dim, bound = 3, 2
+
+    print("compositions.")
+    for current in compositions(bound, dim):
+        print(current)
+    print("Multiindexboundedsum")
     for current in multi_index_bounded_sum(dim, bound):
         print(current)
         count += 1

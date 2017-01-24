@@ -30,7 +30,8 @@ so müssen die Polynome $H_i$ lediglich durch die Normalisierungskonstanten $\sq
 Ist $Y$ keine stetige sondern eine diskrete Zufallsvariable, so ändert sich die Notation und aus obigen Integralen würden Reihen, die Kernaussagen blieben aber dieselben. Wir werden jedoch im Folgenden stets stetige Zufallsvariablen verwenden.
 \end{mathbem}
 Eine Übersicht von einigen bekannten Verteilungen und Polynombasen ist in Tabelle \ref{table:chaos} gegeben. Details zu stetigen Verteilungen finden sich im Anhang \ref{AppendixA}.\\
-\begin{center}
+\begin{table}
+\centering
 \begin{tabular}{c|ccc}
  & Verteilung von $Y$ & gPC Basispolynome & Träger \\ 
 \hline 
@@ -43,11 +44,10 @@ Diskret & Poisson & Charlier & $\lbrace 0,1,2,\dots\rbrace$ \\
  & Binomial & Krawtchouk & $\lbrace 0,1,\dots,P\rbrace$ \\ 
  & Negativ Binomial & Meixner & $\lbrace 0,1,2,\dots\rbrace$ \\  
  & Hypergeometrisch & Hahn & $\lbrace 0,1,\dots,P\rbrace$
+\end{tabular}
+\caption{gPC Beziehung zwischen orthogonalen Polynombasen und stochastischen Verteilungen. $P\in\N_0$ ist dabei ein beliebiger Parameter für gewisse diskrete Verteilungen.}
 \label{table:chaos}
-\end{tabular} 
-\todo[inline]{Das hier als caption!}
-gPC Beziehung zwischen orthogonalen Polynombasen und stochastischen Verteilungen. $P\in\N_0$ ist dabei ein beliebiger Parameter für gewisse diskrete Verteilungen.
-\end{center}
+\end{table}
 
 Das Ziel ist es nun, mithilfe einer gPC Orthonormalbasis eine Funktion $f(Y)$ einer Zufallsvariablen $Y$ zu approximieren. Wir wollen nun einen Einblick dazu bekommen, was an dieser Stelle mit "`approximieren"' gemeint ist.
 \begin{mathdef}[Starke gPC Konvergenz]
@@ -72,26 +72,73 @@ und $f_M(Y)$ konvergiert in Verteilung gegen $f(Y)$ für $M\to\infty$.
 \section{Mehrdimensionale Zufallsräume}
 Wie bereits diskutiert, sei der Zufallsraum durch einen Zufallsvektor $Y=(Y_1,\dots,Y_N)^T$ mit stochastisch unabhängigen Komponenten $Y_i$ mit bekannter Verteilung vollständig parametrisiert. Als mehrdimensionale Erweiterung von Definition \ref{def:gpc} führen wir an dieser Stelle das multivariate gPC ein.
 \begin{mathdef}[Multivariate gPC]
-Sei $M\in\N_0$ der fest gewählte maximale Polynomgrad. Sei weiter $Y=(Y_1,\dots,Y_N)^T$ ein Zufallsvektor, dessen unabhängige Komponenten $Y_k$ eine gPC Basis $\lbrace \Phi_i^{(k)}\in\Poly_M(Y_k)|\quad i=1,\dots,M\rbrace$ besitzen. Ist $m=(m_1,\dots,m_N)\in\N_0^N$ ein Multi-Index mit $|m|=m_1+\dots+m_N$, so sind die $N$-variate gPC Basis Funktionen vom Grad $M$ definiert als 
+Sei $M\in\N_0$ der fest gewählte maximale Polynomgrad. Sei weiter $Y=(Y_1,\dots,Y_N)^T$ ein Zufallsvektor, dessen unabhängige Komponenten $Y_k$ eine gPC Basis $\lbrace \Phi_i^{(k)}\in\Poly_M(Y_k)\mid i=1,\dots,M\rbrace$ besitzen. Ist $m=(m_1,\dots,m_N)\in\N_0^N$ ein Multi-Index mit $|m|=m_1+\dots+m_N$, so sind die $N$-variate gPC Basis Funktionen vom Grad $M$ definiert als 
 \[\Phi_m(Y)=\Phi_{m_1}(Y_1)\cdot\ldots\cdot\Phi_{m_N}(Y_N),\quad 0\le |m|\le M\]
 \end{mathdef}
 
 \begin{mathbem}
 Der von den multivariate gPC Funktionen aufgespannte Raum $\Poly_M^N$ ist der Raum aller Polynome vom Grad höchstens $M$ in $N$ Variablen
-\[\Poly_M^N(Y)=\left\lbrace p\colon I_Y\to \R |\quad p(Y)=\sum_{|m|\le M}c_m\Phi_m(Y)\right\rbrace\]
-Die Dimension des Raumes ist $\dim\Poly_M^N=\left(\frac{M+N}{M}\right)$.
-\todo{Nicht frac sondern binomial...}
+\[\Poly_M^N(Y)=\left\lbrace p\colon I_Y\to \R \mid p(Y)=\sum_{|m|\le M}c_m\Phi_m(Y)\right\rbrace\]
+Die Dimension des Raumes ist $\dim\Poly_M^N=\binom{M+N}{M}=\frac{(M+N)!}{M!N!}$.
 \end{mathbem}
 \begin{proof}
-Wir zeigen die zweite Aussage über die Dimension des Raumes. Dies ist ein konstruktiver Beweis, der dann gleichzeitig einen möglichen Algorithmus zur Generierung der Multi-Indices beschreibt.\\
+Wir zeigen die zweite Aussage über die Dimension des Raumes. Die Beweisidee kann unter Verwendung von stochastischen Kombinationen direkt verwendet werden, um einen Algorithmus zur Generierung der Multi-Indices zu bekommen.\\
 Da die Monome $x^m=x_1^{m_1}\dots x_N^{m_N}$ für verschiedene $m=(m_1,\dots,m_N)$ linear unabhängig und erzeugend sind, ist die Aussage äquivalent zur Aussage
-\[\frac{M+N}{M}=\#\lbrace m\in\N_0^N |\quad |m|\le M\rbrace\] 
-Wir berechnen dazu $a_j=\#\lbrace m\in\N_0^N |\quad |m|=j\rbrace$ für $j=0,\dots,M$. Dazu überlegen wir uns, dass $a_j=\#\lbrace \overline{m}\in\N^N |\quad |\overline{m}|=j+N\rbrace$ wegen der Bijektion $m=(m_1,\dots,m_N)=(\overline{m}_1+1,\dots,\overline{m}_N+1)$. Wir wollen nun herausfinden, wieviele Zerlegungen der Zahl $j+N$ möglich sind und schreiben dazu symbolisch
+\[\binom{M+N}{M}=\#\lbrace m\in\N_0^N \mid |m|\le M\rbrace\] 
+Wir berechnen dazu $a_j=\#\lbrace m\in\N_0^N \mid |m|=j\rbrace$ für $j=0,\dots,M$. Dazu überlegen wir uns, dass $a_j=\#\lbrace \overline{m}\in\N^N \mid |\overline{m}|=j+N\rbrace$ wegen der Bijektion $m=(m_1,\dots,m_N)=(\overline{m}_1-1,\dots,\overline{m}_N-1)=\overline{m}-(1,\dots,1)$. Wir wollen nun herausfinden, wieviele Zerlegungen der Zahl $j+N=|\overline{m}|$ möglich sind und schreiben dazu symbolisch
 \[\overline{m}=\underbrace{(1\_1\_1\_\dots 1\_1)}_{j+N\text{ Einsen getrennt von } j+N-1 \text{ Blanks}}\]
 Um eine mögliche Darstellung zu bekommen, ersetzen wir $N-1$ Blanks durch ein Komma und die restlichen durch ein Plus, beispielsweise für $j=4,N=3$
 \[(1+1+1,1,1+1+1+1+1)=(3,1,5)=\overline{m}\]
-Dies sind exakt alle Möglichkeiten $N$ positive Zahlen deren Summe $j+N$ ist zu erhalten und es ist $a_j=\frac{j+N-1}{N-1}$.
-Anschließend berechnen wir noch $\sum_{j=0}^M\frac{j+N-1}{N-1}=...$
+Dies sind exakt alle Möglichkeiten $N$ positive Zahlen deren Summe $j+N$ ist zu erhalten und es ist $a_j=\binom{j+N-1}{N-1}$.
+Schlussendlich gilt für die Summe von verschobenen Binomialkoeffizienten 
+\[\sum_{j=0}^Ma_j=\sum_{j=0}^M\binom{j+N-1}{N-1}\stackrel{\text{ind.}}{=}\binom{N+M}{N}\]
 \end{proof}
-\todo[inline]{Suche schönere Variante für Trennsymbol von Mengen und ersetze für alle Vorkomnnise}
-\todo[inline]{Spreche Sortierung der m an, das wir zukünftig m nicht als Multiindex sondern als Numerrierung auffassen und wie stark die Anzahl wächst (aber immer noch besser als full tensor)}
+In Zukunft wird es sowohl für die theoretische Notation, als auch die praktische Implementierung häufig praktischer sein, die Multi-Indices $m\in\N_0^M$ durchzunummerieren und äquivalent zum eindimensionalen Fall zu benutzen. Dies ist gerechtfertigt, da sich die zugehörigen Polynome ähnlich verhalten und beispielsweise sich aufgrund des gewählten Tensorproduktansatzes und der stochastischen Unabhängigkeit das mehrdimensionale Pendant zur Orthogonalitätsbedingung (\ref{eqn:gpc_ortho}) für $i,j\in\N_0^N$ schreiben lässt als
+\begin{align*}
+&\E\left[\Phi_i(Y)\Phi_j(Y)\right]=\int_{I_Y} \Phi_i(y)\Phi_j(y)\rho(y)dy\\
+&=\int_{I_{Y_1}}\dots\int_{I_{Y_N}}\Phi_{i_1}(y_1)\dots\Phi_{i_N}(y_N)\Phi_{j_1}(y_1)\dots\Phi_{j_N}(y_N)\rho_{Y_1}(y_1)\dots\rho_{Y_N}(y_N)dy_N\dots dy_1\\
+&=\int_{I_{Y_1}}\Phi_{i_1}(y_1)\Phi_{j_1}(y_1)\rho_{Y_1}(y_1)dy_1\dots\int_{I_{Y_N}}\Phi_{i_N}(y_N)\Phi_{j_N}(y_N)\rho_{Y_N}(y_N)dy_N\\
+&=\delta_{i_1j_1}\dots \delta_{i_Nj_N}=\delta_{ij}
+\end{align*}
+In diesem Sinne wird dann für den Fall der mehrdimensionalen Bestapproximation $P_Mf=\sum_{m=0}^M\hat{f}_mH_m(Y)$ die Beschränkung $M$ gleichgesetzt mit der Anzahl an Basispolynomen $\binom{M+N}{N}$.\\
+Wir einigen uns als Sortierung der Indices auf die Termordnung (engl. \emph{graded lexicographic order}), die für $i,j\in\N_0^N$ gegeben ist durch 
+\[i>j \equivalent |i|\ge |j| \text{ und der erste nicht-negative Eintrag von } i-j \text { ist positiv}\]
+Für $N=3$ sind für $|m|=0,\dots,2$ die ersten Multi-Indices gegeben durch
+\begin{align*}
+&(0,0,0)\\
+&(1,0,0)<(0,1,0)<(0,0,1)\\
+&(2,0,0)<(1,1,0)<(1,0,1)<(0,2,0)<(0,1,1)<(0,0,2)\\
+\end{align*}
+\begin{mathbem}
+Die Wahl der beschränkten Summe $|m|\le M$ für $m\in\N_0^N$ ist eine Einschränkung an den Polynomraum, den wir für die Approximation verwenden wollen. Häufig ist für theoretische Überlegungen der volle Tensorproduktraum mit $m_i\le M$ für $i=1,\dots,N$ der Raum der Wahl, da sich dann Ergebnisse aus dem eindimensionalen direkter auf den mehrdimensionalen Fall übertragen lassen. Die Dimension des vollen Tensorproduktraumes beträgt jedoch $(M+1)^N$, was bereits für kleine Dimensionen $N$ eine große Anzahl an Basispolynomen bedeuten würde und folglich einen hohen Rechenzeitaufwand (vgl. Tabelle \ref{table:poly_space_dim}).
+\begin{table}
+\centering
+\begin{tabular}{c|cc}
+$M$ & $\binom{N+M}{N}$ & $(M+1)^N$\\
+\hline
+1  &  5  &  16 \\
+2  &  15  &  81 \\
+3  &  35  &  256 \\
+4  &  70  &  625 \\
+5  &  126  &  1,296 \\
+10  &  1,001  &  14,641 \\
+100  &  4,598,126  &  104,060,401 
+\end{tabular}
+\caption{Vergleich der Dimensionen der verschiedenen Approximationsräume für $N=4$ und unterschiedliche $M$.}
+\label{table:poly_space_dim}
+\end{table}
+\end{mathbem}
+Als weitere Motivation für unsere Wahl des Polynomraums geben wir ein Beispiel an, wo wir das Verhalten der Koeffizienten der Bestapproximation beobachten.
+\begin{mathbsp}
+\label{bsp:bestapproxcoeffs2d}
+Sei $N=2, Y=(Y_1,Y_2)^T$ mit $Y_1\sim \mathcal{U}(-1,1), Y_2\sim\mathcal{N}(0,1)$ und die zu approximierende Funktion $f(y)=f(y_1,y_2)=\sin^4(y_1\cdot y_2)$.\\
+Wir betrachten die Koeffizienten $\hat{f}_m$ der Bestapproximation \[P_Mf(y)=\sum_{m_1=0}^M\sum_{m_2=0}^M\hat{f}_m\Phi_m(y)\] im vollständigen Tensorproduktraum. Dabei wählen wir die zu den Verteilungen passenden Polynome $\Phi_m(y)=L_{m_1}(y_1)H_{m_2}(y_2)$, wobei $L_{m_1}$ die normierten Legendre-Polynome und $H_{m_2}$ die normierten Hermite-Polynome sind. Für die Koeffizienten gilt
+\[\hat{f}_m=\int_{-1}^1\int_{-\infty}^\infty \sin^4(y_1y_2)\cdot \onehalf \cdot \frac{1}{\sqrt{2\pi}}e^{-\frac{y_2^2}{2}}\cdot L_{m_1}(y_1)\cdot H_{m_2}(y_2)dy_2dy_1\]
+In Abbildung \ref{fig:bestapproxcoeffs2d} ist der Betrag der Koeffizienten $|\hat{f}_m|$ in einem Gitter eingezeichnet. Man erkennt sofort, dass $\hat{f}_m=0$ für $m_1$ oder $m_2$ ungerade. Die schwarze Linie symbolisiert die Grenze derjenigen Indices, die $|m|\le 14$ erfüllen. Wir sehen, dass die Koeffizienten im oberen rechten Eck, die zu Polynomen wie $L_{14}H_{14}$ gehören, betragsmäßig sehr klein sind. Die Koeffizienten zu $L_{2}H_{10}$ oder $L_{12}H_{2}$ hingegen sind noch relativ groß. Die volle Tensorapproximation bietet in diesem Fall also nur geringe Vorteile gegenüber der Approximation mit $|m|\le 14$. Der Verzicht auf diejenigen Polynome mit hohem gemischten Grad $|m|$ erspart also viel Aufwand und bietet dennoch eine gute Approximation, da das Abklingverhalten der Koeffizienten häufig durch die eingezeichnete Diagonale dominiert wird.
+\begin{figure}[!htb]
+\includegraphics[width=\textwidth]{Figures/best_approx_coeffs_2d.png}
+\caption{Koeffizienten $|\hat{f}_m|$ der Bestapproximation für $m_1,m_2=0,\dots,15$ der Funktion aus Beispiel \ref{bsp:bestapproxcoeffs2d}. Koeffizienten links unterhalb der schwarzen Linie erfüllen dabei $|m|\le 14$.}
+\label{fig:bestapproxcoeffs2d}
+\end{figure}
+\end{mathbsp}
+\todo[inline]{Erkläre wie man von gPC Approximation an Statistiken kommt, also Erw und var.}
