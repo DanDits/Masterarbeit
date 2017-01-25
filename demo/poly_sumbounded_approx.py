@@ -1,16 +1,18 @@
 # Here we want to show that we do not need to use the full tensor product space of polynomials to approximate
-# a function well enough
+# a function well enough. We do this by plotting the coefficients for an example function to approximate
 
 from polynomial_chaos.poly_chaos_distributions import hermiteChaos, legendreChaos
 import numpy as np
 from scipy.integrate import nquad
-from util.quadrature.helpers import multi_index_bounded_sum
 from itertools import product
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm  # for logarithmic scaling of colors
 
 
 def to_approx(*ys):
-    return np.sin(ys[0] * ys[1]) ** 4  # one zero row and column after a non zero one, good example
+    # return (2 + np.sin((ys[0]+1) * (2*ys[1]+1))) ** (-2)  #
+    return (2 + np.sin(ys[0] * ys[1])) ** (-2)  # (example2) good example, takes slightly longer for x axis
+    # return np.sin(ys[0] * ys[1]) ** 4  # (example1) one zero row and column after a non zero one, good example
     # return np.sin(ys[0] + ys[1]) ** 2  # chess pattern, declining to top right corner, takes longer for x axis
 
 chaoses = [legendreChaos, hermiteChaos]
@@ -19,7 +21,7 @@ basises = [chaos.normalized_basis for chaos in chaoses]
 supports = [distr.support for distr in distrs]
 
 N = len(chaoses)
-M = 15
+M = 20
 
 
 def calculate_factor(polys):
@@ -45,6 +47,8 @@ plt.xlabel("$m_1$")
 plt.ylabel("$m_2$")
 plt.xlim((0, M))
 plt.ylim((0, M))
-plt.pcolor(Z, vmin=Z.min(), vmax=Z.max())
+shown_min = 1e-4
+Z = np.where(Z < shown_min, shown_min, Z)  # remove zero entries to allow log scaling
+plt.pcolor(Z, norm=LogNorm(vmin=Z.min(), vmax=Z.max()), cmap='PuBu_r')
 plt.colorbar()
 plt.show()

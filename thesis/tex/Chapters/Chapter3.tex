@@ -93,15 +93,19 @@ Dies sind exakt alle Möglichkeiten $N$ positive Zahlen deren Summe $j+N$ ist zu
 Schlussendlich gilt für die Summe von verschobenen Binomialkoeffizienten 
 \[\sum_{j=0}^Ma_j=\sum_{j=0}^M\binom{j+N-1}{N-1}\stackrel{\text{ind.}}{=}\binom{N+M}{N}\]
 \end{proof}
-In Zukunft wird es sowohl für die theoretische Notation, als auch die praktische Implementierung häufig praktischer sein, die Multi-Indices $m\in\N_0^M$ durchzunummerieren und äquivalent zum eindimensionalen Fall zu benutzen. Dies ist gerechtfertigt, da sich die zugehörigen Polynome ähnlich verhalten und beispielsweise sich aufgrund des gewählten Tensorproduktansatzes und der stochastischen Unabhängigkeit das mehrdimensionale Pendant zur Orthogonalitätsbedingung (\ref{eqn:gpc_ortho}) für $i,j\in\N_0^N$ schreiben lässt als
-\begin{align*}
+In Zukunft wird es sowohl für die theoretische Notation, als auch die praktische Implementierung häufig praktischer sein, die Multi-Indices $m\in\N_0^M$ durchzunummerieren und äquivalent zum eindimensionalen Fall zu benutzen. Dies ist gerechtfertigt, da sich die zugehörigen multivariaten Polynome ähnlich verhalten. Zum Beispiel gilt aufgrund des gewählten Tensorproduktansatzes und der stochastischen Unabhängigkeit der Komponenten von $Y$ das mehrdimensionale Pendant zur Orthogonalitätsbedingung (\ref{eqn:gpc_ortho}) für $i,j\in\N_0^N$
+\begin{equation}
+\label{eqn:gpc_ortho_mv}
+\begin{split}
 &\E\left[\Phi_i(Y)\Phi_j(Y)\right]=\int_{I_Y} \Phi_i(y)\Phi_j(y)\rho(y)dy\\
-&=\int_{I_{Y_1}}\dots\int_{I_{Y_N}}\Phi_{i_1}(y_1)\dots\Phi_{i_N}(y_N)\Phi_{j_1}(y_1)\dots\Phi_{j_N}(y_N)\rho_{Y_1}(y_1)\dots\rho_{Y_N}(y_N)dy_N\dots dy_1\\
+&=\int_{I_{Y_1}}\dots\int_{I_{Y_N}}\Phi_{i_1}(y_1)\dots\Phi_{i_N}(y_N)\Phi_{j_1}(y_1)\dots\Phi_{j_N}(y_N)\\
+&\qquad\quad\cdot\rho_{Y_1}(y_1)\dots\rho_{Y_N}(y_N)dy_N\dots dy_1\\
 &=\int_{I_{Y_1}}\Phi_{i_1}(y_1)\Phi_{j_1}(y_1)\rho_{Y_1}(y_1)dy_1\dots\int_{I_{Y_N}}\Phi_{i_N}(y_N)\Phi_{j_N}(y_N)\rho_{Y_N}(y_N)dy_N\\
 &=\delta_{i_1j_1}\dots \delta_{i_Nj_N}=\delta_{ij}
-\end{align*}
-In diesem Sinne wird dann für den Fall der mehrdimensionalen Bestapproximation $P_Mf=\sum_{m=0}^M\hat{f}_mH_m(Y)$ die Beschränkung $M$ gleichgesetzt mit der Anzahl an Basispolynomen $\binom{M+N}{N}$.\\
-Wir einigen uns als Sortierung der Indices auf die Termordnung (engl. \emph{graded lexicographic order}), die für $i,j\in\N_0^N$ gegeben ist durch 
+\end{split}
+\end{equation}
+In diesem Sinne wird dann für den Fall der mehrdimensionalen Bestapproximation $P_Mf=\sum_{m=0}^M\hat{f}_mH_m(Y)$ die Beschränkung der Summe $M$ gleichgesetzt mit der Anzahl an Basispolynomen $\binom{M+N}{N}$.\\
+Für eine eindeutige Nummerierung der Indices benötigen wir eine Sortierung. Wir einigen uns als Sortierung der Indices auf die Termordnung (engl. \emph{graded lexicographic order}), die für $i,j\in\N_0^N$ gegeben ist durch 
 \[i>j \equivalent |i|\ge |j| \text{ und der erste nicht-negative Eintrag von } i-j \text { ist positiv}\]
 Für $N=3$ sind für $|m|=0,\dots,2$ die ersten Multi-Indices gegeben durch
 \begin{align*}
@@ -131,14 +135,69 @@ $M$ & $\binom{N+M}{N}$ & $(M+1)^N$\\
 Als weitere Motivation für unsere Wahl des Polynomraums geben wir ein Beispiel an, wo wir das Verhalten der Koeffizienten der Bestapproximation beobachten.
 \begin{mathbsp}
 \label{bsp:bestapproxcoeffs2d}
-Sei $N=2, Y=(Y_1,Y_2)^T$ mit $Y_1\sim \mathcal{U}(-1,1), Y_2\sim\mathcal{N}(0,1)$ und die zu approximierende Funktion $f(y)=f(y_1,y_2)=\sin^4(y_1\cdot y_2)$.\\
+Sei $N=2, Y=(Y_1,Y_2)^T$ mit $Y_1\sim \mathcal{U}(-1,1), Y_2\sim\mathcal{N}(0,1)$ und die zu approximierende Funktion $f(y)=f(y_1,y_2)=(2+\sin(y_1\cdot y_2))^{-2}$.\\
 Wir betrachten die Koeffizienten $\hat{f}_m$ der Bestapproximation \[P_Mf(y)=\sum_{m_1=0}^M\sum_{m_2=0}^M\hat{f}_m\Phi_m(y)\] im vollständigen Tensorproduktraum. Dabei wählen wir die zu den Verteilungen passenden Polynome $\Phi_m(y)=L_{m_1}(y_1)H_{m_2}(y_2)$, wobei $L_{m_1}$ die normierten Legendre-Polynome und $H_{m_2}$ die normierten Hermite-Polynome sind. Für die Koeffizienten gilt
-\[\hat{f}_m=\int_{-1}^1\int_{-\infty}^\infty \sin^4(y_1y_2)\cdot \onehalf \cdot \frac{1}{\sqrt{2\pi}}e^{-\frac{y_2^2}{2}}\cdot L_{m_1}(y_1)\cdot H_{m_2}(y_2)dy_2dy_1\]
-In Abbildung \ref{fig:bestapproxcoeffs2d} ist der Betrag der Koeffizienten $|\hat{f}_m|$ in einem Gitter eingezeichnet. Man erkennt sofort, dass $\hat{f}_m=0$ für $m_1$ oder $m_2$ ungerade. Die schwarze Linie symbolisiert die Grenze derjenigen Indices, die $|m|\le 14$ erfüllen. Wir sehen, dass die Koeffizienten im oberen rechten Eck, die zu Polynomen wie $L_{14}H_{14}$ gehören, betragsmäßig sehr klein sind. Die Koeffizienten zu $L_{2}H_{10}$ oder $L_{12}H_{2}$ hingegen sind noch relativ groß. Die volle Tensorapproximation bietet in diesem Fall also nur geringe Vorteile gegenüber der Approximation mit $|m|\le 14$. Der Verzicht auf diejenigen Polynome mit hohem gemischten Grad $|m|$ erspart also viel Aufwand und bietet dennoch eine gute Approximation, da das Abklingverhalten der Koeffizienten häufig durch die eingezeichnete Diagonale dominiert wird.
+\[\hat{f}_m=\int_{-1}^1\int_{-\infty}^\infty f(y_1,y_2)\cdot \onehalf \cdot \frac{1}{\sqrt{2\pi}}e^{-\frac{y_2^2}{2}}\cdot L_{m_1}(y_1)\cdot H_{m_2}(y_2)dy_2dy_1\]
+In Abbildung \ref{fig:bestapproxcoeffs2d} ist der Betrag der Koeffizienten $|\hat{f}_m|$ in einem Gitter eingezeichnet. Die schwarze Linie symbolisiert die Grenze derjenigen Indices, die $|m|\le 22$ erfüllen. Wir sehen, dass die Koeffizienten im oberen rechten Eck, die zu Polynomen wie $L_{17}H_{17}$ gehören, betragsmäßig sehr klein in der Größenordnung $10^{-6}$ sind. Die volle Tensorapproximation bietet in diesem Fall also nur geringe Vorteile gegenüber der Approximation mit $|m|\le 22$. Der Verzicht auf diejenigen Polynome mit hohem gemischten Grad $|m|$ erspart also viel Aufwand und bietet dennoch eine gute Approximation, da das Abklingverhalten der Koeffizienten häufig durch die eingezeichnete Diagonale dominiert wird.
 \begin{figure}[!htb]
-\includegraphics[width=\textwidth]{Figures/best_approx_coeffs_2d.png}
-\caption{Koeffizienten $|\hat{f}_m|$ der Bestapproximation für $m_1,m_2=0,\dots,15$ der Funktion aus Beispiel \ref{bsp:bestapproxcoeffs2d}. Koeffizienten links unterhalb der schwarzen Linie erfüllen dabei $|m|\le 14$.}
+\includegraphics[width=\textwidth]{Figures/best_approx_coeffs_2d_example2log.png}
+\caption{Koeffizienten $|\hat{f}_m|$ der Bestapproximation für $m_1,m_2=0,\dots,15$ der Funktion aus Beispiel \ref{bsp:bestapproxcoeffs2d}. Koeffizienten links unterhalb der schwarzen Linie erfüllen dabei $|m|\le 22$.}
 \label{fig:bestapproxcoeffs2d}
 \end{figure}
 \end{mathbsp}
-\todo[inline]{Erkläre wie man von gPC Approximation an Statistiken kommt, also Erw und var.}
+
+\section{Extraktion von Statistiken}
+Gegeben sei die multivariate gPC Approximation mit Summenschranke $M$ zu einer Funktion $f(Y)$ und einem Zufallsvektor $Y$ der Dimension $N$, also
+\[f(Y)\approx f_N(Y)=\sum_{|m|\le M}\hat{f}_m\Phi_m(Y)\in\Poly_M^N,\quad m\in\N_0^N\]
+Unter Ausnutzung der Orthogonalitätsbedingung (\ref{eqn:gpc_ortho_mv}) der Polynombasen lassen sich gewisse Statistiken der gPC Approximation auf sehr einfache Art und Weise berechnen. Schlussendlich ist dies eine der größten Motivationen für die jeweilige Wahl der zur Verteilung passenden Orthogonalbasis.\\
+Es ist $\gamma_{(0,\dots,0)}=1$, da für jede Wahrscheinlichkeitsverteilung $\gamma_0=\E[\Phi_0^2(Y)]=\int 1\cdot 1dF_Y(y)=1$. Folglich gilt $\Phi_{(0,\dots,0)}(Y)\equiv 1$ und für den Erwartungswert $\mu_f$
+\begin{align*}
+\mu_f=\E[f(Y)]\approx \E[f_N(Y)]&=\int\left(\sum_{|m|\le M}\hat{f}_m\Phi_m(Y)\right)dF_Y(y)\\
+&=\sum_{|m|\le M}\hat{f}_m\int\Phi_m(Y)dF_Y(y)\\
+&=\sum_{|m|\le M}\hat{f}_m\E[\underbrace{\Phi_{(0,\dots,0)}(Y)}_{\equiv 1} \Phi_m(Y)]\\
+&=\sum_{|m|\le M}\hat{f}_m\delta_{(0,\dots,0),m}=\hat{f}_{(0,\dots,0)}
+\end{align*}
+Die Varianz lässt sich dann berechnen als
+\begin{align*}
+\sigma^2_f=\text{var}(f(Y))&=\E[f^2(Y)]-\E[f(Y)]^2\\
+&\approx \sum_{|m|\le M}\sum_{|n|\le M}\hat{f}_m\hat{f}_n\underbrace{\E[\Phi_m(Y)\Phi_n(Y)]}_{=\delta_{mn}}-\hat{f}_{(0,\dots,0)}^2\\
+&=\sum_{0<|m|\le M}\hat{f}_m^2
+\end{align*}
+Die Standardabweichung ist folglich gegeben durch
+\[\sigma_f=\sqrt{\text{var}(f(Y))}\approx\sqrt{\sum_{0<|m|\le M}\hat{f}_m^2}\]
+Für höhere Momente gilt
+\begin{align*}
+\E[f^k(Y)]\approx \sum_{|m^{(1)}|,\dots,|m^{(k)}|\le M} \hat{f}_{m^{(1)}}\dots\hat{f}_{m^{(k)}}\underbrace{\E[\Phi_{m^{(1)}}(Y)\dots\Phi_{m^{(k)}}(Y)]}_{=\mathcal{T}_{m^{(1)},\dots m^{(k)}}}
+\end{align*}
+Die Berechnung benötigt also für $k>2$ eine einmalige Berechnung des Tensors $\mathcal{T}$. Dieser ist unabhängig von der betrachten Funktion $f$ und kann somit wieder verwendet werden.
+\begin{mathbsp}
+Für $N=1$ und $k=3$ ist der Momententensor $\mathcal{T}$ für $Y\sim \mathcal{N}(0,1)$ und zugehöriger orthonormaler Polynombasis $H_m$ der Hermite-Polynome für $M=2$ gegeben durch
+\[\mathcal{T}=
+\begin{tikzpicture}[every node/.style={anchor=north east,fill=white,minimum width=0.7cm,minimum height=7mm}]
+\matrix (mA) [draw,matrix of math nodes]
+{
+0 & 0 & 1 \\
+0 & \sqrt{2} & 0 \\
+1 & 0 & 2\sqrt{2} \\
+};
+
+\matrix (mB) [draw,matrix of math nodes] at ($(mA.south west)+(0.2,1.5)$)
+{
+0 & 1 & 0 \\
+1 & 0 & \sqrt{2} \\
+0 & \sqrt{2} & 0 \\
+};
+
+\matrix (mC) [draw,matrix of math nodes] at ($(mB.south west)+(0.2,1.5)$)
+{
+ 1 & 0 & 0 \\
+ 0 & 1 & 0 \\
+ 0 & 0 & 1 \\
+};
+
+\draw[dashed](mA.north east)--(mC.north east);
+\draw[dashed](mA.north west)--(mC.north west);
+\draw[dashed](mA.south east)--(mC.south east);
+\end{tikzpicture}
+\]
+\end{mathbsp}
