@@ -44,7 +44,7 @@ def gpc_approx(y, factors):
     return sum(factor * hermite_basis(m)(y) for factor, m in zip(factors, range(len(factors))))
 
 bin_centers = None
-for approx_order in approx_orders_P:
+for marker, approx_order in zip(["D", ".", "-.", "-", "-", "-", "-"], approx_orders_P):
     # Calculate discrete distribution (=histogram) of the gpc approximation by sampling
     samples_count = 2000  # how many samples of the normal distribution to draw
     # samples = rnd.normal(0., 1., samples_count)  # directly generate normally distributed samples,
@@ -59,7 +59,7 @@ for approx_order in approx_orders_P:
     bin_centers = bin_edges[:-1] + (bin_edges[1:] - bin_edges[:-1]) / 2
 
     # Plotting of the demo approximation
-    plt.plot(bin_centers, hist, label="Approximation mit N=" + str(approx_order))
+    plt.plot(bin_centers, hist, marker, label="Approximation mit M=" + str(approx_order))
 
 
 plt.title("Schwache gPC Approximation der Beta(0.2,3) Verteilung durch Hermite Chaos")

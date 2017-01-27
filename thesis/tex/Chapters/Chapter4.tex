@@ -1,4 +1,62 @@
 % Chapter 4
 
 \chapter{Stochastische Collocation}
+Wie bereits die Monte-Carlo-Methode basieren auch stochastische Collocationsverfahren auf \emph{sampling}, d.h. der wiederholten Auswertung von vielen Zufallsexperimenten. Bei der Monte-Carlo-Methode werden die Punkte dabei abhängig von der gegebenen Verteilung unabhängig und zufällig gewählt. Die Konvergenz ist in einem stochastischen Sinne durch das Gesetz der großen Zahlen gegeben.\\
+Dies ist ein großer Unterschied zu den hier vorgestellten stochastischen Collocationsverfahren. Für diese werden die Collocationspunkte nicht zufällig, sondern so gewählt, dass mithilfe von ihnen eine Polynominterpolation oder Quadratur möglich ist. Konvergenz ist dann abhängig davon, wie gut sich die approximierte stochastische Größe durch Polynome von Zufallsvariablen approximieren lässt.\\
+Die beiden Ansätze \emph{Interpolation} und \emph{diskrete Projektion} (auch \emph{pseudospektraler Ansatz} genannt) werden für die stochastische KGG im Folgenden detailliert vorgestellt und miteinander verglichen.
+\section*{Collocation für die stochastische KGG}
+Die stochastische KGG (\ref{skgg}) für $d$ räumliche Dimensionen, $N$ stochastische Dimensionen und $y\in\R^N$ war definiert durch
+\begin{align*}
+\dtt{u}(t,x,y)&=\alpha(y) \Laplace_x u(t,x,y) - \beta(x,\omega)u(t,x,y), \: t>0, \, x\in \Torus^d\\
+u(0,x,y)&=u_0(x,y), \: x\in \Torus^d\\
+\dt{u}(0,x,y)&=v_0(x,y), \: x\in \Torus^d
+\end{align*}
+Im klassischen Sinne bedeutet Collocation, dass eine Approximation für eine diskrete Knotenmenge $\Theta_S=\lbrace y_i\in\R^N\mid i=1,\dots,S\rbrace$ exakt ist. Auf die stochastische KGG übertragen, muss also für $y=y_i\in\Theta_S$ die Lösung $u(t,x,y_i)$ für $x\in\Torus^d$ und $t>0$ vorliegen und die Approximation $w$ erfüllt $w(t,x,y_i)=u(t,x,y_i)$ für $i=1,\dots,S$. Da wir die exakte Lösung $u(t,x,y_i)$ nicht kennen, sondern für einen Zeitpunkt $T>0$ und eine Knotenmenge $\lbrace x_j\in\Torus^d\mid j=1,\dots,H\rbrace$ nur mithilfe des Strang-Splittings approximieren können, gilt also für festes $x_j$ die Collocationsbedingung lediglich approximativ:
+\[w(T,x_j,y_i)=u(T,x_j,y_i)\approx \tilde{u}(T,x_j,y_i),\quad i=1,\dots,S\]
+Wir wählen daher $\tau$ so klein, dass dieser Fehler im Vergleich zum eigentlichen Collocationsfehler vernachlässigbar gering ist. Zur Vereinfachung der Notation nehmen wir im Folgenden an, die Lösung $u(T,x_j,y_i)$ liege exakt vor.
+
+\section{Interpolation}
+Sei $Y$ ein $N$-dimensionaler Zufallsvektor mit stochastisch unabhängigen Komponenten und $\Theta_S\subset I_Y$ eine zu den Verteilungen von $Y_i$ passende $S$ elementige Knotenmenge. Seien weiter $\lbrace \Phi_m \mid |m|\le P \rbrace$ die zu den Verteilungen passenden gPC Basisfunktionen und im Folgenden mit $m=0,\dots M=\binom{N+P}{P}-1$ durchnummeriert. Eine Diskussion zur Nummerierung findet man im vorherigen Kapitel.\\
+Dann wählen wir als Interpolationspolynom die Funktion
+\begin{equation}
+\label{eqn:coll_interpol_basic}
+w_M^{(j)}(Y)=\sum_{m=0}^M\hat{w}_m^{(j)}\Phi_m(Y)\in\Poly_P^N(Y),\quad j=1,\dots,H
+\end{equation}
+und fordern als Interpolationsbedingung
+\[w_M^{(j)}(y_i)=u(T,x_j,y_i),\quad i=1,\dots,S, j=1,\dots,H\]
+Die Notation macht klar, dass wir zu einem gegebenen Zeitpunkt $T>0$ und jedem festen Knotenpunkt $x_j$ die stochastische Funktion $u(T,x_j,Y)$ durch ein Polynom in $Y$ approximieren wollen.\\
+Betrachten wir die Gleichung (\ref{eqn:coll_interpol_basic}) in den Knotenpunkten $y_i$ für jedes $i=1,\dots,S$, so können wir das entstehende System kompakt schreiben als
+\[A\hat{w}=u\]
+mit 
+\begin{align*}
+A&=(\Phi_m(y_i))_{i=1,\dots,S;m=0,\dots,M}\in\R^{S\times M+1}\\
+\hat{w}&=(\hat{w}_m^{(j)})^T_{m=0,\dots,M;j=1,\dots,H}\in\R^{M+1\times H}\\
+u&=(u(T,x_j,y_i)^T_{i=1,\dots,S;j=1,\dots,H}\in\R^{S\times H}\\
+\end{align*}
+Für jeden Knotenpunkt $x_j$ ist also ein lineares Gleichungssystem der Größe $S\times M+1$ zu lösen. Die obige Schreibweise erlaubt es in vielen Programmiersprachen die Systeme gleichzeitig zu lösen und bietet somit einen starken Laufzeitvorteil gegenüber dem Lösen von $H$ separaten Gleichungen. Um sicherzustellen, dass das System nicht unterbestimmt ist, muss gelten $S\ge M+1=\binom{N+P}{P}$. Ist $S\neq M+1$, so verwenden wir die Pseudoinverse von $A$. Später werden wir an verschiedenen Beispielen Konsequenzen dieser Bedingung genauer betrachten.
+\begin{mathbem}
+In Gleichung (\ref{eqn:gpc_approx_exp}) wurde gezeigt, dass sich der Erwartungswert approximieren lässt durch
+\[\E[u(t,x_j,Y)]\approx \hat{w}_0\]
+Da die Gleichungen gekoppelt sind, müssen aber trotzdem auch alle anderen $\hat{w}_m$ berechnet werden. Dies wird beim anschließend vorgestellten Collocationsansatz nicht der Fall sein.
+\end{mathbem}
+\subsection{Wahl der Interpolationspunkte}
+Wir wollen direkt am Anfang darauf hinweisen, dass die Wahl der Knotenpunkte für die Interpolation insbesondere im mehrdimensionalen für $N>1$ ein nicht vollständig verstandenes Problem darstellt. Das Konzept der Lagrange-Interpolation, die im eindimensionalen für jede beliebige Knotenmenge möglich ist, lässt sich wie in \autocite{San07} gezeigt konzeptuell auf den mehrdimensionalen Fall erweitern. Allerdings benötigt sie die entsprechende Bedingung $\det(A)\neq 0$, welche besagt, dass die Interpolation durch die gegebenen Knotenpunkte eindeutig ist. Die Beziehung dieser Bedingung zur Wahl der Knotenpunkte stellt ein "'komplexes Problem"' dar.
+\subsubsection*{Grundlagen der eindimensionalen Interpolation}
+Der Satz von Cauchy der erste Orientierungspunkt für die Abhängigkeit der Interpolationsgüte zur Wahl der Knotenpunkte für den eindimensionalen Fall und einem kompakten Intervall.
+\begin{maththeorem}[Cauchy]
+Sei $f\in C^{n+1}[-1,1]$ eine $n+1$ mal stetig differenzierbare Funktion. Dann ist für jede Knotenmenge $\lbrace y_1,\dots,y_{n+1}\rbrace$ und $y\in[-1,1]$ der Interpolationsfehler gegeben durch
+\[f(y)-\mathcal{Q}_{n+1}f=\frac{f^{(n+1)}(\xi)}{(n+1)!}\prod_{i=1}^{n+1}(y-y_i),\quad \xi\in [-1,1]\]
+\end{maththeorem}
+
+Da die Funktion gegeben ist, hat man keinen Einfluss auf die Ableitung $f^{(n+1)}$. Wegen
+\[\norm{f(y)-\mathcal{Q}_{n+1}f}\le \frac{\norm{f^{(n+1)}}_\infty}{(n+1)!}\underbrace{\norm{\prod_{i=1}^{n+1}(y-y_i)}}_{=w(y)}\]
+ist also das Ziel, abhängig von der Norm, den Term $\norm{w(y)}$ zu minimieren.
+\begin{mathbem}[Tschebyschow-Interpolation]
+Die Nullstellen $y_i=\cos\left(\frac{2i+1}{2n+2}\right)$, für $i=0,\dots,n$, der Tschebyschow-Polynome $T_{n+1}(y)=\cos((n+1)\arccos(y))$ minimieren den Ausdruck $\norm{w(y)}_\infty$ auf $[-1,1]$ und bieten auf $[-1,1]$ optimale Interpolationsgüte. Es gilt 
+\[\norm{f(y)-\mathcal{Q}_{n+1}f}\le \frac{\norm{f^{(n+1)}}_\infty}{2^n(n+1)!}\]
+\end{mathbem}
+\todo[inline]{maybe show that instead of thebyschow also roots of other orthogonal polynomials are possible and usuable and show equivalence to discrete projection (which is not yet explained but except for aliasing error it is the same as the bestapprox)}
+\todo[inline]{Smolyak Konstruktion in Kapitel drei erklären? (für Punkte Gitter wie bei Interpol benötigt aber auch für allgemeine Operatoren?)}
+\todo[inline]{1d interpolation verstanden (gauß interpol, andere auch möglich und gut); mehrdim aber problematisch: wie punkte wählen (tensor, andere ansätze wie smolyak sparse grid)} 
+
 \todo[inline]{Interpolation;Quadratur (Xiu Kap7) mit Gauß, Glenshaw-Curtis; smolyak sparse grids (fully nested failed, weakly nested and non nested; discrete projection;Äquivalenz von Interpol + diskr proj (zumindest mal in 1d, mehr bei entspr nodes/weights?)}

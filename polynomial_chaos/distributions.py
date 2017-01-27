@@ -92,7 +92,7 @@ def make_gamma(shape, rate):
                                    if x > 0. else 0.),
                         (0, inf),
                         partial(random.gammavariate, shape, 1. / rate),
-                        inverse_distribution=partial(stats_gamma.ppf, a=shape, rate=1./rate),
+                        inverse_distribution=partial(stats_gamma.ppf, a=shape, rate=1./rate),  # TODO parameters incorrect
                         show_name="Gamma({}, {})".format(shape, rate),
                         parameters=(shape, rate))
 

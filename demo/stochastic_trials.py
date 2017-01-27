@@ -153,3 +153,15 @@ trial_discont_simple = StochasticTrial([distributions.make_uniform(-1, 1)],
                     "alpha", lambda ys: 2. if ys[0] > 0. else 1.,
                     "expectancy_data", "../data/qmc_exp, 100000, TrialDiscontSimple, 0.5, 128.npy",
                     "variance_data", "../data/qmc_var, 100000, TrialDiscontSimple, 0.5, 128.npy")
+
+
+def reg_alpha(ys):
+    # result must be smaller than 1/4 and bigger than 0
+    return 0.1 + 0.05 * np.sin(sum(ys))
+trial_reg0 = StochasticTrial([distributions.make_beta(3, 0.5), distributions.make_uniform(-2, 2)],
+                             lambda xs, ys: (np.sin(sum(xs) + sum(ys)) ** 2 - 0.5) * np.sin(sum(ys)),
+                             lambda xs, ys: (np.sin(sum(xs) + sum(ys)) ** 2 - 0.5) * np.cos(sum(ys)),
+                             lambda xs, t, ys: (np.sin(sum(xs) + sum(ys)) ** 2 - 0.5) * np.sin(t + sum(ys)),
+                             name="TrialReg0") \
+    .add_parameters("beta", lambda xs, ys: 1 - 4 * reg_alpha(ys),
+                    "alpha", reg_alpha)
