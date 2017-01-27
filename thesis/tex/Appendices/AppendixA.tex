@@ -41,13 +41,14 @@ Zu $r,s\in\N_0$ ist die hypergeometrische Funktion $_rF_s$ definiert durch
 \[_rF_s(a_1,\dots,a_r;b_1,\dots,b_s;z)\coloneqq \sum_{k=0}^\infty \frac{(a_1)_k\dots (a_r)_kz^k}{(b_1)_k\dots(b_s)_kk!}\]
 \end{mathdef}
 Für weitere Polynome aus dem Askey Schema (siehe Abbildung \ref{askeyscheme}), insbesondere diese mit diskreten Verteilungen, sei wieder beispielsweise auf \autocite{dongbinxiu2010} verwiesen. \\
-Für eine Methode zum Berechnen der Nullstellen aus der Drei Term Rekursion steht der Golub Welsch Algorithmus (vgl. \ref{golubwelschalg}) zur Verfügung.
+Für eine Methode zum Berechnen der Nullstellen aus der Drei Term Rekursion steht der Golub Welsch Algorithmus (vgl. \ref{golubwelschalg}) zur Verfügung.\\
+Für die Drei-Term-Rekursion der nicht normalisierten orthogonalen Polynome $\Psi_n$ gilt stets $\Psi_{-1}\equiv 0$ und $\Psi_{0}\equiv 1$.
 \subsection{Hermite Polynome und Gauß Verteilung}
 Träger:
 \[I=\R\]
 Definition:
 \[H_n(x)=(2x)^n\cdot {_2F_0}\left(-\frac{n}{2},-\frac{n-1}{2};\, ;-\frac{2}{x^2}\right)\]
-Drei Term Rekursion:
+Drei-Term-Rekursion:
 \[H_{n}(x)=xH_{n-1}(x)-(n-1)H_{n-2}(x)\]
 Gewichtsfunktion:
 \[w(x)=\frac{1}{\sqrt{2\pi}}e^{-\frac{x^2}{2}}\]
@@ -63,7 +64,7 @@ Träger:
 \[I=(0,\infty)\]
 Definition:
 \[L_n^{(\alpha)}(x)=\frac{(\alpha)_n}{n!}\cdot {_1F_0}\left(-n;\alpha;x\right),\quad \alpha>0\]
-Drei Term Rekursion:
+Drei-Term-Rekursion:
 \[L_{n}^{(\alpha)}(x)=\frac{2n-2+\alpha -x}{n}L_{n-1}^{(\alpha)}(x)-\frac{n-1+\alpha - 1}{n}L_{n-2}^{(\alpha)}(x)\]
 Gewichtsfunktion:
 \[w(x)=\frac{x^{\alpha-1}e^{-x}}{\Gamma(\alpha)}\]
@@ -80,7 +81,7 @@ Träger:
 \[I=(-1,1)\]
 Definition:
 \[P_n^{(\alpha, \beta)}(x)=\frac{(\alpha + 1)_n}{n!}\cdot {_2F_1}\left(-n,n+\alpha+\beta+1;\alpha+1;\frac{1-x}{2}\right),\quad \alpha,\beta>-1\]
-Drei Term Rekursion:
+Drei-Term-Rekursion:
 \begin{center}
 Zum Abkürzen sei für $n\in\N\quad f_n \coloneqq \frac{(2n + \alpha + \beta - 1)(2n + \alpha + \beta)}{2n(n + \alpha + \beta)}$
 \begin{align*}
@@ -111,7 +112,7 @@ Träger:
 \[I=[-1,1]\]
 Definition:
 \[L_n(x)={_2F_1}\left(-n,n+1;1;\frac{1-x}{2}\right)\]
-Drei Term Rekursion:
+Drei-Term-Rekursion:
 \[L_{n}(x)=x\frac{2n-1}{n}L_{n-1}(x)-\frac{n-1}{n}L_{n-2}(x)\]
 Gewichtsfunktion:
 \[w(x)\equiv \onehalf\]

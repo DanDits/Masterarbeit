@@ -128,7 +128,7 @@ u(t,x,y)&=2\cos(ty)\sin(\hat{x})\\
 u_0(x,y)&=2\sin(\hat{x})\\
 v_0(x,y)&\equiv 0
 \end{align*}
-löst die stochastische KGG (\ref{skgg}) für $\alpha(y)=\frac{y}{d}$ und $\beta(x,y)=y^2-y$\\
+löst die stochastische KGG (\ref{skgg}) für $\alpha(y)=\frac{y}{d}$ und $\beta(x,y)=y^2-y$ (vergleiche \nameref{trial:1} im Anhang).\\
 Für den Erwartungswert und Varianz von $u$ gelten
 \begin{align*}
 \E[u(t,x,Y)]&=\int_2^3u(t,x,y)dy=\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\\
@@ -140,18 +140,7 @@ Dies erkennt man beispielsweise am Zeitpunkt $t=\frac{\pi}{2}$, wo gilt
 \[\E[u(t,x,Y)]=-\sin(\hat{x})\pi \neq -\sin(\hat{x})\sqrt{2}=u(t,x,\E[Y])\]
 Der Erwartungswert ist linear, die Abhängigkeiten von $y$ sind es aber nicht. Diese erste fehlgeschlagene Idee den Erwartungswert durch das Lösen eines deterministischen Systems zu erhalten, ist jedoch nicht vollends vergebens. Wir werden am Beispiel der Monte-Carlo-Methode sehen, dass wir dazu allerdings weit mehr als ein deterministisches System lösen müssen.
 \end{mathbsp}
-Wir geben ein weiteres Referenzbeispiel an, wo nun auch die Ortsabhängigkeit von $\beta$ benutzt wird und auch ein Anfangswert abhängig von der Zufallsvariablen ist.
-\begin{mathbsp}
-Sei $Y=(Y_1)$ eine eindimensionale und in $(10,50)$ gleichverteilte Zufallsvariable. Dann gilt für $t>0$, $d=1$, $x\in\Torus$ und $y=Y(\omega)$
-\begin{align*}
-u(t,x,y)&=\frac{\cos(t)}{\sin(x) + y}\\
-u_0(x,y)&=\frac{1}{\sin(x) + y}\\
-v_0(x,y)&\equiv 0
-\end{align*}
-löst die stochastische KGG (\ref{skgg}) für \[\alpha(y)=y-2\text{  und  }\beta(x,y)=1 + (y-2)\left(\frac{\sin(x)}{\sin(x) + y}+ \frac{2\cos^2(x)}{(\sin(x) + y)^2}\right)\]
-Für den Erwartungswert von $u$ gilt
-\[\E[u(t,x,Y)]=\frac{\cos(t)}{40}(\log(\sin(x) + 50)- \log(\sin(x) + 10))\]
-\end{mathbsp}
+
 \section{Die Monte-Carlo-Methode} % offizieller Name; auch: Monte-Carlo-Simulation
 Die Monte-Carlo-Methode (auch: Monte-Carlo-Simulation) ist ein in vielen Disziplinen bekanntes Verfahren, welches auf wiederholtem Durchführen von "`Zufallsexperimenten"' in sehr großer Zahl basiert. So können analytisch nicht --oder nur sehr aufwändig-- lösbare Probleme auf Basis des Gesetz der großen Zahlen approximiert werden.\\
 Die Grundstruktur des Algorithmus, angewandt auf die stochastische KGG zur Berechnung des Erwartungswertes und der Varianz, ist beschrieben durch Algorithmus \ref{algmc}.

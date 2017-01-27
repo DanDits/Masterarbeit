@@ -26,7 +26,10 @@ und fordern als Interpolationsbedingung
 \[w_M^{(j)}(y_i)=u(T,x_j,y_i),\quad i=1,\dots,S, j=1,\dots,H\]
 Die Notation macht klar, dass wir zu einem gegebenen Zeitpunkt $T>0$ und jedem festen Knotenpunkt $x_j$ die stochastische Funktion $u(T,x_j,Y)$ durch ein Polynom in $Y$ approximieren wollen.\\
 Betrachten wir die Gleichung (\ref{eqn:coll_interpol_basic}) in den Knotenpunkten $y_i$ für jedes $i=1,\dots,S$, so können wir das entstehende System kompakt schreiben als
-\[A\hat{w}=u\]
+\begin{equation}
+\label{eqn:interpol_compact}
+A\hat{w}=u
+\end{equation}
 mit 
 \begin{align*}
 A&=(\Phi_m(y_i))_{i=1,\dots,S;m=0,\dots,M}\in\R^{S\times M+1}\\
@@ -44,18 +47,63 @@ Wir wollen direkt am Anfang darauf hinweisen, dass die Wahl der Knotenpunkte fü
 \subsubsection*{Grundlagen der eindimensionalen Interpolation}
 Der Satz von Cauchy der erste Orientierungspunkt für die Abhängigkeit der Interpolationsgüte zur Wahl der Knotenpunkte für den eindimensionalen Fall und einem kompakten Intervall.
 \begin{maththeorem}[Cauchy]
-Sei $f\in C^{n+1}[-1,1]$ eine $n+1$ mal stetig differenzierbare Funktion. Dann ist für jede Knotenmenge $\lbrace y_1,\dots,y_{n+1}\rbrace$ und $y\in[-1,1]$ der Interpolationsfehler gegeben durch
-\[f(y)-\mathcal{Q}_{n+1}f=\frac{f^{(n+1)}(\xi)}{(n+1)!}\prod_{i=1}^{n+1}(y-y_i),\quad \xi\in [-1,1]\]
+Sei $f\in C^{S}[-1,1]$ eine $S$ mal stetig differenzierbare Funktion. Dann ist für jede Knotenmenge $\lbrace y_1,\dots,y_{S}\rbrace$ und $y\in[-1,1]$ der Interpolationsfehler gegeben durch
+\[f(y)-\mathcal{Q}_{S}f=\frac{f^{(S)}(\xi)}{S!}\prod_{i=1}^{S}(y-y_i),\quad \xi\in [-1,1]\]
 \end{maththeorem}
 
-Da die Funktion gegeben ist, hat man keinen Einfluss auf die Ableitung $f^{(n+1)}$. Wegen
-\[\norm{f(y)-\mathcal{Q}_{n+1}f}\le \frac{\norm{f^{(n+1)}}_\infty}{(n+1)!}\underbrace{\norm{\prod_{i=1}^{n+1}(y-y_i)}}_{=w(y)}\]
+Da die Funktion gegeben ist, hat man keinen Einfluss auf die Ableitung $f^{(S)}$. Wegen
+\[\norm{f(y)-\mathcal{Q}_{S}f}\le \frac{\norm{f^{(S)}}_\infty}{S!}\underbrace{\norm{\prod_{i=1}^{S}(y-y_i)}}_{=\norm{w(y)}}\]
 ist also das Ziel, abhängig von der Norm, den Term $\norm{w(y)}$ zu minimieren.
 \begin{mathbem}[Tschebyschow-Interpolation]
-Die Nullstellen $y_i=\cos\left(\frac{2i+1}{2n+2}\right)$, für $i=0,\dots,n$, der Tschebyschow-Polynome $T_{n+1}(y)=\cos((n+1)\arccos(y))$ minimieren den Ausdruck $\norm{w(y)}_\infty$ auf $[-1,1]$ und bieten auf $[-1,1]$ optimale Interpolationsgüte. Es gilt 
-\[\norm{f(y)-\mathcal{Q}_{n+1}f}\le \frac{\norm{f^{(n+1)}}_\infty}{2^n(n+1)!}\]
+Die Nullstellen $y_i=\cos\left(\frac{2i-1}{2S+2}\right)$, für $i=1,\dots,S+1$, der Tschebyschow-Polynome $T_{S+1}(y)=\cos((S+1)\arccos(y))$ minimieren den Ausdruck $\norm{w(y)}_\infty$ auf $[-1,1]$ und bieten auf $[-1,1]$ optimale Interpolationsgüte. Es gilt 
+\[\norm{f(y)-\mathcal{Q}_{S+1}f}_\infty\le \frac{\norm{f^{(S+1)}}_\infty}{2^S(S+1)!}\]
 \end{mathbem}
-\todo[inline]{maybe show that instead of thebyschow also roots of other orthogonal polynomials are possible and usuable and show equivalence to discrete projection (which is not yet explained but except for aliasing error it is the same as the bestapprox)}
+Die Tschebyschow-Polynome bilden eine Orthogonalbasis bezüglich $\langle \cdot,\cdot\rangle_{L_w^2[-1,1]}$ mit $w(y)=(1-y^2)^{-\onehalf}$. Eine Idee ist es nun, auch Nullstellen anderer orthogonalen Polynombasen als Knotenpunkte zu verwenden um ähnliche Approximationsergebnisse auf nicht-kompakten Intervallen zu erhalten.
+\begin{maththeorem}
+\label{th:interpol_and_proj}
+Sei $\lbrace \Phi_m\in\Poly_m\mid m=0,\dots,M\rbrace\subset L_w^2(I)$ eine Orthonormalbasis von Polynomen und $(y_i,\alpha_i)_{i=0,\dots,M}$ eine Quadraturformel mit Exaktheitsgrad $2M$ bezüglich $w$ und $y_i\neq y_j,i\neq j$, d.h. \[\int_I p(y)w(y)dy=\sum_{i=0}^M\alpha_ip(y_i),\quad p\in\Poly_{2M}\]
+Sei weiter das Interpolationspolynom  $\mathcal{Q}_Mf$ einer Funktion $f\colon I\to\R$ bezüglich den Interpolationspunkten $\lbrace y_i\mid i=0,\dots,M\rbrace$ beschrieben durch
+\[\mathcal{Q}_Mf(y)=\sum_{m=0}^M\hat{w}_m\Phi_m(y)\]
+Die Koeffizienten $\hat{w}_m$ werden in Analogie zu (\ref{eqn:interpol_compact}) berechnet durch das Lösen des linearen Gleichungssystems
+\[A\hat{w}=\hat{f}\]
+Dann ist \[\hat{w}_i=\sum_{j=0}^M\Phi_i(y_j)\alpha_jf(y_j)\approx \int_I \Phi_i(y)f(y)w(y)dy,\quad i=0,\dots,M\]
+\end{maththeorem}
+\begin{proof}
+Es ist $A_{ij}=\Phi_j(y_i)$. Da wir uns im eindimensionalen Fall befinden ($N$=1) ist die Vandermonde-artige Matrix $A$ invertierbar, da die $\Phi_i$ eine Basis bilden und die $y_i$ paarweise verschieden sind. Es gilt für $\widetilde{w}_i\coloneqq \sum_{j=0}^M\Phi_i(y_j)\alpha_jf(y_j)$ und $\widetilde{w}\coloneqq (\widetilde{w}_i)^T$
+\begin{align*}
+\left(A\widetilde{w}\right)_i&=\sum_{j=0}^M\Phi_j(y_i)\widetilde{w}_j\\
+&=\sum_{j=0}^M\Phi_j(y_i)\sum_{k=0}^M\Phi_j(y_k)\alpha_kf(y_k),\quad \text{Interpol.:} f(y_k)=\sum_{\ell=0}^M\hat{w}_\ell\Phi_\ell(y_k)\\
+&=\sum_{\ell=0}^M\hat{w}_\ell \sum_{j=0}^M\Phi_j(y_i)\sum_{k=0}^M\Phi_j(y_k)\alpha_k\Phi_\ell(y_k)\\
+&\stackrel{\text{deg}(\Phi_j\Phi_\ell)\le 2M}{=}\sum_{\ell=0}^M\hat{w}_\ell\sum_{j=0}^M\Phi_j(y_i)\underbrace{\int_I\Phi_j(y)\Phi_\ell(y)w(y)dy}_{=\delta_{j\ell}}\\
+&=\sum_{\ell=0}^M\hat{w}_\ell\Phi_\ell(y_i)=f(y_i)=\hat{f}_i
+\end{align*}
+Also gilt $A\widetilde{w}=\hat{f}=A\hat{w}$ und da $A$ regulär ist somit $\widetilde{w}=\hat{w}$.
+\end{proof}
+\begin{mathbem}
+Wir wollen nun dem technischen Satz \ref{th:interpol_and_proj} Leben einhauchen und seine Relevanz verdeutlichen.
+\begin{itemize}
+\item
+Die vorausgesetzte Existenz einer Quadraturformel aus $M+1$ verschiedenen Quadraturpunkten und Exaktheitsgrad $2M$ ist durch die später vorgestellte Gauss-Quadratur erfüllt. Die Quadraturpunkte sind dabei die Nullstellen des $M+1$-ten Basispolynoms und daher paarweise verschieden. Die Quadraturgewichte lassen sich über die erste Komponente dessen Einheitsvektors bestimmen, der beim Golub-Welsch-Algorithmus auch die entsprechende Nullstelle des Polynoms berechnet.
+\item
+Wir sehen, dass sich bei bekannter Quadraturformel die Interpolationskoeffizienten $\hat{w}_m$ auch explizit berechnen lassen. Diese (im eindimensionalen) äquivalente Darstellung führt auf den später vorgestellten zweiten Ansatz zur stochastischen Collocation.
+\item
+Die Darstellung $\hat{w}_i=\sum_{j=0}^M\Phi_i(y_j)\alpha_jf(y_j)$ kann als Approximation an die Koeffizienten $\int_I \Phi_i(y)f(y)w(y)dy$ der Bestapproximation $P_Mf$ in $L_w^2(I)$ aufgefasst werden. Mithilfe der Dreiecksungleichung lässt sich dann der Fehler der Interpolation beschreiben durch
+\begin{align*}
+&\norm{\mathcal{Q}_Mf-f}_{L_w^2}\le \underbrace{\norm{P_Mf-f}_{L_w^2}}_{\text{Fehler der Bestapproximation}}+\underbrace{\norm{\mathcal{Q}_Mf-P_Mf}_{L_w^2}}_{\text{Aliasing Fehler}}\\
+&=\norm{\mathcal{Q}_Mf-P_Mf}_{L_w^2}+\norm{\sum_{m=0}^M\left(\sum_{j=0}^M\Phi_m(y_j)\alpha_jf(y_j)\right)\Phi_m-\sum_{m=0}^M\left(\int_I\Phi_m(y)f(y)w(y)dy\right)\Phi_m}_{L_w^2}\\
+&\stackrel{\text{Parseval}}{=}\norm{\mathcal{Q}_Mf-P_Mf}_{L_w^2}+\sqrt{\sum_{m=0}^M\left(\sum_{j=0}^M\Phi_m(y_j)\alpha_jf(y_j)-\int_I\Phi_m(y)f(y)w(y)dy\right)^2}
+\end{align*}
+Schlussendlich lässt sich also der Fehler der Interpolation durch den Fehler der Bestapproximation in $L_w^2$ und einen Quadraturfehler bezüglich der Gewichtsfunktion $w$ beschreiben. Für den Fehler der Bestapproximation erwarten wir nach Xiu spektrale Konvergenz. Finden wir eine zur Gewichtsfunktion $w$ passende Quadraturformel, so hat lediglich die Glattheit von $f$ Einfluss auf den Quadraturfehler.
+\end{itemize}
+\end{mathbem}
+
+\section{Diskrete Projektion}
+\subsection{Gauss-Quadratur im eindimensionalen}
+
+\subsection{Mehrdimensionale Quadratur}
+\subsubsection{Tensorkonstruktion}
+\subsubsection{Smoylaks dünne Gitter}
+
 \todo[inline]{Smolyak Konstruktion in Kapitel drei erklären? (für Punkte Gitter wie bei Interpol benötigt aber auch für allgemeine Operatoren?)}
 \todo[inline]{1d interpolation verstanden (gauß interpol, andere auch möglich und gut); mehrdim aber problematisch: wie punkte wählen (tensor, andere ansätze wie smolyak sparse grid)} 
 
