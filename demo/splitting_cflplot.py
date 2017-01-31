@@ -1,3 +1,6 @@
+# In correspondence to the instability observed by splitting_orderplot.py for different weights we here test
+# the dependence on the weight by estimating the CFL number. Should be the same for different N, but because estimation
+# is different (and not always equally accurate as these are heuristics) they do not completely fit on top of each oth
 import demo.splitting as ds
 import diff_equation.klein_gordon as kg
 import numpy as np
@@ -8,19 +11,20 @@ from util.analysis import error_l2_relative
 
 
 dimension = 1
-grid_size_Ns = [256, 512, 1024, 2048]
+grid_size_Ns = [256, 512, 1024, 2048, 2048*2]
 plt.figure()
 plt.title("Abhängigkeit der CFL Zahl $\\tilde{c}$ vom Gewicht $w$", fontsize="xx-large")
 plt.xlabel("Gewicht $w$", fontsize="xx-large")
 plt.ylabel("CFL Zahl $\\tilde{c}$", fontsize="xx-large")
 for grid_size_N in grid_size_Ns:
+    print(grid_size_N)
     domain = list(repeat([-np.pi, np.pi], dimension))
-    trial = ds.trial_4
+    trial = ds.trial_frog2
 
 
     start_time = 0.
-    dt = 0.00025
-    delta_times = np.arange(0.001, 0.1, dt)
+    dt = 0.0001
+    delta_times = np.arange(0.0002, 0.1, dt)
     stop_time = 1.
 
     dw = 0.05
@@ -43,11 +47,11 @@ for grid_size_N in grid_size_Ns:
 
             trial.error_function = error_l2_relative
             error = trial.error(xs_mesh, splitting.times()[-1], splitting.solutions()[-1])
-
+            print("dt=", delta_time, "error=", error)
             if error > prev_error > 0:
                 steigung = np.abs(np.log(error - prev_error) / np.log(delta_time - prev_delta_time))
-                print("dt=", delta_time, "error=", error, "Steigung=", steigung)
-                if error > 1 or steigung > 2.5: # or steigung < 1.5
+                print("Steigung=", steigung)
+                if error > 1 or steigung > 3. or steigung < 1.:
                     print("BREAKING, next would be:", error)
                     cfl_constants.append((2*np.pi / grid_size_N) / prev_delta_time)
                     break

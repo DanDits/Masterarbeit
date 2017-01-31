@@ -200,9 +200,9 @@ headsepline, % Uncomment to get a line under the header
 
 \begin{acknowledgements}
 \addchaptertocentry{\acknowledgementname} % Add the acknowledgements to the table of contents
-Hiermit danke ich allen, die mir während meines Studiums hilfreich zur Seite standen und mich immer unterstützt haben; im Speziellen danke ich meine Eltern und Großeltern für ihre uneingeschränkte Unterstützung und meinem Bruder Fabian.\\ 
-Für die Unterstützung bei meiner Masterarbeit und für zahlreiche hilfreiche Ratschläge danke ich insbesondere meinem Betreuer Herr Jahnke. \todo{weitere Korrekturleser o.ä.?}
-\todo{Latex Vorlage erwähnen irgendwo}
+Hiermit danke ich allen, die mir während meines Studiums hilfreich zur Seite standen und mich immer unterstützt haben. Im Speziellen danke ich meine Eltern, Großeltern und meinem Bruder Fabian für ihre uneingeschränkte Unterstützung.\\ 
+Für die Unterstützung bei meiner Masterarbeit und für hilfreiche Ratschläge danke ich insbesondere meinem Betreuer Herrn Jahnke. \todo{weitere Korrekturleser o.ä.?}\\
+Für die verwendete \LaTeX Vorlage veröffentlicht auf \emph{www.LaTeXTemplates.com} danke ich Steve Gunn und Sunil Patel.
 \end{acknowledgements}
 
 %----------------------------------------------------------------------------------------
@@ -211,9 +211,9 @@ Für die Unterstützung bei meiner Masterarbeit und für zahlreiche hilfreiche R
 
 \tableofcontents % Prints the main table of contents
 
-\listoffigures % Prints the list of figures
+%\listoffigures % Prints the list of figures
 
-\listoftables % Prints the list of tables
+%\listoftables % Prints the list of tables
 
 %----------------------------------------------------------------------------------------
 %	ABBREVIATIONS
@@ -222,7 +222,10 @@ Für die Unterstützung bei meiner Masterarbeit und für zahlreiche hilfreiche R
 \begin{abbreviations}{ll} % Include a list of abbreviations (a table of two columns)
 
 \textbf{KGG} & \textbf{K}lein-\textbf{G}ordon-\textbf{G}leichung\\
-\textbf{PC} & \textbf{P}olynomial \textbf{C}haos\\
+\textbf{sKGG} & \textbf{s}tochastische \textbf{K}lein-\textbf{G}ordon-\textbf{G}leichung\\
+\textbf{gPC} & \textbf{g}eneral \textbf{P}olynomial \textbf{C}haos\\
+\textbf{MC} & \textbf{M}onte-\textbf{C}arlo\\
+\textbf{QMC} & \textbf{Q}uasi-\textbf{M}onte-\textbf{C}arlo\\
 
 
 \end{abbreviations}
@@ -235,8 +238,11 @@ Für die Unterstützung bei meiner Masterarbeit und für zahlreiche hilfreiche R
 $t$ & Zeit & Einheitslose nicht-negative reelle Variable\\
 $x$ & Ort & Einheitslose (mehrdimensionale) reelle Ortsvariable\\
 \addlinespace % Gap to separate the Roman symbols from the Greek
-$\partial_x$ & Ableitung nach x & $\partial_x u(x,y)=u_x(x,y)=\frac{d}{dx}u(x,y)$ für $u\colon\R^2\to \R$ stetig differenzierbar\\ 
-$\Laplace$ & Laplace& Laplace Operator im Ort $\Laplace u(x_1,x_2)=u_{x_1x_1}(x_1,x_2)+u_{x_2x_2}(x_1,x_2)$ \\
+$\dt{u}$ & Ableitung nach t & Für differenzierbares $u\colon\R\to \R$\\ 
+$\Laplace$ & Laplace& Laplace Operator im Ort $\Laplace u(x_1,x_2)=\frac{\text{d}^2}{\text{d}x^2_1}u(x_1,x_2)+\frac{\text{2}^2}{\text{d}x^2_d}u(x_1,x_2)$ \\
+$\Torus$ & eindimensionaler Torus & $\Torus=\R/(2\pi\Z)$\\
+$\tau$ & Zeitschrittweite & $0<\tau<1$\\
+$d$ & räumliche Dimension & $d\in\N$\\
 
 %Symbol & Name & Description \\
 

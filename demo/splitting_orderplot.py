@@ -9,12 +9,12 @@ from util.analysis import error_l2_relative
 dimension = 1
 grid_size_N = 64 if dimension >= 2 else 1024
 domain = list(repeat([-np.pi, np.pi], dimension))
-trial = ds.trial_1
-wave_weight = 0.93
+trial = ds.trial_4
+wave_weight = 0.9
 
 start_time = 0.
 delta_times = np.arange(0.25, 0.0001, -0.0005)
-stop_time = 1.
+stop_time = 2.
 
 errors_per_delta_time = []
 splittings = []
