@@ -41,9 +41,9 @@ Folgende Definitionen werden die später hauptsächlich untersuchten Eigenschaft
 Ist $Y\colon\R\to\R$ eine reelle Zufallsvariable mit Dichte $\rho_Y$ so ist definieren wir den Erwartungswert von $Y$ als
 \[\mu_Y=\E[Y]=\int_{-\infty}^\infty y\rho_Y(y)dy\]
 und die Varianz von $Y$ als 
-\[\sigma_Y^2=\text{var}(Y)=\int_{-\infty}^\infty (y-\mu_Y)^2\rho_Y(y)dy\]
+\[\sigma_Y^2=\text{var}(Y)=\int_{-\infty}^\infty (y-\mu_Y)^2\rho_Y(y)dy=\E[Y^2]-\E[Y]^2\]
 \end{mathdef}
-Ohne Beweis präsentieren wir die Inversionsmethode. Diese ist nützlich, um aus Zufallsvariablen einer bestimmten Verteilung Zufallsvariablen einer anderen Verteilung zu gewinnen. In der Numerik ist dies ist essentiell für die Generation von Pseudozufallszahlen von beliebigen Verteilungen, aber auch für die "`stochastische Normierung"' von verschiedenen Zufallsvariablen zu einem gemeinsamen Wahrscheinlichkeitsraum, auf dem dann Erwartungswerte berechnet werden können.
+Ohne Beweis präsentieren wir die Inversionsmethode. Diese ist nützlich, um aus Zufallsvariablen einer bestimmten Verteilung Zufallsvariablen einer anderen Verteilung zu gewinnen. In der Numerik ist dies ist essentiell für die Generation von Pseudozufallszahlen von beliebigen Verteilungen. Die Methode ist aber auch wichtig für die "`stochastische Normierung"' von verschiedenen Zufallsvariablen zu einem gemeinsamen Wahrscheinlichkeitsraum, auf dem dann Erwartungswerte berechnet werden können.
 \begin{maththeorem}[Inversionsmethode]
 \label{thinversionsmethode}
 Ist $Y$ eine reelle Zufallsvariable mit Verteilungsfunktion $F_Y$, so definieren wir deren Quantilfunktion als
@@ -57,7 +57,7 @@ Dann gilt
 Der auch Gesetz der großen Zahlen genannte Zentrale Grenzwertsatz sei ebenfalls genannt, da er die Grundlage für das erste Verfahren zur Berechnung von Erwartungswert und Varianz darstellt.
 \begin{maththeorem}[Zentraler Grenzwertsatz]
 \label{thzentralgrenzwert}
-Seien $Y_1,Y_2,\dots,Y_n$ unabhängige und identisch verteilte Zufallsvariablen mit $\E[Y]_i=\mu$ und $\text{var}(Y_i)=\sigma^2<\infty$ Der Mittelwert sei definiert als
+Seien $Y_1,Y_2,\dots,Y_n$ unabhängige und identisch verteilte Zufallsvariablen mit $\E[Y_i]=\mu$ und $\text{var}(Y_i)=\sigma^2<\infty$ Der Mittelwert sei definiert als
 \[\overline{Y}\coloneqq \frac{1}{n}\sum_{i=1}^nY_i\]
 und skaliert durch
 \[Z_n=\sqrt{n}\left(\frac{\overline{Y}-\mu}{\sigma}\right)\]
@@ -74,7 +74,7 @@ Weitere wichtige Begriffe, die aber in dieser Arbeit nicht in den Vordergrund r�
 \item Konvergenz $P$ fast sicher, Konvergenz in Wahrscheinlichkeit, Konvergenz in Verteilung\\
 \item Bedingte Wahrscheinlichkeit, bedingte Erwartung
 \item Unkorreliertheit vs. Unabhängigkeit
-\item Momente höherer Ordnung, Moment-generierende Funktion
+\item Momente höherer Ordnung
 \end{itemize}
 
 \section{Endliche Parametrisierung}
@@ -107,7 +107,7 @@ und sind definiert durch
 \[Z_i(\omega)=\frac{1}{\sqrt{\lambda_i}}\int_T (Y_t(\omega)-\mu_Y(t))\Psi_i(t)dt\]
 Um eine endliche Approximation zu erhalten wird die Reihe bei einem gewissen Index $n\in\N$ abgebrochen.
 \end{mathdef}
-Wiederrum erhält man daraus für normalverteilte Prozesse eine endliche Menge von unabhängigen Zufallsvariablen. Für nicht-normalverteilte Prozesse wird häufig dennoch die Karhunen-Loeve Darstellung verwendet und zusätzlich angenommen, dass die $Z_i$ unabhängig sind. Diese Vorgehensweise ist noch nicht zufrieden stellend und ein offenes Forschungsproblem.
+Wiederrum erhält man daraus für normalverteilte Prozesse eine endliche Menge von unabhängigen Zufallsvariablen. Für nicht-normalverteilte Prozesse wird häufig dennoch die Karhunen-Loeve Darstellung verwendet und zusätzlich angenommen, dass die $Z_i$ unabhängig sind. Diese Vorgehensweise ist nicht sehr zufriedenstellend und ein offenes Forschungsproblem.
 
 \section{Formulierung der stochastischen KGG}
 In Analogie zur Klein-Gordon-Gleichung (\ref{kgg}) definieren wir für einen Wahrscheinlichkeitsraum $(\Omega,\mathcal{F},P)$ und $Y\colon\Omega\to\R^N$ die stochastische Klein-Gordon-Gleichung (sKGG) für $y=Y(\omega)$ durch
@@ -135,7 +135,7 @@ Für den Erwartungswert und Varianz von $u$ gelten
 \text{var}(u(t,x,Y))&=\frac{1}{t}\sin^2(\hat{x})\left(2t + \sin(6t) - \sin(4t)\right)- \left(\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\right)^2
 \end{align*}
 Um einen potentiellen Denkfehler zu vermeiden, weisen wir an dieser Stelle explizit darauf hin, dass 
-\[\E[u(t,x,Y)]=\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\neq 2\sin(\hat{x})\cos(\frac{5}{2}t)=u(t,x,\E[Y])\]
+\[\E[u(t,x,Y)]=\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\quad \neq \quad 2\sin(\hat{x})\cos(\frac{5}{2}t)=u(t,x,\E[Y])\]
 Dies erkennt man beispielsweise am Zeitpunkt $t=\frac{\pi}{2}$, wo gilt
 \[\E[u(t,x,Y)]=-\sin(\hat{x})\pi \neq -\sin(\hat{x})\sqrt{2}=u(t,x,\E[Y])\]
 Der Erwartungswert ist linear, die Abhängigkeiten von $y$ sind es aber nicht. Diese erste fehlgeschlagene Idee den Erwartungswert durch das Lösen eines deterministischen Systems zu erhalten, ist jedoch nicht vollends vergebens. Wir werden am Beispiel der Monte-Carlo-Methode sehen, dass wir dazu allerdings weit mehr als ein deterministisches System lösen müssen.
@@ -143,7 +143,7 @@ Der Erwartungswert ist linear, die Abhängigkeiten von $y$ sind es aber nicht. D
 
 \section{Die Monte-Carlo-Methode} % offizieller Name; auch: Monte-Carlo-Simulation
 Die Monte-Carlo-Methode (auch: Monte-Carlo-Simulation) ist ein in vielen Disziplinen bekanntes Verfahren, welches auf wiederholtem Durchführen von "`Zufallsexperimenten"' in sehr großer Zahl basiert. So können analytisch nicht --oder nur sehr aufwändig-- lösbare Probleme auf Basis des Gesetz der großen Zahlen approximiert werden.\\
-Die Grundstruktur des Algorithmus, angewandt auf die stochastische KGG zur Berechnung des Erwartungswertes und der Varianz, ist beschrieben durch Algorithmus \ref{algmc}.
+Algorithmus \ref{algmc} beschreibt die Grundstruktur des Algorithmus, angewandt auf die stochastische KGG zur Berechnung des Erwartungswertes und der Varianz. .
 \begin{algorithm}[ht]
     \caption{Monte-Carlo}
     \label{algmc}
@@ -212,7 +212,7 @@ Benötigt man wiederum Zufallszahlen mit einer anderen Verteilungsfunktion, so s
 
 \subsection{Approximation von Erwartungswert und Varianz}
 Bevor wir den Kern der Schleife betrachten, wollen wir uns zuerst mit den eng miteinander zusammenhängenden Fragen \ref{mcsaveresults} und \ref{mcestimations} beschäftigen. Diese Fragen über die Verwendung der einzelnen Zwischenergebnisse zur Approximation des Erwartungswertes und der Varianz können wiederum vielseitig beantwortet werden.
-\subsubsection*{Verarbeitung am Ende}
+\subsubsection*{Verarbeitung am Ende des Algorithmus}
 Gegeben sei ein Zeitpunkt $T>0$ und die stochastische KGG (\ref{skgg}) zu einer Zufallsvariablen $Y$ und gesucht seien $\E[u(T,x,Y)]$ und $\text{var}(u(T,x,Y))$. Sind für $i=1,\dots,R$ die deterministischen Lösungen $u_i(T,x,y_i)$ gespeichert, so verwenden wir als Approximationen
 \begin{align*}
 \E[u(T,x,Y)]&\approx \frac{1}{R}\sum_{i=1}^R u_i(T,x,y_i)\eqqcolon m_R\\
@@ -277,7 +277,7 @@ Teilen wir nun $s_k$ noch durch $k-1$, so erhalten wir wieder die korrigierte St
 Man bemerkt schon an der Pseudocode Darstellung der Monte-Carlo-Methode, dass das Bottleneck des Algorithmus in der Berechnung der Lösung der deterministischen KGG liegt. Der Zeitaufwand für alle anderen Operationen ist in Relation dazu vernachlässigbar klein. Ein großer Vorteil des Algorithmus ist seine \emph{embarrassingly parallel} Eigenschaft: Es ist quasi kein Aufwand nötig die Schleife zu parallelisieren und somit skaliert er perfekt mit der Anzahl an zur Verfügung stehenden Prozessoren. Dies ist eine erste Antwort auf Frage \ref{mcalgspeed}, jedoch sollte klar sein, dass das Lösen des deterministischen Systems dennoch so effizient wie möglich passieren muss. Ein Löser, der nur 0.1 Sekunden für ein einziges System benötigt und $R=100000$ Durchgänge erledigt, läuft ohne Parallelisierung bereits etwa 3 Stunden.\\
 \subsubsection*{Konvergenz}
 Anhand von Abbildung \ref{fig:mc_convergence_trial1} erkennen wir für Beispiel \ref{bsp:trial1} die (probabilistische) Konvergenz des Erwartungswertes und der Varianz mit ungefährer Ordnung $0.5$ für die Monte-Carlo-Methode. Vergleichen wir dazu die Quasi-Monte-Carlo-Methode anhand desselben Beispiels in Abbildung \ref{fig:quasi_mc_convergence_trial1}, so erkennen wir eine bessere Konvergenzordnung und ein weniger chaotisches Verhalten des Fehlers.\\
-Diese schlechte Konvergenzordnung macht das Verfahren sehr unattraktiv. Wir benötigen selbst für das simple Beispiel \ref{bsp:trial1} und die Quasi-Monte-Carlo-Methode bereits $R=100000$ Durchläufe für einen Fehler des Erwartungswertes in die Größenordnung $10^{-5}$.
+Dennoch macht diese schlechte Konvergenzordnung das Verfahren sehr unattraktiv. Wir benötigen selbst für das simple Beispiel \ref{bsp:trial1} und die Quasi-Monte-Carlo-Methode bereits $R=100000$ Durchläufe für einen Fehler des Erwartungswertes in die Größenordnung $10^{-5}$.
 \begin{figure}
 \includegraphics[width=\textwidth]{Figures/mc_convergence_trial1.png}
 \caption{Konvergenz des Erwartungswertes und der Varianz von Beispiel \ref{bsp:trial1} mithilfe der Monte-Carlo-Methode zum Zeitpunkt $T=0.5$. Ordnungsplot mit Referenzlinie $0.08\frac{1}{\sqrt{R}}$ der erwarteten Ordnung.}
@@ -286,7 +286,7 @@ Diese schlechte Konvergenzordnung macht das Verfahren sehr unattraktiv. Wir ben�
 \begin{figure}
 \includegraphics[width=\textwidth]{Figures/quasi_mc_convergence_trial1.png}
 \caption{Konvergenz des Erwartungswertes und der Varianz von Beispiel \ref{bsp:trial1} mithilfe der Quasi-Monte-Carlo-Methode zum Zeitpunkt $T=0.5$. Ordnungsplot mit Referenzlinie $0.08\frac{1}{\sqrt{R}}$.}
-Einen Vorteil allerdings bietet das Verfahren: Unabhängig von der Größe des Zufallsvektors $Y$ erhalten wir jeweils dieselbe Konvergenzordnung und benötigen bis auf die Generierung der Komponenten keinen zeitlichen Mehraufwand für die Ausführung des Algorithmus im Vergleich zu eindimensionalen Zufallsvektoren. Diese Eigenschaft wird von keinem anderen Verfahren, das wir noch vorstellen werden geteilt. Im Gegenteil nämlich wird der Rechenaufwand exponentiell in der Größe des Zufallsvektors steigen. 
+Einen Vorteil allerdings bietet das Verfahren: Unabhängig von der Größe des Zufallsvektors $Y$ erhalten wir jeweils dieselbe Konvergenzordnung und benötigen bis auf die Generierung der Komponenten keinen zeitlichen Mehraufwand für die Ausführung des Algorithmus im Vergleich zu eindimensionalen Zufallsvektoren. Diese Eigenschaft wird von keinem anderen Verfahren, das wir noch vorstellen werden geteilt. Deren Rechenaufwand wird exponentiell in der Größe des Zufallsvektors steigen. 
 \label{fig:quasi_mc_convergence_trial1}
 \end{figure}
 

@@ -51,7 +51,7 @@ linhyp_config.solve(show_times)
 if show_errors:
     errors = [trial.error(linhyp_config.xs_mesh, t, y) for t, y in linhyp_config.timed_solutions()]
     plt.figure()
-    plt.plot(linhyp_config.times(), errors, label="Errors in discrete L2 norm")
+    plt.plot(linhyp_config.times(), errors, label="Errors in discrete L2-norm")
     plt.xlabel("Time")
     plt.ylabel("Error")
     plt.show()

@@ -38,14 +38,14 @@ u&=(u(T,x_j,y_i)^T_{i=1,\dots,S;j=1,\dots,H}\in\R^{S\times H}\\
 \end{align*}
 Für jeden Knotenpunkt $x_j$ ist also ein lineares Gleichungssystem der Größe $S\times M+1$ zu lösen. Die obige Schreibweise erlaubt es in vielen Programmiersprachen die Systeme gleichzeitig zu lösen und bietet somit einen starken Laufzeitvorteil gegenüber dem Lösen von $H$ separaten Gleichungen. Um sicherzustellen, dass das System nicht unterbestimmt ist, muss gelten $S\ge M+1=\binom{N+P}{P}$. Ist $S\neq M+1$, so verwenden wir die Pseudoinverse von $A$. Später werden wir an verschiedenen Beispielen Konsequenzen dieser Bedingung genauer betrachten.
 \begin{mathbem}
-In Gleichung (\ref{eqn:gpc_approx_exp}) wurde gezeigt, dass sich der Erwartungswert approximieren lässt durch
-\[\E[u(t,x_j,Y)]\approx \hat{w}_0\]
-Da die Gleichungen gekoppelt sind, müssen aber trotzdem auch alle anderen $\hat{w}_m$ berechnet werden. Dies wird beim anschließend vorgestellten Collocationsansatz nicht der Fall sein.
+In Gleichung (\ref{eqn:gpc_approx_exp}) wurde gezeigt, dass sich der Erwartungswert an der Stelle $x_j$ approximieren lässt durch
+\[\E[u(t,x_j,Y)]\approx \hat{w}_0^{(j)}\]
+Da die Gleichungen gekoppelt sind, müssen aber trotzdem auch alle anderen $\hat{w}_m$ berechnet werden.
 \end{mathbem}
 \subsection{Wahl der Interpolationspunkte}
-Wir wollen direkt am Anfang darauf hinweisen, dass die Wahl der Knotenpunkte für die Interpolation insbesondere im mehrdimensionalen für $N>1$ ein nicht vollständig verstandenes Problem darstellt. Das Konzept der Lagrange-Interpolation, die im eindimensionalen für jede beliebige Knotenmenge möglich ist, lässt sich wie in \autocite{San07} gezeigt konzeptuell auf den mehrdimensionalen Fall erweitern. Allerdings benötigt sie die entsprechende Bedingung $\det(A)\neq 0$, welche besagt, dass die Interpolation durch die gegebenen Knotenpunkte eindeutig ist. Die Beziehung dieser Bedingung zur Wahl der Knotenpunkte stellt ein "'komplexes Problem"' dar.
+Wir wollen direkt am Anfang darauf hinweisen, dass im mehrdimensionalen für $N>1$ die Wahl der Knotenpunkte für die Interpolation ein nicht vollständig verstandenes Problem darstellt. Das Konzept der Lagrange-Interpolation, die im eindimensionalen für jede beliebige Knotenmenge möglich ist, lässt sich wie in \autocite{San07} gezeigt konzeptuell auf den mehrdimensionalen Fall erweitern. Allerdings benötigt sie die entsprechende Bedingung $\det(A)\neq 0$, welche besagt, dass die Interpolation durch die gegebenen Knotenpunkte eindeutig ist. Die Beziehung dieser Bedingung zur Wahl der Knotenpunkte stellt ein "'komplexes Problem"' dar.
 \subsubsection*{Grundlagen der eindimensionalen Interpolation}
-Der Satz von Cauchy der erste Orientierungspunkt für die Abhängigkeit der Interpolationsgüte zur Wahl der Knotenpunkte für den eindimensionalen Fall und einem kompakten Intervall.
+Der Satz von Cauchy ist der erste Orientierungspunkt für die Abhängigkeit der Interpolationsgüte zur Wahl der Knotenpunkte für den eindimensionalen Fall und einem kompakten Intervall.
 \begin{maththeorem}[Cauchy]
 Sei $f\in C^{S}[-1,1]$ eine $S$ mal stetig differenzierbare Funktion. Dann ist für jede Knotenmenge $\lbrace y_1,\dots,y_{S}\rbrace$ und $y\in[-1,1]$ der Interpolationsfehler gegeben durch
 \[f(y)-\mathcal{Q}_{S}f=\frac{f^{(S)}(\xi)}{S!}\prod_{i=1}^{S}(y-y_i),\quad \xi\in [-1,1]\]
@@ -53,12 +53,12 @@ Sei $f\in C^{S}[-1,1]$ eine $S$ mal stetig differenzierbare Funktion. Dann ist f
 
 Da die Funktion gegeben ist, hat man keinen Einfluss auf die Ableitung $f^{(S)}$. Wegen
 \[\norm{f(y)-\mathcal{Q}_{S}f}\le \frac{\norm{f^{(S)}}_\infty}{S!}\underbrace{\norm{\prod_{i=1}^{S}(y-y_i)}}_{=\norm{w(y)}}\]
-ist also das Ziel, abhängig von der Norm, den Term $\norm{w(y)}$ zu minimieren.
-\begin{mathbem}[Tschebyschow-Interpolation]
-Die Nullstellen $y_i=\cos\left(\frac{2i-1}{2S+2}\right)$, für $i=1,\dots,S+1$, der Tschebyschow-Polynome $T_{S+1}(y)=\cos((S+1)\arccos(y))$ minimieren den Ausdruck $\norm{w(y)}_\infty$ auf $[-1,1]$ und bieten auf $[-1,1]$ optimale Interpolationsgüte. Es gilt 
+ist es somit das Ziel, den Term $\norm{w(y)}$ abhängig von der Norm zu minimieren.
+\begin{mathbem}[\chebyspace Interpolation]
+Die Nullstellen $y_i=\cos\left(\frac{2i-1}{2S+2}\right)$, für $i=1,\dots,S+1$, der \chebyspace Polynome $T_{S+1}(y)=\cos((S+1)\arccos(y))$ minimieren den Ausdruck $\norm{w(y)}_\infty$ auf $[-1,1]$ und bieten auf $[-1,1]$ optimale Interpolationsgüte. Es gilt 
 \[\norm{f(y)-\mathcal{Q}_{S+1}f}_\infty\le \frac{\norm{f^{(S+1)}}_\infty}{2^S(S+1)!}\]
 \end{mathbem}
-Die Tschebyschow-Polynome bilden eine Orthogonalbasis bezüglich $\langle \cdot,\cdot\rangle_{L_w^2[-1,1]}$ mit $w(y)=(1-y^2)^{-\onehalf}$. Eine Idee ist es nun, auch Nullstellen anderer orthogonalen Polynombasen als Knotenpunkte zu verwenden um ähnliche Approximationsergebnisse auf nicht-kompakten Intervallen zu erhalten.
+Die \chebyspace Polynome bilden eine Orthogonalbasis bezüglich $\langle \cdot,\cdot\rangle_{L_w^2[-1,1]}$ mit $w(y)=(1-y^2)^{-\onehalf}$. Eine Idee ist es nun, auch Nullstellen anderer orthogonalen Polynombasen als Knotenpunkte zu verwenden um ähnliche Approximationsergebnisse auf nicht-kompakten Intervallen zu erhalten.
 \begin{maththeorem}
 \label{th:interpol_and_proj}
 Sei $\lbrace \Phi_m\in\Poly_m\mid m=0,\dots,M\rbrace\subset L_w^2(I)$ eine Orthonormalbasis von Polynomen und $(y_i,\alpha_i)_{i=0,\dots,M}$ eine Quadraturformel mit Exaktheitsgrad $2M$ bezüglich $w$ und $y_i\neq y_j,i\neq j$, d.h. \[\int_I p(y)w(y)dy=\sum_{i=0}^M\alpha_ip(y_i),\quad p\in\Poly_{2M}\]
@@ -85,7 +85,7 @@ Wir wollen nun dem technischen Satz \ref{th:interpol_and_proj} Leben einhauchen 
 \item
 Die vorausgesetzte Existenz einer Quadraturformel aus $M+1$ verschiedenen Quadraturpunkten und Exaktheitsgrad $2M$ ist durch die später vorgestellte Gauss-Quadratur erfüllt. Die Quadraturpunkte sind dabei die Nullstellen des $M+1$-ten Basispolynoms und daher paarweise verschieden. Die Quadraturgewichte lassen sich über die erste Komponente dessen Einheitsvektors bestimmen, der beim Golub-Welsch-Algorithmus auch die entsprechende Nullstelle des Polynoms berechnet.
 \item
-Wir sehen, dass sich bei bekannter Quadraturformel die Interpolationskoeffizienten $\hat{w}_m$ auch explizit berechnen lassen. Diese (im eindimensionalen) äquivalente Darstellung führt auf den später vorgestellten zweiten Ansatz zur stochastischen Collocation.
+Wir sehen, dass sich im eindimensionalen bei bekannter Quadraturformel die Interpolationskoeffizienten $\hat{w}_m$ auch einzeln ohne Lösen eines linearen Gleichungssystems berechnen lassen. Diese Darstellung führt auf den später vorgestellten zweiten Ansatz zur stochastischen Collocation.
 \item
 Die Darstellung $\hat{w}_i=\sum_{j=0}^M\Phi_i(y_j)\alpha_jf(y_j)$ kann als Approximation an die Koeffizienten $\int_I \Phi_i(y)f(y)w(y)dy$ der Bestapproximation $P_Mf$ in $L_w^2(I)$ aufgefasst werden. Mithilfe der Dreiecksungleichung lässt sich dann der Fehler der Interpolation beschreiben durch
 \begin{align*}
@@ -93,7 +93,7 @@ Die Darstellung $\hat{w}_i=\sum_{j=0}^M\Phi_i(y_j)\alpha_jf(y_j)$ kann als Appro
 &=\norm{\mathcal{Q}_Mf-P_Mf}_{L_w^2}+\norm{\sum_{m=0}^M\left(\sum_{j=0}^M\Phi_m(y_j)\alpha_jf(y_j)\right)\Phi_m-\sum_{m=0}^M\left(\int_I\Phi_m(y)f(y)w(y)dy\right)\Phi_m}_{L_w^2}\\
 &\stackrel{\text{Parseval}}{=}\norm{\mathcal{Q}_Mf-P_Mf}_{L_w^2}+\sqrt{\sum_{m=0}^M\left(\sum_{j=0}^M\Phi_m(y_j)\alpha_jf(y_j)-\int_I\Phi_m(y)f(y)w(y)dy\right)^2}
 \end{align*}
-Schlussendlich lässt sich also der Fehler der Interpolation durch den Fehler der Bestapproximation in $L_w^2$ und einen Quadraturfehler bezüglich der Gewichtsfunktion $w$ beschreiben. Für den Fehler der Bestapproximation erwarten wir nach Xiu spektrale Konvergenz. Finden wir eine zur Gewichtsfunktion $w$ passende Quadraturformel, so hat lediglich die Glattheit von $f$ Einfluss auf den Quadraturfehler.
+Schlussendlich lässt sich also der Fehler der Interpolation durch den Fehler der Bestapproximation in $L_w^2$ und einen Quadraturfehler bezüglich der Gewichtsfunktion $w$ beschreiben. Für den Fehler der Bestapproximation erwarten wir nach Xiu spektrale Konvergenz. Finden wir eine zur Gewichtsfunktion $w$ passende Quadraturformel, so hat lediglich die Glattheit von $f$ Einfluss auf den Quadraturfehler, da $\Phi_m$ als Polynom bei hinreichend hoher Ordnung exakt integriert wird.
 \end{itemize}
 \end{mathbem}
 

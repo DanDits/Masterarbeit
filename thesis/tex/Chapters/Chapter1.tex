@@ -15,7 +15,7 @@ u(0,x)&=u_0(x), \: x\in \Torus^d\\
 Im Folgenden werden wir auf den, hier zur Betonung verwendeten, Index $x$ des Laplace Operators $\Laplace=\Laplace_x=\frac{\text{d}^2}{\text{d}x^2_1}+\dots+\frac{\text{d}^2}{\text{d}x^2_d}$ verzichten.\\
 Bevor wir Abhängigkeiten von einer Zufallsvariablen hinzufügen, ist es hilfreich, die Gleichung für deterministische Parameter besser zu verstehen. Diese Mühe ist nicht vergebens, da einige numerische Verfahren zur Bestimmung der Lösung der zufallsabhängigen Gleichung stark auf einem robusten und schnellen Löser der deterministischen Gleichung basieren. Dazu seien als Stichworte Monte-Carlo-Verfahren und Collocations-Verfahren genannt, die wir im späteren Verlauf genauer betrachten werden.
 \subsection{(Physikalische) Definitionen}
-Die KGG ist eine relativistische Feldgleichung, welche die Kinematik von spin-freien Teilchen, wie dem Pion, beschreibt. Auch das 2012 entdeckte Higgs-Boson ist ein spin-freies Teilchen, es ist jedoch noch unklar, ob es wirklich das von dem Standardmodell der Teilchenphysik vorgesagte ist und sich vom Standardmodell beschreiben lässt \autocite{cern2016}.\\
+Die KGG ist eine relativistische Feldgleichung, welche die Kinematik von spin-freien Teilchen, wie dem Pion, beschreibt. Auch das 2012 entdeckte Higgs-Boson ist ein spin-freies Teilchen, es ist jedoch noch unklar, ob es wirklich das von dem Standardmodell der Teilchenphysik vorhergesagte Teilchen ist und sich vom Standardmodell beschreiben lässt \autocite{cern2016}.\\
 Dabei ist
 \begin{itemize}
 \item $\Torus=\R/(2\pi\Z)$ der skalierte eindimensionale Torus. Wir werden ab sofort die vereinfachte Darstellung $\Torus^d=(-\pi,\pi)^d$ mit periodischen Randbedingungen verwenden. Diese Skalierung des Torus ermöglicht das direkte Verwenden der schnellen Fouriertransformation ohne weitere Skalierung, ist jedoch keine Beschränkung der Allgemeinheit. 
@@ -37,15 +37,15 @@ womit sich aus Lösungen von
 \alpha\Laplace g(x)-\beta(x)g(x)&=\lambda g(x), \: \lambda\in\R\\
 \mu f(t)&=f''(t), \: \mu\in \R
 \end{align*}
-Lösungen der KGG ergeben. Für $\beta(x) \equiv \beta>\absolute{\lambda}$ ergibt sich das Eigenwertproblem $\Laplace g(x)=\frac{\beta + \lambda}{\alpha}g(x)$ mit periodischen Randbedingungen und eine lineare gewöhnliche Differentialgleichung.\\Die Anfangswerte $u_0$ und $v_0$ der KGG werden dann entsprechend passend gewählt.\\[1cm]
+Lösungen der KGG ergeben. Für $\beta(x) \equiv \beta>0$ ergibt sich das Eigenwertproblem $-\Laplace g(x)=-\frac{\beta + \lambda}{\alpha}g(x)$ mit periodischen Randbedingungen und eine lineare gewöhnliche Differentialgleichung.\\Die Anfangswerte $u_0$ und $v_0$ der KGG werden dann entsprechend passend gewählt.\\[1cm]
 Beispiele für exakte Lösungen ($d=1$) sind
 \begin{align*}
 u(t,x)&=\sin(\lambda x)(c_1 \sin(\mu t) + c_2 \cos(\mu t)), \quad \mu^2=\beta+\alpha \lambda^2\\ 
 u(t,x)&=(c_1 \sin(\lambda x) + c_2 \cos(\lambda x))\sin(\mu t), \quad \mu^2=\beta+\alpha \lambda^2\\
 u(t,x)&=\exp(-\cos(x))\sin(\mu t), \quad \beta(x)=\mu^2+\cos(x)+\sin^2(x), \, \mu \in \R
 \end{align*}
-wobei $\lambda\in \pi\Z$ um die Periodizität zu gewährleisten und $c_1, c_2 \in \R$ frei wählbare Skalierungsfaktoren.\\
-Diese lassen sich auch auf höhere Dimensionen erweitern, beispielsweise
+wobei $\lambda\in \pi\Z$ um die Periodizität zu gewährleisten und $c_1, c_2 \in \R$ frei wählbare Skalierungsfaktoren sind.\\
+Diese Lösungen lassen sich auch auf höhere Dimensionen erweitern, beispielsweise
 \begin{eqnarray}
 u(t,x)=\exp(-\cos(x_1+\dots+x_d))\sin(\mu t)\\
 \beta(x)=\mu^2+d(\cos(x_1+\dots+x_d)+\sin^2(x_1+\dots+x_d)), \, \mu\in\R \nonumber
@@ -66,10 +66,10 @@ u(t,x)=\exp(-\cos(x_1+\dots+x_d))\sin(\mu t)\\
 \beta(x)=4+d(\cos(\sum_{j=1}^dx_j)+\sin^2(\sum_{j=1}^dx_j))$.}
 \end{figure}
 
-Weitere --allerdings nicht-periodische-- Lösungen finden sich in \autocite{andreipolyanin2004}.
+Eine Sammlung von nicht-periodischen Lösungen finden sich in \autocite{andreipolyanin2004}.
 
 \section{Operatorsplitting}
-Um einen Ansatz für numerische Approximationen an die Lösung der KGG zu erhalten bietet sich ein klassischer Operatorsplitting-Ansatz an. Dabei wiederholen wir an dieser Stelle zuerst kurz die relevante Approximationstheorie und diskutieren mögliche Varianten.
+Als numerischen Ansatz für approximative Lösungen der KGG wählen wir ein klassisches Operatorsplitting. Dabei wiederholen wir an dieser Stelle zuerst kurz die relevante Approximationstheorie und diskutieren mögliche Varianten.
 \subsection{Generelle Idee}
 Angenommen wir stehen vor dem Problem die Differentialgleichung 
 \begin{equation}
@@ -77,12 +77,12 @@ Angenommen wir stehen vor dem Problem die Differentialgleichung
 \dt{u}(t)=(L+R)u(t), \, t>0, \quad u(0)=u_0
 \end{equation}
 zu lösen. Dabei ist im einfachsten Fall $u$ eine vektorwertige Funktion und $L$ bzw. $R$ zwei Matrizen.\\
-Sind aufgrund der Struktur der Matrizen --beispielsweise könnte $L$ eine untere und $R$ eine obere Dreiecksmatrix sein-- die Gleichungen 
+Sind beispielsweise $L$ eine untere und $R$ eine obere Dreiecksmatrix, so sind die Gleichungen 
 \begin{align*}
 \dt{v}(t)&=Lv(t), \quad v(0)=v_0\\
 \dt{w}(t)&=Rw(t), \quad w(0)=w_0
 \end{align*}
-deutlich einfacher zu lösen als die Gleichung (\ref{gencompdgl}), so lässt sich aus den Lösungen $v$ und $w$ dennoch eine Approximation an $u$ gewinnen.\\
+einfacher zu lösen als die Gleichung (\ref{gencompdgl}). Das Ziel des Operatorsplittings ist es aus den Lösungen $v$ und $w$ eine Approximation an $u$ zu gewinnen.\\
 Wir \emph{teilen} (engl. split) die Gleichung also in zwei neue Gleichungen auf. Häufig lässt sich dann eine der gewonnen Gleichungen sogar exakt lösen. Dieser Ansatz funktioniert auch für (nicht-lineare) Operatoren anstelle von Matrizen.\\
 Diese zentrale Idee werden wir verwenden, um die KGG 
 \begin{equation*}
@@ -135,7 +135,7 @@ Ist insbesondere $\Phi_{\deltat}$ symmetrisch, so ist wegen $C(y_0)=(-1)^pC(y_0)
 \end{maththeorem}
 Nun zerlegen wir die ursprüngliche Gleichung (\ref{orddgl}) in zwei Teile
 \[\dt{y}=f(y)=A(y)+B(y) \]
-Das Aufteilen ist hierbei nicht eindeutig! Eine Möglichkeit im zweidimensionalen wäre zum Beispiel: $A=\text{P}_{(1,0)^T}f,\,B=\text{P}_{(0,1)^T}f$, wobei $\text{P}_v$ die Projektion auf $\text{span}(v)$ darstellt. Häufig --ebenso wie in unserem Fall der KGG-- ist die bereits vorhandene natürliche Aufteilung der Summe die Methode der Wahl.\\
+Das Aufteilen ist hierbei nicht eindeutig! Eine Möglichkeit im zweidimensionalen wäre zum Beispiel: $A=\text{P}_{(1,0)^T}f,\,B=\text{P}_{(0,1)^T}f$, wobei $\text{P}_v$ die Projektion auf $\text{span}(v)$ darstellt. Wie in unserem Fall der KGG ist die bereits vorhandene natürliche Aufteilung der Summe die Methode der Wahl.\\
 Sind nun $\varphi_{\deltat}^A$ und $\varphi_{\deltat}^B$ die exakten Flüsse der Systeme
 \begin{align}
 \dt{y}&=A(y)\quad \text{und} \label{splitsimple1}\\ 
@@ -191,7 +191,8 @@ von Ordnung $p+1$, wenn
 \sum_{j=1}^sa_j^{p+1}+(-1)^pb_j^{p+1}&=0
 \end{align*}
 \end{maththeorem}
-Ohne das allgemeine Ergebnis zu verwenden wollen wir nun dennoch ein Verfahren $\Phi_{\deltat}^S$ mit Ordnung $p=2$ gewinnen. Dieses sollte möglichst den selben Zeitaufwand wie das Lie-Trotter-Splitting besitzen. Hierzu verwenden wir den Ansatz \[\Phi_{\deltat}^S=\Phi_{\deltathalf}^*\circ\Phi_{\deltathalf}\]
+Um das Lie-Trotter-Splitting zur Ordnung 2 zu erweitern motiviert der Satz die Wahl $\alpha_1=\beta_1=\onehalf$. Wir wollen nun ein Verfahren $\Phi_{\deltat}^S$ mit Ordnung $p=2$ gewinnen. Dieses sollte möglichst den selben Zeitaufwand wie das Lie-Trotter-Splitting besitzen. Daher definieren wir
+\[\Phi_{\deltat}^S=\Phi_{\deltathalf}^*\circ\Phi_{\deltathalf}\]
 Wir erkennen sofort, dass es sich hierbei um ein symmetrisches Verfahren handelt. Als Komposition von Verfahren mit Ordnung 1 (siehe Satz \ref{lieorder1}) ist es ebenfalls mindestens von Ordnung 1. Als zusätzlich symmetrisches Verfahren gilt mit Satz \ref{adjfloworder}, dass das Verfahren mindestens von Ordnung 2 ist.\\
 Dieses sogenannte \emph{Strang-Splitting} lässt sich unter Verwendung der aufgeteilten Flüsse (\ref{liesplittings}) auch darstellen als 
 
@@ -205,7 +206,7 @@ Dieses sogenannte \emph{Strang-Splitting} lässt sich unter Verwendung der aufge
 &=\varphi_{\deltathalf}^A\circ\varphi_{\deltat}^B\circ\varphi_{\deltathalf}^A
 \end{align}
 \end{minipage}
-Für einen Schritt ist also nur der anderthalbfache Aufwand nötig wie beim Lie-Trotter-Splitting, aber man gewinnt bereits eine Ordnung dazu. Unter Umständen kann dies sogar noch verbessert werden:\\
+Für einen Schritt ist also nur der anderthalbfache Aufwand nötig wie beim Lie-Trotter-Splitting, aber man gewinnt bereits eine Ordnung dazu. Die Laufzeit kann sogar noch verbessert werden:\\
 Gegeben sei ein Anfangswert $y_0$ für das System (\ref{orddgl}). Ist man an einer Approximation $y_T$ der Lösung $y(T)$ zu einem Zeitpunkt $T=n\deltat>0$ interessiert, so gilt unter Verwendung des Strang-Splittingverfahrens
 \begin{align*}
 y_T&=\underbrace{\Phi_{\deltat}^S\circ\dots\circ\Phi_{\deltat}^S}_{n\text{ mal}}(y_0)\\
@@ -216,7 +217,7 @@ y_T&=\underbrace{\Phi_{\deltat}^S\circ\dots\circ\Phi_{\deltat}^S}_{n\text{ mal}}
 &=\varphi_{\deltathalf}^A\circ\varphi_{\deltat}^B\circ
 \underbrace{\Phi_{\deltat}^*\circ\dots\circ\Phi_{\deltat}^*}_{n-1\text{ mal}}\circ\,\varphi_{\deltathalf}^A
 \end{align*}
-Durch das Kombinieren der äußeren Halbschritte bekommt man also nun eine Darstellung des Strang-Splittings, die nur einen zusätzlichen Fluss berechnen muss und trotzdem Ordnung $p=2$ besitzt. Man muss hierbei allerdings auf Zwischenergebnisse verzichten, da diese eine weitere Anwendung von $\varphi_{\deltathalf}^A$ benötigen würden.\\[0.5cm]
+Durch das Kombinieren der äußeren Halbschritte bekommt man somit eine Darstellung des Strang-Splittings, die im Vergleich zum Lie-Trotter-Splitting nur einen zusätzlichen Fluss berechnen muss und trotzdem Ordnung $p=2$ besitzt. Man muss hierbei allerdings auf Zwischenergebnisse verzichten, da diese eine weitere Anwendung von $\varphi_{\deltathalf}^A$ benötigen würden.\\[0.5cm]
 Bisher sind wir davon ausgegangen, dass sich die Flüsse $\varphi_{\deltat}^A$ btw. $\varphi_{\deltat}^B$ exakt berechnen lassen. Dies ist in den seltensten Fällen der Fall und man verwendet stattdessen approximative Verfahren $\Phi_{\deltat}^A$ bzw. $\Phi_{\deltat}^B$. 
 \begin{maththeorem}
 Sind die Verfahren ebenfalls von Ordnung $p$, d.h. falls 
@@ -230,11 +231,11 @@ Insbesondere ist das Strang-Splitting immer noch von Ordnung 2, wenn alle verwen
 \begin{proof}[Beweisidee]
 Am Beispiel von $\varphi_{\deltat}^A$ und $p=1$:\\
 Man verwendet die Darstellung $\varphi_{\deltat}^A(y_0)=y_0+\deltat f^A(y_0)+\mathcal{O}(\deltat^2)$ und ersetzt $\varphi_{\deltat}^A$ durch $\Phi_{\deltat}^A$. Die Vorgehensweise in den Beweisen muss dann höchstens minimal angepasst werden.\\
-Man beachte hierbei, dass nun $\Phi_{\deltat}^A$ im Gegensatz zu $\varphi_{\deltat}^A$ nicht mehr symmetrisch ist. Die Argumentation über die Ordnung von symmetrischen Verfahren kann also nicht direkt verwendet werden, um $p=2$ für das Strang-Splittings zu begründen. Außerdem kann dies die Möglichkeit, das Strang-Splitting durch Kombination der Halbschritte zu beschleunigen, zunichte machen.
+Man beachte hierbei, dass nun $\Phi_{\deltat}^A$ im Gegensatz zu $\varphi_{\deltat}^A$ nicht mehr symmetrisch ist. Die Argumentation über die Ordnung von symmetrischen Verfahren kann daher nicht direkt verwendet werden, um $p=2$ für das Strang-Splittings zu begründen. Außerdem kann dies die Möglichkeit, das Strang-Splitting durch Kombination der Halbschritte zu beschleunigen, zunichte machen.
 \end{proof}
 
 \subsection{Numerischer Löser der KGG}
-Dieser Abschnitt ist das wichtige Fundament, auf dem viele numerischen Lösungsverfahren basieren werden. Um ein Operator Splitting auf die KGG anwenden zu können, muss diese zuerst in eine Gleichung mit Zeitableitung erster Ordnung in der Form von (\ref{orddgl}) umgeschrieben werden. Formal:
+Dieser Abschnitt ist das wichtige Fundament, auf dem viele numerischen Lösungsverfahren basieren werden. Um ein Operatorsplitting auf die KGG anwenden zu können, muss diese zuerst in eine Gleichung mit Zeitableitung erster Ordnung in der Form von (\ref{orddgl}) umgeschrieben werden. Formal:
 \begin{align}
 \dtt{u}(t,x)&=\alpha \Laplace u(t,x) - \beta(x)u(t,x)\nonumber\\
 \iff
@@ -277,7 +278,7 @@ für die Beispiele $f_1(x)=-\sin(x)e^{-\sin(x)}$ und $f_2(x)=|x|$.
   \includegraphics[width=0.9\linewidth]{Figures/spectral_derivative_error_discont.png}
   \caption{Konvergenz der spektralen Ableitung zweiter Ordnung von $f_2$.}
 \end{figure}
-Wir erkennen, dass die analytische Funktion $f_1$ eine exponentielle Konvergenz aufweist und bereits für $2N=64$ Punkte im Bereich der Maschinengenauigkeit liegt. Rechenfehler sorgen für größeres $N$ für eine Aufsummierung von kleinen Überschwingungen und einen langsam wachsenden Fehler.\\
+Wir erkennen, dass die analytische Funktion $f_1$ eine exponentielle Konvergenz aufweist und bereits für $N=64$ Punkte im Bereich der Maschinengenauigkeit liegt. Rechenfehler sorgen für größeres $N$ für eine Aufsummierung von kleinen Überschwingungen und einen langsam wachsenden Fehler.\\
 Die stetige Funktion $f_2$ mit stückweise stetiger nicht-periodischer Ableitung leidet bei der Approximation unter dem Gibbs-Phänomen und deutlich langsamerer Konvergenz.
 \end{mathbsp}
 
@@ -293,8 +294,8 @@ Im Folgenden nehmen wir an, die Fourier-Approximation (\ref{eqn:fourier_approx})
 \label{eqn:laplace_approxu}
 \Laplace u(t,x_j)=\sum_{k\in\mathcal{I}_N}\fourier{u}_k(t)\Laplace e^{ikx_j}=\sum_{k\in\mathcal{I}_N}-k^2\fourier{u}_k(t)e^{ikx_j}
 \end{equation}
-Betrachten wir nun $(\Laplace u(t,x_j))_{j=0,\dots,N-1}^T$ für den Vektor $u_N(t)=(u(t,x_j))_{j=0,\dots,N-1}^T$ so gilt
-\[(\Laplace u(t,x_j))_{j=0,\dots,N-1}^T\approx \mathcal{F}_N^{-1}\left(\big(-k^2\big)_{k\in\mathcal{I}_N}\odot\mathcal{F}_Nu_N(t)\right)\]
+Betrachten wir nun $(\Laplace u(t,x_j))_{j=0,\dots,N-1}$ für den Vektor $u_N(t)=(u(t,x_j))_{j=0,\dots,N-1}$ so gilt
+\[(\Laplace u(t,x_j))_{j=0,\dots,N-1}\approx \mathcal{F}_N^{-1}\left(\big(-k^2\big)_{k\in\mathcal{I}_N}\odot\mathcal{F}_Nu_N(t)\right)\]
 wobei $\odot$ die komponentenweise Multiplikation der Vektoren bezeichnet.\\
 Damit erhalten wir für $\beta_N=(\beta(x_j))_{j=0,\dots,N-1}$ die im Ort diskretisierte KGG
 \begin{equation}
@@ -404,16 +405,17 @@ Dabei ist die Wahl gewisser Parameter jedoch noch unklar:
 \item Die Anzahl der Fourierpunkte $N$.
 \item Das Gewicht $w\in[0,1]$ für die Gewichtung des Splittings. 
 \end{itemize}
+\todo{Vielleicht noch ein Plot wie die geschätze cfl bedingung in abhängigkeit von w aussieht?}
 Um die Zusammenhänge und Probleme besser zu verstehen, werden wir anhand eines Beispiels mit bekannter exakter Lösung verschiedene Kombinationen der Parameter demonstrieren.
 \begin{mathbsp}
 \label{bsp:trialfrog2}
-Seien $c>2$ und $d\neq 0$, dann ist
+Sei $c>2$, dann ist
 \begin{align*}
-u(t,x)&=\frac{\cos(dt)}{\sin(x)+c}\\
+u(t,x)&=\frac{\cos(t)}{\sin(x)+c}\\
 u_0(x)&=\frac{1}{\sin(x)+c}\\
 v_0(x)&\equiv 0\\
 \end{align*}
-eine Lösung der KGG (\ref{kgg}) mit $\alpha=c-2$ und $\beta(x)=d^2+(c-2)\left(\frac{\sin(x)}{\sin(x)+c}+\frac{2\cos^2(x)}{(\sin(x)+c)^2}\right)$. Wir lösen nun die KGG mithilfe verschiedener Splitting Varianten und beobachten in Abbildung \ref{fig:splitting_convergence}
+eine Lösung der eindimensionalen KGG (\ref{kgg}) mit $\alpha=c-2$ und $\beta(x)=1+(c-2)\left(\frac{\sin(x)}{\sin(x)+c}+\frac{2\cos^2(x)}{(\sin(x)+c)^2}\right)$. Wir lösen nun die KGG mithilfe verschiedener Splitting Varianten und beobachten in Abbildung \ref{fig:splitting_convergence}
 \begin{itemize}
 \item für das Strang-Splitting die erwartete Konvergenz von Ordnung 2.
 \item für das Lie-Trotter-Splitting die erwartete Konvergenz von Ordnung 1.
@@ -434,14 +436,14 @@ u(t,x_N)&=\mathcal{F}_N^{-1}\left(\mathcal{F}_Ng(x_N)\right)=g(x_N)=u(0,x_N)\\
 &=t\alpha \Laplace_N g(x_N)+h(x_N)\\
 &\approx t\dtt{u}(0,x_N)+\dt{u}(0,x_N)
 \end{align*}
-Somit wird in diesem Randfall nur die erste Ableitung geändert und dieses Update entspricht einem expliziten Eulerschritt. Wir erhalten eine \emph{Courant-Friedrichs-Lewy-Bedingung} (CFL-Bedingung) der Form $\tilde{c}\tau\le h=\frac{2\pi}{N}$. Im Fall $k=0$ entspricht die CFL-Zahl $\tilde{c}$ der CFL-Zahl des expliziten Eulers. Andernfalls beobachten wir, dass die CFL-Zahl abhängig von $w$ ist und für $w=1$ ein Minimum annimmt. Wie man an Abbildung \ref{fig:splitting_convergence_w1} erkennt, verhält sich für $w=1$ die Gleichung am stabilsten und kann auch für große Zeitschrittweiten sinnvoll gelöst werden. Dies wird eine große Motivation dafür sein, das Gewicht $w=1$ zu wählen.
+Somit wird in diesem Randfall nur die erste Ableitung geändert und dieses Update entspricht einem expliziten Eulerschritt für die erste Ableitung. Das Splittingverfahren ist dann äquivalent zu einem sogenannten Leapfrog-Verfahren, welches schneller zu berechnen ist, da eine Anwendung von $\mathcal{F}_N^{-1}$ entfällt. Wir erhalten für die Stabilität eine \emph{Courant-Friedrichs-Lewy-Bedingung} (CFL-Bedingung) der Form $\tilde{c}\tau\le h=\frac{2\pi}{N}$. Im Fall $k=0$ entspricht die CFL-Zahl $\tilde{c}$ der CFL-Zahl des expliziten Eulers. Andernfalls beobachten wir, dass die CFL-Zahl abhängig von $w$ ist und für $w=1$ ein Minimum annimmt. Wie man an Abbildung \ref{fig:splitting_convergence_w1} erkennt, verhält sich für $w=1$ die Gleichung am stabilsten und kann auch für große Zeitschrittweiten sinnvoll gelöst werden. Dies wird eine große Motivation dafür sein, das Gewicht $w=1$ zu wählen.
 
 \begin{figure}[!htb]
 \includegraphics[width=\textwidth]{Figures/splitting_convergence_fix_weight_frog2_cfl_corrected.png}
 \caption{Konvergenzordnung für verschiedene Splitting Varianten anhand von Beispiel \ref{bsp:trialfrog2} mit $c=3$, $d=1$, $N=512$, $w=1$ zum Zeitpunkt $T=1$.}
 \label{fig:splitting_convergence_w1}
 \end{figure}
-Zuletzt sei aber erwähnt, dass die Wahl $w=1$ aus Sicht des minimalen Fehlers selten optimal ist. An Abbildung \ref{fig:splitting_dependence_on_weight} erkennen wir für verschiedene bekannte Lösungen der KGG, dass das Minimum des Fehlers in Abhängigkeit vom Gewicht $w$ sowohl an beiden Rändern, als auch als lokales Minimum auftreten kann. Das genaue Minimum zu bestimmen und dies mit der CFL-Zahl zu kombinieren, um das optimale $w$ zu wählen, kann ein möglicher Ansatz zur Verbesserung des Algorithmus sein. Wir werden dies jedoch nicht weiter verfolgen und uns auf $w=1$ beschränken, da eine Verbesserung des Fehlers dann mit einer Verringerung der Schrittweite $\tau$ immer möglich ist.
+Zuletzt sei aber erwähnt, dass die Wahl $w=1$ aus Sicht des minimalen Fehlers selten optimal ist. An Abbildung \ref{fig:splitting_dependence_on_weight} erkennen wir für verschiedene bekannte Lösungen der KGG, dass das Minimum des Fehlers in Abhängigkeit vom Gewicht $w$ sowohl an beiden Rändern, als auch als lokales Minimum auftreten kann. Das genaue Minimum zu bestimmen und dies mit der CFL-Zahl zu kombinieren, um das optimale $w$ zu wählen, kann ein möglicher Ansatz zur Verbesserung des Algorithmus sein. Wir werden dies jedoch nicht weiter verfolgen und uns in den meisten Fällen auf $w=1$ beschränken, da eine Verbesserung des Fehlers dann mit einer Verringerung der Schrittweite $\tau$ besser kontrollierbar ist.
 \begin{figure}[!htb]
 \includegraphics[width=\textwidth]{Figures/splitting_error_over_weights.png}
 \caption{Verschiedene Beispiele von bekannten Lösungen der KGG gelöst mit FastStrang. Der Fehler wird dabei in Abhängigkeit des Gewichts $w$ verglichen.}
@@ -452,13 +454,14 @@ Zuletzt sei aber erwähnt, dass die Wahl $w=1$ aus Sicht des minimalen Fehlers s
 Die Theorie des general Polynomial Chaos ist die Grundlage für später vorgestellte Verfahren zum Lösen von der stochastischen Klein-Gordon-Gleichung. Im Mittelpunkt dieser Theorie stehen orthogonale Polynombasen. Die Verflechtung mit der Stochastik geschieht dann auf natürliche Weise durch die passende Wahl des zugrunde liegenden Skalarproduktes.
 \subsection{Orthogonale Polynome}
 Wir beginnen mit grundlegender Notation und Namensgebung um das zentrale Werkzeug der Polynomapproximation festzulegen. Später werden diese Polynome verwendet, um die Zufallsabhängigkeit der auftretenden Funktionen darzustellen, indem das Orthogonalitätsmaß der Dichtefunktion entspricht.
+
 \begin{mathdef}
 Ein allgemeines Polynom $Q$ vom Grad $n$ lässt sich darstellen als
 \[Q_n(x)=q_nx^n+q_{n-1}^{n-1}+\dots+q_1x+q_0,\quad q_n\ne 0\]
 Ein System $\left\lbrace Q_n(x),\: n\in\mathcal{N}\right\rbrace$ von Polynomen mit $\mathcal{N}=\N_0=\N\cup\lbrace 0\rbrace$ oder $\mathcal{N}=\lbrace 0,1,\dots,N-1,N\rbrace$ heißt Orthogonalsystem, wenn bezüglich eines reellen positiven Maßes $\alpha$ die Orthogonalitätsbedingung
- \[\langle Q_n(x),Q_m(x)\rangle =\int_S Q_n(x)Q_m(x)d\alpha(x)=\gamma_n\delta_{mn},\quad m,n\in\mathcal{N}\]
- erfüllt ist. Dabei ist $\delta_{mn}$ das Kronecker-Delta, $S$ der nicht notwendigerweise endliche Träger des Maßes $\alpha$ und $y_n>0$ die Normalisierungskonstanten. Es gilt 
- \[\gamma_n=\int_S Q_n^2(x)d\alpha(x),\quad n\in\mathcal{N}\] und O.B.d.A. werden wir in folgenden Kapiteln stets von $\gamma_n=1$ ausgehen. In diesem Fall nennt man das System ein Orthonormalsystem.
+ \[\langle Q_n(x),Q_m(x)\rangle =\int_I Q_n(x)Q_m(x)d\alpha(x)=\gamma_n\delta_{mn},\quad m,n\in\mathcal{N}\]
+ erfüllt ist. Dabei ist $\delta_{mn}$ das Kronecker-Delta, $I$ der nicht notwendigerweise endliche Träger des Maßes $\alpha$ und $\gamma_n>0$ die Normalisierungskonstanten. Es gilt 
+ \[\gamma_n=\int_I Q_n^2(x)d\alpha(x),\quad n\in\mathcal{N}\] und O.B.d.A. werden wir in folgenden Kapiteln stets von $\gamma_n=1$ ausgehen. In diesem Fall nennt man das System ein Orthonormalsystem.
 \end{mathdef}
 Das zukünftig von uns verwendete Skalarprodukt wird dabei in der folgenden Definition konkretisiert.
 \begin{mathdef}
@@ -475,12 +478,12 @@ und zugehöriger Norm
 Das Hermite Chaos ist ein motivierendes Beispiel dafür, dass gewisse orthogonale Polynombasen auf natürlicher Weise mit stochastischen Verteilungen verbunden sind.
 \begin{mathbsp}[Hermite Chaos]
 \label{bsp:hermitechaos}
-Ist $S=(-\infty,\infty)$, $w(x)=\frac{1}{\sqrt{2\pi}}e^{-\frac{x^2}{2}}$ die Dichtefunktion der Gauss-Verteilung und verwenden wir diese als Dichte des Maßes $\alpha$, so sind die Hermite Polynome
+Ist $I=(-\infty,\infty)$, $w(x)=\frac{1}{\sqrt{2\pi}}e^{-\frac{x^2}{2}}$ die Dichtefunktion der Gauss-Verteilung und verwenden wir diese als Dichte des Maßes $\alpha$, so sind die Hermite Polynome
 \[H_0(x)\equiv 1,\quad H_1(x)=x,\quad H_2(x)=x^2-1,\quad H_n(x)=xH_{n-1}(x)-(n-1)H_{n-2}(x)\]
-ein Orthogonalsystem bezüglich $\langle\cdot,\cdot\rangle_{L_w^2(S)}$ mit Normalisierungskonstanten $\gamma_n=n!$.\\
+ein Orthogonalsystem bezüglich $\langle\cdot,\cdot\rangle_{L_w^2(I)}$ mit Normalisierungskonstanten $\gamma_n=n!$.\\
 Der Erwartungswert der Gauss-Verteilung
 \[\E_w[Z]= \int_{-\infty}^\infty Z(x)w(x)dx\] erfüllt also die entscheidende Beziehung des Polynomial Chaos
-\[\langle H_n,H_m\rangle_{L_w^2(S)} =\E_w \left[H_nH_m\right]=\gamma_n\delta_{nm}\]
+\[\langle H_n,H_m\rangle_{L_w^2(I)} =\E_w \left[H_nH_m\right]=\gamma_n\delta_{nm}\]
 Man beachte, dass diese Definition der Hermite Polynome leicht von der in der Literatur üblichen abweicht. Dies ist der Tatsache geschuldet, dass dort die entsprechende Gewichtsfunktion einen zusätzlichen Faktor $\sqrt{2}$ besitzt. Sie stellt somit keine Dichte einer Wahrscheinlichkeitsverteilung dar und ist für unsere Zwecke unpraktisch und wird nicht verwendet. 
 \end{mathbsp}
 Wir werden in dieser Arbeit auf Polynombasen, die diskreten Verteilungen entsprechen, verzichten. Es sei jedoch bemerkt, dass dies keine Einschränkung der Methode ist, sondern lediglich die Notation vereinfacht. Konkret werden wir uns mit Laguerre-, Jacobi-, Hermite- und Legendre-Polynomen beschäftigen, wobei letztere ein Spezialfall der Jacobipolynome darstellen. Details und Eigenschaften sind im Anhang \ref{AppendixA} zu finden.\\[0.3cm]
@@ -552,27 +555,27 @@ In kompakter Form lässt sich dies darstellen als
 \[xQ(x)=TQ(x)+\frac{1}{a_n}Q_n(x)e_n\]
 wobei $e_n=(0,\dots,0,1)^T$ der n-te Einheitsvektor ist. Hieran erkennt man sofort, dass $Q_n(x_j)=0\equivalent x_j\text{ ist Eigenwert von }T$.\\
 Weiterhin erhalten wir aus Satz \ref{threetermexist}, dass $\frac{c_i}{a_i}=\frac{1}{a_{i-1}}\frac{\gamma_i}{\gamma_{i-1}}$ und somit wäre $T=J$ bereits symmetrisch, wenn die $Q_i$ eine Orthonormalbasis bilden.\\
-Andernfalls führen wir eine Äquivalenztransformation durch mit der Diagonalmatrix $D=\text{diag}\left((d_1,\dots,d_n)^T\right)$, so dass $J=DTD^{-1}$. Koeffizientenvergleich ergibt die Bedingung $d_{i+1}=d_i\sqrt{\frac{a_{i+1}}{c_{i+1}a_i}}$; mit einer möglichen Wahl $d_1=1$ des freien Parameters $d_1$ erhalten wir somit die gewünschte symmetrische Matrix.
+Andernfalls führen wir eine Äquivalenztransformation durch mit der Diagonalmatrix $D=\text{diag}\left((d_1,\dots,d_n)^T\right)$, so dass $J=DTD^{-1}$. Koeffizientenvergleich ergibt die Bedingung $d_{i+1}=d_i\sqrt{\frac{a_{i+1}}{c_{i+1}a_i}}$. Mit einer möglichen Wahl $d_1=1$ des freien Parameters $d_1$ erhalten wir somit die gewünschte symmetrische Matrix.
 \end{proof}
 Wir bemerken zusätzlich ohne Beweis, dass das Polynom $Q_n$ für $n\ge 1$ insgesamt $n$ verschiedene reelle Nullstellen besitzt. Dies ist eine fundamentale Aussage über Orthogonalpolynome und lässt sich induktiv einsehen unter Ausnutzung von $n$ Vorzeichenwechseln, die durch die Orthogonalität vorhanden sein müssen.
 
 \subsection{Polynomiale Approximationstheorie}
 \label{sec:poly_approx}
-Es gibt sehr viele Ergebnisse über die Approximation von Funktionen $f\colon \R\to\R$ durch Polynome $p\in\Poly_n$. Um ein Gefühl für die Mächtigkeit --aber auch für die Grenzen-- von polynomialer Approximation zu bekommen, werden an dieser Stelle einige zentrale Sätze genannt. Auf Beweise werden wir größtenteils verzichten, jedoch basierend auf \autocite{Trefethen} eine Diskussion der Interpretation dieser Ergebnisse aus dem numerischen Blickwinkel der Interpolation und Quadratur geben.
+Es gibt sehr viele Ergebnisse über die Approximation von Funktionen $f\colon \R\to\R$ durch Polynome $p\in\Poly_n$. Um ein Gefühl für die Mächtigkeit und auch für die Grenzen von polynomialer Approximation zu bekommen, werden an dieser Stelle einige zentrale Sätze genannt. Auf Beweise werden wir größtenteils verzichten, jedoch basierend auf \autocite{Trefethen} eine Diskussion der Interpretation dieser Ergebnisse aus dem numerischen Blickwinkel der Interpolation und Quadratur geben.
 \begin{maththeorem}[Weierstrass]
 Ist $I$ ein beschränktes Intervall und $f\in C^0(\bar{I})$ stetig, dann gibt es für jedes $\epsilon >0$ ein $n\in\N$ und $p\in\Poly_n$, so dass
 \[|f(x)-p(x)|<\epsilon,\quad \forall x\in\bar{I}\]
 \end{maththeorem}
-Folglich gilt für die \emph{gleichmäßige Bestapproximation} $\phi_n$, welche zu $f\in C^0(\bar{I})$ eine eindeutige Lösung $\phi_n(f)\in\Poly_n$ mit minimaler Maximumsnorm ergibt, die Aussage
+Folglich gilt für die \emph{gleichmäßige Bestapproximation} $\phi_n$, welche zu $f\in C^0(\bar{I})$ eine eindeutige Lösung $\phi_n(f)\in\Poly_n$ mit minimalem Abstand bezüglich der Maximumsnorm ergibt, die Aussage
 \[\lim\limits_{n\to\infty}\norm{f-\phi_n(f)}_\infty=0\] 
-Dieses Ergebnis sieht sehr vielversprechend aus und Interpolation ist eine naheliegende erste Idee, wie $\phi_n(f)$ berechenbar sein könnte. Jedoch wurde von Faber in \autocite{faber14} gezeigt, dass es kein Interpolationsschema gibt, das für alle stetigen Funktionen auf diese Weise konvergiert. Doch dieser vermeintliche Rückschlag ist in der Praxis selten von Bedeutung! Problematisch sind nur Interpolationsschemata, die auf gleichverteilten Knotenpunkten basieren und dann unter dem Runge-Phänomen leiden, welches bei Funktionen wie $f(x)=\frac{1}{1+x^2}$ an den Rändern für eine schlechte Approximationsgüte sorgt. Erfüllt $f$ jedoch minimale Glattheitsanforderungen (wie bereits Lipschitzstetigkeit) und verwendet man Chebyshev Interpolationspunkte, so ist die Approximationsgüte bereits bereits für kleines $n$ gesichert.\\
+Dieses Ergebnis sieht sehr vielversprechend aus und Interpolation ist eine naheliegende erste Idee, wie $\phi_n(f)$ berechenbar sein könnte. Jedoch wurde von Faber in \autocite{faber14} gezeigt, dass es kein Interpolationsschema gibt, das für alle stetigen Funktionen auf diese Weise konvergiert. Doch dieser vermeintliche Rückschlag ist in der Praxis selten von Bedeutung. Problematisch sind nur Interpolationsschemata, die auf gleichverteilten Knotenpunkten basieren und dann unter dem Runge-Phänomen leiden, welches bei Funktionen wie $f(x)=\frac{1}{1+x^2}$ an den Rändern für eine schlechte Approximationsgüte sorgt. Erfüllt $f$ jedoch minimale Glattheitsanforderungen (wie bereits Lipschitzstetigkeit) und verwendet man \chebyspace Interpolationspunkte, so ist die Approximationsgüte bereits bereits für kleines $n$ gesichert.\\
 Man beachte, dass der Name "`Bestapproximation"' sich strikt auf die verwendete Norm bezieht. Punktweise Aussagen lassen sich somit im Allgemeinen nicht treffen. 
 \begin{mathbsp}
-Als Beispiel vergleichen wir die Bestapproximation bezüglich der Maximumsnorm und die Chebyshev Interpolation vom Grad $N=100$ von der Funktion $f(x)=|x-\frac{1}{4}|$ in $[-1,1]$. Wie wir an Abbildung \ref{polyapproxcomp} erkennen, ist der maximale Fehler der Bestapproximation zwar geringer, aber tritt an $N+2$ Punkten auf, wohingegen der Fehler der Chebyshev Approximation zu den Rändern hin stark abnimmt. Dies soll verdeutlichen, dass die Bestapproximation nicht immer in jedem Sinne die "`beste"' Approximation darstellt.
+Als Beispiel vergleichen wir die Bestapproximation bezüglich der Maximumsnorm und die \chebyspace Interpolation vom Grad $N=100$ von der Funktion $f(x)=|x-\frac{1}{4}|$ in $[-1,1]$. Wie wir an Abbildung \ref{polyapproxcomp} erkennen, ist der maximale Fehler der Bestapproximation zwar geringer, aber tritt an $N+2$ Punkten auf, wohingegen der Fehler der \chebyspace Approximation zu den Rändern hin stark abnimmt. Dies soll verdeutlichen, dass die Bestapproximation nicht immer in jedem Sinne die "`beste"' Approximation darstellt.
 \begin{figure}[ht]
  \center
  \includegraphics[width=\linewidth]{Figures/polynomial_approx_comparison.png}
- \caption{Visualisierung der Fehler verschiedener Approximationen, angelehnt an \autocite{Trefethen}. Hierbei wurde die Bestapproximation mithilfe des \emph{Remez} Algorithmus aus dem Chebfun Projekt (http://www.chebfun.org/) berechnet. Der Fehler der Chebyshev Approximation nimmt zu den Rändern hin stark ab.}
+ \caption{Visualisierung der Fehler verschiedener Approximationen, angelehnt an \autocite{Trefethen}. Hierbei wurde die Bestapproximation mithilfe des \emph{Remez} Algorithmus aus dem Chebfun Projekt (http://www.chebfun.org/) berechnet. Der Fehler der \chebyspace Approximation nimmt zu den Rändern hin stark ab.}
  \label{polyapproxcomp}
 \end{figure}
 \end{mathbsp}
@@ -591,7 +594,7 @@ Wie schon bei der Bestapproximation bzgl. der Maximumsnorm erhält man auch für
 Für jedes $f\in L_w^2(I)$ gilt
 \[\lim\limits_{N\to\infty}\norm{f-P_Nf}_{L_w^2(I)}=0\]
 \end{maththeorem}
-Die Konvergenzordnung ist hierbei abhängig von der Regularität von $f$ und der Art der für die Projektion verwendeten Orthogonalpolynome. Man nennt diese Art der Konvergenz in der Literatur auch \emph{spektrale Konvergenz}, da die Konvergenzrate abhängig von der Glattheit der Funktion ist. Man muss also aufpassen eine hohe Approximationsordnung nicht mit einer hohen Approximationsgenauigkeit zu verwechseln.\\
+Die Konvergenzordnung ist hierbei abhängig von der Regularität von $f$ und der Art der für die Projektion verwendeten Orthogonalpolynome. Man nennt diese Art der Konvergenz in der Literatur auch \emph{spektrale Konvergenz}, da die Konvergenzrate abhängig von der Glattheit der Funktion ist. Man muss also aufpassen eine hohe Approximationsordnung $N$ nicht mit einer hohen Approximationsgenauigkeit zu verwechseln.\\
 Für das Beispiel der Legendre Polynome, also mit konstanter Gewichtsfunktion $w$, zeigt Xiu in \autocite[Theorem 3.6]{dongbinxiu2010} folgendes Ergebnis
 \begin{maththeorem}
 \label{spectralconvth}
@@ -602,7 +605,7 @@ Für jedes $f\in H_w^p[-1,1]\coloneqq \left\lbrace v\colon I\to\R | \frac{d^mv}{
 Als Veranschaulichung von Satz \ref{spectralconvth} approximieren wir verschiedene Funktionen $f\colon [-1,1]\to\R$ durch die orthogonale Projektion $P_Nf$ für steigendes $N\in\N$. In Abbildung \ref{figurespectralconverg} sind dafür die Fehler der Approximationen dargestellt. Dabei sind die $f$ unterschiedlich glatt und man erkennt unterschiedliche Konvergenzordnungen. Insbesondere erahnt man für die analytische Funktion $f(x)=\sin(\pi x)$ exponentielle Konvergenz in $N$. Da der General-Purpose Integrator, der für die Berechnung der Fourierkoeffizienten verwendet wurde für zu hohe Polynomgrade versagt, bricht die Darstellung an der entsprechenden Stelle ab.
 \begin{figure}[h]
 \includegraphics[width=\textwidth]{Figures/spectral_convergence_legendre.png}
-\caption{Spektrale Konvergenz von Funktionen verschiedener Glattheit mithilfe von Legendre Polynomen und Gewichtsfunktion $w\equiv \onehalf$ auf $[-1,1]$.}
+\caption{Spektrale Konvergenz der Bestapproximation von Funktionen verschiedener Glattheit mithilfe von Legendre Polynomen und Gewichtsfunktion $w\equiv \onehalf$ auf $[-1,1]$.}
 \label{figurespectralconverg}
 \end{figure}
 \end{mathbsp}

@@ -4,8 +4,8 @@
 Die hier aufgezeigte Einführung in das general Polynomial Chaos (gPC) ist angelehnt an Xiu in \autocite{dongbinxiu2010}.
 \section{Approximation von Zufallsvariablen}
 Anhand des Beispiels \ref{bsp:hermitechaos} des Hermite-Chaos haben wir bereits gesehen, dass für gewisse Orthonormalbasen von Polynomen $\lbrace H_i\rbrace$ und Zufallsvariablen $Y$ mit passenden stochastischen Verteilungen die Beziehung
-\[\langle H_i,H_j\rangle_{L_w^2(S)} =\E_Y \left[H_i(Y)H_j(Y)\right]=\delta_{ij}\]
-erfüllt wird.
+\[\langle H_i(x),H_j(x)\rangle_{L_w^2(S)} =\E_Y \left[H_i(Y)H_j(Y)\right]=\delta_{ij}\]
+erfüllt wird. Beachte, dass die Polynome einmal mit reellem Argument und einmal mit der Zufallsvariable $Y$ als Argument aufgefasst werden.
 \begin{mathdef}[General Polynomial Chaos Basis]
 \label{def:gpc}
 Sei $Y$ eine reelle Zufallsvariable mit Verteilungsfunktion $F_Y(y)=P(Y\le y)$ und endlichen Momenten
@@ -51,7 +51,7 @@ Diskret & Poisson & Charlier & $\lbrace 0,1,2,\dots\rbrace$ \\
 
 Das Ziel ist es nun, mithilfe einer gPC Orthonormalbasis eine Funktion $f(Y)$ einer Zufallsvariablen $Y$ zu approximieren. Wir wollen nun einen Einblick dazu bekommen, was an dieser Stelle mit "`approximieren"' gemeint ist.
 \begin{mathdef}[Starke gPC Konvergenz]
-Sei $f(Y)$ eine Funktion einer Zufallsvariablen $Y$ mit Dichte $\rho_Y$ und Träger $I_Y$. Eine general Polynomial Chaos Approximation $f_M(Y)\in\Poly_M(Y)$ konvergiert in einem starken Sinne gegen $F(Y)$, wenn \[\norm{f(Y)-f_M(Y)}_{L_{\rho_Y}^2(I_Y)}\to 0\text{ für }{M\to\infty}\]
+Sei $f(Y)$ eine Funktion einer Zufallsvariablen $Y$ mit Dichte $\rho_Y$ und Träger $I_Y$. Eine general Polynomial Chaos Approximation $f_M(Y)\in\Poly_M(Y)$ konvergiert in einem starken Sinne gegen $f(Y)$, wenn \[\norm{f(Y)-f_M(Y)}_{L_{\rho_Y}^2(I_Y)}\to 0\text{ für }{M\to\infty}\]
 \end{mathdef}
 Die starke gPC Konvergenz entspricht also direkt der in Kapitel \ref{sec:poly_approx} vorgestellten spektralen Konvergenz, entsprechend ist die Konvergenzordnung abhängig von der Glattheit der Funktion $f$. Ohne Beweis folgt aus der starken gPC Konvergenz auch die Konvergenz in Wahrscheinlichkeit und schlussendlich die Konvergenz in Verteilung.
 \begin{mathbem}
@@ -59,7 +59,7 @@ Ist die Funktion $f$ oder ihre Abhängigkeit von der Zufallsvariablen $Y$ nicht 
 Ein illustratives Beispiel ist in Abbildung \ref{fig:gpcweakconv} gegeben. Dort verwenden wir die Bestapproximation bezüglich $L_\rho^2(-\infty,\infty)$, wobei $\rho$ die Dichtefunktion der Normalverteilung ist, die Orthonormalbasis aus den Hermite-Polynomen $H_m$ besteht und $Y$ eine normalverteilte Zufallsvariable ist. Es ist
 \[f_M(Y)=\sum_{m=0}^M\hat{f}_mH_m(Y), \quad \hat{f}_m=\E[f(Y)H_m(Y)]\]
 die Bestapproximation an die Funktion $f(Y)$ in $\Poly_M(Y)$. Wir nehmen an, dass wir nur die Verteilung von $Z=f(Y)$ kennen und $Z\sim\text{Beta}(0.2,3.)$ in $[-1,1]$.\\
-Dann tritt bei der Berechnung von $\E[ZH_m(Y)]$ eine Schwierigkeit auf: es ist in dieser Form nicht möglich den Erwartungswert zu berechnen, da die Zufallsvariablen $Z$ und $H_m(Y)$ zu verschiedenen Wahrscheinlichkeitsräumen gehören. Hierzu ist es nun hilfreich, mithilfe der Inversionsmethode die beiden Verteilungen auf einen gemeinsamen Wahrscheinlichkeitsraum $\mathcal{U}(0,1)$ zu "`normieren"'. Dann gilt
+Dann tritt bei der Berechnung von $\E[ZH_m(Y)]$ eine Schwierigkeit auf: Es ist in dieser Form nicht möglich den Erwartungswert zu berechnen, da die Zufallsvariablen $Z$ und $H_m(Y)$ zu verschiedenen Wahrscheinlichkeitsräumen gehören. Hierzu ist es nun hilfreich, mithilfe der Inversionsmethode die beiden Verteilungen auf einen gemeinsamen Wahrscheinlichkeitsraum $\mathcal{U}(0,1)$ zu "`normieren"'. Dann gilt
 \[\hat{f}_m=\E_U\left[F_Z^{-1}(U)H_m(F_Y^{-1}(U))\right]=\int_0^1F_Z^{-1}(u)H_m(F_Y^{-1}(u))du\]
 und $f_M(Y)$ konvergiert in Verteilung gegen $f(Y)$ für $M\to\infty$.
 \begin{figure}[!htb]
@@ -78,7 +78,7 @@ Sei $P\in\N_0$ der fest gewählte maximale Polynomgrad. Sei weiter $Y=(Y_1,\dots
 
 \begin{mathbem}
 Der von den multivariate gPC Funktionen aufgespannte Raum $\Poly_P^N$ ist der Raum aller Polynome vom Grad höchstens $P$ in $N$ Variablen
-\[\Poly_P^N(Y)=\left\lbrace p\colon I_Y\to \R \mid p(Y)=\sum_{|m|\le P}c_m\Phi_m(Y)\right\rbrace\]
+\[\Poly_P^N(Y)\coloneqq \left\lbrace p\colon I_Y\to \R \mid p(Y)=\sum_{|m|\le P}c_m\Phi_m(Y)\right\rbrace\]
 Die Dimension des Raumes ist $\dim\Poly_P^N=\binom{P+N}{P}=\frac{(P+N)!}{P!N!}$.
 \end{mathbem}
 \begin{proof}
@@ -93,7 +93,7 @@ Dies sind exakt alle Möglichkeiten $N$ positive Zahlen deren Summe $j+N$ ist zu
 Schlussendlich gilt für die Summe von verschobenen Binomialkoeffizienten 
 \[\sum_{j=0}^Pa_j=\sum_{j=0}^P\binom{j+N-1}{N-1}\stackrel{\text{ind.}}{=}\binom{N+P}{N}=\binom{N+P}{P}\]
 \end{proof}
-In Zukunft wird es sowohl für die theoretische Notation, als auch die praktische Implementierung häufig praktischer sein, die Multi-Indices $m\in\N_0^M$ durchzunummerieren und äquivalent zum eindimensionalen Fall zu benutzen. Dies ist gerechtfertigt, da sich die zugehörigen multivariaten Polynome ähnlich verhalten. Zum Beispiel gilt aufgrund des gewählten Tensorproduktansatzes und der stochastischen Unabhängigkeit der Komponenten von $Y$ das mehrdimensionale Pendant zur Orthogonalitätsbedingung (\ref{eqn:gpc_ortho}) für $i,j\in\N_0^N$
+In Zukunft wird es sowohl für die theoretische Notation, als auch die konkrete Implementierung häufig praktischer sein, die Multi-Indices $m\in\N_0^M$ durchzunummerieren und äquivalent zum eindimensionalen Fall zu benutzen. Dies ist gerechtfertigt, da sich die zugehörigen multivariaten Polynome ähnlich wie die eindimensionalen Polynome verhalten. Zum Beispiel gilt aufgrund des gewählten Tensorproduktansatzes und der stochastischen Unabhängigkeit der Komponenten von $Y$ das mehrdimensionale Pendant zur Orthogonalitätsbedingung (\ref{eqn:gpc_ortho}) für $i,j\in\N_0^N$
 \begin{equation}
 \label{eqn:gpc_ortho_mv}
 \begin{split}

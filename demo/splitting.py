@@ -218,7 +218,7 @@ if __name__ == "__main__":
                                                                                offset_wave_solver.solutions()[-1])))
         plt.title("Splitting method errors for Klein Gordon, dt={}, N={}".format(delta_time, grid_size_N))
         plt.xlabel("Time")
-        plt.ylabel("Error in discrete L2 norm")
+        plt.ylabel("Error in discrete L2-norm")
         plt.yscale('log')
         plt.legend()
 

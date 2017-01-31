@@ -38,13 +38,13 @@ marker = cycle(('D', '*', 'o', '>', '<'))
 for name, Ns, errors in errors_over_N:
     plt.plot(Ns, errors, "-" + next(marker), label=name)
 rel_size = 'x-large'
-plt.title("Spektrale Konvergenz verschiedener Funktionen mit {} Polynomen".format(chaos.poly_basis.name),
+plt.title("Spektrale Konvergenz der Bestapproximation verschiedener Funktionen mit {} Polynomen".format(chaos.poly_basis.name),
           fontsize=rel_size)
 plt.xscale('log')
 plt.yscale('log')
 plt.ylim((1e-13, plt.ylim()[1]))
 plt.xlabel('Maximaler Polynom Grad', fontsize=rel_size)
-plt.ylabel('Relativer Fehler in diskreter L2 Norm', fontsize=rel_size)
+plt.ylabel('Relativer Fehler in diskreter L2-Norm', fontsize=rel_size)
 plt.legend(fontsize=rel_size)
 plt.show()
 

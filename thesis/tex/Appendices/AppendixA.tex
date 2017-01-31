@@ -23,15 +23,16 @@ Für eine genauere Betrachtung der Beziehungen der hypergeometrischen Polynome i
 \section{Auflisting von Polynombasen und Verteilungen}
 Wir präsentieren hier eine Auswahl der von uns verwendeten Orthogonalpolynome, insbesondere ihre Definition, Darstellung als Drei Term Rekursion, Gewichtsfunktion und ihre Beziehung zu stochastischen Verteilungen. Für weitere Eigenschaften wie die Darstellung als Lösung einer Differentialgleichung oder die Rodriguez Formel sei beispielsweise auf den Anhang von \autocite{dongbinxiu2010} verwiesen.\\
 Eine schöne Übersichtstabelle findet sich unter \url{http://dlmf.nist.gov/18.3}, man beachte, dass dort die verwendeten Polynome und Gewichte teilweise von unserer Notation abweichen. Dies ist der Tatsache geschuldet, dass die Beziehung zu Verteilungen und entsprechende Normierungsanforderungen keine Rolle spielen. Ebenso gibt es verschiedene Varianten die untere Grenze für die Parameter $\alpha$ und $\beta$ der Jacobi und Laguerre Polynome zu definieren.\\
-Benötigt man Referenzwerte für Nullstellen und Gewichte einer zugehörigen Gauss Quadratur, so findet sich unter\\\url{http://keisan.casio.com/exec/system/1281279441} ein Onlinerechner. Hierbei sei wieder auf abweichende Notation hingewiesen, insbesondere die fehlende Normierung der Gewichte um einen Faktor.\\
+Benötigt man Referenzwerte für Nullstellen und Gewichte einer zugehörigen Gauss Quadratur, so findet sich unter\\\url{http://keisan.casio.com/exec/system/1281279441} ein Onlinerechner.\\
+Hierbei sei wieder auf abweichende Notation hingewiesen, insbesondere die fehlende Normierung der Gewichte um einen Faktor.\\
 Um die Polynome möglichst kompakt darzustellen zu können, werden folgende Definitionen nützlich sein.
 \begin{mathdef}[Pochhammer Symbol]
 Das Pochhammer Symbol $(a)_n$ für $a\in\R$ und $n\in\lbrace -1,0,1,2,\dots\rbrace$ sei definiert durch
-\[(a)_n=\frac{\Gamma(a+n)}{\Gamma(a)}=
+\[(a)_n=
    \begin{cases}
    1, &n=-1\text{ oder } n=0\\
    a(a+1)\dots (a+n-1), &n\in\N
-   \end{cases}
+   \end{cases}\left(\stackrel{n\in\N}{=}\frac{\Gamma(a+n)}{\Gamma(a)}\right)
    \]
 Beachte, dass dies auch \emph{steigende Fakultät} genannt wird und nicht mit der \emph{fallenden Fakultät} verwechselt werden sollte, wie das Symbol auch manchmal verwendet wird. Die Notation ist in der Literatur nicht einheitlich!
 \end{mathdef}
@@ -41,7 +42,7 @@ Zu $r,s\in\N_0$ ist die hypergeometrische Funktion $_rF_s$ definiert durch
 \[_rF_s(a_1,\dots,a_r;b_1,\dots,b_s;z)\coloneqq \sum_{k=0}^\infty \frac{(a_1)_k\dots (a_r)_kz^k}{(b_1)_k\dots(b_s)_kk!}\]
 \end{mathdef}
 Für weitere Polynome aus dem Askey Schema (siehe Abbildung \ref{askeyscheme}), insbesondere diese mit diskreten Verteilungen, sei wieder beispielsweise auf \autocite{dongbinxiu2010} verwiesen. \\
-Für eine Methode zum Berechnen der Nullstellen aus der Drei Term Rekursion steht der Golub Welsch Algorithmus (vgl. \ref{golubwelschalg}) zur Verfügung.\\
+Für eine Methode zum Berechnen der Nullstellen aus der Drei-Term-Rekursion steht der Golub-Welsch-Algorithmus (vgl. \ref{golubwelschalg}) zur Verfügung.\\
 Für die Drei-Term-Rekursion der nicht normalisierten orthogonalen Polynome $\Psi_n$ gilt stets $\Psi_{-1}\equiv 0$ und $\Psi_{0}\equiv 1$.
 \subsection{Hermite Polynome und Gauß Verteilung}
 Träger:
@@ -54,7 +55,7 @@ Gewichtsfunktion:
 \[w(x)=\frac{1}{\sqrt{2\pi}}e^{-\frac{x^2}{2}}\]
 Normalisierungsfaktor:
 \[\gamma_n=n!\]
-Stochastische Verteilung:
+Stochastische Verteilung $\mathcal{N}(0,1)$:
 \begin{center}
 normalisierte Gauß Verteilung mit Dichtefunktion $\rho(x)=w(x)$
 \end{center}
@@ -70,7 +71,7 @@ Gewichtsfunktion:
 \[w(x)=\frac{x^{\alpha-1}e^{-x}}{\Gamma(\alpha)}\]
 Normalisierungsfaktor:
 \[\gamma_n=\frac{(\alpha)_n}{n!}\]
-Stochastische Verteilung:
+Stochastische Verteilung $\gamma(\alpha,1)$:
 \begin{center}
 Gamma Verteilung mit $\alpha>0,\beta=1$ und Dichtefunktion
 \[\rho(x)=\frac{x^{\alpha-1}e^{-\frac{x}{\beta}}}{\beta^{\alpha}\Gamma(\alpha)}\]
@@ -99,7 +100,7 @@ Gewichtsfunktion:
 \[w(x)=\frac{\Gamma(\alpha+\beta+2)}{2^{\alpha+\beta+1}\Gamma(\alpha+1)\Gamma(\beta+1)}(1-x)^\alpha(1+x)^\beta\]
 Normalisierungsfaktor:
 \[\gamma_n=\frac{(\alpha+1)_n(\beta+1)_n}{n!(2n+\alpha+\beta+1)(\alpha+\beta+2)_{n-1}}\]
-Stochastische Verteilung:
+Stochastische Verteilung $Beta(\alpha,\beta)$:
 \begin{center}
 Beta Verteilung auf $(-1,1)$ mit $\alpha,\beta>-1$ und Dichtefunktion
 \[\rho(x)=\frac{(1 - x)^\alpha(1 + x)^\beta}{2^{\alpha + \beta + 1}B(\alpha+1,\beta+1)}=w(x),\quad B\text{ ist Eulersche Betafunktion}\]
@@ -118,7 +119,7 @@ Gewichtsfunktion:
 \[w(x)\equiv \onehalf\]
 Normalisierungsfaktor:
 \[\gamma_n=\frac{1}{2n+1}\]
-Stochastische Verteilung:
+Stochastische Verteilung $\mathcal{U}(-1,1)$:
 \begin{center}
 Gleichverteilung auf $[-1,1]$ mit Dichtefunktion $\rho(x)=w(x)$
 \end{center}

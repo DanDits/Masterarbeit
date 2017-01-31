@@ -7,10 +7,10 @@ from diff_equation.splitting import Splitting
 from util.analysis import error_l2_relative
 
 dimension = 1
-grid_size_N = 64 if dimension >= 2 else 512
+grid_size_N = 64 if dimension >= 2 else 1024
 domain = list(repeat([-np.pi, np.pi], dimension))
-trial = ds.trial_frog2
-wave_weight = 0.9
+trial = ds.trial_1
+wave_weight = 0.93
 
 start_time = 0.
 delta_times = np.arange(0.25, 0.0001, -0.0005)
@@ -50,21 +50,24 @@ for delta_time in delta_times:
             errors_per_delta_time.append([])
         trial.error_function = error_l2_relative
         errors_per_delta_time[i].append(trial.error(xs_mesh, splitting.times()[-1], splitting.solutions()[-1]))
+        if i==1:
+            print(delta_time, errors_per_delta_time[i][-1])
 
 size = "xx-large"
 plt.figure()
 print(trial.name)
-plt.title("Konvergenz verschiedener Splittings, $N={}$, $w={}$"
-          .format(grid_size_N, wave_weight),
+plt.title("Konvergenz verschiedener Splitting Varianten, $N={}$, $w={}$, $T={}$"
+          .format(grid_size_N, wave_weight, stop_time),
           fontsize=size)
 plt.xlabel("$\\frac{1}{\\tau}$", fontsize=size)
-plt.ylabel("Relativer Fehler bei $T={}$".format(stop_time), fontsize=size)
+plt.ylabel("Relativer Fehler in diskreter L2-Norm", fontsize=size)
 plt.xscale('log')
 plt.yscale('log')
 dts = [1/delta_time for delta_time in delta_times]
 for splitting, errors in zip(splittings, errors_per_delta_time):
     plt.plot(dts, errors, label=splitting.name)
-plt.plot(dts, np.array(dts) ** -2, label="Referenz $\\tau^{2}$")
+plt.plot(dts, np.array(dts) ** -2, label="Referenz $\\tau^{2}$", linestyle="dashed", color="black")
 plt.xlim((dts[0], dts[-1]))
+plt.ylim(ymax=1.)
 plt.legend(fontsize=size)
 plt.show()
