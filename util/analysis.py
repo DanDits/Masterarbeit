@@ -86,3 +86,7 @@ def error_l2_relative(approx_y, solution_y):
     assert approx_y.shape == solution_y.shape
     solution_error = np.sqrt(np.sum(np.abs(solution_y) ** 2.) / solution_y.size)
     return error_l2(approx_y, solution_y) / solution_error
+
+
+def error_maximum(approx_y, solution_y):
+    return np.max(np.abs(approx_y - solution_y))

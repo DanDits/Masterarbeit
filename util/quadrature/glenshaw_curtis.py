@@ -9,6 +9,10 @@ def chebyshev_nodes(size):
     return np.cos(np.pi * (np.arange(1, size + 1) * 2 - 1) / (2 * size))
 
 
+def chebyshev_nodes_second_kind(size):
+    return np.cos(np.pi * (np.arange(1, size + 1)) / (size + 1))
+
+
 def get_nodes(order):
     if order == 1:
         return np.zeros(1)

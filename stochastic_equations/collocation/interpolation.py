@@ -6,6 +6,8 @@ from stochastic_equations.collocation.coll_util import check_distribution_assert
 from numpy.linalg import lstsq
 import polynomial_chaos.multivariation as mv
 from util.quadrature.helpers import multi_index_bounded_sum_length
+from util.quadrature.glenshaw_curtis import chebyshev_nodes, chebyshev_nodes_second_kind
+from itertools import product
 
 
 def matrix_inversion_expectancy(trial, max_poly_degree, quadrature_method, quadrature_param, spatial_domain, grid_size,
@@ -16,8 +18,13 @@ def matrix_inversion_expectancy(trial, max_poly_degree, quadrature_method, quadr
         check_distribution_assertions(distr)
     chaos = mv.chaos_multify([get_chaos_by_distribution(distr) for distr in distrs], sum_bound)
 
-    chaos.init_quadrature_rule(quadrature_method, quadrature_param)
-    nodes_list = chaos.quadrature_rule.get_nodes()
+    if quadrature_method == "chebyshev":
+        nodes_list = [chebyshev_nodes(size) for size in quadrature_param]
+        # use full tensor product of all dimensions by using 'product'
+        nodes_list = np.array([grid_nodes for grid_nodes in product(*nodes_list)])
+    else:
+        chaos.init_quadrature_rule(quadrature_method, quadrature_param)
+        nodes_list = chaos.quadrature_rule.get_nodes()
 
     # for uniform or beta distribution you could also use chebyshev (or slightly worse glenshaw) nodes
     # not always optimal performance, but pretty good
@@ -75,5 +82,6 @@ def matrix_inversion_expectancy(trial, max_poly_degree, quadrature_method, quadr
     # Var[w_N]=E[(w_N)^2]-E[w_N]^2
     variance = np.reshape(np.sum(weights ** 2, axis=0) - (chaos.normalization_gamma(0) * (weights[0, :] ** 2)),
                           solution_shape)
+    nodes_count = 0 if chaos.quadrature_rule is None else chaos.quadrature_rule.get_nodes_count()
     return (splitting_xs, splitting_xs_mesh, expectancy, variance, rank,
-            poly_count, chaos.quadrature_rule.get_nodes_count())
+            poly_count, nodes_count)

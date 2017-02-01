@@ -11,12 +11,12 @@ Die stochastische KGG (\ref{skgg}) für $d$ räumliche Dimensionen, $N$ stochast
 u(0,x,y)&=u_0(x,y), \: x\in \Torus^d\\
 \dt{u}(0,x,y)&=v_0(x,y), \: x\in \Torus^d
 \end{align*}
-Im klassischen Sinne bedeutet Collocation, dass eine Approximation für eine diskrete Knotenmenge $\Theta_S=\lbrace y_i\in\R^N\mid i=1,\dots,S\rbrace$ exakt ist. Auf die stochastische KGG übertragen, muss also für $y=y_i\in\Theta_S$ die Lösung $u(t,x,y_i)$ für $x\in\Torus^d$ und $t>0$ vorliegen und die Approximation $w$ erfüllt $w(t,x,y_i)=u(t,x,y_i)$ für $i=1,\dots,S$. Da wir die exakte Lösung $u(t,x,y_i)$ nicht kennen, sondern für einen Zeitpunkt $T>0$ und eine Knotenmenge $\lbrace x_j\in\Torus^d\mid j=1,\dots,H\rbrace$ nur mithilfe des Strang-Splittings approximieren können, gilt also für festes $x_j$ die Collocationsbedingung lediglich approximativ:
+Im klassischen Sinne bedeutet Collocation, dass eine Approximation für eine diskrete Knotenmenge $\Theta_Y=\lbrace y_i\in\R^N\mid i=1,\dots,S\rbrace$ exakt ist. Auf die stochastische KGG übertragen, muss also für $y=y_i\in\Theta_Y$ die Lösung $u(t,x,y_i)$ für $x\in\Torus^d$ und $t>0$ vorliegen und die Approximation $w$ erfüllt $w(t,x,y_i)=u(t,x,y_i)$ für $i=1,\dots,S$. Da wir die exakte Lösung $u(t,x,y_i)$ nicht kennen, sondern für einen Zeitpunkt $T>0$ und eine Knotenmenge $\lbrace x_j\in\Torus^d\mid j=1,\dots,H\rbrace$ nur mithilfe des Strang-Splittings approximieren können, gilt also für festes $x_j$ die Collocationsbedingung lediglich approximativ:
 \[w(T,x_j,y_i)=u(T,x_j,y_i)\approx \tilde{u}(T,x_j,y_i),\quad i=1,\dots,S\]
 Wir wählen daher $\tau$ so klein, dass dieser Fehler im Vergleich zum eigentlichen Collocationsfehler vernachlässigbar gering ist. Zur Vereinfachung der Notation nehmen wir im Folgenden an, die Lösung $u(T,x_j,y_i)$ liege exakt vor.
 
 \section{Interpolation}
-Sei $Y$ ein $N$-dimensionaler Zufallsvektor mit stochastisch unabhängigen Komponenten und $\Theta_S\subset I_Y$ eine zu den Verteilungen von $Y_i$ passende $S$ elementige Knotenmenge. Seien weiter $\lbrace \Phi_m \mid |m|\le P \rbrace$ die zu den Verteilungen passenden gPC Basisfunktionen und im Folgenden mit $m=0,\dots M=\binom{N+P}{P}-1$ durchnummeriert. Eine Diskussion zur Nummerierung findet man im vorherigen Kapitel.\\
+Sei $Y$ ein $N$-dimensionaler Zufallsvektor mit stochastisch unabhängigen Komponenten und $\Theta_Y\subset I_Y$ eine zu den Verteilungen von $Y_i$ passende $S$ elementige Knotenmenge. Seien weiter $\lbrace \Phi_m \mid |m|\le P \rbrace$ die zu den Verteilungen passenden gPC Basisfunktionen und im Folgenden mit $m=0,\dots M=\binom{N+P}{P}-1$ durchnummeriert. Eine Diskussion zur Nummerierung findet man im vorherigen Kapitel.\\
 Dann wählen wir als Interpolationspolynom die Funktion
 \begin{equation}
 \label{eqn:coll_interpol_basic}
@@ -55,7 +55,8 @@ Da die Funktion gegeben ist, hat man keinen Einfluss auf die Ableitung $f^{(S)}$
 \[\norm{f(y)-\mathcal{Q}_{S}f}\le \frac{\norm{f^{(S)}}_\infty}{S!}\underbrace{\norm{\prod_{i=1}^{S}(y-y_i)}}_{=\norm{w(y)}}\]
 ist es somit das Ziel, den Term $\norm{w(y)}$ abhängig von der Norm zu minimieren.
 \begin{mathbem}[\chebyspace Interpolation]
-Die Nullstellen $y_i=\cos\left(\frac{2i-1}{2S+2}\right)$, für $i=1,\dots,S+1$, der \chebyspace Polynome $T_{S+1}(y)=\cos((S+1)\arccos(y))$ minimieren den Ausdruck $\norm{w(y)}_\infty$ auf $[-1,1]$ und bieten auf $[-1,1]$ optimale Interpolationsgüte. Es gilt 
+\label{bem:cheby}
+Die Nullstellen $y_i=\cos\left(\pi\frac{2i-1}{2S+2}\right)$, für $i=1,\dots,S+1$, der \chebyspace Polynome $T_{S+1}(y)=\cos((S+1)\arccos(y))$ minimieren den Ausdruck $\norm{w(y)}_\infty$ auf $[-1,1]$ und bieten auf $[-1,1]$ optimale Interpolationsgüte. Es gilt 
 \[\norm{f(y)-\mathcal{Q}_{S+1}f}_\infty\le \frac{\norm{f^{(S+1)}}_\infty}{2^S(S+1)!}\]
 \end{mathbem}
 Die \chebyspace Polynome bilden eine Orthogonalbasis bezüglich $\langle \cdot,\cdot\rangle_{L_w^2[-1,1]}$ mit $w(y)=(1-y^2)^{-\onehalf}$. Eine Idee ist es nun, auch Nullstellen anderer orthogonalen Polynombasen als Knotenpunkte zu verwenden um ähnliche Approximationsergebnisse auf nicht-kompakten Intervallen zu erhalten.
@@ -96,6 +97,62 @@ Die Darstellung $\hat{w}_i=\sum_{j=0}^M\Phi_i(y_j)\alpha_jf(y_j)$ kann als Appro
 Schlussendlich lässt sich also der Fehler der Interpolation durch den Fehler der Bestapproximation in $L_w^2$ und einen Quadraturfehler bezüglich der Gewichtsfunktion $w$ beschreiben. Für den Fehler der Bestapproximation erwarten wir nach Xiu spektrale Konvergenz. Finden wir eine zur Gewichtsfunktion $w$ passende Quadraturformel, so hat lediglich die Glattheit von $f$ Einfluss auf den Quadraturfehler, da $\Phi_m$ als Polynom bei hinreichend hoher Ordnung exakt integriert wird.
 \end{itemize}
 \end{mathbem}
+\begin{mathbsp}
+Wir vergleichen anhand von \nameref{trial:1} für $d=1$ zwei mögliche Wahlen der Interpolationspunkte. Da $Y$ eine Gleichverteilung zugrunde liegt, verwenden wir die normalisierten Legendre-Polynome $L_0,\dots,L_M$. Als Interpolationspunkte $y_i$ wählen wir dann
+\begin{enumerate}
+\item die $M+1$ Nullstellen des Legendre-Polynoms vom Grad $M+1$ (genannt \textit{full\_tensor}).
+\item die $M+1$ Nullstellen des \chebyspace Polynoms vom Grad $M+1$ (siehe Bemerkung \ref{bem:cheby}).
+\end{enumerate}
+In Abbildung \ref{fig:collocation_trial1} ist die Approximationsgüte der Interpolation dargestellt, links für $\tau=0.001$ und rechts für $\tau=0.0001$, gemessen durch die Fehler an den Erwartungswert und die Varianz. Man erkennt, dass die \chebyspace Interpolation langsamer konvergiert als die Legendre-Interpolation. Die Konvergenz stoppt bei einer gewissen Genauigkeit, die abhängig ist von $\tau$. Dies ist dadurch begründet, dass die Punkte $u(T,x_j,y_i)$ nicht exakt vorliegen sondern lediglich mithilfe eines Strang-Splittings mit Schrittweite $\tau$ approximiert werden. Dies betont die Wichtigkeit der Wahl eines kleinen $\tau$, allerdings bedeutet dies gleichzeitig eine entsprechende multiplikative Vergrößerung der Berechnungszeit und somit insbesondere für $N>1$ einen deutlichen Mehraufwand.
+\begin{figure}[!htb]
+\minipage{0.5\textwidth}
+  \includegraphics[width=\linewidth]{Figures/collocation_mi_trial1_tau001.png}
+\endminipage
+\minipage{0.5\textwidth}
+  \includegraphics[width=\linewidth]{Figures/collocation_mi_trial1_tau0001.png}
+\endminipage
+\caption{Vergleich von verschiedenen Interpolationspunkten und der Abhängigkeit der bestmöglichen Interpolation von der Genauigkeit der Interpolationspunkte anhand von \nameref{trial:1} zum Zeitpunkt $T=0.5$ und für $d=1$.}
+\label{fig:collocation_trial1}
+\end{figure}
+\end{mathbsp}
+\subsubsection*{Mehrdimensionale Interpolation durch volles Tensorprodukt}
+Eine mögliche Wahl für $N>1$ die Menge der Interpolationspunkte $\Theta_Y^N$ zu einem gegebenem Zufallsvektor $Y$ der Dimension $N$ zu wählen, ist gegeben durch das volle Tensorprodukt
+\[\Theta_Y^N=\Theta_{Y_1}\otimes \dots \otimes \Theta_{Y_N},\quad \Theta_{Y_i}\subset I_{Y_i}\]
+Dann gilt für die Anzahl der Interpolationspunkte $S=S_1\cdot \dots \cdot S_N$. Ist die Anzahl an Basispolynomen $M+1$ fest, so ist es schwierig die Bedingung $S=M+1$ exakt zu erfüllen. Wir fordern daher, dass $S_1=\dots=S_N$ und $S\ge M+1$ minimal. Dieser Ansatz wird in Abbildungen durch \textit{full\_tensor} gekennzeichnet.
+\subsubsection*{Mehrdimensionale Interpolation durch zentralisiertes dünnes Gitter}
+Eine weitere Option für $M+1=\binom{N+P}{P}$ ist mit $S_1=\dots=S_N$ die Wahl
+\[\Theta_Y^N=\lbrace (y_{m_1},\dots,y_{m_N})\mid |m|\le P, y_{m_i}\in \Theta_{Y_i}\rbrace \]
+Es wird somit jedem Multi-Index $m\in\N_0^N$ genau ein mehrdimensionaler Interpolationspunkt $y$ zugewiesen und es gilt $M+1=S$. Die Wahl der Nummerierung der eindimensionalen Interpolationspunkte ist dabei entscheidend. Für Legendre- oder Hermite-Polynome bietet sich eine betragsmäßig aufsteigende Sortierung der Punkte an, da diese symmetrisch um $0$ verteilt sind. Für Jacobi- und Laguerre-Polynome ist diese Symmetrie abhängig von den Parametern verschoben. Man beobachtet in Abbildung \ref{fig:poly_roots} dennoch die für Orthogonalpolynome geltende Eigenschaft, dass die Nullstellen eines Polynoms höheren Grades zwischen den Nullstellen des vorherigen Polynoms zu finden sind. Dies motiviert es die Nullstellen um den Median herum zu sortieren. Dieser Ansatz wird in Abbildungen durch \textit{centralized} gekennzeichnet.
+\begin{figure}[!htb]
+\minipage{0.5\textwidth}
+  \includegraphics[width=\linewidth]{Figures/roots_legendre.png}
+  \includegraphics[width=\linewidth]{Figures/roots_jacobi.png}
+\endminipage
+\minipage{0.5\textwidth}
+  \includegraphics[width=\linewidth]{Figures/roots_hermite.png}
+  \includegraphics[width=\linewidth]{Figures/roots_laguerre.png}  
+\endminipage
+\caption{Nullstellen verschiedener Orthogonalbasen von Polynomen mit steigendem Grad.}
+\label{fig:poly_roots}
+\end{figure}
+
+Ein Beispiel sei für $N=2$ und $P=14$ gemacht, wo für Legendre- und Hermite-Polynome die Interpolationspunkte des zentralisierten Gitters in Abbildung \ref{fig:roots_centralized} dargestellt sind. Der Vorteil dieser Methode ist, dass durch die Eigenschaft $M+1=S$ die Matrix quadratisch ist und die Kondition kleiner ist als für ein überbestimmtes System. Wir werden später basierend auf Smolyaks Konstruktion einen effizienteren dünne Gitter Ansatz kennen lernen, der nicht nur für Interpolation zu verwenden ist, sondern sich auch auf generelle Operatoren übertragen lässt.
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=0.8\linewidth]{Figures/roots_centralized.png}
+\caption{Interpolationspunkte des centralized Ansatzes für $N=2$ und Legendre- und Hermite-Polynome.}
+\label{fig:roots_centralized}
+\end{figure}
+\subsection{Vergleiche der Ansätze}
+Wir reduzieren uns für $N=1$ auf die Nullstellen derjenigen Orthogonalpolynome, die gemäß des gPC zu der Verteilung von $Y$ gehören. Für das kompakte Interval $I=[-1,1]$ wäre es ebenso möglich die \chebyspace Interpolationspunkte zu verwenden. Diese bieten aber nach unseren Beobachtungen keinen Vorteil.\\
+Für $N>1$ besteht die Möglichkeit das volle Tensorprodukt der jeweiligen eindimensionalen Interpolationspunkte zu den Komponenten von $Y$ zu wählen. Da dies jedoch im Allgemeinen mehr Punkte umfasst als die vorhandenen $M+1$ Polynome ist das lineare Gleichungssystem überbestimmt und wir beobachten eine hohe Kondition der Matrix. Dies sorgt insbesondere dafür, dass die Approximation der Varianz, welche jede Komponente des Lösungsvektors benötigt, bereits für $P>3$ instabil ist.\\
+Anhand der \nameref{trial:4} aus dem Appendix mit $N=4$ vergleichen wir die beiden Wahlen in Abbildung \ref{fig:collocation_trial4}. Wir sehen, dass sich der Erwartungswert mit beiden Ansätzen gleich gut approximieren lässt. Die Varianz ist durch das überbestimmte System beim full\_tensor Ansatz jedoch nicht berechenbar (für $P=9$ ergibt sich ein System der Größe $6^4\times \binom{4+9}{9} =1296\times 715$).
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\linewidth]{Figures/collocation_mi_trial4_ft_centralized.png}
+\caption{Approximation des Erwartungswerts und der Varianz von \nameref{trial:4} mithilfe von Collocation durch Interpolation und verschiedenen Ansätzen.}
+\label{fig:collocation_trial4}
+\end{figure}
 
 \section{Diskrete Projektion}
 \subsection{Gauss-Quadratur im eindimensionalen}
