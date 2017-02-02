@@ -77,6 +77,8 @@ trial_3 = StochasticTrial([distributions.make_uniform(-1, 1)],  # y[0] bigger th
                     "expectancy", lambda xs, t: (np.cos(t) / (right_3 - left_3)
                                                  * (np.log(np.sin(sum(xs)) + right_3)
                                                     - np.log(np.sin(sum(xs)) + left_3))))
+# expectancy error MI best we got is (centralized or full_tensor) 6.084676525001868e-05
+# variance error MI best we got is (centralized): 0.00095091110795730524
 trial_4 = StochasticTrial([distributions.gaussian, distributions.make_uniform(-1, 1),
                            distributions.make_beta(-0.5, 2.5), distributions.make_uniform(-1, 1)],
                           lambda xs, ys: np.sin(sum(xs)),

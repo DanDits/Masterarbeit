@@ -9,11 +9,11 @@ import util.quadrature.nesting as nst
 from util.quadrature.closed_fully_nested import ClosedFullNesting
 from polynomial_chaos.poly_chaos_distributions import get_chaos_name_by_distribution
 
-trial = st.trial_discont_simple
+trial = st.trial_4
 
 # "High order is not the same as high accuracy. High order translates to high accuracy only when the integrand
 # is very smooth" (http://apps.nrbook.com/empanel/index.html?pg=179#)
-N = list(range(25))  # maximum degree of the univariate polynomial
+N = list(range(17))  # maximum degree of the univariate polynomial
 
 # from n+1 to n+10 notably difference for most examples
 # number of nodes in random space, >= N+1, higher CAN give more accuracy (for higher polys)
