@@ -118,7 +118,7 @@ In Abbildung \ref{fig:collocation_trial1} ist die Approximationsgüte der Interp
 \subsubsection*{Mehrdimensionale Interpolation durch volles Tensorprodukt}
 Eine mögliche Wahl für $N>1$ die Menge der Interpolationspunkte $\Theta_Y^N$ zu einem gegebenem Zufallsvektor $Y$ der Dimension $N$ zu wählen, ist gegeben durch das volle Tensorprodukt
 \[\Theta_Y^N=\Theta_{Y_1}\otimes \dots \otimes \Theta_{Y_N},\quad \Theta_{Y_i}\subset I_{Y_i}\]
-Dann gilt für die Anzahl der Interpolationspunkte $S=S_1\cdot \dots \cdot S_N$. Ist die Anzahl an Basispolynomen $M+1$ fest, so ist es schwierig die Bedingung $S=M+1$ exakt zu erfüllen. Wir fordern daher, dass $S_1=\dots=S_N$ und $S\ge M+1$ minimal. Dieser Ansatz wird in Abbildungen durch \textit{full\_tensor} gekennzeichnet.
+Dann gilt für die Anzahl der Interpolationspunkte $S=S_1 \dots S_N$. Ist die Anzahl an Basispolynomen $M+1$ fest, so ist es schwierig die Bedingung $S=M+1$ exakt zu erfüllen. Wir fordern daher, dass $S_1=\dots=S_N$ und $S\ge M+1$ minimal. Dieser Ansatz wird in Abbildungen durch \textit{full\_tensor} gekennzeichnet.
 \subsubsection*{Mehrdimensionale Interpolation durch zentralisiertes dünnes Gitter}
 Eine weitere Option für $M+1=\binom{N+P}{P}$ ist mit $S_1=\dots=S_N$ die Wahl
 \[\Theta_Y^N=\lbrace (y_{m_1},\dots,y_{m_N})\in \Theta_{Y_1}\otimes \dots \otimes \Theta_{Y_N} \mid |m|\le P \rbrace \]
@@ -157,7 +157,7 @@ Anhand der \nameref{trial:4} aus dem Appendix mit $N=4$ vergleichen wir die beid
 \section{Diskrete Projektion}
 Der zweite Ansatz zur stochastischen Collocation basiert auf der Bestapproximation in $L_{\rho_Y}^2$.
 \begin{mathdef}[Diskrete Projektion]
-Sei $Y$ ein Zufallsvektor und $\Phi_m(Y)$ für $m=1,\dots M$ die zugehörigen orthonormalen gPC Basisfunktionen. Dann ist die Bestapproximation der sKGG zu einem Zeitpunkt $T>0$ und für eine Stelle $x_j$ definiert als
+Sei $Y$ ein Zufallsvektor und $\Phi_m(Y)$ für $m=0,\dots M$ die zugehörigen orthonormalen gPC Basisfunktionen. Dann ist die Bestapproximation der sKGG zu einem Zeitpunkt $T>0$ und für eine Stelle $x_j$ definiert als
 \[P_Mu(T,x_j,Y)=\sum_{m=0}^M\hat{u}_m^{(j)}\Phi_m(Y)\]
 mit Koeffizienten
 \[\hat{u}_m^{(j)}=\E[u(T,x_j,Y)\Phi_m(Y)]=\int_{I_Y} u(T,x_j,y)\Phi_m(y)\rho_Y(y)dy\]
@@ -170,10 +170,10 @@ Satz \ref{th:interpol_and_proj} zeigt, dass für $Q=M$ und eine Quadraturformel 
 \subsection{Gauss-Quadratur im eindimensionalen}
 Wir wollen nun eine möglichst exakte Quadraturformel konstruieren, welche auf natürliche Weise das jeweilige Gewicht $\rho$ des Integrals berücksichtigt.
 \begin{maththeorem}[Gauss-Quadratur]
-Sei $Q_0,\dots,Q_{n+1}\in L_\rho^2(I)$ eine Orthogonalbasis von Polynomen bezüglich des Gewichts $\rho$. O.B.d.A. sei $Q_j\in \Poly_j$ für $j=0,\dots,n+1$. Seien $y_0,\dots,y_n$ die Nullstellen des Polynoms $Q_{n+1}$. Dann ist die Quadraturformel $(y_i,a_i)$ mit 
+Sei $Q_0,\dots,Q_{n+1}\in L_\rho^2(I)$ eine Orthogonalbasis von Polynomen bezüglich des Gewichts $\rho$. Es sei $\text{deg}(Q_j)=j$ für $j=0,\dots,n+1$. Seien $y_0,\dots,y_n$ die Nullstellen des Polynoms $Q_{n+1}$. Dann ist die Quadraturformel $(y_i,a_i)$ mit 
 \[\int_If(y)\rho(y)dy\approx \sum_{i=0}^na_if(y_i)\]
 und 
-\[a_i=\int_I \rho(y)\underbrace{\prod_{j\neq i} \frac{y-y_j}{y_i-y_j}}_{=\ell_i}dy\]
+\[a_i=\int_I \rho(y)\underbrace{\prod_{j\neq i} \frac{y-y_j}{y_i-y_j}}_{=\ell_i(y)}dy\]
 exakt für alle Polynome vom Grad höchstens $2n+1$.
 \end{maththeorem} 
 \begin{proof}[Beweisskizze]
@@ -184,7 +184,7 @@ eine durch Polynomdivision erhaltene Zerlegung von $f$. Da die $y_i$ Nullstellen
 Dann ist
 \[\int_If(y)\rho(y)dy=\underbrace{\int_IQ_{n+1}(y)p(y)\rho(y)dy}_{=0}+\int_Ir(y)\rho(y)dy\]
 da $Q_{n+1}$ orthogonal zum Raum aller Polynome vom Grad höchstens $n$ ist.\\
-Die interpolatorischen Newton-Cotes-Quadraturformeln mit den Gewichten $a_i$, die über das gewichtete Integral der Lagrange-Polynome $\ell_i$ definiert werden, sind unabhängig von den gewählten Quadraturpunkten exakt für Polynome vom Grad höchstens $n$. Somit gilt
+Die interpolatorischen Quadraturformeln (wie beispielsweise die Newton-Cotes-Formeln) mit den Gewichten $a_i$, die über das gewichtete Integral der Lagrange-Polynome $\ell_i$ definiert werden, sind exakt für Polynome vom Grad höchstens $n$. Somit gilt
 \[\int_If(y)\rho(y)dy=\int_Ir(y)\rho(y)dy=\sum_{i=0}^{n}a_ir(y_i)=\sum_{i=0}^{n}a_if(y_i)\]
 \end{proof}
 \begin{mathbem}
@@ -192,7 +192,7 @@ Wir nennen an dieser Stelle noch einige praktische Hinweise zur Gauss-Quadratur.
 \begin{itemize}
 \item Die Gauss-Quadraturformel zur entsprechenden gPC Basis erfüllt die Voraussetzungen an die Quadraturformel von Satz \ref{th:interpol_and_proj}.
 \item Die Nullstellen $y_i$ lassen sich als die Eigenwerte einer symmetrischen Tridiagonalmatrix mithilfe des Golub-Welsch-Algorithmus berechnen.
-\item Die Gewichte $a_i$ lassen sich ebenfalls mithilfe des Golub-Welsch-Algorithmus berechnen. Ist $y_i$ ein Eigenwert der Tridiagonalmatrix $J$ mit normalisiertem Eigenvektor $z$, d.h. $Jz=y_iz$ und $\norm{z}=1$, so gilt
+\item Die Gewichte $a_i$ lassen sich ebenfalls mithilfe des Golub-Welsch-Algorithmus berechnen. Ist $y_i$ ein Eigenwert der symmetrischen Tridiagonalmatrix $J$ mit normalisiertem Eigenvektor $z$, d.h. $Jz=y_iz$ und $\norm{z}=1$, so gilt
 \[a_i=(z_1)^2\]
 Das Gewicht ist somit das Quadrat des ersten Eintrags des Eigenvektors, siehe \autocite{GolubWelsch}.
 \end{itemize}
@@ -200,9 +200,16 @@ Das Gewicht ist somit das Quadrat des ersten Eintrags des Eigenvektors, siehe \a
 \todo[inline]{Nenne Vorteile der Interpolation: Keine Gewichte benötigt, Nodes "beliebig" und flexibler, evtl. somit besser für sparse grids da man auch glenshaw curtis nehmen kann, info über Stabilität durch cond der Matrix. Nachteil: gekoppelt, LGS muss gelöst werden (aufwändig), häufig unter/überbestimmt}
 \todo[inline]{Nachteil der DP: Konvergenz abhängig von zweitem Freiheitsgrad Q anstelle von nur M, aber für erwartungswert praktisch da dort eh nur eins nötig ist und somit "beliebig genau" mit Q steuerbar}
 \subsection{Mehrdimensionale Quadratur}
+Um den Ansatz der diskreten Projektion für einen mehrdimensionalen Zufallsvektor mit $N>1$ durchzuführen, benötigen wir eine mehrdimensionale Quadratur. Im Gegensatz zur mehrdimensionalen Interpolation liegt die Schwierigkeit nicht nur darin eine Menge von Collocationspunkten zu finden, sondern auch die zugehörige Menge der Quadraturgewichte zu bestimmen.\\
+Die numerischen Möglichkeiten der mehrdimensionalen Integration (engl. \emph{cubature}) umfassen unter anderem adaptive Verfahren und Monte-Carlo-Methoden. Da diese auf einer großen Menge an Funktionsauswertungen basieren und in unserem Fall eine Funktionsauswertung das aufwändige Lösen einer Instanz der sKGG bedeutet, benötigen wir somit angepasste Integrationsverfahren.
 \subsubsection{Tensorkonstruktion}
+Sei $Y$ ein Zufallsvektor und $A_{Y_i}$ ein eindimensionaler Quadraturoperator bezüglich des Gewichts $\rho_{Y_i}$, beispielsweise die Gauss-Quadratur. Dann erhalten wir mithilfe einer Tensorkonstruktion die mehrdimensionale Quadratur
+\[A_Y=A_{Y_1}\otimes\dots\otimes A_{Y_N}\]
+Für die Menge an Quadraturpunkten gilt wie schon bei der Interpolation
+\[\Theta_Y=\Theta_{Y_1}\otimes\dots\otimes \Theta_{Y_N}\]
+Die Anzahl der Quadraturpunkte $Q=Q_1\dots Q_N$ wächst daher wiederum sehr stark und dies macht den Ansatz bereits für geringe Dimensionen $N$ sehr rechenaufwändig. Andererseits sehen wir sofort, dass sich die polynomiale Exaktheit der Gauss-Quadraturen direkt auf den mehrdimensionalen Fall übertragen lässt. Die Quadratur $A_Y$ ist exakt für alle Polynome in
+\[\Poly_{2Q_1-1}(Y_1)\otimes\dots\otimes\Poly_{2Q_N-1}(Y_N)\]
 \subsubsection{Smoylaks dünne Gitter}
-
-\todo[inline]{Smolyak Konstruktion in Kapitel drei erklären? (für Punkte Gitter wie bei Interpol benötigt aber auch für allgemeine Operatoren?)}
+\todo[inline]{Smolyak Konstruktion erklären für Punkte Gitter wie bei Interpol benötigt aber auch für allgemeine Operatoren, welche Quelle?}
 
 \todo[inline]{Quadratur (Xiu Kap7) mit Glenshaw-Curtis; smolyak sparse grids (fully nested failed, weakly nested and non nested; discrete projection}

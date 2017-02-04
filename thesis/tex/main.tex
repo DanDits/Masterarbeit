@@ -45,16 +45,19 @@ headsepline, % Uncomment to get a line under the header
 \PassOptionsToPackage{hyphens}{url}\usepackage{hyperref}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{mathtools}
-\usepackage{tikz}
+
+\usepackage{tikz} % For generating diagrams, plotting tensors,...
 \usetikzlibrary{matrix,calc}
+
 \usepackage{algorithm} % basic pseudocode package
 \usepackage{algorithmicx} % For pseudocode, algorithm environment
 \usepackage{algpseudocode} % defines stuff like\Procedure for algorithmicx
 \algtext*{EndWhile}% Remove "end while" text
 \algtext*{EndIf}% Remove "end if" text
-\algtext*{EndFor}
-\algtext*{EndProcedure}
-\algtext*{EndFunction}
+\algtext*{EndFor}% Remove "end for" text
+\algtext*{EndProcedure}% Remove "end procedure" text
+\algtext*{EndFunction}% Remove "end function" text
+
 \makeatletter 
  \renewcommand{\ALG@name}{Algorithmus} %change "Algorithm" to "Algorithmus"
 \makeatother  

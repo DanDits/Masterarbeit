@@ -44,8 +44,8 @@ start_time = 0
 stop_time = trial.get_parameter("stop_time", 0.5)
 # if grid_size is bigger this needs to be smaller, especially for higher poly degrees
 delta_time = trial.get_parameter("delta_time", 0.001)
-methods = ["full_tensor"]  # , "centralized"]  # ["full_tensor", "sparse", "sparse_gc", "centralized"]
-method_params = [M]  # , [(n, False) for n in N]]  # [M, L, L_gc, [(n, False) for n in N]]
+methods = ["full_tensor", "centralized"]  # ["full_tensor", "sparse", "sparse_gc", "centralized"]
+method_params = [M, [(n, False) for n in N]]  # [M, L, L_gc, [(n, False) for n in N]]
 method_markers = ["-o", "-D", "-x", "-."]
 rank_frac = None
 exp_var_results = dict()
