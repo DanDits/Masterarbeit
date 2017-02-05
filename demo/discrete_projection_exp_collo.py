@@ -2,14 +2,14 @@ import numpy as np
 from itertools import repeat
 from stochastic_equations.collocation.discrete_projection import discrete_projection_expectancy
 import matplotlib.pyplot as plt
-from util.analysis import error_l2
+from util.analysis import error_l2_relative
 import demo.stochastic_trials as st
 import util.quadrature.nesting as nst
 from polynomial_chaos.poly_chaos_distributions import get_chaos_name_by_distribution
 from util.quadrature.closed_fully_nested import ClosedFullNesting
 from itertools import chain
-
-trial = st.trial_5
+# TODO COMPLETELY REDO THIS!
+trial = st.trial_1
 
 # to calculate expectancy we only need polynomial of degree 0 as the equations are not coupled like for matrix inversion
 n = 0
@@ -73,19 +73,29 @@ plt.title("Discrete projection colloc. for {}, gridsize={}, dt={}, T={}".format(
                                                                                 delta_time, stop_time))
 for method, marker in zip(methods, method_markers):
     errors_exp = []
+    errors_var = []
     for n, param, expectancy, variance in exp_var_results[method]:
         if np.any(np.isnan(expectancy)):
             print("Expectancy contains NaN:", expectancy)
         error = -1
         if trial_expectancy is not None:
-            error = error_l2(trial_expectancy, expectancy)
+            error = error_l2_relative(expectancy, trial_expectancy)
             errors_exp.append(error)
             print("Error expectancy dp", method, n, param, "=", error)
+        if trial_variance is not None:
+            # TODO why is the error constantly 1. for trial_1?
+            error = error_l2_relative(variance, trial_variance)
+            errors_var.append(error)
+            print("Error variance dp", method, n, param, "=", error)
 
     if len(errors_exp) > 0:
         x_values = quad_points[method]
         if len(errors_exp) == len(x_values):
             plt.plot(x_values, errors_exp, marker, color="b", label="Errors of {} to expectancy".format(method))
+    if len(errors_var) > 0:
+        x_values = quad_points[method]
+        if len(errors_var) == len(x_values):
+            plt.plot(x_values, errors_var, marker, color="r", label="Errors of {} to variance".format(method))
 
 print("Quadrature points:", quad_points)
 plt.yscale('log')

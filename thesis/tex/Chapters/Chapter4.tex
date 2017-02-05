@@ -146,11 +146,11 @@ Ein Beispiel sei für $N=2$ und $P=14$ gemacht, wo für Legendre- und Hermite-Po
 \subsection{Vergleiche der Ansätze}
 Wir reduzieren uns für $N=1$ auf die Nullstellen derjenigen Orthogonalpolynome, die gemäß des gPC zu der Verteilung von $Y$ gehören. Für das kompakte Interval $I=[-1,1]$ wäre es ebenso möglich die \chebyspace Interpolationspunkte zu verwenden. Diese bieten aber nach unseren Beobachtungen keinen Vorteil.\\
 Für $N>1$ besteht die Möglichkeit das volle Tensorprodukt der jeweiligen eindimensionalen Interpolationspunkte zu den Komponenten von $Y$ zu wählen. Da dies jedoch im Allgemeinen mehr Punkte umfasst als die vorhandenen $M+1$ Polynome, ist das lineare Gleichungssystem überbestimmt und wir beobachten eine hohe Kondition der Matrix. Dies sorgt insbesondere dafür, dass die Approximation der Varianz, welche jede Komponente des Lösungsvektors benötigt, bereits für $P>3$ instabil ist.\\
-Anhand der \nameref{trial:4} aus dem Appendix mit $N=4$ vergleichen wir die beiden Wahlen in Abbildung \ref{fig:collocation_trial4}. Wir sehen, dass sich der Erwartungswert mit beiden Ansätzen gleich gut approximieren lässt. Die Varianz ist durch das überbestimmte System beim full\_tensor Ansatz jedoch nicht berechenbar (für $P=9$ ergibt sich ein System der Größe $6^4\times \binom{4+9}{9} =1296\times 715$).
+Anhand der \nameref{trial:4} aus dem Appendix mit $N=4$ vergleichen wir die beiden Wahlen in Abbildung \ref{fig:collocation_trial4}. Wir sehen, dass sich der Erwartungswert mit beiden Ansätzen gleich gut approximieren lässt. Die Varianz ist durch das überbestimmte System beim full\_tensor Ansatz jedoch nicht berechenbar (für $P=9$ ergibt sich ein System der Größe $6^4\times \binom{4+9}{9} =1296\times 715$). Erhöht man $P$ weiter so beobachtet man auch für den centralized Ansatz zunehmende Instabilität. Der Erwartungswert des vollen Tensorproduktansatzes ist dabei bis zur Referenzgenauigkeit $\mathcal{O}(10^{-4})$ konvergiert. In beiden Fällen ist die Kondition der Matrix schon für $P=9$ in der Größenordnung $\mathcal{O}(10^6)$.
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=\linewidth]{Figures/collocation_mi_trial4_ft_centralized.png}
-\caption{Approximation des Erwartungswerts und der Varianz von \nameref{trial:4} mithilfe von Collocation durch Interpolation und verschiedenen Ansätzen.}
+\includegraphics[width=\linewidth]{Figures/collocation_mi_trial4_ft_centralized_p15.png}
+\caption{Approximation des Erwartungswerts und der Varianz von \nameref{trial:4} mithilfe von Collocation durch Interpolation und verschiedenen Ansätzen bis zu $P=15$.}
 \label{fig:collocation_trial4}
 \end{figure}
 
@@ -197,19 +197,55 @@ Wir nennen an dieser Stelle noch einige praktische Hinweise zur Gauss-Quadratur.
 Das Gewicht ist somit das Quadrat des ersten Eintrags des Eigenvektors, siehe \autocite{GolubWelsch}.
 \end{itemize}
 \end{mathbem}
-\todo[inline]{Nenne Vorteile der Interpolation: Keine Gewichte benötigt, Nodes "beliebig" und flexibler, evtl. somit besser für sparse grids da man auch glenshaw curtis nehmen kann, info über Stabilität durch cond der Matrix. Nachteil: gekoppelt, LGS muss gelöst werden (aufwändig), häufig unter/überbestimmt}
-\todo[inline]{Nachteil der DP: Konvergenz abhängig von zweitem Freiheitsgrad Q anstelle von nur M, aber für erwartungswert praktisch da dort eh nur eins nötig ist und somit "beliebig genau" mit Q steuerbar}
 \subsection{Mehrdimensionale Quadratur}
 Um den Ansatz der diskreten Projektion für einen mehrdimensionalen Zufallsvektor mit $N>1$ durchzuführen, benötigen wir eine mehrdimensionale Quadratur. Im Gegensatz zur mehrdimensionalen Interpolation liegt die Schwierigkeit nicht nur darin eine Menge von Collocationspunkten zu finden, sondern auch die zugehörige Menge der Quadraturgewichte zu bestimmen.\\
 Die numerischen Möglichkeiten der mehrdimensionalen Integration (engl. \emph{cubature}) umfassen unter anderem adaptive Verfahren und Monte-Carlo-Methoden. Da diese auf einer großen Menge an Funktionsauswertungen basieren und in unserem Fall eine Funktionsauswertung das aufwändige Lösen einer Instanz der sKGG bedeutet, benötigen wir somit angepasste Integrationsverfahren.
 \subsubsection{Tensorkonstruktion}
-Sei $Y$ ein Zufallsvektor und $A_{Y_i}$ ein eindimensionaler Quadraturoperator bezüglich des Gewichts $\rho_{Y_i}$, beispielsweise die Gauss-Quadratur. Dann erhalten wir mithilfe einer Tensorkonstruktion die mehrdimensionale Quadratur
-\[A_Y=A_{Y_1}\otimes\dots\otimes A_{Y_N}\]
+Sei $Y$ ein Zufallsvektor und $L_{Y_i}$ ein eindimensionaler Quadraturoperator bezüglich des Gewichts $\rho_{Y_i}$, beispielsweise die Gauss-Quadratur. Dann erhalten wir mithilfe einer Tensorkonstruktion die mehrdimensionale Quadratur
+\[L_Y=L_{Y_1}\otimes\dots\otimes L_{Y_N}\]
 Für die Menge an Quadraturpunkten gilt wie schon bei der Interpolation
 \[\Theta_Y=\Theta_{Y_1}\otimes\dots\otimes \Theta_{Y_N}\]
-Die Anzahl der Quadraturpunkte $Q=Q_1\dots Q_N$ wächst daher wiederum sehr stark und dies macht den Ansatz bereits für geringe Dimensionen $N$ sehr rechenaufwändig. Andererseits sehen wir sofort, dass sich die polynomiale Exaktheit der Gauss-Quadraturen direkt auf den mehrdimensionalen Fall übertragen lässt. Die Quadratur $A_Y$ ist exakt für alle Polynome in
+Die Anzahl der Quadraturpunkte $Q=Q_1\dots Q_N$ wächst daher wiederum sehr stark und dies macht den Ansatz bereits für geringe Dimensionen $N$ sehr rechenaufwändig. Andererseits sehen wir sofort, dass sich die polynomiale Exaktheit der Gauss-Quadraturen direkt auf den mehrdimensionalen Fall übertragen lässt. Die Quadratur $L_Y$ ist exakt für alle Polynome in
 \[\Poly_{2Q_1-1}(Y_1)\otimes\dots\otimes\Poly_{2Q_N-1}(Y_N)\]
-\subsubsection{Smoylaks dünne Gitter}
-\todo[inline]{Smolyak Konstruktion erklären für Punkte Gitter wie bei Interpol benötigt aber auch für allgemeine Operatoren, welche Quelle?}
+\subsubsection{Smolyaks dünne Gitter}
+Basierend auf \autocite{ConradMarzouk} geben wir eine kurze Einführung in die Konstruktion von Smolyaks dünnen Gittern. Sei $L_{Y_i}^{Q_i}$ ein linearer Operator für die $i$-te Komponente von $Y$. Im Folgenden wird $L_{Y_i}^{Q_i}$ einen Quadraturoperator darstellen, die Konstruktion ist aber beispielsweise auch für Interpolationsoperatoren gültig.\\
+Es sei $L_{Y_i}^{Q_i}\to L_{Y_i}$ für $Q_i\to\infty$ konvergent zum entsprechenden exakten Operator. Im Fall der Quadratur bedeutet dies für glatte integrierbare Funktionen $f\colon I\to\R$
+\[L^Qf=\sum_{j=0}^Q a_jf(y_j)\xrightarrow[]{Q\to\infty}\int_If(y)dy=Lf\]
+Dann lässt sich der exakte Operator als Teleskopsumme darstellen
+\[L_{Y_i}=\sum_{m=0}^\infty L_{Y_i}^m - L_{Y_i}^{m-1}=\sum_{m=0}^\infty \varDelta_{Y_i}^m\]
+mit $\varDelta_{Y_i}^0=L_{Y_i}^0=0$ und $\varDelta_{Y_i}^m=L_{Y_i}^m-L_{Y_i}^{m-1}$.\\
+Wir können damit das volle Tensorprodukt der exakten Operatoren mithilfe der Teleskopsummen schreiben und Produkt und Summe tauschen
+\begin{align*}
+L_{Y_1}\otimes\dots\otimes L_{Y_N}&=\sum_{m_1=0}^\infty \varDelta_{Y_1}^{m_1}\otimes\dots\otimes \sum_{m_N=0}^\infty\varDelta_{Y_N}^{m_N}\\
+&=\sum_{m\in\N_0^N} \varDelta_{Y_1}^{m_1}\otimes\dots\otimes \varDelta_{Y_N}^{m_N}\\
+\end{align*}
+Zur Approximation ersetzt man die Summe über alle Multi-Indices $m\in\N_0^N$ durch eine passende Teilmenge. Dazu verwenden wir die Menge aller Indices mit $|m|\le \ell$ bezüglich eines Levels $\ell$. Schreibt man die Approximation wieder bezüglich der Komponenten $L_{Y_i}^{m_i}$ so gilt nach \autocite{NoTeWe07}
+\begin{align*}
+L_Y^\ell &= \sum_{|m|\le \ell} \varDelta_{Y_1}^{m_1}\otimes\dots\otimes \varDelta_{Y_N}^{m_N}\\
+&= \sum_{|m|\le \ell} c_m L_{Y_1}^{m_1}\otimes\dots\otimes L_{Y_N}^{m_N}\\
+&= \sum_{\ell - N+1\le |m|\le \ell} (-1)^{\ell - |m|}\binom{N-1}{\ell - |m|}L_{Y_1}^{m_1}\otimes\dots\otimes L_{Y_N}^{m_N}\\
+\end{align*}
+Die Menge an benötigten Collocationspunkten ist dann 
+\[\Theta_Y^\ell=\bigcup_{\ell - N+1\le |m|\le \ell} \Theta_{Y_1}^{m_1}\times\dots\times \Theta_{Y_N}^{m_N}\]
+Die Gestalt und Größe der Menge $\Theta_Y^\ell$ ist abhängig davon, wie die Teilmengen geschachtelt (engl. \emph{nested}) sind. Dies ist eine entscheidende Bedingung für eine eventuelle Reduktion der benötigten Collocationspunkte. In Abbildung \ref{fig:grids} sehen wir zwei Beispiele für dünne Gitter. Die zugrunde liegenden Knotenmengen $\Theta_{Y_1}^j$ und $\Theta_{Y_2}^j$ sind dabei die Nullstellen der Legendre- bzw. Hermite-Polynome mit Grad $j$.
+\begin{figure}[!htb]
+\minipage{0.5\textwidth}
+  \includegraphics[width=\linewidth]{Figures/sparse_grid_legendre_legendre.png}
+\endminipage
+\minipage{0.5\textwidth}
+  \includegraphics[width=\linewidth]{Figures/sparse_grid_hermite_legendre.png}
+\endminipage
+\caption{Dünne Gitter nach Smolyak mit $N=2$ und Legendre- bzw. Hermite-Collocationspunkten für das Level $\ell=6$.}
+\label{fig:grids}
+\end{figure}
+Die Nullstellen der Legendre- und Hermite sind schwach geschachtelt (engl. \emph{weakly nested}), da für ungerade Polynomgrade die Zahl $0$ eine Nullstelle ist. Dies ist jedoch die einzige Wiederholung eines Knotenpunktes. Die Nullstellen der Laguerre- und Jacobi-Polynome besitzen im Allgemeinen keinerlei Schachtelung.\\
+Im Gegensatz zu Gittern, die beispielsweise auf Glenshaw-Curtis Knotenpunkten basieren und vollständig geschachtelt sind, bieten schwach geschachtelte Gitter somit wenig Zeitersparnis durch Wiederverwendung von Collocationspunkten. Der Vorteil liegt hauptsächlich in der geschickten Approximation des vollen Tensorprodukts der exakten Operatoren.\\
+Eine Implementierung für vollständig geschachtelte, schwach geschachtelte und nicht geschachtelte dünne Gitter in Matlab und C++ ist durch die Sandia Sparse Bibliothek (siehe \autocite{Sandia}) gegeben. Die Schwierigkeit liegt dabei darin, für schwach geschachtelte Gitter die einzelnen wieder auftauchenden Knotenstellen korrekt zu identifizieren. 
 
-\todo[inline]{Quadratur (Xiu Kap7) mit Glenshaw-Curtis; smolyak sparse grids (fully nested failed, weakly nested and non nested; discrete projection}
+\todo[inline]{Quadratur (Xiu Kap7) mit Glenshaw-Curtis; smolyak sparse grids (fully nested failed, weakly nested and non nested}
+
+\section{Vergleich der Ansätze Interpolation und diskrete Projektion}
+\todo[inline]{Plots der Fehler in 1d und 4d, Nenne Vorteile/Nachteile}
+
+\todo[inline]{Nenne Vorteile der Interpolation: Keine Gewichte benötigt, Nodes "beliebig" und flexibler, evtl. somit besser für sparse grids da man auch glenshaw curtis nehmen kann, info über Stabilität durch cond der Matrix. Nachteil: gekoppelt, LGS muss gelöst werden (aufwändig), häufig unter/überbestimmt}
+\todo[inline]{Nachteil der DP: Konvergenz abhängig von zweitem Freiheitsgrad Q anstelle von nur M, aber für erwartungswert praktisch da dort eh nur eins nötig ist und somit "beliebig genau" mit Q steuerbar}

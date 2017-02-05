@@ -15,8 +15,10 @@ chaos = mv.chaos_multify([pcd.legendreChaos] * 2, 1)
 setting6 = (lambda xs: 1./(1 + 25*xs[0]**2)/(1 + 225*xs[1]**2), 0.27468 * 0.10028, 2, chaos)  # runge function 2d
 chaos = mv.chaos_multify([pcd.legendreChaos] * 2, 1)
 setting7 = (lambda xs: np.sin(3 * xs[0] + np.cos(xs[1])), 0.0347458, 2, chaos)
+chaos = mv.chaos_multify([pcd.make_laguerreChaos(1.), pcd.make_laguerreChaos(1.)], 1)
+setting8 = (lambda xs: 0, 1., 2, chaos)  # not useful for testing but only visualization
 
-setting = setting7
+setting = setting4
 visualize_quad = True
 nodes_counts_sparse, nodes_counts_full, nodes_counts_sparse_gc = [], [], []
 error_sparse, error_full, error_sparse_gc = [], [], []
@@ -24,7 +26,7 @@ level = 6
 for level in range(level + 1):
     print("current level=", level)
     chaos = setting[3]
-
+    # TODO test polynomial exactness of quadrature rules (see the test file of sandia sparse for comparison)
     chaos.init_quadrature_rule("sparse_gc", level)
     nodes_count = chaos.quadrature_rule.get_nodes_count()
     nodes_counts_sparse_gc.append(nodes_count)
@@ -50,25 +52,29 @@ for level in range(level + 1):
     sparse_result = chaos.integrate(setting[0])
     error_sparse.append(abs(sparse_result - setting[1]))
 
-import matplotlib.pyplot as plt
+print(nodes_counts_full)
 print(nodes_counts_sparse)
+import matplotlib.pyplot as plt
+print(nodes_counts_sparse_gc)
 plt.figure()
-plt.xlabel("Number of quadrature nodes")
-plt.ylabel("Error of quadrature")
-plt.plot(nodes_counts_sparse_gc, error_sparse_gc, "o-", label="Sparse GC")
-plt.plot(nodes_counts_sparse, error_sparse, "o-", label="Sparse")
-plt.plot(nodes_counts_full, error_full, "o-", label="FullTensor")
+plt.xlabel("Anzahl an Quadraturpunkten")
+plt.ylabel("Fehler der Quadratur")
+plt.plot(nodes_counts_sparse_gc, error_sparse_gc, "o-", label="sparse GC")
+plt.plot(nodes_counts_sparse, error_sparse, "o-", label="sparse")
+plt.plot(nodes_counts_full, error_full, "o-", label="full_tensor")
 plt.legend(loc='best')
 plt.yscale('log')
-
+plt.xscale('log')
 
 nodes = chaos.quadrature_rule.get_nodes()
 weights = chaos.quadrature_rule.get_weights()
 if nodes.shape[1] == 2 and visualize_quad:
     plt.figure()
-    plt.title("Sparse nodes distribution in 2d (level={}, count={})"
+    plt.title("Dünne Gitter Collocationspunkte $N=2$, $\\ell={}$, Anzahl: {}"
               .format(level, chaos.quadrature_rule.get_nodes_count()))
     print("Nodes=", nodes)
     plt.plot(nodes[:, 0], nodes[:, 1], ".")
+    plt.xlabel("Punkte von den {}-Polynomen".format(chaos.chaos_list[0].poly_basis.name))
+    plt.ylabel("Punkte von den {}-Polynomen".format(chaos.chaos_list[1].poly_basis.name))
     print("Weights=", len(weights))
 plt.show()

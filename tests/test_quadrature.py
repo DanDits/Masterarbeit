@@ -5,9 +5,36 @@ from polynomial_chaos.poly import make_hermite, make_laguerre, make_legendre, ma
 import numpy as np
 from polynomial_chaos.poly_chaos_distributions import legendreChaos
 from itertools import product
+from util.quadrature.helpers import multi_index_bounded_sum
+from util.analysis import mul_prod
 
 
 class QuadratureTestCase(unittest.TestCase):
+    def testSparseMonomialQuadrature(self):
+        chaos = make_legendre()
+        dim = 2
+        level_max = 3  # legendre and hermite: level,maxsumbound: 1,3/2,7/3,11/4,17/5,31/6,78
+        sum_bound = 11  # open weakly nested order is 2 ** (level+1) - 1 (for level=3 this is 15)
+        quad = SparseQuadrature(level_max, nst.get_nesting_for_name(chaos.name), dim * [chaos.nodes_and_weights])
+        for multi_index in multi_index_bounded_sum(dim, sum_bound):
+            def func(xs):
+                return mul_prod(x ** index for x, index in zip(xs, multi_index))
+
+            result = quad.apply(func)
+            if chaos.name == "Legendre":
+                wanted = (0 if any(index % 2 == 1 for index in multi_index)
+                          else mul_prod(1. / (index + 1) for index in multi_index))
+            elif chaos.name == "Hermite":
+                def uneven_factorial(number):
+                    fac = 1
+                    while number > 1:
+                        fac *= number - 1
+                        number -= 2
+                    return fac
+                wanted = (0 if any(index % 2 == 1 for index in multi_index)
+                          else mul_prod(uneven_factorial(index) for index in multi_index))
+            # print(result, wanted, "for multi index", multi_index)
+            self.assertAlmostEqual(result, wanted)
 
     def testSparseQuadrature(self):
         hermite = make_hermite()
@@ -92,7 +119,7 @@ class QuadratureTestCase(unittest.TestCase):
             if n % 2 == 1 or m % 2 == 1:
                 wanted = 0.
             else:
-                wanted = 2./(n+1) * 2./(m+1)
+                wanted = 2. / (n + 1) * 2. / (m + 1)
             self.assertAlmostEqual(result, wanted, places=10,
                                    msg="GC quad with count = {}, 2d poly exactness, n={}, m={}".format(count, n, m))
 
@@ -107,7 +134,6 @@ class QuadratureTestCase(unittest.TestCase):
                                        msg="GC sparse quad on level={} with count = {}, n={} polynomial exactness"
                                        .format(level, count, n))
 
-
         # sparse test nd
         from util.quadrature.helpers import multi_index_bounded_sum
         from util.analysis import mul_prod
@@ -119,7 +145,7 @@ class QuadratureTestCase(unittest.TestCase):
                     if any(i % 2 == 1 for i in ind):
                         wanted = 0.
                     else:
-                        wanted = mul_prod(2./(i+1) for i in ind)
+                        wanted = mul_prod(2. / (i + 1) for i in ind)
                     self.assertAlmostEqual(result, wanted, places=10,
                                            msg="CG sparse {}d on level={}, ind={}, quadpoints={}"
                                            .format(dim, level, ind, quad.get_nodes_count()))
@@ -137,7 +163,8 @@ class QuadratureTestCase(unittest.TestCase):
         self.assertAlmostEqual(quad.apply(lambda xs: xs[0] ** 2), 0.25, places=5, msg="CG transformed Jacobi")
 
         # sparse 1d
-        quad = SparseQuadrature(6, nesting, [nodes_and_weights])  # level 5 would be 2**5+1=33 nodes, but we need 50 for 5 digit accuracy
+        quad = SparseQuadrature(6, nesting, [
+            nodes_and_weights])  # level 5 would be 2**5+1=33 nodes, but we need 50 for 5 digit accuracy
         self.assertAlmostEqual(quad.apply(lambda xs: xs[0] ** 2), 0.25, places=5, msg="CG transformed Jacobi sparse")
 
         # sparse 2d
@@ -202,7 +229,8 @@ class QuadratureTestCase(unittest.TestCase):
 
         # continuous function
         def to_integrate_weighted(x, y):
-            return np.sin(x + 3) * (np.cos(y) ** 2) * hermiteChaos.distribution.weight(x) * hermiteChaos.distribution.weight(y)
+            return np.sin(x + 3) * (np.cos(y) ** 2) * hermiteChaos.distribution.weight(
+                x) * hermiteChaos.distribution.weight(y)
 
         def to_integrate(xs):
             return np.sin(xs[0] + 3) * (np.cos(xs[1]) ** 2)
@@ -230,6 +258,7 @@ class QuadratureTestCase(unittest.TestCase):
         from polynomial_chaos.poly_chaos_distributions import make_jacobiChaos, legendreChaos
 
         chaos = make_jacobiChaos(0., 0.)  # theoretically almost equivalent to legendreChaos
+
         # except the gamma distribution can't handle the edge points -1 and 1 for alpha or beta <= 0., which results
         # in worse results for sparse_gc then we observe for higher values of alpha and beta
 
@@ -257,6 +286,7 @@ class QuadratureTestCase(unittest.TestCase):
         self.assertAlmostEqual(result_sciquad, result_full_quad, places=12)
         self.assertAlmostEqual(result_sciquad, result_sparse_quad, places=8)
         self.assertAlmostEqual(result_sciquad, result_sparse_gc_quad, places=2)
+
 
 if __name__ == "__main__":
     tc = QuadratureTestCase()
