@@ -245,7 +245,29 @@ Eine Implementierung für vollständig geschachtelte, schwach geschachtelte und 
 \todo[inline]{Quadratur (Xiu Kap7) mit Glenshaw-Curtis; smolyak sparse grids (fully nested failed, weakly nested and non nested}
 
 \section{Vergleich der Ansätze Interpolation und diskrete Projektion}
-\todo[inline]{Plots der Fehler in 1d und 4d, Nenne Vorteile/Nachteile}
-
-\todo[inline]{Nenne Vorteile der Interpolation: Keine Gewichte benötigt, Nodes "beliebig" und flexibler, evtl. somit besser für sparse grids da man auch glenshaw curtis nehmen kann, info über Stabilität durch cond der Matrix. Nachteil: gekoppelt, LGS muss gelöst werden (aufwändig), häufig unter/überbestimmt}
-\todo[inline]{Nachteil der DP: Konvergenz abhängig von zweitem Freiheitsgrad Q anstelle von nur M, aber für erwartungswert praktisch da dort eh nur eins nötig ist und somit "beliebig genau" mit Q steuerbar}
+In diesem Abschnitt werden wir die beiden Ansätze für die Collocation miteinander vergleichen. Dabei werden wir für die Interpolation die Gauss-Stützstellen verwenden und ebenso für die diskrete Projektion die Gauss-Quadratur. Wir betrachten Beispiele mit $N=1$ und $N=4$ und verwenden im mehrdimensionalen Fall den vollen Tensorprodukt Ansatz. Für die mehrdimensionale Quadratur bei der diskreten Projektion vergleichen wir zusätzlich den vollen Tensorprodukt Ansatz mit der dünnen Gitter Quadratur nach Smolyak.
+\subsection*{Allgemeiner Vergleich}
+\begin{center}
+\begin{tabular}{p{0.47\linewidth}|p{0.47\linewidth}}
+Interpolation & Diskrete Projektion\\
+\hhline{=|=}
+\multicolumn{2}{c}{Für Gauss-Stützstellen im eindimensionalen äquivalent (siehe Satz \ref{th:interpol_and_proj})}\\
+\hline
+Collocationspunkte "'beliebig"' & Collocationspunkte entsprechen Quadraturpunkten\\
+\hline
+Benötigt keine weiteren Approximationen & Benötigt Quadraturgewichte zu Quadraturpunkten\\
+\hline
+Informationen über Stabilität durch Matrixkondition & Explizite Berechnung ohne gekoppeltes System\\
+\hline
+Erwartungswert abhängig von $P$ & Erwartungswert benötigt nur $P=0$\\
+\hline
+Bei quadratischer Matrix Varianz nur von $P$ abhängig & Varianz abhängig von $P$ und $Q$\\
+\hline
+Volles Tensorprodukt macht LGS überbestimmt & Volles Tensorprodukt ohne Stabilitätseinfluss\\
+\end{tabular}
+\end{center}
+Die Überbestimmtheit des Systems bei der Interpolation mit vollem Tensorprodukt der Knoten ist bedingt durch unsere Wahl der Interpolationspolynome. Bei Verwendung des vollen Tensorprodukts der eindimensionalen Polynombasen ist diese Quelle der Instabilität auf Kosten der Rechenzeit beseitigt.\\
+Dass für die Berechnung des Erwartungswerts nur $P=0$ benötigt wird, macht die diskrete Projektion für manche Anwendungen sehr attraktiv. Die explizite Berechnung der Koeffizienten, die ohne Lösen eines LGS auskommt, verspricht mehr Stabilität und Geschwindigkeit.\\
+Die Beziehung der beiden freien Parameter $P$ für den eindimensionalen Polynomgrad und $Q$ für die Quadraturpunkte ist einerseits aus praktischer Sicht problematisch, da im Vorhinein unklar ist, welche Erhöhung eine Verbesserung der Approximation bietet. Andererseits ist der Einfluss der Parameter auf den Fehler durch die Aufteilung in den Fehler der Bestapproximation und den Aliasing Fehler aus theoretischer Sicht gut verstanden.
+\subsection*{Numerischer Vergleich}
+\todo[inline]{Plots der Fehler in 1d und 4d, und auch für discontinuous}

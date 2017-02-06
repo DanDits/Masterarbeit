@@ -1,16 +1,14 @@
 import numpy as np
 
-from diff_equation.splitting import Splitting
 from polynomial_chaos.poly_chaos_distributions import get_chaos_by_distribution
 from stochastic_equations.collocation.coll_util import check_distribution_assertions
 import polynomial_chaos.multivariation as mv
-import diff_equation.klein_gordon as kg
 from util.quadrature.helpers import multi_index_bounded_sum_length
-from functools import lru_cache
+from stochastic_equations.collocation.coll_util import cached_collocation_point
 
 
-def discrete_projection_expectancy(trial, max_poly_degree, method, method_param, spatial_domain,
-                                   grid_size, start_time, stop_time, delta_time, wave_weight=0.5):
+def discrete_projection(trial, max_poly_degree, method, method_param, spatial_domain,
+                        grid_size, start_time, stop_time, delta_time, wave_weight=0.5):
     sum_bound = max_poly_degree
     distrs = trial.variable_distributions
     for distr in distrs:
@@ -31,18 +29,13 @@ def discrete_projection_expectancy(trial, max_poly_degree, method, method_param,
     solution_shape = None
     debug_counter = 0
 
-    @lru_cache(maxsize=None)
     def solution_at_node(nodes):
         nonlocal splitting_xs, splitting_xs_mesh, solution_shape, debug_counter
         debug_counter += 1
-        print("...Node counter", debug_counter)
-        trial.set_random_values(nodes)
-        configs = kg.make_klein_gordon_wave_linhyp_configs(spatial_domain, [grid_size], trial.alpha,
-                                                           trial.beta, wave_weight)
-        splitting = Splitting.make_fast_strang(*configs, "FastStrang",
-                                               start_time, trial.start_position, trial.start_velocity, delta_time)
-        splitting.progress(stop_time, delta_time, 0)
-        last_solution = splitting.solutions()[-1]
+        if debug_counter % 100 == 0:
+            print("...Node counter", debug_counter)
+        last_solution, splitting = cached_collocation_point(spatial_domain, grid_size, trial, wave_weight,
+                                                            start_time, stop_time, delta_time, nodes)
         if splitting_xs is None:
             splitting_xs = splitting.get_xs()
             splitting_xs_mesh = splitting.get_xs_mesh()
@@ -50,15 +43,18 @@ def discrete_projection_expectancy(trial, max_poly_degree, method, method_param,
         sol = last_solution.real.flatten()
         if method == "sparse" and not np.all(np.isfinite(sol)):
             print("Solution at node", nodes, "is not finite:", sol)
+            sol = np.nan_to_num(sol)
         return sol
 
     for i, poly in enumerate(basis):
-        print("Integrationg poly with number", i)
+
         def to_integrate(nodes):
             return solution_at_node(tuple(nodes)) * poly(nodes)
+
         curr_poly_weight = chaos.integrate(to_integrate)
         poly_weights.append(curr_poly_weight / chaos.normalization_gamma(i))
-        print("Projection progress:", i + 1, "/", len(basis))
+        if i % 100 == 0:
+            print("Projection progress:", i + 1, "/", len(basis))
     expectancy = np.reshape(np.sqrt(chaos.normalization_gamma(0)) * poly_weights[0], solution_shape)
     variance = np.reshape(sum((weight ** 2) * chaos.normalization_gamma(i) for i, weight in enumerate(poly_weights))
                           - chaos.normalization_gamma(0) * (poly_weights[0]) ** 2,

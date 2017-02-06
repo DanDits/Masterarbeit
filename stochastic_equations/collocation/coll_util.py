@@ -1,3 +1,8 @@
+from functools import lru_cache
+from diff_equation.splitting import Splitting
+import diff_equation.klein_gordon as kg
+
+
 def check_distribution_assertions(distr):
     """
     The assertions made are necessary as the polynomials are only an orthogonal basis for special
@@ -11,3 +16,16 @@ def check_distribution_assertions(distr):
                         "Gamma": distr.parameters[1] == 1,
                         "Beta": distr.support == (-1, 1)}
     assert distr_assertions[distr.name]
+
+
+@lru_cache(maxsize=15000)
+def cached_collocation_point(spatial_domain, grid_size, trial, wave_weight, start_time, stop_time, delta_time,
+                             nodes):
+    trial.set_random_values(nodes)
+    configs = kg.make_klein_gordon_wave_linhyp_configs(spatial_domain, [grid_size], trial.alpha,
+                                                       trial.beta, wave_weight)
+    splitting = Splitting.make_fast_strang(*configs, "FastStrang",
+                                           start_time, trial.start_position, trial.start_velocity, delta_time)
+    splitting.progress(stop_time, delta_time, 0)
+    last_solution = splitting.solutions()[-1]
+    return last_solution, splitting

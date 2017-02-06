@@ -1,13 +1,12 @@
 import numpy as np
-from diff_equation.splitting import Splitting
-import diff_equation.klein_gordon as kg
 from polynomial_chaos.poly_chaos_distributions import get_chaos_by_distribution
 from stochastic_equations.collocation.coll_util import check_distribution_assertions
 from numpy.linalg import lstsq
 import polynomial_chaos.multivariation as mv
 from util.quadrature.helpers import multi_index_bounded_sum_length
-from util.quadrature.glenshaw_curtis import chebyshev_nodes, chebyshev_nodes_second_kind
+from util.quadrature.glenshaw_curtis import chebyshev_nodes
 from itertools import product
+from stochastic_equations.collocation.coll_util import cached_collocation_point
 
 
 def matrix_inversion_expectancy(trial, max_poly_degree, quadrature_method, quadrature_param, spatial_domain, grid_size,
@@ -38,13 +37,9 @@ def matrix_inversion_expectancy(trial, max_poly_degree, quadrature_method, quadr
     splitting_xs_mesh = None
     solution_shape = None
     for nodes in nodes_list:
-        trial.set_random_values(nodes)
-        configs = kg.make_klein_gordon_wave_linhyp_configs(spatial_domain, [grid_size], trial.alpha,
-                                                           trial.beta, wave_weight)
-        splitting = Splitting.make_fast_strang(*configs, "FastStrang",
-                                               start_time, trial.start_position, trial.start_velocity, delta_time)
-        splitting.progress(stop_time, delta_time, 0)
-        last_solution = splitting.solutions()[-1]
+        nodes = tuple(nodes)
+        last_solution, splitting = cached_collocation_point(spatial_domain, grid_size, trial, wave_weight,
+                                                            start_time, stop_time, delta_time, nodes)
         if splitting_xs is None:
             splitting_xs = splitting.get_xs()
             splitting_xs_mesh = splitting.get_xs_mesh()

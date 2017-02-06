@@ -39,7 +39,7 @@ use_max_error = False
 show_point_count_plot = False
 plot_variance = True
 grid_size = trial.get_parameter("grid_size", 128)
-spatial_domain = list(repeat([-np.pi, np.pi], spatial_dimension))
+spatial_domain = tuple(repeat(tuple([-np.pi, np.pi]), spatial_dimension))
 start_time = 0
 stop_time = trial.get_parameter("stop_time", 0.5)
 # if grid_size is bigger this needs to be smaller, especially for higher poly degrees
