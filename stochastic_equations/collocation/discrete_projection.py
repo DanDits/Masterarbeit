@@ -32,19 +32,15 @@ def discrete_projection(trial, max_poly_degree, method, method_param, spatial_do
     def solution_at_node(nodes):
         nonlocal splitting_xs, splitting_xs_mesh, solution_shape, debug_counter
         debug_counter += 1
-        if debug_counter % 100 == 0:
-            print("...Node counter", debug_counter)
-        last_solution, splitting = cached_collocation_point(spatial_domain, grid_size, trial, wave_weight,
-                                                            start_time, stop_time, delta_time, nodes)
+        last_solution, splitting, actual_shape = cached_collocation_point(spatial_domain, grid_size, trial, wave_weight,
+                                                                          start_time, stop_time, delta_time, nodes,
+                                                                          real_only=True, flatten=True,
+                                                                          ensure_is_finite=True)
         if splitting_xs is None:
             splitting_xs = splitting.get_xs()
             splitting_xs_mesh = splitting.get_xs_mesh()
-            solution_shape = last_solution.shape
-        sol = last_solution.real.flatten()
-        if method == "sparse" and not np.all(np.isfinite(sol)):
-            print("Solution at node", nodes, "is not finite:", sol)
-            sol = np.nan_to_num(sol)
-        return sol
+            solution_shape = actual_shape
+        return last_solution
 
     for i, poly in enumerate(basis):
 

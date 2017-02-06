@@ -1,6 +1,7 @@
 from functools import lru_cache
 from diff_equation.splitting import Splitting
 import diff_equation.klein_gordon as kg
+import numpy as np
 
 
 def check_distribution_assertions(distr):
@@ -18,9 +19,9 @@ def check_distribution_assertions(distr):
     assert distr_assertions[distr.name]
 
 
-@lru_cache(maxsize=15000)
+@lru_cache(maxsize=20000)
 def cached_collocation_point(spatial_domain, grid_size, trial, wave_weight, start_time, stop_time, delta_time,
-                             nodes):
+                             nodes, real_only=False, flatten=False, ensure_is_finite=False):
     trial.set_random_values(nodes)
     configs = kg.make_klein_gordon_wave_linhyp_configs(spatial_domain, [grid_size], trial.alpha,
                                                        trial.beta, wave_weight)
@@ -28,4 +29,12 @@ def cached_collocation_point(spatial_domain, grid_size, trial, wave_weight, star
                                            start_time, trial.start_position, trial.start_velocity, delta_time)
     splitting.progress(stop_time, delta_time, 0)
     last_solution = splitting.solutions()[-1]
-    return last_solution, splitting
+    if real_only:
+        last_solution = last_solution.real
+    if ensure_is_finite and not np.all(np.isfinite(last_solution)):
+        last_solution = np.nan_to_num(last_solution)
+    if not flatten:
+        return last_solution, splitting
+    else:
+        actual_shape = last_solution.shape
+        return last_solution.flatten(), splitting, actual_shape

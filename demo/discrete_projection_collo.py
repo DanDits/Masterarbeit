@@ -50,7 +50,6 @@ quadrature_methods = {"full_tensor": list(map(minimum_full_tensor_param_for_coun
                       "sparse": wanted_levels}
 trial_expectancy, trial_variance = None, None
 
-# for each sum bound for the polynomial basis use all possible quadratures
 plt.figure()
 plt.title("Collocation durch Diskrete Projektion, $T={}$, $\\tau={}$".format(stop_time, delta_time))
 plt.yscale('log')
@@ -61,22 +60,26 @@ expectancy_already_plotted_by_method = set()  # plot expectancy only once per me
 variance_colors = ["#FF0000", "#FF6200", "#F5C711", "#54C41B", "#00FF00", "#000000", "#AAAAAA"]
 if len(P) > len(variance_colors):
     raise ValueError("Too many values for P... reduce or add more colors.")
-for p, variance_color in zip(P, variance_colors):
+
+# for each quadrature method do projections
+for (method, method_params), marker in zip(quadrature_methods.items(), ["-o", "-D"]):
+    print("Starting method", method, "with params", method_params)
     exp_var_results = dict()
     quad_points = dict()
-    # for each quadrature method do projections
-    for method, method_params in quadrature_methods.items():
-        print("Starting method", method, "with params", method_params)
-        exp_var_results[method] = []
-        quad_points[method] = []
+
+    # for each sum bound for the polynomial basis use all possible quadratures
+    for p in P:
+        print("P=", p, "of", P)
+        exp_var_results[p] = []
+        quad_points[p] = []
         # for each parameter of the method do a discrete projection and save it
         for param in method_params:
             print("Current param:", param)
             result_xs, result_xs_mesh, dp_expectancy, dp_variance, points, poly_count = \
                 discrete_projection(trial, p, method, param, spatial_domain, grid_size, start_time, stop_time,
                                     delta_time)
-            exp_var_results[method].append((param, dp_expectancy, dp_variance))
-            quad_points[method].append(points)
+            exp_var_results[p].append((param, dp_expectancy, dp_variance))
+            quad_points[p].append(points)
 
     # get the references (if available and not yet calculated)
     if trial_expectancy is None:
@@ -85,11 +88,10 @@ for p, variance_color in zip(P, variance_colors):
         trial_variance = trial.obtain_evaluated_variance(result_xs, result_xs_mesh, stop_time)
 
     # calculate and plot errors depending on the amount of quadrature points
-    print("P=", p)
-    for method, marker in zip(quadrature_methods, ["-o", "-D"]):
+    for p, variance_color in zip(P, variance_colors):
         errors_exp = []
         errors_var = []
-        for param, expectancy, variance in exp_var_results[method]:
+        for param, expectancy, variance in exp_var_results[p]:
             if method not in expectancy_already_plotted_by_method and trial_expectancy is not None:
                 error = error_l2_relative(expectancy, trial_expectancy)
                 errors_exp.append(error)
@@ -99,7 +101,7 @@ for p, variance_color in zip(P, variance_colors):
                 errors_var.append(error)
                 print("Error variance dp", method, param, "=", error)
 
-        x_values = quad_points[method]
+        x_values = quad_points[p]
         if len(errors_exp) > 0 and len(errors_exp) == len(x_values):
             expectancy_already_plotted_by_method.add(method)
             plt.plot(x_values, errors_exp, marker, color="b", label="Erwartungswert P={} ({})".format(p, method))
