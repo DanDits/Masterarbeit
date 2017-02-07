@@ -6,7 +6,7 @@ from polynomial_chaos.distributions import make_exponential, inverse_gaussian
 
 
 # Setup configurable parameters
-approx_orders_P = [1, 3, 5, 7, 9]  # orders to approximate and plot
+approx_orders_P = [1, 2, 5, 7, 9]  # orders to approximate and plot
 
 
 # Load required distributions and hermite polynomial basis
@@ -43,6 +43,9 @@ print(gpc_factors)
 def gpc_approx(y, factors):
     return sum(factor * hermite_basis(m)(y) for factor, m in zip(factors, range(len(factors))))
 
+x_data = np.arange(-1, 1.01, 0.01)
+plt.plot(x_data, np.vectorize(to_approximate.weight)(x_data), color=(0., 0., 0.), linewidth=2,
+         label="Beta(0.2,3) Verteilung auf $[-1,1]$", )
 bin_centers = None
 for marker, approx_order in zip(["D", ".", "-.", "-", "-", "-", "-"], approx_orders_P):
     # Calculate discrete distribution (=histogram) of the gpc approximation by sampling
@@ -63,8 +66,6 @@ for marker, approx_order in zip(["D", ".", "-.", "-", "-", "-", "-"], approx_ord
 
 
 plt.title("Schwache gPC Approximation der Beta(0.2,3) Verteilung durch Hermite Chaos")
-plt.plot(bin_centers, np.vectorize(to_approximate.weight)(bin_centers), color=(0.7, 0.2, 0.1), linewidth=2,
-         label="Beta(0.2,3) Verteilung auf $[-1,1]$", )
 plt.legend(loc='best')
 # plt.axis([-6, 14, 0, 1])
 plt.show()

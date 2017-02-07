@@ -79,6 +79,7 @@ trial_3 = StochasticTrial([distributions.make_uniform(-1, 1)],  # y[0] bigger th
                                                     - np.log(np.sin(sum(xs)) + left_3))))
 # expectancy error MI best we got is (centralized or full_tensor) 6.084676525001868e-05
 # variance error MI best we got is (centralized): 0.00095091110795730524
+# The Exp(Normal) part makes this overflow for collocation on level 5...
 trial_4 = StochasticTrial([distributions.gaussian, distributions.make_uniform(-1, 1),
                            distributions.make_beta(-0.5, 2.5), distributions.make_uniform(-1, 1)],
                           lambda xs, ys: np.sin(sum(xs)),
@@ -135,6 +136,20 @@ trial_7 = StochasticTrial([distributions.make_beta(0.5, 0.5)],
                     "stop_time", 0.5,
                     "expectancy_data", "../data/qmc_exp, 100000, Trial7, 0.5, 128.npy",
                     "variance_data", "../data/qmc_var, 100000, Trial7, 0.5, 128.npy")
+
+trial_8 = StochasticTrial([distributions.gaussian, distributions.make_uniform(-1, 1),
+                           distributions.make_beta(-0.5, 2.5), distributions.make_gamma(2, 1)],
+                          lambda xs, ys: np.sin(sum(xs)),
+                          lambda xs, ys: np.sin(sum(xs)) ** 2,
+                          random_variables=[lambda y: y, lambda y: (y + 1) / 2,
+                                            lambda y: y, lambda y: y],
+                          name="Trial8") \
+    .add_parameters("beta", lambda xs, ys: 3 + np.sin(xs[0] + ys[0]) + np.sin(xs[0] + ys[3]),
+                    "alpha", lambda ys: 1 + ys[1] + 0.5 * ys[2],
+                    "grid_size", 128,
+                    "stop_time", 0.5,
+                    "expectancy_data", "../data/qmc_exp, 100000, Trial8, 0.5, 128.npy",
+                    "variance_data", "../data/qmc_var, 100000, Trial8, 0.5, 128.npy")
 
 # accuracy of expectancy data for Galerkin: 0.006854368887610221, too many QP decrease again?! for MI: 1.1360616011928265e-05, zigzac, convergent for uneven poly degrees, unstable before fully converged around degree 60
 # accuracy of variance data for MI(dt=0.001): 7.38374747346e-05, zigzac, convergent for uneven degrees, same behavior as expectancy

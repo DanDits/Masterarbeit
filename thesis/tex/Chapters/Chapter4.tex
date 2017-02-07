@@ -146,12 +146,12 @@ Ein Beispiel sei für $N=2$ und $P=14$ gemacht, wo für Legendre- und Hermite-Po
 \subsection{Vergleiche der Ansätze}
 Wir reduzieren uns für $N=1$ auf die Nullstellen derjenigen Orthogonalpolynome, die gemäß des gPC zu der Verteilung von $Y$ gehören. Für das kompakte Interval $I=[-1,1]$ wäre es ebenso möglich die \chebyspace Interpolationspunkte zu verwenden. Diese bieten aber nach unseren Beobachtungen keinen Vorteil.\\
 Für $N>1$ besteht die Möglichkeit das volle Tensorprodukt der jeweiligen eindimensionalen Interpolationspunkte zu den Komponenten von $Y$ zu wählen. Da dies jedoch im Allgemeinen mehr Punkte umfasst als die vorhandenen $M+1$ Polynome, ist das lineare Gleichungssystem überbestimmt und wir beobachten eine hohe Kondition der Matrix. Dies sorgt insbesondere dafür, dass die Approximation der Varianz, welche jede Komponente des Lösungsvektors benötigt, bereits für $P>3$ instabil ist.\\
-Anhand der \nameref{trial:4} aus dem Appendix mit $N=4$ vergleichen wir die beiden Wahlen in Abbildung \ref{fig:collocation_trial4}. Wir sehen, dass sich der Erwartungswert mit beiden Ansätzen gleich gut approximieren lässt. Die Varianz ist durch das überbestimmte System beim full\_tensor Ansatz jedoch nicht berechenbar (für $P=9$ ergibt sich ein System der Größe $6^4\times \binom{4+9}{9} =1296\times 715$). Erhöht man $P$ weiter so beobachtet man auch für den centralized Ansatz zunehmende Instabilität. Der Erwartungswert des vollen Tensorproduktansatzes ist dabei bis zur Referenzgenauigkeit $\mathcal{O}(10^{-4})$ konvergiert. In beiden Fällen ist die Kondition der Matrix schon für $P=9$ in der Größenordnung $\mathcal{O}(10^6)$.
+Anhand der \nameref{trial:8} aus dem Appendix mit $N=4$ vergleichen wir die beiden Wahlen in Abbildung \ref{fig:collocation_trial8}. \todo[inline]{Centralized weglassen? Beschreibung auf jeden Fall anpassen...}Wir sehen, dass sich der Erwartungswert mit beiden Ansätzen gleich gut approximieren lässt. Die Varianz ist durch das überbestimmte System beim full\_tensor Ansatz jedoch nicht berechenbar (für $P=9$ ergibt sich ein System der Größe $6^4\times \binom{4+9}{9} =1296\times 715$). Erhöht man $P$ weiter so beobachtet man auch für den centralized Ansatz zunehmende Instabilität. Der Erwartungswert des vollen Tensorproduktansatzes ist dabei bis zur Referenzgenauigkeit $\mathcal{O}(10^{-4})$ konvergiert. In beiden Fällen ist die Kondition der Matrix schon für $P=9$ in der Größenordnung $\mathcal{O}(10^6)$.
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=\linewidth]{Figures/collocation_mi_trial4_ft_centralized_p15.png}
-\caption{Approximation des Erwartungswerts und der Varianz von \nameref{trial:4} mithilfe von Collocation durch Interpolation und verschiedenen Ansätzen bis zu $P=15$.}
-\label{fig:collocation_trial4}
+\includegraphics[width=\linewidth]{Figures/collocation_mi_trial8_ft_centralized.png}
+\caption{Approximation des Erwartungswerts und der Varianz von \nameref{trial:8} mithilfe von Collocation durch Interpolation und verschiedenen Ansätzen bis zu $P=15$.}
+\label{fig:collocation_trial8}
 \end{figure}
 
 \section{Diskrete Projektion}
@@ -255,7 +255,7 @@ Interpolation & Diskrete Projektion\\
 \hline
 Collocationspunkte "'beliebig"' & Collocationspunkte entsprechen Quadraturpunkten\\
 \hline
-Benötigt keine weiteren Approximationen & Benötigt Quadraturgewichte zu Quadraturpunkten\\
+Benötigt Interpolationspunkte & Benötigt zusätzlich Quadraturgewichte zu Quadraturpunkten\\
 \hline
 Informationen über Stabilität durch Matrixkondition & Explizite Berechnung ohne gekoppeltes System\\
 \hline

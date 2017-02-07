@@ -13,9 +13,9 @@ from util.analysis import error_l2_relative
 dimension = 1
 grid_size_Ns = [256, 512, 1024, 2048, 2048*2]
 plt.figure()
-plt.title("Abhängigkeit der CFL Zahl $\\tilde{c}$ vom Gewicht $w$", fontsize="xx-large")
-plt.xlabel("Gewicht $w$", fontsize="xx-large")
-plt.ylabel("CFL Zahl $\\tilde{c}$", fontsize="xx-large")
+plt.title("Abhängigkeit der CFL Zahl $\\tilde{c}$ vom Gewicht $w$")
+plt.xlabel("Gewicht $w$")
+plt.ylabel("CFL Zahl $\\tilde{c}$")
 for grid_size_N in grid_size_Ns:
     print(grid_size_N)
     domain = list(repeat([-np.pi, np.pi], dimension))
@@ -63,5 +63,5 @@ for grid_size_N in grid_size_Ns:
             cfl_constants.append(0)
     print(cfl_constants)
     plt.plot(weights, cfl_constants, label="$N={}$".format(grid_size_N))
-plt.legend(fontsize="xx-large")
+plt.legend()
 plt.show()

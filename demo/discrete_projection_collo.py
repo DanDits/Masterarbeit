@@ -16,12 +16,12 @@ import matplotlib.pyplot as plt
 #           time increase in p is linear due to caching but for p=15 already takes like 30 minutes for lvl 4
 
 # COMMON CONFIGURATION HERE:
-trial = st.trial_4  # which trial to calculate expectancy and variance for
+trial = st.trial_8  # which trial to calculate expectancy and variance for
 only_expectancy = False  # if only expectancy is to be calculated, this allows only using the zeroth polynomial!
 
 # Which values to choose for P and max_level greatly depend on the dimension of the trial's random space
 # the amount of basis polynomials in one dimension, is by one higher than values of P (= the sum bound)
-P = [0, 1, 5, 15] if not only_expectancy else [0]  # should not use more than 4 different values for P
+P = [0, 1, 3, 5, 6] if not only_expectancy else [0]  # should not use more than 4 different values for P
 max_level = 5  # from 0 to max_level (inclusive) this is the setting for the sparse quadrature
 
 # PROBABLY DOES NOT NEED TO BE CHANGED:

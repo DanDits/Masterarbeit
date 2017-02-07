@@ -16,14 +16,14 @@ domain = list(repeat([-np.pi, np.pi], dimension))
 delta_time = 0.001
 start_time = 0.
 stop_time = 0.5
-save_last_solution = False
-simulations_count = 10000
+save_last_solution = True
+simulations_count = 100000
 do_quasi_monte_carlo = True
 
 # the factor of the step number between two consecutive solutions used to estimate order of convergence
 order_factor = 10  # >=2, integer
 
-trial = st.trial_reg0
+trial = st.trial_8
 
 splitting_xs, splitting_xs_mesh, expectancy, variance, expectancy_errors, variance_errors, \
     solutions, solutions_for_order_estimate = \

@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib
 
 trial = sp.trial_frog
-dim = 1
+dim = 2
 time = 0.5
 grid_size_N = 64
 

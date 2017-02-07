@@ -92,7 +92,7 @@ def make_gamma(shape, rate):
                                    if x > 0. else 0.),
                         (0, inf),
                         partial(random.gammavariate, shape, 1. / rate),
-                        inverse_distribution=partial(stats_gamma.ppf, a=shape, rate=1./rate),  # TODO parameters incorrect
+                        inverse_distribution=partial(stats_gamma.ppf, a=shape, scale=1./rate),
                         show_name="Gamma({}, {})".format(shape, rate),
                         parameters=(shape, rate))
 
@@ -128,9 +128,10 @@ def make_beta(alpha, beta):
 if __name__ == "__main__":
     import numpy as np
     import matplotlib.pyplot as plt
-    test_weight = False
+    test = "ppf"
 
-    if test_weight:
+    if test == "weight":
+        # test the distributions sample_generator to produce the correct weight function
         test_distribution = make_beta(1., 2.)
 
         data = [test_distribution.sample_generator() for _ in range(100000)]
@@ -143,7 +144,7 @@ if __name__ == "__main__":
         plt.ylim((0, plt.ylim()[1]))
         plt.legend()
         plt.show()
-    else:
+    elif test == "pdf":
         from scipy.stats import gamma as test_distr
         shape, rate = 0.5, 0.2  # >0
         loc, scale = 0., 1. / rate
@@ -159,5 +160,21 @@ if __name__ == "__main__":
         plt.plot(x_data, res1, 'x', label="pdf scipy")
         plt.plot(x_data, res2, label="pdf own")
         #plt.plot(y_data, test_distr.ppf(y_data, a, loc=loc, scale=scale), label='ppf scipy')
+        plt.legend()
+        plt.show()
+    elif test == "ppf":
+        # test if the inverse_distribution really produces the same distribution using uniformly distributed data
+        # by the inversion method
+        uniform_data = [random.uniform(0, 1) for _ in range(10000)]
+        shape, rate = 0.33, 1
+        distr = make_gamma(shape, rate)
+        inverted_data = list(map(distr.inverse_distribution, uniform_data))
+        hist, bin_edges = np.histogram(inverted_data, bins='auto', density=True)
+        bin_centers = bin_edges[:-1] + (bin_edges[1:] - bin_edges[:-1]) / 2
+
+        plt.figure()
+        plt.plot(bin_centers, hist, label="Calculated distribution")
+        plt.plot(bin_centers, np.vectorize(distr.weight)(bin_centers), label="PDF")
+        plt.ylim((0, plt.ylim()[1]))
         plt.legend()
         plt.show()
