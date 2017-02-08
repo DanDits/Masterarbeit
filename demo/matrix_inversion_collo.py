@@ -13,7 +13,7 @@ trial = st.trial_8
 
 # "High order is not the same as high accuracy. High order translates to high accuracy only when the integrand
 # is very smooth" (http://apps.nrbook.com/empanel/index.html?pg=179#)
-N = list(range(13))  # maximum degree of the univariate polynomial
+N = list(range(15))  # maximum degree of the univariate polynomial
 
 # from n+1 to n+10 notably difference for most examples
 # number of nodes in random space, >= N+1, higher CAN give more accuracy (for higher polys)
@@ -44,8 +44,8 @@ start_time = 0
 stop_time = trial.get_parameter("stop_time", 0.5)
 # if grid_size is bigger this needs to be smaller, especially for higher poly degrees
 delta_time = trial.get_parameter("delta_time", 0.001)
-methods = ["full_tensor", "centralized"]  # ["full_tensor", "sparse", "sparse_gc", "centralized"]
-method_params = [M, [(n, True) for n in N]]  # [M, L, L_gc, [(n, False) for n in N]]
+methods = ["full_tensor", "pseudo_sparse"]  # , "chebyshev"]  # ["full_tensor", "sparse", "sparse_gc", "centralized"]
+method_params = [M, [(n, chaos_names) for n in N]]  # , M]  # [M, L, L_gc, [(n, False) for n in N]]
 method_markers = ["-o", "-D", "-x", "-."]
 rank_frac = None
 exp_var_results = dict()

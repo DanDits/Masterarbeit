@@ -85,6 +85,48 @@ class CentralizedDiamondQuadrature(QuadratureRule):
         return self.weights
 
 
+# Not a quadrature rule, this is just a way to associate the subset of the full tensor product that is restricted
+# by the sum_bound with a set of nodes that does a good job for the matrix inversion approach, similiar to
+# CentralizedDiamond but treating Laguerre and Jacobi differently as their nodes are not symmetric around 0
+# one can think of this approach using t
+class PseudoSparseDiamond(QuadratureRule):
+    def __init__(self, nodes_and_weights_funcs, poly_names, sum_bound):
+        nodes_list, weights_list = [], []
+        length = sum_bound + 1
+        nodes_weights_pairs = [nodes_and_weights_func(length) for nodes_and_weights_func in nodes_and_weights_funcs]
+        # for every multi index we add one nodes tuple to the list, so we will later have the same
+        # amount of nodes/weights as we have basis polynomials with the same sum_bound
+        indices = multi_index_bounded_sum(len(nodes_and_weights_funcs), sum_bound)
+
+        for multi_index in indices:
+            current_nodes, current_weights = [], []
+            for (nodes, weights), index, poly_name in zip(nodes_weights_pairs, multi_index, poly_names):
+                # here it is important that we have enough nodes to use the multi_index's index!
+                if poly_name in ["Hermite", "Legendre"]:
+                    index = centralize_index(index, length)  # important as nodes are symmetric around the center
+                elif poly_name == "Jacobi":
+                    index = length - index - 1  # TODO maybe depending on if alpha > beta ?
+                elif poly_name == "Laguerre":
+                    pass  # do not change index
+                else:
+                    raise ValueError("Not supported polynomials:", poly_name)
+                current_nodes.append(nodes[index])
+                current_weights.append(weights[index])
+            nodes_list.append(current_nodes)
+            weights_list.append(mul_prod(current_weights))
+        self.nodes = np.array(nodes_list)
+        self.weights = np.array(weights_list)
+
+    def get_nodes(self):
+        return self.nodes
+
+    def get_nodes_count(self):
+        return len(self.weights)
+
+    def get_weights(self):
+        return self.weights
+
+
 # implementation for weakly and fully nested grids inspired and adapted
 # from code from https://people.sc.fsu.edu/~jburkardt/m_src/sandia_sparse/sandia_sparse.html
 class SparseQuadrature(QuadratureRule):

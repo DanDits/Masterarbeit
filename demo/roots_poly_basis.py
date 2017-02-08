@@ -13,5 +13,6 @@ for n in range(max_n):
 plt.title("Nullstellen der {}-Polynome".format(polybasis.name))
 plt.ylim((0, max_n+1))
 plt.ylabel("Polynomgrad")
+plt.tight_layout()
 plt.show()
 

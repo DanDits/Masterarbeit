@@ -3,7 +3,7 @@ import polynomial_chaos.poly as poly
 import polynomial_chaos.distributions as distr
 from functools import lru_cache
 from util.analysis import rising_factorial
-from util.quadrature.rules import CentralizedDiamondQuadrature, FullTensorQuadrature, SparseQuadrature
+from util.quadrature.rules import CentralizedDiamondQuadrature, FullTensorQuadrature, SparseQuadrature, PseudoSparseDiamond
 from util.quadrature.nesting import get_nesting_for_name
 from util.quadrature.closed_fully_nested import ClosedFullNesting
 from util.quadrature.glenshaw_curtis import calculate_transformed_nodes_and_weights
@@ -43,6 +43,9 @@ class PolyChaosDistribution:
         elif method == "centralized":
             sum_bound, even = param
             self.quadrature_rule = CentralizedDiamondQuadrature(self.get_nodes_and_weights(), sum_bound, even)
+        elif method == "pseudo_sparse":
+            sum_bound, poly_names = param
+            self.quadrature_rule = PseudoSparseDiamond(self.get_nodes_and_weights(), poly_names, sum_bound)
         elif method == "sparse_gc":
             distrs = self.get_distributions()
             nesting = ClosedFullNesting()
@@ -75,7 +78,7 @@ def make_laguerreChaos(alpha):  # alpha > 0
     assert alpha > 0
     return PolyChaosDistribution(poly.make_laguerre(alpha),
                                  distr.make_gamma(alpha, 1),
-                                 lambda n: 1)
+                                 lambda n: 1)  # we use normalized polynomials here
 
 
 def make_jacobiChaos(alpha, beta):  # alpha, beta > -1

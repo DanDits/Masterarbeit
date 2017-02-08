@@ -119,10 +119,10 @@ In Abbildung \ref{fig:collocation_trial1} ist die Approximationsgüte der Interp
 Eine mögliche Wahl für $N>1$ die Menge der Interpolationspunkte $\Theta_Y^N$ zu einem gegebenem Zufallsvektor $Y$ der Dimension $N$ zu wählen, ist gegeben durch das volle Tensorprodukt
 \[\Theta_Y^N=\Theta_{Y_1}\otimes \dots \otimes \Theta_{Y_N},\quad \Theta_{Y_i}\subset I_{Y_i}\]
 Dann gilt für die Anzahl der Interpolationspunkte $S=S_1 \dots S_N$. Ist die Anzahl an Basispolynomen $M+1$ fest, so ist es schwierig die Bedingung $S=M+1$ exakt zu erfüllen. Wir fordern daher, dass $S_1=\dots=S_N$ und $S\ge M+1$ minimal. Dieser Ansatz wird in Abbildungen durch \textit{full\_tensor} gekennzeichnet.
-\subsubsection*{Mehrdimensionale Interpolation durch zentralisiertes dünnes Gitter}
+\subsubsection*{Mehrdimensionale Interpolation durch pseudo-dünne Gitter}
 Eine weitere Option für $M+1=\binom{N+P}{P}$ ist mit $S_1=\dots=S_N$ die Wahl
-\[\Theta_Y^N=\lbrace (y_{m_1},\dots,y_{m_N})\in \Theta_{Y_1}\otimes \dots \otimes \Theta_{Y_N} \mid |m|\le P \rbrace \]
-Es wird somit jedem Multi-Index $m\in\N_0^N$ genau ein mehrdimensionaler Interpolationspunkt $y$ zugewiesen und es gilt $M+1=S$. Die Wahl der Nummerierung der eindimensionalen Interpolationspunkte ist dabei entscheidend. Für Legendre- oder Hermite-Polynome bietet sich eine betragsmäßig aufsteigende Sortierung der Punkte an, da diese symmetrisch um $0$ verteilt sind. Für Jacobi- und Laguerre-Polynome ist diese Symmetrie abhängig von den Parametern verschoben. Man beobachtet in Abbildung \ref{fig:poly_roots} dennoch die für Orthogonalpolynome geltende Eigenschaft, dass die Nullstellen eines Polynoms höheren Grades zwischen den Nullstellen des vorherigen Polynoms zu finden sind. Dies motiviert es die Nullstellen um den Median herum zu sortieren. Dieser Ansatz wird in Abbildungen durch \textit{centralized} gekennzeichnet.
+\[\Theta_Y^N=\lbrace (y_{m_1},\dots,y_{m_N})\in \Theta_{Y_1}\otimes \dots \otimes \Theta_{Y_N} \mid |m|\le P,m\in\N_0^N \rbrace \]
+Es wird somit jedem Multi-Index $m\in\N_0^N$ genau ein mehrdimensionaler Interpolationspunkt $y$ zugewiesen und es gilt $M+1=S$. Die Matrix im Interpolationsansatz ist dadurch quadratisch und die ihre Kondition geringer. Die Wahl der Nummerierung der eindimensionalen Interpolationspunkte ist entscheidend. Für Legendre- oder Hermite-Polynome bietet sich eine betragsmäßig aufsteigende Sortierung der Punkte an, da diese symmetrisch um $0$ verteilt sind. Für Jacobi- und Laguerre-Polynome beobachten wir in Abbildung \ref{fig:poly_roots} keine Symmetrie. Dennoch gilt die Eigenschaft von Orthogonalpolynomen, dass die Nullstellen eines Polynoms höheren Grades zwischen den Nullstellen des vorherigen Polynoms zu finden sind. Wir sortieren die Nullstellen aufsteigend und hoffen dadurch eine repräsentative Auswahl zu treffen. Dieser Ansatz wird in Abbildungen durch \textit{pseudo\_sparse} gekennzeichnet.
 \begin{figure}[!htb]
 \minipage{0.5\textwidth}
   \includegraphics[width=\linewidth]{Figures/roots_legendre.png}
@@ -135,24 +135,32 @@ Es wird somit jedem Multi-Index $m\in\N_0^N$ genau ein mehrdimensionaler Interpo
 \caption{Nullstellen verschiedener Orthogonalbasen von Polynomen mit steigendem Grad.}
 \label{fig:poly_roots}
 \end{figure}
-
-Ein Beispiel sei für $N=2$ und $P=14$ gemacht, wo für Legendre- und Hermite-Polynome die Interpolationspunkte des zentralisierten Gitters in Abbildung \ref{fig:roots_centralized} dargestellt sind. Der Vorteil dieser Methode ist, dass durch die Eigenschaft $M+1=S$ die Matrix quadratisch ist und die Kondition kleiner ist als für ein überbestimmtes System. Wir werden später basierend auf Smolyaks Konstruktion einen effizienteren dünne Gitter Ansatz kennen lernen, der nicht nur für Interpolation verwendbar ist, sondern sich auch auf generelle Operatoren übertragen lässt.
+Ein Beispiel sei für $N=2$ und $P=14$ gemacht, wo für Legendre- und Laguerre-Polynome die Interpolationspunkte des pseudo-dünnen Gitters und des vollen Tensorprodukts in Abbildung \ref{fig:roots_two_dim} dargestellt sind.\\
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=0.8\linewidth]{Figures/roots_centralized.png}
-\caption{Interpolationspunkte des centralized Ansatzes für $N=2$ und Legendre- und Hermite-Polynome.}
-\label{fig:roots_centralized}
+\minipage{0.5\textwidth}
+  \includegraphics[width=\linewidth]{Figures/roots_pseudo_sparse.png}
+\endminipage
+\minipage{0.5\textwidth}
+  \includegraphics[width=\linewidth]{Figures/roots_full_tensor.png}
+\endminipage
+\caption{Interpolationspunkte für den pseudo-dünne Gitter Ansatz und das volle Tensorprodukt für die Nullstellen der Legendre- und Laguerre(3)-Polynome mit $N=2$ und $P=14$.}
+\label{fig:roots_two_dim}
 \end{figure}
+
+Wir werden später basierend auf Smolyaks Konstruktion einen effizienteren dünne Gitter Ansatz kennen lernen, der nicht nur für Interpolation verwendbar ist, sondern sich auch auf generelle Operatoren übertragen lässt. Dieser basiert allerdings auf vollen Tensorprodukten von Operatoren und ist daher nur übertragbar, wenn wir volle Tensorprodukte von Polynombasen zulassen (d.h. ohne die zusätzliche Bedingung $|m|\le P$). Da dies einen erheblichen Rechenaufwand impliziert, werden wir keine dünnen Gitter Ansätze für die Interpolation verwenden.
 \subsection{Vergleiche der Ansätze}
 Wir reduzieren uns für $N=1$ auf die Nullstellen derjenigen Orthogonalpolynome, die gemäß des gPC zu der Verteilung von $Y$ gehören. Für das kompakte Interval $I=[-1,1]$ wäre es ebenso möglich die \chebyspace Interpolationspunkte zu verwenden. Diese bieten aber nach unseren Beobachtungen keinen Vorteil.\\
 Für $N>1$ besteht die Möglichkeit das volle Tensorprodukt der jeweiligen eindimensionalen Interpolationspunkte zu den Komponenten von $Y$ zu wählen. Da dies jedoch im Allgemeinen mehr Punkte umfasst als die vorhandenen $M+1$ Polynome, ist das lineare Gleichungssystem überbestimmt und wir beobachten eine hohe Kondition der Matrix. Dies sorgt insbesondere dafür, dass die Approximation der Varianz, welche jede Komponente des Lösungsvektors benötigt, bereits für $P>3$ instabil ist.\\
-Anhand der \nameref{trial:8} aus dem Appendix mit $N=4$ vergleichen wir die beiden Wahlen in Abbildung \ref{fig:collocation_trial8}. \todo[inline]{Centralized weglassen? Beschreibung auf jeden Fall anpassen...}Wir sehen, dass sich der Erwartungswert mit beiden Ansätzen gleich gut approximieren lässt. Die Varianz ist durch das überbestimmte System beim full\_tensor Ansatz jedoch nicht berechenbar (für $P=9$ ergibt sich ein System der Größe $6^4\times \binom{4+9}{9} =1296\times 715$). Erhöht man $P$ weiter so beobachtet man auch für den centralized Ansatz zunehmende Instabilität. Der Erwartungswert des vollen Tensorproduktansatzes ist dabei bis zur Referenzgenauigkeit $\mathcal{O}(10^{-4})$ konvergiert. In beiden Fällen ist die Kondition der Matrix schon für $P=9$ in der Größenordnung $\mathcal{O}(10^6)$.
+Anhand der \nameref{trial:8} aus dem Appendix mit $N=4$ vergleichen wir die beiden Ansätze in Abbildung \ref{fig:collocation_trial8}. 
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=\linewidth]{Figures/collocation_mi_trial8_ft_centralized.png}
-\caption{Approximation des Erwartungswerts und der Varianz von \nameref{trial:8} mithilfe von Collocation durch Interpolation und verschiedenen Ansätzen bis zu $P=15$.}
+\includegraphics[width=\linewidth]{Figures/collocation_mi_trial8_ft_pseudosparse.png}
+\caption{Approximation des Erwartungswerts und der Varianz von \nameref{trial:8} mithilfe von Collocation durch Interpolation und verschiedenen Ansätzen bis zu $P=14$.}
 \label{fig:collocation_trial8}
 \end{figure}
+Wir sehen, dass sich der Erwartungswert mit beiden Ansätzen approximieren lässt. Bis zu $P=11$ ist die Approximation mit dem pseudo\_sparse Ansatz dabei um einen Faktor 10 genauer. Die Kondition der Matrix ist für $P=11$ jedoch bereits in der Größenordnung $\mathcal{O}(10^{13})$ mit wachsender Tendenz, was Approximationen mit $P>11$ zunehmend schlechter werden lässt.\\
+Die Varianz ist durch das überbestimmte System beim full\_tensor Ansatz nicht berechenbar (für $P=9$ ergibt sich ein System der Größe $6^4\times \binom{4+9}{9} =1296\times 715$). Erhöht man $P$ weiter, so beobachtet man auch für den pseudo\_sparse Ansatz zunehmende Instabilität.
 
 \section{Diskrete Projektion}
 Der zweite Ansatz zur stochastischen Collocation basiert auf der Bestapproximation in $L_{\rho_Y}^2$.
