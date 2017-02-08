@@ -248,9 +248,21 @@ Die Gestalt und Größe der Menge $\Theta_Y^\ell$ ist abhängig davon, wie die T
 \end{figure}
 Die Nullstellen der Legendre- und Hermite sind schwach geschachtelt (engl. \emph{weakly nested}), da für ungerade Polynomgrade die Zahl $0$ eine Nullstelle ist. Dies ist jedoch die einzige Wiederholung eines Knotenpunktes. Die Nullstellen der Laguerre- und Jacobi-Polynome besitzen im Allgemeinen keinerlei Schachtelung.\\
 Im Gegensatz zu Gittern, die beispielsweise auf Glenshaw-Curtis Knotenpunkten basieren und vollständig geschachtelt sind, bieten schwach geschachtelte Gitter somit wenig Zeitersparnis durch Wiederverwendung von Collocationspunkten. Der Vorteil liegt hauptsächlich in der geschickten Approximation des vollen Tensorprodukts der exakten Operatoren.\\
-Eine Implementierung für vollständig geschachtelte, schwach geschachtelte und nicht geschachtelte dünne Gitter in Matlab und C++ ist durch die Sandia Sparse Bibliothek (siehe \autocite{Sandia}) gegeben. Die Schwierigkeit liegt dabei darin, für schwach geschachtelte Gitter die einzelnen wieder auftauchenden Knotenstellen korrekt zu identifizieren. 
-
-\todo[inline]{Quadratur (Xiu Kap7) mit Glenshaw-Curtis; smolyak sparse grids (fully nested failed, weakly nested and non nested}
+Eine Implementierung für vollständig geschachtelte, schwach geschachtelte und nicht geschachtelte dünne Gitter in Matlab und C++ ist durch die Sandia Sparse Bibliothek (siehe \autocite{Sandia}) gegeben. Die Schwierigkeit liegt dabei darin, für schwach geschachtelte Gitter die einzelnen wieder auftauchenden Knotenstellen korrekt zu identifizieren.
+\begin{figure}[!htb]
+\includegraphics[width=\textwidth]{Figures/collocation_dp_trial8.png}
+\caption{Konvergenz des Erwartungswert und der Varianz mit diskreter Projektion für \nameref{trial:8} mit $N=4$.}
+\label{fig:dp_trial8}
+\end{figure}
+In Abbildung \ref{fig:dp_trial8} wird die Konvergenz der diskreten Projektion für das volle Tensorprodukt und den dünne Gitter Ansatz miteinander verglichen. Der Fehler wird dabei in Abhängigkeit von den Anzahl an benötigten Quadraturpunkten gezeigt. Wir beobachten:
+\begin{itemize}
+\item Der Erwartungswert benötigt nur $P=0$ und ist lediglich abhängig von der Güte der verwendeten Quadraturformel.
+\item Der dünne Gitter Ansatz nach Smolyak ist für den Erwartungswert mit 1000 Quadraturpunkte in der Referenzgenauigkeit $\mathcal{O}(10^{-5})$ auskonvergiert.
+\item Die maximal mögliche Genauigkeit der Varianz ist abhängig von $P$. 
+\item Für größeres $P$ ist der Fehler der Varianz geringer, allerdings gilt dies erst, wenn die Quadraturformel die zusätzlich unter dem Integral auftauchenden Polynome $\Phi_m$ für $|m|=P$ exakt integriert.
+\item Bei der Varianz bietet der dünne Gitter Ansatz keine klaren Vorteile, da der Gesamtfehler stärker von $P$ als vom Quadraturfehler abhängig ist und für größeres $P$ die Polynome $\Phi_m$ mit $|m|=P$ als Faktoren im Integral auftauchen.
+\end{itemize} 
+\todo[inline]{smolyak sparse grids (fully nested failed erklären/sagen?)}
 
 \section{Vergleich der Ansätze Interpolation und diskrete Projektion}
 In diesem Abschnitt werden wir die beiden Ansätze für die Collocation miteinander vergleichen. Dabei werden wir für die Interpolation die Gauss-Stützstellen verwenden und ebenso für die diskrete Projektion die Gauss-Quadratur. Wir betrachten Beispiele mit $N=1$ und $N=4$ und verwenden im mehrdimensionalen Fall den vollen Tensorprodukt Ansatz. Für die mehrdimensionale Quadratur bei der diskreten Projektion vergleichen wir zusätzlich den vollen Tensorprodukt Ansatz mit der dünnen Gitter Quadratur nach Smolyak.
