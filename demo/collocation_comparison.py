@@ -6,23 +6,24 @@ from polynomial_chaos.poly_chaos_distributions import get_chaos_name_by_distribu
 from util.quadrature.helpers import multi_index_bounded_sum_length
 from stochastic_equations.collocation.interpolation import matrix_inversion_expectancy
 import util.quadrature.nesting as nst
+from util.quadrature.closed_fully_nested import ClosedFullNesting
 import matplotlib.pyplot as plt
 from util.analysis import error_l2_relative
 from stochastic_equations.collocation.discrete_projection import discrete_projection
 
 
-trial = st.trial_8  # the trial to use
+trial = st.trial_1  # the trial to use
 
 # for 4 dimensions: max(N)=10 (x system) fits together with max_level=4 (625 nodes for full_tensor)
 # for 1 dimension: chooses discrete projection parameter automatically the same to those of matrix inversion
-N = list(range(10))  # for mi maximum degree of the univariate polynomial
+N = list(range(35))  # for mi maximum degree of the univariate polynomial
 
 # for full_tensor(s)
 M = [(int(np.ceil(multi_index_bounded_sum_length(len(trial.variable_distributions), n)
                   ** (1 / len(trial.variable_distributions)))),) * len(trial.variable_distributions)
      for n in N]
 
-P = [0, 4]   # for dp
+P = [0, 2, 7]   # for dp
 max_level = 4  # for dp
 
 chaos_names = [get_chaos_name_by_distribution(distr) for distr in trial.variable_distributions]
@@ -38,8 +39,7 @@ grid_size = trial.get_parameter("grid_size", 128)
 spatial_domain = tuple(repeat(tuple([-np.pi, np.pi]), spatial_dimension))
 start_time = 0
 stop_time = trial.get_parameter("stop_time", 0.5)
-# if grid_size is bigger this needs to be smaller, especially for higher poly degrees
-delta_time = trial.get_parameter("delta_time", 0.0005)
+delta_time = trial.get_parameter("delta_time", 0.001)
 
 
 # methods to use for matrix inversion
@@ -96,9 +96,12 @@ for method, marker in zip(methods_mi, method_markers_mi):
 nesting = nst.get_nesting_for_multiple_names(chaos_names)
 wanted_levels = list(range(max_level + 1))
 wanted_quad_points = [nesting.calculate_point_num(random_dim, level) for level in wanted_levels]
+nesting = ClosedFullNesting()
+L_gc = [nesting.get_minimum_level_with_point_num(random_dim, count) for count in wanted_quad_points]
 if random_dim > 1:
     quadrature_methods_dp = {"full_tensor": list(map(minimum_full_tensor_param_for_count, wanted_quad_points[:-1]))
                              , "sparse": wanted_levels}
+                             #, "sparse_gc": L_gc}
 else:
     quadrature_methods_dp = {"full_tensor": M}
 
@@ -108,7 +111,7 @@ variance_colors = ["#FF0000", "#FF6200", "#F5C711", "#54C41B", "#00FF00", "#0000
 if len(P) > len(variance_colors):
     raise ValueError("Too many values for P... reduce or add more colors.")
 
-for (method, method_params), marker in zip(quadrature_methods_dp.items(), ["->", "-x"]):
+for (method, method_params), marker in zip(quadrature_methods_dp.items(), ["->", "-x", "-<", "-."]):
     print("Starting dp method", method, "with params", method_params)
     exp_var_results_dp = dict()
     quad_points_dp = dict()

@@ -171,6 +171,40 @@ trial_discont_simple = StochasticTrial([distributions.make_uniform(-1, 1)],
                     "expectancy_data", "../data/qmc_exp, 100000, TrialDiscontSimple, 0.5, 128.npy",
                     "variance_data", "../data/qmc_var, 100000, TrialDiscontSimple, 0.5, 128.npy")
 
+trial_discont_simple_gauss = StochasticTrial([distributions.gaussian],
+                                       lambda xs, ys: np.cos(sum(xs)),
+                                       lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
+                                       name="TrialDiscontSimpleGauss") \
+    .add_parameters("beta", lambda xs, ys: 2 + np.sin(xs[0] + ys[0]) if ys[0] > 0. else 2 + np.cos(xs[0] + ys[0]),
+                    "alpha", lambda ys: 2. if ys[0] > 0. else 1.)
+
+trial_discont_super_simple = StochasticTrial([distributions.make_uniform(-1, 1)],
+                                       lambda xs, ys: np.cos(sum(xs)),
+                                       lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
+                                       name="TrialDiscontSuperSimple") \
+    .add_parameters("beta", lambda xs, ys: 2 + np.sin(xs[0] + ys[0]),
+                    "alpha", lambda ys: 2. if ys[0] > 0. else 1.,
+                    "expectancy_data", "../data/qmc_exp, 100000, TrialDiscontSuperSimple, 0.5, 128.npy",
+                    "variance_data", "../data/qmc_var, 100000, TrialDiscontSuperSimple, 0.5, 128.npy")
+
+trial_discont_super_extreme_simple = StochasticTrial([distributions.make_uniform(-1, 1)],
+                                       lambda xs, ys: np.cos(sum(xs)),
+                                       lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
+                                       name="TrialDiscontSuperExtremeSimple") \
+    .add_parameters("beta", lambda xs, ys: 2 + np.sin(xs[0]),
+                    "alpha", lambda ys: 2. if ys[0] > 0. else 1.,
+                    "expectancy_data", "../data/qmc_exp, 100000, TrialDiscontSuperExtremeSimple, 0.5, 128.npy",
+                    "variance_data", "../data/qmc_var, 100000, TrialDiscontSuperExtremeSimple, 0.5, 128.npy")
+
+trial_discont_triple = StochasticTrial([distributions.make_uniform(-1, 1)],
+                                       lambda xs, ys: np.cos(sum(xs)),
+                                       lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
+                                       name="TrialDiscontTriple") \
+    .add_parameters("beta", lambda xs, ys: 2 + np.sin(xs[0] + ys[0]),
+                    "alpha", lambda ys: 3. if ys[0] > 0.5 else (2. if ys[0] > 0. else 1.),
+                    "expectancy_data", "../data/qmc_exp, 100000, TrialDiscontTriple, 0.5, 128.npy",
+                    "variance_data", "../data/qmc_var, 100000, TrialDiscontTriple, 0.5, 128.npy")
+
 
 def reg_alpha(ys):
     # result must be smaller than 1/4 and bigger than 0
