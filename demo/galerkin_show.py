@@ -4,18 +4,21 @@ import demo.stochastic_trials as st
 import matplotlib.pyplot as plt
 from stochastic_equations.galerkin.galerkin import galerkin_expectancy
 
+# OBSERVATIONS:
+# trial1: with delta time = 0.000001 it loses accuracy, this loss seems independent of quadrature count and is the same for poly degree 2,3,4
+#         does not depend on wave_weight
 domain = [(-np.pi, np.pi)]
-trial = st.trial_1
+trial = st.trial_7
 grid_size = trial.get_parameter("grid_size", 128)
 start_time = 0.
 stop_time = trial.get_parameter("stop_time", 0.5)
-delta_times = [0.01, 0.0001, 0.00001, 0.000001]
-max_poly_degrees = [0, 1, 2, 3, 4]
+delta_times = [0.1, 0.05, 0.01, 0.005, 0.001]
+max_poly_degrees = [0, 1, 2, 5, 10, 20, 35]
 wave_weight = 1.  # does not seem to have much influence (at least on trial5); but can have on stability as this problem is kinda irregular!
 
 quadrature_method = "full_tensor"
 # trial7: >=10 if degree <=6, >=15 if degree <= 10,  if degree <= 15
-quadrature_param = [17] * len(trial.variable_distributions)
+quadrature_param = [40] * len(trial.variable_distributions)
 #quadrature_method = "sparse"
 #quadrature_param = 4
 print("Max polys:", max_poly_degrees)

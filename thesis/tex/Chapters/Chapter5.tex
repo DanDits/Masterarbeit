@@ -59,7 +59,7 @@ die Darstellung mithilfe der Koeffizienten der Bestapproximation von $g$ und $h$
 \dt{\hat{v}}_m(0,x)=\hat{h}_m=\E[h(x,Y)\Phi_m(Y)]
 \end{align*}
 \section{Splitting für den Galerkin-Ansatz}
-Die partielle Differentialgleichung (\ref{eqn:galerkin_dgl}) ist ein System mit Zeitableitung zweiter Ordnung und vektorwertig mit Größe $M+1$. Um eine numerische Lösung des Systems zu erhalten, bietet sich wieder ein Splitting-Ansatz an. Zuerst wollen wir das System aber so weit wie möglich entkoppeln. Dazu beobachten wir, dass die Matrix $A$ symmetrisch positiv definit ist, da $\alpha(y)>0$ und somit $a_{mk}>\delta_{mk}$. Wir können $A\in\R^{M+1\times M+1}$ zerlegen in
+Die partielle Differentialgleichung (\ref{eqn:galerkin_dgl}) ist ein System mit Zeitableitung zweiter Ordnung und vektorwertig mit Größe $M+1$. Um eine numerische Lösung des Systems zu erhalten, bietet sich wieder ein Splitting-Ansatz an. Zuerst wollen wir das System aber so weit wie möglich entkoppeln. Dazu beobachten wir, dass die Matrix $A$ symmetrisch positiv definit ist,\todo{Warum? Das passt so nicht.} da $\alpha(y)>0$ und somit $a_{mk}>\delta_{mk}$. Wir können $A\in\R^{M+1\times M+1}$ zerlegen in
 \[A=SDS^T,\quad \text{$D$ diagonal und $S$ orthogonal}\]
 Wir definieren dann 
 \[w(t,x)\coloneqq S^T\hat{v}(t,x),\quad t>0,x\in\Torus^d\]
@@ -72,3 +72,18 @@ w(0,x)&=S^T\hat{g}(x)\\
 \dt{w}(0,x)&=S^T\hat{h}(x)\\
 \end{split}
 \end{equation}
+Schreiben wir es anschließend formal um in ein System mit Zeitableitung erster Ordnung, so gilt für $\tilde{w}\coloneqq \dt w$ und ein Gewicht $\kappa\in[0,1]$
+\[\dt\begin{pmatrix}w\\ \tilde{w}\end{pmatrix}(t,x)=\left[\begin{pmatrix}0 & \kappa I_{M+1}\\ D\Laplace& 0\end{pmatrix}+\begin{pmatrix}0&(1-\kappa)I_{M+1}\\-S^TB(x)S & 0\end{pmatrix}\right]
+\begin{pmatrix}w\\\tilde{w}\end{pmatrix}(t,x)\]
+Das Splitting besteht dann aus den zwei Gleichungen
+\begin{equation}
+\label{eqn:galerkin_split1}
+\dt\begin{pmatrix}w_1\\ \tilde{w}_1\end{pmatrix}(t,x)=\begin{pmatrix}0 & \kappa I_{M+1}\\ D\Laplace& 0\end{pmatrix}\begin{pmatrix}w_1\\\tilde{w}_1\end{pmatrix}(t,x)
+\end{equation}
+und
+\begin{equation}
+\label{eqn:galerkin_split2}
+\dt\begin{pmatrix}w_2\\ \tilde{w}_2\end{pmatrix}(t,x)=\begin{pmatrix}0&(1-\kappa)I_{M+1}\\-S^TB(x)S & 0\end{pmatrix}\begin{pmatrix}w_2\\\tilde{w}_2\end{pmatrix}(t,x)
+\end{equation}
+Diese sind wie schon in Kapitel \ref{chapter:solver_kgg} mithilfe der Matrixexponentialfunktion lösbar. Beachte, dass die Gleichung (\ref{eqn:galerkin_split1}) entkoppelt ist, da $D$ diagonal ist. Der erste Teil des Splittings besteht daher aus dem Lösen von $M+1$ unabhängigen "'Wellengleichungen"' (für $\kappa=1$), wobei die Wellengeschwindigkeiten die Eigenwerte $d_m$ der Matrix $A$ sind.\\
+Der zweite Teil des Splittings muss für jedes $x$ im benötigten Gitter extra gelöst werden.

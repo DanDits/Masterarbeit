@@ -11,7 +11,8 @@ from util.quadrature.helpers import multi_index_bounded_sum_length
 from util.quadrature.rules import QuadratureRule
 
 
-# TODO currently only for one spatial dimension
+# TODO currently (and probably always) only for one spatial dimension
+# TODO rework, got kinda messy, also use diagonalization of S^TB(x)S
 
 def get_evaluated_poly(cache, basis, i, chaos):
     rule = chaos.quadrature_rule  # type: QuadratureRule
@@ -88,7 +89,7 @@ def calculate_wave_speed_transform(trial, basis, poly_count, chaos, cache):
         return res1 * res2 * res3
 
     matrix_a = calculate_expectancy_matrix_sym(chaos, alpha_expectancy_func, "alpha_func", poly_count, cache)
-
+    print("MATRIXA=", matrix_a)
     # diagonalize A=SDS'
     diag, transform_s = eigh(matrix_a)  # now holds A=S*D*S', S is orthonormal, D a diagonal matrix
     # eigenvalues in D are positive and bounded by the extrema of alpha(y)
