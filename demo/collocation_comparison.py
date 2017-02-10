@@ -12,11 +12,11 @@ from util.analysis import error_l2_relative
 from stochastic_equations.collocation.discrete_projection import discrete_projection
 
 
-trial = st.trial_1  # the trial to use
+trial = st.trial_discont_simple_gauss  # the trial to use
 
 # for 4 dimensions: max(N)=10 (x system) fits together with max_level=4 (625 nodes for full_tensor)
 # for 1 dimension: chooses discrete projection parameter automatically the same to those of matrix inversion
-N = list(range(35))  # for mi maximum degree of the univariate polynomial
+N = list(range(20))  # for mi maximum degree of the univariate polynomial
 
 # for full_tensor(s)
 M = [(int(np.ceil(multi_index_bounded_sum_length(len(trial.variable_distributions), n)

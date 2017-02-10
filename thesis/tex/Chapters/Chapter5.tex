@@ -1,3 +1,74 @@
 % Chapter 5
 
 \chapter{Stochastische Galerkin-Methode}
+Die stochastische Klein-Gordon-Gleichung war für eine $N$-dimensionale Zufallsvariable $Y$ und $y\in\R^N$ definiert durch
+\begin{align}
+\label{eqn:galerkin_skgg}
+\dtt{u}(t,x,y)&=\alpha(y) \Laplace u(t,x,y) - \beta(x,\omega)u(t,x,y), \: t>0, \, x\in \Torus^d\\
+u(0,x,y)&=g(x,y), \: x\in \Torus^d\nonumber\\
+\dt{u}(0,x,y)&=h(x,y), \: x\in \Torus^d\nonumber
+\end{align}
+Seien $\Phi_m(Y)$ die zu $Y$ gehörenden gPC Basisfunktionen. Diese erfüllen die Orthogonalitätsbedingung 
+\[\E[\Phi_i(Y)\Phi_j(Y)]=\delta_{ij}\] 
+Sei $\Poly_P^N$ der Raum aller Polynome mit summiertem Grad kleiner gleich $P$ und Dimension $\binom{N+P}{P}$. Die gPC Projektion der Lösung der sKGG zu einem fixen Zeitpunkt $T>0$ und Ort $x\in\Torus^d$ ist definiert durch
+\begin{align*}
+u_M(T,x,Y)&=\sum_{m=0}^M\hat{u}_m(T,x)\Phi_m(Y)\in\Poly_P^N,\quad  M+1=\binom{N+P}{P}\\
+\hat{u}_m(T,x)&=\E[u(T,x,Y)\Phi_m(Y)]
+\end{align*}
+Ist $\rho$ die Dichtefunktion von $Y$, so stimmt die gPC Projektion mit der Bestapproximation in $L_\rho^2$ überein. Diese Approximation ist im $L_\rho^2$ Sinne optimal, allerdings benötigen wir zur Berechnung der Koeffizienten $\hat{u}_m$ die unbekannte exakte Lösung $u(T,x,Y)$.\\
+Der stochastische Galerkin Ansatz ist eine Erweiterung des klassischen Galerkin Ansatzes. Sei dazu eine weitere Approximation $v_M\in\Poly_P^N$ gegeben durch
+\begin{equation}
+v_M(t,x,Y)=\sum_{m=0}^M\hat{v}_m(t,x)\Phi_m(Y)
+\end{equation}
+Die Forderung an $v_M$ ist dann, dass das Residuum der sKGG (\ref{eqn:galerkin_skgg}) orthogonal zu allen Polynomen aus $\Poly_P^N$ ist. Eine Motivation dafür ist die schwache Lösung der sKGG, welche diese Orthogonalität für alle Polynome $\Poly^N$ erfüllt. Ist die schwache Lösung hinreichend regulär, so stimmt sie mit der Lösung der sKGG überein.
+Konkret lautet die Orthogonalitätsbedingung an das Residuum für $t>0$ und $x\in\Torus^d$
+\begin{equation}
+\label{eqn:galerkinOrtho}
+\E\left[\left(\dtt{v_M}(t,x,Y)-\alpha(Y)\Laplace v_M(t,x,Y)+\beta(x,Y)v_M(t,x,Y)\right)\Phi_k\right]=0
+\end{equation} 
+für alle $k=0,\dots,M$.\\
+Wir wollen jetzt aus der Orthogonalitätsbedingung (\ref{eqn:galerkinOrtho}) eine Gleichung für die Koeffizienten $\hat{v}_m$ gewinnen. Dazu setzen wir die Definition von $v_M$ in die Gleichung ein und erhalten
+\begin{align*}
+\sum_{m=0}^M\dtt{\hat{v}}_m(t,x)\underbrace{\E[\Phi_m(Y)\Phi_k(Y)]}_{=\delta_{mk}}&=\E\left[\alpha(Y)\sum_{m=0}^M\Laplace \hat{v}_m(t,x)\Phi_m(Y)\Phi_k(Y)\right]\\
+&\quad -\E\left[\beta(x,Y)\sum_{m=0}^M\hat{v}_m(t,x)\Phi_m(Y)\Phi_k(Y)\right]\\
+\equivalent \qquad \dtt{\hat{v}}_k(t,x)&=\sum_{m=0}^M\Laplace \hat{v}_m(t,x)\underbrace{\E[\alpha(Y)\Phi_m(Y)\Phi_k(Y)]}_{=a_{mk}}\\
+&\quad -\sum_{m=0}^M\hat{v}_m(t,x)\underbrace{\E[\beta(x,Y)\Phi_m(Y)\Phi_k(Y)]}_{=b_{mk}}\\
+\equivalent \qquad \dtt{\hat{v}}_k(t,x)&=a_k\Laplace \hat{v}(t,x)-b_k(x)\hat{v}(t,x)\\
+\intertext{mit $ a_k=(a_{0k},\dots,a_{Mk}),\quad b_k(x)=(b_{0k}(x),\dots,b_{Mk}(x)),\quad \hat{v}(t,x)=(\hat{v}_0(t,x),\dots,\hat{v}_M(t,x))^T$}\\
+\equivalent \qquad \dtt{\hat{v}}_k(t,x)&=A\Laplace \hat{v}(t,x)-B(x)\hat{v}(t,x)
+\end{align*}
+Die Matrizen $A$ und $B(x)$ werden durch die Zeilenvektoren $a_k$ und $b_k(x)$ gebildet und sind symmetrisch. Die benötigten Koeffizienten der Approximation $v_M$ sind gekoppelt und als Lösung folgender partieller Differentialgleichung zu erhalten
+\begin{equation}
+\label{eqn:galerkin_dgl}
+\begin{split}
+\dtt{\hat{v}}(t,x)&=A\Laplace \hat{v}(t,x)-B(x)\hat{v}(t,x)\\
+\hat{v}(0,x)&=\hat{g}(x)\\
+\dt{\hat{v}}(0,x)&=\hat{h}(x)\\
+\end{split}
+\end{equation}
+Dabei gilt für die Anfangswerte $\hat{v}(0,x)$ und $\dt{\hat{v}}(0,x)$ wegen 
+\[v_M(0,x,Y)=\sum_{m=0}^M\hat{v}_m(0,x)\Phi_m(Y)\]
+und
+\begin{align*}
+g(x,y)&\approx v_M(0,x,y)\\
+h(x,y)&\approx \dt{v}_M(0,x,y)
+\end{align*}
+die Darstellung mithilfe der Koeffizienten der Bestapproximation von $g$ und $h$
+\begin{align*}
+\hat{v}_m(0,x)=\hat{g}_m=\E[g(x,Y)\Phi_m(Y)]\\
+\dt{\hat{v}}_m(0,x)=\hat{h}_m=\E[h(x,Y)\Phi_m(Y)]
+\end{align*}
+\section{Splitting für den Galerkin-Ansatz}
+Die partielle Differentialgleichung (\ref{eqn:galerkin_dgl}) ist ein System mit Zeitableitung zweiter Ordnung und vektorwertig mit Größe $M+1$. Um eine numerische Lösung des Systems zu erhalten, bietet sich wieder ein Splitting-Ansatz an. Zuerst wollen wir das System aber so weit wie möglich entkoppeln. Dazu beobachten wir, dass die Matrix $A$ symmetrisch positiv definit ist, da $\alpha(y)>0$ und somit $a_{mk}>\delta_{mk}$. Wir können $A\in\R^{M+1\times M+1}$ zerlegen in
+\[A=SDS^T,\quad \text{$D$ diagonal und $S$ orthogonal}\]
+Wir definieren dann 
+\[w(t,x)\coloneqq S^T\hat{v}(t,x),\quad t>0,x\in\Torus^d\]
+und schreiben das System (\ref{eqn:galerkin_dgl}) in der Form
+\begin{equation}
+\label{eqn:galerkin_dgl_transformed}
+\begin{split}
+\dtt{w}(t,x)&=D\Laplace w(t,x)-S^TB(x)Sw(t,x)\\
+w(0,x)&=S^T\hat{g}(x)\\
+\dt{w}(0,x)&=S^T\hat{h}(x)\\
+\end{split}
+\end{equation}

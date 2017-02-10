@@ -26,7 +26,6 @@ level = 6
 for level in range(level + 1):
     print("current level=", level)
     chaos = setting[3]
-    # TODO test polynomial exactness of quadrature rules (see the test file of sandia sparse for comparison)
     chaos.init_quadrature_rule("sparse_gc", level)
     nodes_count = chaos.quadrature_rule.get_nodes_count()
     nodes_counts_sparse_gc.append(nodes_count)

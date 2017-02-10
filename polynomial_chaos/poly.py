@@ -116,7 +116,6 @@ def calculate_nodes_and_weights(alphas, betas):
 # Polynomial basis: http://dlmf.nist.gov/18.3
 # Recurrence correlations: http://dlmf.nist.gov/18.9#i
 
-# TODO maybe save calculated nodes/weights on disk, especially for higher degrees
 
 
 # when returned 'amount' of nodes is fixed (no matter the degree),
