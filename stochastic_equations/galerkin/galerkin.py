@@ -24,7 +24,7 @@ def get_evaluated_poly(cache, basis, i, chaos):
         quadrature_nodes = rule.get_nodes()
         for j in range(len(cached_evaluated_polys), i + 1):
             print("NEW IN CACHE:", j)
-            cached_evaluated_polys.append(np.apply_along_axis(basis[i], 1, quadrature_nodes))
+            cached_evaluated_polys.append(np.apply_along_axis(basis[j], 1, quadrature_nodes))
     return cached_evaluated_polys[i]
 
 

@@ -9,7 +9,10 @@ class LinhypSolverConfig(SolverConfig):
     # splitting_factor=0. is the old LinhypMomentConfig, though not quite as fast due to redundant calculations
     def __init__(self, intervals, grid_points_list, beta, splitting_factor=1.):
         super().__init__(intervals, grid_points_list)
-        self.beta = beta(self.xs_mesh)
+        if callable(beta):
+            self.beta = beta(self.xs_mesh)
+        else:
+            self.beta = beta  # if we cannot call it then it has to be already correct
         self.beta_sqrt = np.sqrt(self.beta)
         self.splitting_factor = splitting_factor
 
