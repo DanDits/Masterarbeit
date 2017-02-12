@@ -9,7 +9,7 @@ from stochastic_equations.galerkin.newgalerkin import galerkin_approximation
 # trial1: with delta time = 0.000001 it loses accuracy, this loss seems independent of quadrature count and is the same for poly degree 2,3,4
 #         does not depend on wave_weight
 domain = [(-np.pi, np.pi)]
-trial = st.trial_4
+trial = st.trial_8
 grid_size = trial.get_parameter("grid_size", 128)
 start_time = 0.
 stop_time = trial.get_parameter("stop_time", 0.5)
@@ -19,7 +19,7 @@ wave_weight = 1.
 
 quadrature_method = "full_tensor"
 # trial7: >=10 if degree <=6, >=15 if degree <= 10,  if degree <= 15
-quadrature_param = [6] * len(trial.variable_distributions)
+quadrature_param = [5] * len(trial.variable_distributions)
 quadrature_method = "sparse"  # TODO compare sparse and full_tensor, how to handle different caching?
 quadrature_param = 2
 # if quadrature method or parameter is changed, the caches need to be cleared as they use the quadrature nodes
@@ -38,9 +38,11 @@ cache = {}
 trial_exp, trial_var = None, None
 
 for max_poly_degree in max_poly_degrees:
+    print("Curr degree", max_poly_degree, "of all", max_poly_degrees)
     errors_exp, errors_var = [], []
     error_var = None
     for delta_time in delta_times:
+        print("Curr dt", delta_time, "of all", delta_times)
         xs, xs_mesh, exp, var = galerkin_approximation(trial, max_poly_degree, domain, grid_size,
                                                start_time, stop_time, delta_time, wave_weight,
                                                quadrature_method, quadrature_param)

@@ -11,8 +11,21 @@ from diff_equation.ode_solver import LinhypSolverConfig
 from diff_equation.splitting import Splitting
 
 
+parameter_validation_for_cache = None
+
+
 def galerkin_approximation(trial, max_poly_degree, domain, grid_size, start_time, stop_time, delta_time, wave_weight,
                            quadrature_method, quadrature_param):
+    global parameter_validation_for_cache
+    if parameter_validation_for_cache is None:
+        parameter_validation_for_cache = {"grid_size": grid_size,
+                                          "quadrature_method": quadrature_method,
+                                          "trial": trial}
+    assert parameter_validation_for_cache["grid_size"] == grid_size
+    assert parameter_validation_for_cache["quadrature_method"] == quadrature_method
+    assert parameter_validation_for_cache["trial"] == trial
+    assert len(domain) == 1  # can only handle 1d domains so far, else would need to flatten arrays and other reshaping
+
     trial.flag_raw_attributes = True
     distrs = trial.variable_distributions
     random_dim = len(distrs)
@@ -20,6 +33,7 @@ def galerkin_approximation(trial, max_poly_degree, domain, grid_size, start_time
 
     chaos = mv.chaos_multify([get_chaos_by_distribution(distr) for distr in distrs], sum_bound)
     chaos.init_quadrature_rule(quadrature_method, quadrature_param)
+    print("Quadrature nodes count:", chaos.quadrature_rule.get_nodes_count())
 
     poly_count = multi_index_bounded_sum_length(random_dim, sum_bound)
     basis = [chaos.normalized_basis(i) for i in range(poly_count)]
@@ -82,13 +96,18 @@ def calculate_transformed_betas(poly_count, trial, basis, chaos, transform_s, xs
     return betas, transform_r
 
 
+@cache_by_first_parameter
+def calculate_beta_integral(ikj, x, chaos, to_expect):  # j needs to be cached as well as this corresponds to x
+    return chaos.integrate(partial(to_expect, i=ikj[0], k=ikj[1], x=x), function_parameter_is_nodes_matrix=True)
+
+
 def calculate_expectancy_tensor(chaos, to_expect, poly_count, x_nodes):
     nodes_count = len(x_nodes)
     tensor = np.empty((nodes_count, poly_count, poly_count))
     for i in range(poly_count):
         for k in range(i, poly_count):
             for j, x in enumerate(x_nodes):
-                exp_value = chaos.integrate(partial(to_expect, i=i, k=k, x=x), function_parameter_is_nodes_matrix=True)
+                exp_value = calculate_beta_integral((i, k, j), x, chaos, to_expect)
                 # use symmetry to fill matrix
                 tensor[j, i, k] = exp_value
                 tensor[j, k, i] = exp_value
@@ -226,7 +245,7 @@ def calculate_expectancy_variance(splitting, stop_time, delta_time):
 
     expectancy = grid_coeffs[:, 0]
 
-    variance = None
+    variance = np.zeros(shape=expectancy.shape)
     if grid_coeffs.shape[1] > 1:
         # for variance we need all coefficients except for the zeroth one,
         # polynomials are normalized so no need for gammas
