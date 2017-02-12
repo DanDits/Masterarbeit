@@ -20,9 +20,11 @@ def galerkin_approximation(trial, max_poly_degree, domain, grid_size, start_time
     if parameter_validation_for_cache is None:
         parameter_validation_for_cache = {"grid_size": grid_size,
                                           "quadrature_method": quadrature_method,
+                                          "quadrature_param": quadrature_param,
                                           "trial": trial}
     assert parameter_validation_for_cache["grid_size"] == grid_size
     assert parameter_validation_for_cache["quadrature_method"] == quadrature_method
+    assert parameter_validation_for_cache["quadrature_param"] == quadrature_param
     assert parameter_validation_for_cache["trial"] == trial
     assert len(domain) == 1  # can only handle 1d domains so far, else would need to flatten arrays and other reshaping
 
@@ -41,16 +43,16 @@ def galerkin_approximation(trial, max_poly_degree, domain, grid_size, start_time
 
     # diagonalize symmetric positive definite matrix A where a_ik=E[alpha(y)phi_i(y)phi_k(y)], A=SDS^T
     wave_speeds, matrix_s = calculate_wave_speed_transform(poly_count, trial, basis, chaos)
-
+    print("Wave speeds calculation finished.")
     # diagonalize transformed symmetric positive definite matrix B(x) for each x, so S^TB(x)S=R(x)D(x)R(x)^T
     # the dependence on x will be performed for every x in xs and the results stacked in a layer of matrices
     # assumes that xs do not change between runs
     betas, matrix_r = calculate_transformed_betas(poly_count, trial, basis, chaos, matrix_s, xs)
-
+    print("Betas calculation finished.")
     splitting = make_splitting(domain, grid_size, wave_speeds,
                                basis, betas, matrix_r, matrix_s, start_time, trial, chaos, delta_time, wave_weight)
     expectancy, variance = calculate_expectancy_variance(splitting, stop_time, delta_time)
-    return xs, xs_mesh, expectancy, variance
+    return xs, xs_mesh, expectancy, variance, chaos.quadrature_rule.get_nodes_count()
 
 
 @cache_by_first_parameter
@@ -111,6 +113,7 @@ def calculate_expectancy_tensor(chaos, to_expect, poly_count, x_nodes):
                 # use symmetry to fill matrix
                 tensor[j, i, k] = exp_value
                 tensor[j, k, i] = exp_value
+        print("Tensor calculation:", i, "/", poly_count)
     return tensor
 
 
@@ -123,6 +126,7 @@ def calculate_expectancy_matrix_sym(chaos, to_expect, poly_count):
             # use symmetry to fill matrix
             matrix[i, k] = exp_value
             matrix[k, i] = exp_value
+        print("Matrix A calculation", i, "/", poly_count)
     return matrix
 
 
