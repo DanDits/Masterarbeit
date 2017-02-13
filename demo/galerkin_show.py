@@ -13,15 +13,15 @@ trial = st.trial_8
 grid_size = trial.get_parameter("grid_size", 128)
 start_time = 0.
 stop_time = trial.get_parameter("stop_time", 0.5)
-delta_times = [0.1, 0.01, 0.001]
-max_poly_degrees = [4]
+delta_times = [0.1, 0.01, 0.001, 0.0001]
+max_poly_degrees = [0, 1, 2, 3, 4, 5, 6]
 wave_weight = 1.
 
-#quadrature_method = "full_tensor"
+quadrature_method = "full_tensor"
 # trial7: >=10 if degree <=6, >=15 if degree <= 10,  if degree <= 15
-#quadrature_param = [31] * len(trial.variable_distributions)  # needs to be by one bigger than max(max_poly_degrees) in 1D
+quadrature_param = [15] * len(trial.variable_distributions)  # needs to be by one bigger than max(max_poly_degrees) in 1D
 quadrature_method = "sparse"
-quadrature_param = 4
+quadrature_param = 6
 
 # if quadrature method or parameter is changed, the caches need to be cleared as they use the quadrature nodes
 print("Max polys:", max_poly_degrees)
@@ -64,6 +64,7 @@ for max_poly_degree in max_poly_degrees:
     plt.plot(1. / np.array(delta_times), errors_exp, "-", label="Erwartungswert, $P={}$".format(max_poly_degree))
     if len(delta_times) == len(errors_var):
         plt.plot(1. / np.array(delta_times), errors_var, "-o", label="Varianz, $P={}$".format(max_poly_degree))
+    print("Plotting done.")
 
 
 plt.title("Galerkin-Approximation, T={}, $\\kappa={}$, {} mit {} Punkten"

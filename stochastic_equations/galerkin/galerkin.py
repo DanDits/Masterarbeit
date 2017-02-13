@@ -65,10 +65,16 @@ def get_evaluated_polys(ik, basis, chaos):
     return get_evaluated_poly(ik[0], basis, chaos) * get_evaluated_poly(ik[1], basis, chaos)
 
 
+# noinspection PyUnusedLocal
+@cache_by_first_parameter
+def get_alpha_at_nodes_matrix(poly_count, trial, nodes_matrix):
+    return np.apply_along_axis(lambda ys: trial.alpha(trial.transform_values(ys)), 1, nodes_matrix)
+
+
 @cache_by_first_parameter
 def calculate_wave_speed_transform(poly_count, trial, basis, chaos):
     def alpha_expectancy_func(nodes_matrix, i, k):
-        res1 = np.apply_along_axis(lambda ys: trial.alpha(trial.transform_values(ys)), 1, nodes_matrix)
+        res1 = get_alpha_at_nodes_matrix(poly_count, trial, nodes_matrix)
         res2 = get_evaluated_polys((i, k), basis, chaos)
         return res1 * res2
 
@@ -79,9 +85,15 @@ def calculate_wave_speed_transform(poly_count, trial, basis, chaos):
 
 
 @cache_by_first_parameter
+def get_beta_at_nodes_matrix(poly_count_and_x, trial, nodes_matrix):
+    return np.apply_along_axis(lambda ys: trial.beta([poly_count_and_x[1]], trial.transform_values(ys)),
+                               1, nodes_matrix)
+
+
+@cache_by_first_parameter
 def calculate_transformed_betas(poly_count, trial, basis, chaos, transform_s, xs):
     def beta_expectancy_func(nodes_matrix, i, k, x):
-        res1 = np.apply_along_axis(lambda ys: trial.beta([x], trial.transform_values(ys)), 1, nodes_matrix)
+        res1 = get_beta_at_nodes_matrix((poly_count, x), trial, nodes_matrix)
         res2 = get_evaluated_polys((i, k), basis, chaos)
         return res1 * res2
     x_nodes = xs[0]  # one dimensional only
@@ -130,21 +142,27 @@ def calculate_expectancy_matrix_sym(chaos, to_expect, poly_count):
     return matrix
 
 
-def get_projection_coefficients(function, project_trial, basis, chaos):
+def get_projection_coefficients(name_and_poly_count, function, project_trial, basis, chaos):
     def vectorized_func(ys):
         vec_result = function(project_trial.transform_values(ys))
         return vec_result
 
+    @cache_by_first_parameter
+    def get_vectorized_with_nodes_matrix(namepoly, nodes_matrix):
+        return np.apply_along_axis(vectorized_func, 1, nodes_matrix)
+
     def integrate_func(nodes_matrix, i):
-        res1 = np.apply_along_axis(vectorized_func, 1, nodes_matrix)
+        res1 = get_vectorized_with_nodes_matrix(name_and_poly_count, nodes_matrix)
         res2 = get_evaluated_poly(i, basis, chaos)
         return res1 * res2
 
-    return [chaos.integrate(partial(integrate_func, i=i), function_parameter_is_nodes_matrix=True)
+    return [chaos.integrate(partial(integrate_func, i=i),
+                            function_parameter_is_nodes_matrix=True)
             for i in range(len(basis))]
 
 
-def get_starting_value_coefficients(xs_mesh, starting_value_func,
+@cache_by_first_parameter
+def get_starting_value_coefficients(name_and_poly_count, xs_mesh, starting_value_func,
                                     project_trial, matrix_s_transposed,
                                     basis, chaos):
     coefficients = []
@@ -152,7 +170,7 @@ def get_starting_value_coefficients(xs_mesh, starting_value_func,
         def current_func(ys):
             return starting_value_func([x], ys)
         # if starting_value_func does not depend on ys, then only the first coeff will be nonzero
-        coeff = get_projection_coefficients(current_func, project_trial, basis, chaos)
+        coeff = get_projection_coefficients(name_and_poly_count, current_func, project_trial, basis, chaos)
         coeffs = matrix_s_transposed.dot(coeff)
         coefficients.append(coeffs)
     return list(map(np.array, zip(*coefficients)))  # transpose and convert to vectors, we want a list of length N+1
@@ -224,11 +242,11 @@ def make_splitting(domain, grid_size, wave_speeds,
     multi_linhyp_config = MultiLinhypSolver(domain, [grid_size], betas, matrix_r, 1 - wave_weight)
 
     print("Calculating starting position coefficients...")
-    start_positions = get_starting_value_coefficients(multi_wave_config.xs_mesh,
+    start_positions = get_starting_value_coefficients(("position", len(basis)), multi_wave_config.xs_mesh,
                                                       trial.start_position,
                                                       trial, matrix_s.T, basis, chaos)
     print("Calculating starting velocity coefficients...")
-    start_velocities = get_starting_value_coefficients(multi_wave_config.xs_mesh,
+    start_velocities = get_starting_value_coefficients(("velocity", len(basis)), multi_wave_config.xs_mesh,
                                                        trial.start_velocity,
                                                        trial, matrix_s.T, basis, chaos)
     splitting = Splitting.make_fast_strang(multi_wave_config, multi_linhyp_config, "FastStrangGalerkin",
