@@ -35,7 +35,7 @@ Wir wollen jetzt aus der Orthogonalitätsbedingung (\ref{eqn:galerkinOrtho}) ein
 &\quad -\sum_{m=0}^M\hat{v}_m(t,x)\underbrace{\E[\beta(x,Y)\Phi_m(Y)\Phi_k(Y)]}_{=b_{mk}}\\
 \equivalent \qquad \dtt{\hat{v}}_k(t,x)&=a_k\Laplace \hat{v}(t,x)-b_k(x)\hat{v}(t,x)\\
 \intertext{mit $ a_k=(a_{0k},\dots,a_{Mk}),\quad b_k(x)=(b_{0k}(x),\dots,b_{Mk}(x)),\quad \hat{v}(t,x)=(\hat{v}_0(t,x),\dots,\hat{v}_M(t,x))^T$}\\
-\equivalent \qquad \dtt{\hat{v}}_k(t,x)&=A\Laplace \hat{v}(t,x)-B(x)\hat{v}(t,x)
+\equivalent \qquad \dtt{\hat{v}}(t,x)&=A\Laplace \hat{v}(t,x)-B(x)\hat{v}(t,x)
 \end{align*}
 Die Matrizen $A$ und $B(x)$ werden durch die Zeilenvektoren $a_k$ und $b_k(x)$ gebildet und sind symmetrisch. Die benötigten Koeffizienten der Approximation $v_M$ sind gekoppelt und als Lösung folgender partieller Differentialgleichung zu erhalten
 \begin{equation}
@@ -59,7 +59,28 @@ die Darstellung mithilfe der Koeffizienten der Bestapproximation von $g$ und $h$
 \dt{\hat{v}}_m(0,x)=\hat{h}_m=\E[h(x,Y)\Phi_m(Y)]
 \end{align*}
 \section{Splitting für den Galerkin-Ansatz}
-Die partielle Differentialgleichung (\ref{eqn:galerkin_dgl}) ist ein System mit Zeitableitung zweiter Ordnung und vektorwertig mit Größe $M+1$. Um eine numerische Lösung des Systems zu erhalten, bietet sich wieder ein Splitting-Ansatz an. Zuerst wollen wir das System aber so weit wie möglich entkoppeln. Dazu beobachten wir, dass die Matrix $A$ symmetrisch positiv definit ist,\todo{Warum? Das passt so nicht.} da $\alpha(y)>0$ und somit $a_{mk}>\delta_{mk}$. Wir können $A\in\R^{M+1\times M+1}$ zerlegen in
+Die partielle Differentialgleichung (\ref{eqn:galerkin_dgl}) ist ein System mit Zeitableitung zweiter Ordnung und vektorwertig mit Größe $M+1$. Um eine numerische Lösung des Systems zu erhalten, bietet sich wieder ein Splitting-Ansatz an. Zuerst wollen wir das System aber so weit wie möglich entkoppeln.
+\begin{maththeorem}
+\label{th:galerkin_posdef}
+Ist $\alpha(y)>c$ für ein $c>0$, so ist die Matrix $A$ aus dem Galerkin-Ansatz positiv definit und besitzt nur positive Eigenwerte $\lambda>c$.\\
+Ist $\norm{\alpha}_\infty < \infty$, so gilt $\lambda\le \norm{\alpha}_\infty$.
+\end{maththeorem}
+\begin{proof}
+Sei $z\in\R^{M+1}\setminus \lbrace 0\rbrace$ beliebig. Dann gilt wegen $a_{ij}=\int \alpha(y)\Phi_i(y)\Phi_j(y)\rho(y)dy$
+\[(Az)_i=\int \alpha(y)\Phi_i(y)\underbrace{\left(\sum_{j=0}^M\Phi_j(y)z_j\right)}_{=\tilde{z}(y)}\rho(y)dy\]
+und daher
+\begin{align*}
+z^TAz&=\int \alpha(y)\left(\sum_{i=0}^M\Phi_i(y)z_i\right)\tilde{z}(y)\rho(y)dy\\
+&=\int\underbrace{\alpha(y)}_{>c}\underbrace{\tilde{z}^2(y)}_{>0 \text{ f.ü.}}\underbrace{\rho(y)}_{>0}dy\\
+&>c\int \tilde{z}^2(y)\rho(y)dy\\
+&=c\sum_{i=0}^Mz_i\sum_{j=0}^Mz_j\underbrace{\int \Phi_i(y)\Phi_j(y)\rho(y)dy}_{=\delta_{ij}}\\
+&=cz^Tz
+\end{align*}
+Die Abschätzung nach oben ergibt sich ähnlich, da für einen Eigenvektor $z\neq 0$ zum Eigenwert $\lambda$ gilt
+\[|\lambda| z^Tz=|z^TAz|=\left|\int \alpha(y)\tilde{z}^2(y)\rho(y)dy\right|\leq \norm{\alpha}_\infty z^Tz\]
+\end{proof}
+Unter entsprechenden Voraussetzungen an $B(x)$ gelten die Aussagen von Satz \ref{th:galerkin_posdef} punktweise auch für $B(x)$.\\
+Wir können $A\in\R^{M+1\times M+1}$ zerlegen in
 \[A=SDS^T,\quad \text{$D$ diagonal und $S$ orthogonal}\]
 Wir definieren dann 
 \[w(t,x)\coloneqq S^T\hat{v}(t,x),\quad t>0,x\in\Torus^d\]
@@ -85,5 +106,4 @@ und
 \label{eqn:galerkin_split2}
 \dt\begin{pmatrix}w_2\\ \tilde{w}_2\end{pmatrix}(t,x)=\begin{pmatrix}0&(1-\kappa)I_{M+1}\\-S^TB(x)S & 0\end{pmatrix}\begin{pmatrix}w_2\\\tilde{w}_2\end{pmatrix}(t,x)
 \end{equation}
-Diese sind wie schon in Kapitel \ref{chapter:solver_kgg} mithilfe der Matrixexponentialfunktion lösbar. Beachte, dass die Gleichung (\ref{eqn:galerkin_split1}) entkoppelt ist, da $D$ diagonal ist. Der erste Teil des Splittings besteht daher aus dem Lösen von $M+1$ unabhängigen "'Wellengleichungen"' (für $\kappa=1$), wobei die Wellengeschwindigkeiten die Eigenwerte $d_m$ der Matrix $A$ sind.\\
-Der zweite Teil des Splittings muss für jedes $x$ im benötigten Gitter extra gelöst werden.
+Diese sind wie schon in Kapitel \ref{chapter:solver_kgg} mithilfe der Matrixexponentialfunktion lösbar. Beachte, dass die Gleichung (\ref{eqn:galerkin_split1}) nach Umsortierung in $2\times 2$ Systeme entkoppelt ist, da $D$ diagonal ist. Die Matrixexponentialfunktion der entkoppelten $2\times 2$ Systeme ist in Algorithmus \ref{alg:kgg_solver} als \emph{First\_Part\_Solver} in einfacher Darstellung direkt gegeben. Der erste Teil des Splittings besteht somit aus dem Lösen von $M+1$ unabhängigen "'Wellengleichungen"' (Name passend für $\kappa=1$). Die Eigenwerte $d_i$ von $A$ sind die Quadrate der Wellengeschwindigkeiten. Abschätzungen für diese, insbesondere Positivität, erhalten wir mithilfe von Satz \ref{th:galerkin_posdef} unter entsprechenden Voraussetzungen an $\alpha(y)$.\\

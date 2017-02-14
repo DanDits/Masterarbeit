@@ -9,19 +9,22 @@ from stochastic_equations.galerkin.galerkin import galerkin_approximation
 # trial1: with delta time = 0.000001 it loses accuracy, this loss seems independent of quadrature count and is the same for poly degree 2,3,4
 #         does not depend on wave_weight
 domain = [(-np.pi, np.pi)]
-trial = st.trial_8
+trial = st.trial_1
 grid_size = trial.get_parameter("grid_size", 128)
 start_time = 0.
-stop_time = trial.get_parameter("stop_time", 0.5)
-delta_times = [0.1, 0.01, 0.001, 0.0001]
-max_poly_degrees = [0, 1, 2, 3, 4, 5, 6]
+stop_time = trial.get_parameter("stop_time", 1.)
+delta_times = [0.1, 0.01, 0.001, 0.0001, 0.00001]
+max_poly_degrees = [1, 3, 5, 10, 15]
 wave_weight = 1.
 
-quadrature_method = "full_tensor"
 # trial7: >=10 if degree <=6, >=15 if degree <= 10,  if degree <= 15
-quadrature_param = [15] * len(trial.variable_distributions)  # needs to be by one bigger than max(max_poly_degrees) in 1D
-quadrature_method = "sparse"
-quadrature_params = max_poly_degrees
+if len(trial.variable_distributions) == 1:
+    # needs to be by one bigger than max(max_poly_degrees) in 1D
+    quadrature_method = "full_tensor"
+    quadrature_params = [[n + 1] * len(trial.variable_distributions) for n in max_poly_degrees]
+else:
+    quadrature_method = "sparse"
+    quadrature_params = max_poly_degrees
 
 # if quadrature method or parameter is changed, the caches need to be cleared as they use the quadrature nodes
 print("Max polys:", max_poly_degrees)

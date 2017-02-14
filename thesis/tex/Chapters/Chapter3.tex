@@ -118,7 +118,7 @@ Die Wahl der beschränkten Summe $|m|\le P$ für $m\in\N_0^N$ ist eine Einschrä
 \begin{table}
 \centering
 \begin{tabular}{c|cc}
-$P$ & $\binom{P+M}{P}$ & $(P+1)^N$\\
+$P$ & $\binom{P+N}{P}$ & $(P+1)^N$\\
 \hline
 1  &  5  &  16 \\
 2  &  15  &  81 \\
@@ -149,8 +149,8 @@ In Abbildung \ref{fig:bestapproxcoeffs2d} ist der Betrag der Koeffizienten $|\ha
 \section{Extraktion von Statistiken}
 Gegeben sei die multivariate gPC Approximation mit Summenschranke $P$ zu einer Funktion $f(Y)$ und einem Zufallsvektor $Y$ der Dimension $N$, also
 \[f(Y)\approx f_M(Y)=\sum_{|m|\le P}\hat{f}_m\Phi_m(Y)\in\Poly_P^N,\quad m\in\N_0^N\]
-Unter Ausnutzung der Orthogonalitätsbedingung (\ref{eqn:gpc_ortho_mv}) der Polynombasen lassen sich gewisse Statistiken der gPC Approximation auf sehr einfache Art und Weise berechnen. Schlussendlich ist dies eine der größten Motivationen für die jeweilige Wahl der zur Verteilung passenden Orthogonalbasis.\\
-Es ist $\gamma_{(0,\dots,0)}=1$, da für das nicht normalisierte Polynom $\Psi_0\equiv 1$ und eine Wahrscheinlichkeitsverteilung $F_Y$ gilt $\gamma_0=\E[\Psi_0^2(Y)]=\int 1\cdot 1dF_Y(y)=1$. Folglich gilt $\Phi_{(0,\dots,0)}(Y)\equiv \frac{\Psi_0}{\sqrt{\gamma_0}}\equiv 1$ und für den Erwartungswert $\mu_f$
+Unter Ausnutzung der Orthogonalitätsbedingung (\ref{eqn:gpc_ortho_mv}) der Polynombasen lassen sich gewisse Statistiken der gPC Approximation auf sehr einfache Art und Weise berechnen. Schlussendlich ist dies eine der größten Motivationen dafür, die Orthogonalbasis passend zur gegebenen Verteilung zu wählen.\\
+Es ist $\gamma_{(0,\dots,0)}=1$, da für das nicht normalisierte Polynom $\Psi_0\equiv 1$ und eine Wahrscheinlichkeitsverteilung $F_Y$ gilt $\gamma_0=\E[\Psi_0^2(Y)]=\int 1\cdot 1dF_Y(y)=1$. Folglich gilt $\Phi_{(0,\dots,0)}(Y)= \frac{\Psi_0(Y)}{\sqrt{\gamma_0}}\equiv 1$ und für den Erwartungswert $\mu_f$
 \begin{equation}
 \label{eqn:gpc_approx_exp}
 \begin{split}
@@ -168,6 +168,7 @@ Die Varianz lässt sich dann berechnen als
 \end{align*}
 Die Standardabweichung ist folglich gegeben durch
 \[\sigma_f=\sqrt{\text{var}(f(Y))}\approx\sqrt{\sum_{0<|m|\le P}\hat{f}_m^2}\]
+Ist man an einer Approximation der Dichtefunktion von $f(Y)$ interessiert, so lässt sich diese mittels eines Histogramms und Samplings der Funktion $f_N(Y)=\sum_{|m|\le P}\hat{f}_m\Phi_m(Y)$ erhalten.\\[0.2cm]
 Für höhere Momente gilt
 \begin{align*}
 \E[f^\ell(Y)]\approx \sum_{|m^{(1)}|,\dots,|m^{(\ell)}|\le P} \hat{f}_{m^{(1)}}\dots\hat{f}_{m^{(\ell)}}\underbrace{\E[\Phi_{m^{(1)}}(Y)\dots\Phi_{m^{(\ell)}}(Y)]}_{=\mathcal{T}_{m^{(1)},\dots m^{(\ell)}}}
@@ -204,4 +205,3 @@ Für $N=1$ und $\ell=3$ ist der Momententensor $\mathcal{T}$ für $Y\sim \mathca
 \end{tikzpicture}
 \]
 \end{mathbsp}
-Ist man an einer Approximation der Dichtefunktion von $f(Y)$ interessiert, so lässt sich diese mittels eines Histogramms und Samplings der Funktion $f_N(Y)=\sum_{|m|\le P}\hat{f}_m\Phi_m(Y)$ erhalten.
