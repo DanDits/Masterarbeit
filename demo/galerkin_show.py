@@ -21,11 +21,11 @@ quadrature_method = "full_tensor"
 # trial7: >=10 if degree <=6, >=15 if degree <= 10,  if degree <= 15
 quadrature_param = [15] * len(trial.variable_distributions)  # needs to be by one bigger than max(max_poly_degrees) in 1D
 quadrature_method = "sparse"
-quadrature_param = 6
+quadrature_params = max_poly_degrees
 
 # if quadrature method or parameter is changed, the caches need to be cleared as they use the quadrature nodes
 print("Max polys:", max_poly_degrees)
-print("Quad=", quadrature_method, "params=", quadrature_param)
+print("Quad=", quadrature_method, "params=", quadrature_params)
 print("Waveweight=", wave_weight)
 print("DT=", delta_times)
 plt.figure()
@@ -37,7 +37,7 @@ plt.yscale('log')
 cache = {}
 trial_exp, trial_var = None, None
 
-for max_poly_degree in max_poly_degrees:
+for max_poly_degree, quadrature_param in zip(max_poly_degrees, quadrature_params):
     print("Curr degree", max_poly_degree, "of all", max_poly_degrees)
     errors_exp, errors_var = [], []
     error_var = None

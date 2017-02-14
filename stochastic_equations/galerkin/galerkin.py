@@ -4,14 +4,15 @@ import polynomial_chaos.multivariation as mv
 from numpy.linalg import eigh
 import numpy as np
 from functools import partial
-from util.caching import cache_by_first_parameter
+from util.caching import cache_by_first_parameter, clear_caches_by_name
 from diff_equation.solver_config import SolverConfig
 from diff_equation.pseudospectral_solver import WaveSolverConfig
 from diff_equation.ode_solver import LinhypSolverConfig
 from diff_equation.splitting import Splitting
 
-
 parameter_validation_for_cache = None
+cache_name_poly_count = "Poly"
+cache_name_quadrature = "Quad"
 
 
 def galerkin_approximation(trial, max_poly_degree, domain, grid_size, start_time, stop_time, delta_time, wave_weight,
@@ -21,11 +22,15 @@ def galerkin_approximation(trial, max_poly_degree, domain, grid_size, start_time
         parameter_validation_for_cache = {"grid_size": grid_size,
                                           "quadrature_method": quadrature_method,
                                           "quadrature_param": quadrature_param,
-                                          "trial": trial}
+                                          "trial": trial,
+                                          "poly_degree": max_poly_degree}
     assert parameter_validation_for_cache["grid_size"] == grid_size
-    assert parameter_validation_for_cache["quadrature_method"] == quadrature_method
-    assert parameter_validation_for_cache["quadrature_param"] == quadrature_param
     assert parameter_validation_for_cache["trial"] == trial
+    if max_poly_degree != parameter_validation_for_cache["poly_degree"]:
+        clear_caches_by_name(cache_name_poly_count)
+    if (parameter_validation_for_cache["quadrature_method"] != quadrature_method
+            or parameter_validation_for_cache["quadrature_param"] != quadrature_param):
+        clear_caches_by_name(cache_name_quadrature)
     assert len(domain) == 1  # can only handle 1d domains so far, else would need to flatten arrays and other reshaping
 
     trial.flag_raw_attributes = True
@@ -55,23 +60,23 @@ def galerkin_approximation(trial, max_poly_degree, domain, grid_size, start_time
     return xs, xs_mesh, expectancy, variance, chaos.quadrature_rule.get_nodes_count()
 
 
-@cache_by_first_parameter
+@cache_by_first_parameter([cache_name_quadrature])
 def get_evaluated_poly(i, basis, chaos):
     return np.apply_along_axis(basis[i], 1, chaos.quadrature_rule.get_nodes())
 
 
-@cache_by_first_parameter
+@cache_by_first_parameter([cache_name_quadrature])
 def get_evaluated_polys(ik, basis, chaos):
     return get_evaluated_poly(ik[0], basis, chaos) * get_evaluated_poly(ik[1], basis, chaos)
 
 
 # noinspection PyUnusedLocal
-@cache_by_first_parameter
+@cache_by_first_parameter([cache_name_quadrature])
 def get_alpha_at_nodes_matrix(poly_count, trial, nodes_matrix):
     return np.apply_along_axis(lambda ys: trial.alpha(trial.transform_values(ys)), 1, nodes_matrix)
 
 
-@cache_by_first_parameter
+@cache_by_first_parameter([cache_name_quadrature, cache_name_poly_count])
 def calculate_wave_speed_transform(poly_count, trial, basis, chaos):
     def alpha_expectancy_func(nodes_matrix, i, k):
         res1 = get_alpha_at_nodes_matrix(poly_count, trial, nodes_matrix)
@@ -84,18 +89,19 @@ def calculate_wave_speed_transform(poly_count, trial, basis, chaos):
     return wave_speeds, transform_s
 
 
-@cache_by_first_parameter
+@cache_by_first_parameter([cache_name_poly_count])
 def get_beta_at_nodes_matrix(poly_count_and_x, trial, nodes_matrix):
     return np.apply_along_axis(lambda ys: trial.beta([poly_count_and_x[1]], trial.transform_values(ys)),
                                1, nodes_matrix)
 
 
-@cache_by_first_parameter
+@cache_by_first_parameter([cache_name_poly_count])
 def calculate_transformed_betas(poly_count, trial, basis, chaos, transform_s, xs):
     def beta_expectancy_func(nodes_matrix, i, k, x):
         res1 = get_beta_at_nodes_matrix((poly_count, x), trial, nodes_matrix)
         res2 = get_evaluated_polys((i, k), basis, chaos)
         return res1 * res2
+
     x_nodes = xs[0]  # one dimensional only
     # tensor.shape = (nodes_count,poly_count,poly_count), so one matrix B(x) per layer
     tensor = calculate_expectancy_tensor(chaos, beta_expectancy_func, poly_count, x_nodes)
@@ -110,7 +116,7 @@ def calculate_transformed_betas(poly_count, trial, basis, chaos, transform_s, xs
     return betas, transform_r
 
 
-@cache_by_first_parameter
+@cache_by_first_parameter([cache_name_quadrature])
 def calculate_beta_integral(ikj, x, chaos, to_expect):  # j needs to be cached as well as this corresponds to x
     return chaos.integrate(partial(to_expect, i=ikj[0], k=ikj[1], x=x), function_parameter_is_nodes_matrix=True)
 
@@ -125,7 +131,7 @@ def calculate_expectancy_tensor(chaos, to_expect, poly_count, x_nodes):
                 # use symmetry to fill matrix
                 tensor[j, i, k] = exp_value
                 tensor[j, k, i] = exp_value
-        print("Tensor calculation:", i, "/", poly_count)
+        print("Tensor calculation:", i+1, "/", poly_count)
     return tensor
 
 
@@ -138,7 +144,7 @@ def calculate_expectancy_matrix_sym(chaos, to_expect, poly_count):
             # use symmetry to fill matrix
             matrix[i, k] = exp_value
             matrix[k, i] = exp_value
-        print("Matrix A calculation", i, "/", poly_count)
+        print("Matrix A calculation", i+1, "/", poly_count)
     return matrix
 
 
@@ -147,7 +153,8 @@ def get_projection_coefficients(name_and_poly_count, function, project_trial, ba
         vec_result = function(project_trial.transform_values(ys))
         return vec_result
 
-    @cache_by_first_parameter
+    # noinspection PyUnusedLocal
+    @cache_by_first_parameter([cache_name_quadrature])
     def get_vectorized_with_nodes_matrix(namepoly, nodes_matrix):
         return np.apply_along_axis(vectorized_func, 1, nodes_matrix)
 
@@ -161,7 +168,7 @@ def get_projection_coefficients(name_and_poly_count, function, project_trial, ba
             for i in range(len(basis))]
 
 
-@cache_by_first_parameter
+@cache_by_first_parameter([cache_name_poly_count, cache_name_quadrature])
 def get_starting_value_coefficients(name_and_poly_count, xs_mesh, starting_value_func,
                                     project_trial, matrix_s_transposed,
                                     basis, chaos):
@@ -169,11 +176,13 @@ def get_starting_value_coefficients(name_and_poly_count, xs_mesh, starting_value
     for i, x in enumerate(xs_mesh[0]):
         def current_func(ys):
             return starting_value_func([x], ys)
+
         # if starting_value_func does not depend on ys, then only the first coeff will be nonzero
         coeff = get_projection_coefficients(name_and_poly_count, current_func, project_trial, basis, chaos)
         coeffs = matrix_s_transposed.dot(coeff)
         coefficients.append(coeffs)
     return list(map(np.array, zip(*coefficients)))  # transpose and convert to vectors, we want a list of length N+1
+
 
 # ---------------------------SPLITTING---------------------------
 
@@ -222,6 +231,7 @@ class MultiLinhypSolver(SolverConfig):
 
         for config, u0, u0t in zip(self.configs, transformed_positions, transformed_velocities):
             config.init_solver(t0, u0, u0t)
+
         # each individual config solver returns a list of vectors of length 'grid_size'. We pack the lists all in a list
         # then we transpose this construct using list(zip(*...))
         # then we get a list whose first entry contains a list of positions, the second a list of velocities,...
@@ -232,12 +242,12 @@ class MultiLinhypSolver(SolverConfig):
             transformed_result_positions = np.einsum('kij,jk->ik', self.tensor_r, np.array(positions))
             transformed_result_velocities = np.einsum('kij,jk->ik', self.tensor_r, np.array(velocities))
             return transformed_result_positions, transformed_result_velocities
+
         self.solver = solution_at
 
 
 def make_splitting(domain, grid_size, wave_speeds,
                    basis, betas, matrix_r, matrix_s, start_time, trial, chaos, delta_time, wave_weight):
-
     multi_wave_config = MultiWaveSolver(domain, [grid_size], wave_speeds, wave_weight)
     multi_linhyp_config = MultiLinhypSolver(domain, [grid_size], betas, matrix_r, 1 - wave_weight)
 
