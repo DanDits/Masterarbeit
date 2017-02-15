@@ -2,7 +2,6 @@ import numpy as np
 from stochastic_equations.stochastic_trial import StochasticTrial
 from polynomial_chaos import distributions
 
-
 # y[0] > 1
 left_1, right_1 = 2, 3
 trial_1 = StochasticTrial([distributions.make_uniform(-1, 1)],
@@ -137,22 +136,25 @@ trial_7 = StochasticTrial([distributions.make_beta(0.5, 0.5)],
                     "expectancy_data", "../data/qmc_exp, 100000, Trial7, 0.5, 128.npy",
                     "variance_data", "../data/qmc_var, 100000, Trial7, 0.5, 128.npy")
 trial_7_t1 = StochasticTrial([distributions.make_beta(0.5, 0.5)],
-                          lambda xs, ys: np.cos(sum(xs)),
-                          lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
-                          name="Trial7t1") \
+                             lambda xs, ys: np.cos(sum(xs)),
+                             lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
+                             name="Trial7t1") \
     .add_parameters("beta", lambda xs, ys: 4 + np.sin(2 * xs[0] + ys[0]) + 2 * np.sin(xs[0] + ys[0]),
                     "alpha", lambda ys: 1 + np.exp(ys[0]),
                     "grid_size", 128,
-                    "stop_time", 1.)
+                    "stop_time", 1.,
+                    "expectancy_data", "../data/qmc_exp, 100000, Trial7t1, 1.0, 128.npy",
+                    "variance_data", "../data/qmc_var, 100000, Trial7t1, 1.0, 128.npy")
 trial_7_t2 = StochasticTrial([distributions.make_beta(0.5, 0.5)],
-                          lambda xs, ys: np.cos(sum(xs)),
-                          lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
-                          name="Trial7t2") \
+                             lambda xs, ys: np.cos(sum(xs)),
+                             lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
+                             name="Trial7t2") \
     .add_parameters("beta", lambda xs, ys: 4 + np.sin(2 * xs[0] + ys[0]) + 2 * np.sin(xs[0] + ys[0]),
                     "alpha", lambda ys: 1 + np.exp(ys[0]),
                     "grid_size", 128,
-                    "stop_time", 2.)
-
+                    "stop_time", 2.,
+                    "expectancy_data", "../data/qmc_exp, 100000, Trial7t2, 2.0, 128.npy",
+                    "variance_data", "../data/qmc_var, 100000, Trial7t2, 2.0, 128.npy")
 
 trial_7 = StochasticTrial([distributions.make_beta(0.5, 0.5)],
                           lambda xs, ys: np.cos(sum(xs)),
@@ -164,7 +166,6 @@ trial_7 = StochasticTrial([distributions.make_beta(0.5, 0.5)],
                     "stop_time", 0.5,
                     "expectancy_data", "../data/qmc_exp, 100000, Trial7, 0.5, 128.npy",
                     "variance_data", "../data/qmc_var, 100000, Trial7, 0.5, 128.npy")
-
 
 trial_8 = StochasticTrial([distributions.gaussian, distributions.make_uniform(-1, 1),
                            distributions.make_beta(-0.5, 2.5), distributions.make_gamma(2, 1)],
@@ -201,27 +202,27 @@ trial_discont_simple = StochasticTrial([distributions.make_uniform(-1, 1)],
                     "variance_data", "../data/qmc_var, 100000, TrialDiscontSimple, 0.5, 128.npy")
 
 trial_discont_simple_gauss = StochasticTrial([distributions.gaussian],
-                                       lambda xs, ys: np.cos(sum(xs)),
-                                       lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
-                                       name="TrialDiscontSimpleGauss") \
+                                             lambda xs, ys: np.cos(sum(xs)),
+                                             lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
+                                             name="TrialDiscontSimpleGauss") \
     .add_parameters("beta", lambda xs, ys: 2 + np.sin(xs[0] + ys[0]) if ys[0] > 0. else 2 + np.cos(xs[0] + ys[0]),
                     "alpha", lambda ys: 2. if ys[0] > 0. else 1.,
                     "expectancy_data", "../data/qmc_exp, 100000, TrialDiscontSimpleGauss, 0.5, 128.npy",
                     "variance_data", "../data/qmc_var, 100000, TrialDiscontSimpleGauss, 0.5, 128.npy")
 
 trial_discont_super_simple = StochasticTrial([distributions.make_uniform(-1, 1)],
-                                       lambda xs, ys: np.cos(sum(xs)),
-                                       lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
-                                       name="TrialDiscontSuperSimple") \
+                                             lambda xs, ys: np.cos(sum(xs)),
+                                             lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
+                                             name="TrialDiscontSuperSimple") \
     .add_parameters("beta", lambda xs, ys: 2 + np.sin(xs[0] + ys[0]),
                     "alpha", lambda ys: 2. if ys[0] > 0. else 1.,
                     "expectancy_data", "../data/qmc_exp, 100000, TrialDiscontSuperSimple, 0.5, 128.npy",
                     "variance_data", "../data/qmc_var, 100000, TrialDiscontSuperSimple, 0.5, 128.npy")
 
 trial_discont_super_extreme_simple = StochasticTrial([distributions.make_uniform(-1, 1)],
-                                       lambda xs, ys: np.cos(sum(xs)),
-                                       lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
-                                       name="TrialDiscontSuperExtremeSimple") \
+                                                     lambda xs, ys: np.cos(sum(xs)),
+                                                     lambda xs, ys: np.sin(sum([x ** 2 for x in xs])),
+                                                     name="TrialDiscontSuperExtremeSimple") \
     .add_parameters("beta", lambda xs, ys: 2 + np.sin(xs[0]),
                     "alpha", lambda ys: 2. if ys[0] > 0. else 1.,
                     "expectancy_data", "../data/qmc_exp, 100000, TrialDiscontSuperExtremeSimple, 0.5, 128.npy",
@@ -240,6 +241,8 @@ trial_discont_triple = StochasticTrial([distributions.make_uniform(-1, 1)],
 def reg_alpha(ys):
     # result must be smaller than 1/4 and bigger than 0
     return 0.1 + 0.05 * np.sin(sum(ys))
+
+
 trial_reg0 = StochasticTrial([distributions.make_beta(3, 0.5), distributions.make_uniform(-2, 2)],
                              lambda xs, ys: (np.sin(sum(xs) + sum(ys)) ** 2 - 0.5) * np.sin(sum(ys)),
                              lambda xs, ys: (np.sin(sum(xs) + sum(ys)) ** 2 - 0.5) * np.cos(sum(ys)),

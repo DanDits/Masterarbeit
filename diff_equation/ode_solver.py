@@ -13,11 +13,22 @@ class LinhypSolverConfig(SolverConfig):
             self.beta = beta(self.xs_mesh)
         else:
             self.beta = beta  # if we cannot call it then it has to be already correct
+        self.sinc_arg = None
+        self.cos_arg = None
         self.beta_sqrt = np.sqrt(self.beta)
         self.splitting_factor = splitting_factor
 
     def start_momentum(self):
         return -self.beta * self.start_position
+
+    def update_cached(self, delta_time):
+        self.last_delta_time = delta_time
+        argument = self.beta_sqrt * (delta_time * np.sqrt(self.splitting_factor))
+
+        # np.sinc multiplies arguments by pi, so revert this
+        # motivation to use np.sinc over np.sin is to avoid handling splitting_factor=0. explicitly
+        self.sinc_arg = np.sinc(argument / np.pi) * delta_time
+        self.cos_arg = np.cos(argument)
 
     def init_solver(self, t0, u0, u0t):
         self.init_initial_values(t0, u0, u0t)
@@ -27,12 +38,10 @@ class LinhypSolverConfig(SolverConfig):
         c1_derivative = -self.beta * self.start_position
 
         def solution_at(time):
-            argument = self.beta_sqrt * (time - self.start_time) * np.sqrt(self.splitting_factor)
-            cos_arg = np.cos(argument)
-            # motivation to use np.sinc over np.sin is to avoid handling splitting_factor=0. explicitly
-            sinc_arg = np.sinc(argument / np.pi) * (time - self.start_time)
-            return [self.start_position * cos_arg + c2 * sinc_arg,
-                    c1_derivative * sinc_arg + self.start_velocity * cos_arg]
+            if self.is_new_delta_time(time - self.start_time):
+                self.update_cached(time - self.start_time)
+            return [self.start_position * self.cos_arg + c2 * self.sinc_arg,
+                    c1_derivative * self.sinc_arg + self.start_velocity * self.cos_arg]
 
         self.solver = solution_at
 

@@ -6,15 +6,15 @@ from stochastic_equations.galerkin.galerkin import galerkin_approximation
 
 
 # OBSERVATIONS:
-# trial1: with delta time = 0.000001 it loses accuracy, this loss seems independent of quadrature count and is the same for poly degree 2,3,4
-#         does not depend on wave_weight
+# trial1: with delta time = 0.000001 it loses accuracy,
+# this loss seems independent of quadrature count and is the same for poly degree 2,3,4; does not depend on wave_weight
 domain = [(-np.pi, np.pi)]
-trial = st.trial_1
+trial = st.trial_7_t2
 grid_size = trial.get_parameter("grid_size", 128)
 start_time = 0.
 stop_time = trial.get_parameter("stop_time", 1.)
-delta_times = [0.1, 0.01, 0.001, 0.0001, 0.00001]
-max_poly_degrees = [1, 3, 5, 10, 15]
+delta_times = [0.1, 0.01, 0.001, 0.0001]
+max_poly_degrees = [1, 5, 10, 20, 40]
 wave_weight = 1.
 
 # trial7: >=10 if degree <=6, >=15 if degree <= 10,  if degree <= 15
@@ -57,7 +57,6 @@ for max_poly_degree, quadrature_param in zip(max_poly_degrees, quadrature_params
         error_exp = error_l2_relative(exp, trial_exp)
         errors_exp.append(error_exp)
         if var is not None:
-            print(var.shape, trial_var.shape)
             error_var = error_l2_relative(var, trial_var)
             errors_var.append(error_var)
         print("Degree={}, dt={}, error_exp={}, error_var={}".format(max_poly_degree, delta_time, error_exp, error_var))
