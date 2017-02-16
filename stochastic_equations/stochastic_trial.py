@@ -91,11 +91,31 @@ class StochasticTrial(Trial):
     def obtain_evaluated_variance(self, xs, xs_mesh, time):
         if self.has_parameter("variance"):
             return self.variance(xs_mesh, time)
+        elif self.raw_reference is not None:
+            expectancy = self.obtain_evaluated_expectancy(xs, xs_mesh, time)
+            if expectancy is not None:
+                return self.calculate_variance(xs, time, self.raw_reference, expectancy)
         elif self.has_parameter("variance_data"):
             try:
                 return np.load(self.variance_data)
             except FileNotFoundError:
                 print("No variance data found, should be here!?")
+
+    def calculate_variance(self, xs_lines, t, function, expectancy):
+        sizes = tuple(map(len, xs_lines))
+        result = np.zeros(shape=sizes)
+        for index, x_coords in zip(product(*map(range, sizes)), product(*xs_lines)):
+            # iterate over every coordinate, calculating the variance for this point by calculating the integral
+            # over the variables ys weighted by the distribution's weights
+            # Var[Z]=int((Z-E[Z])^2 * weights)
+            def func_in_ys(*ys):
+                transformed_ys = [rvar(value) for rvar, value in zip(self.rvars, ys)]
+                return ((function(x_coords, t, transformed_ys) - expectancy[index]) ** 2
+                        * mul_prod(distr.weight(y) for y, distr in zip(ys, self.variable_distributions)))
+
+            point_value = nquad(func_in_ys, [distr.support for distr in self.variable_distributions])[0]
+            result[index] = point_value
+        return result
 
     def calculate_expectancy(self, xs_lines, t, function):
         """

@@ -9,6 +9,7 @@ from diff_equation.solver_config import SolverConfig
 from diff_equation.pseudospectral_solver import WaveSolverConfig
 from diff_equation.ode_solver import LinhypSolverConfig
 from diff_equation.splitting import Splitting
+import collections
 
 parameter_validation_for_cache = None
 cache_name_poly_count = "Poly"
@@ -56,8 +57,13 @@ def galerkin_approximation(trial, max_poly_degree, domain, grid_size, start_time
     print("Betas calculation finished.")
     splitting = make_splitting(domain, grid_size, wave_speeds,
                                basis, betas, matrix_r, matrix_s, start_time, trial, chaos, delta_time, wave_weight)
-    expectancy, variance = calculate_expectancy_variance(splitting, stop_time, delta_time)
-    return xs, xs_mesh, expectancy, variance, chaos.quadrature_rule.get_nodes_count()
+    if isinstance(stop_time, collections.Iterable):
+        for stop in stop_time:
+            expectancy, variance = calculate_expectancy_variance(splitting, stop, delta_time)
+            yield xs, xs_mesh, expectancy, variance, chaos.quadrature_rule.get_nodes_count()
+    else:
+        expectancy, variance = calculate_expectancy_variance(splitting, stop_time, delta_time)
+        yield xs, xs_mesh, expectancy, variance, chaos.quadrature_rule.get_nodes_count()
 
 
 @cache_by_first_parameter([cache_name_quadrature])
