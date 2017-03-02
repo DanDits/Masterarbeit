@@ -142,6 +142,7 @@ def calculate_expectancy_tensor(chaos, to_expect, poly_count, x_nodes):
 
 
 def calculate_expectancy_matrix_sym(chaos, to_expect, poly_count):
+    print("Starting calculating symmetric expectancy matrix")
     matrix = np.empty((poly_count, poly_count))
     for i in range(poly_count):
         # we know it is symmetric and therefore only calculate upper triangle

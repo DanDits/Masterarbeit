@@ -30,24 +30,25 @@ def testfun2_solution(eks):
     else:
         return 1
 
-fun = testfun
-funsol = testfun_solution
+fun = testfun2
+funsol = testfun2_solution
 deriv = 2 if fun == testfun else 1
 fun_descr = "$f(x)=-\sin(x)e^{-\sin(x)}$" if fun == testfun else "$f(x)=|x|$"
 
-result_x, result_y = spectral_derivative(bound, 2**8, fun, deriv)
-x_highres = np.linspace(bound[0], bound[1], endpoint=False, num=512)  # higher resolution
+max_order = 2**16
+result_x, result_y = spectral_derivative(bound, max_order, fun, deriv)
+x_highres = np.linspace(bound[0], bound[1], endpoint=False, num=2 * max_order)  # higher resolution
 plt.plot(result_x, result_y, x_highres, funsol(x_highres))
 plt.legend(["Pseudospectral solution", "Original solution"])
 
 from util.analysis import error_l2_relative as error
 errors = []
-Ns = [2 ** r for r in range(1, 8)]
+Ns = [2 ** r for r in range(1, int(np.log2(max_order)))]
 for N in Ns:
     result_x, result_y = spectral_derivative(bound, N, fun, deriv)
     errors.append(error(result_y, funsol(result_x)))
 plt.figure()
-font = 28
+font = 15
 plt.title("Fehler der spektralen Ableitung der Ordnung {} von {}".format(deriv, fun_descr),
           fontsize=font)
 plt.plot(Ns, errors, "-o")

@@ -7,12 +7,12 @@ from stochastic_equations.galerkin.galerkin import galerkin_approximation
 
 
 domain = [(-np.pi, np.pi)]
-trial = st.trial_7
+trial = st.trial_8
 grid_size = trial.get_parameter("grid_size", 128)
 start_time = 0.
-stop_time = trial.get_parameter("stop_time", 4.)
+stop_time = trial.get_parameter("stop_time", 0.5)
 delta_time = 0.0001
-max_poly_degrees = [1, 3, 5]
+max_poly_degrees = [1, 2, 3, 4, 5]
 wave_weight = 1.
 
 if len(trial.variable_distributions) == 1:

@@ -83,6 +83,8 @@ class StochasticTrial(Trial):
         elif self.raw_reference is not None:
             return self.calculate_expectancy(xs, time, self.raw_reference)
         elif self.has_parameter("expectancy_data"):
+            if self.has_parameter("stop_time") and self.stop_time != time:
+                raise ValueError("Saved expectancy time {} does not match wanted time {}".format(self.stop_time, time))
             try:
                 return np.load(self.expectancy_data)
             except FileNotFoundError:

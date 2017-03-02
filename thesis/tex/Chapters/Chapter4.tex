@@ -44,7 +44,7 @@ In Gleichung (\ref{eqn:gpc_approx_exp}) wurde gezeigt, dass sich der Erwartungsw
 Da die Gleichungen gekoppelt sind, müssen aber trotzdem auch alle anderen $\hat{w}_m$ berechnet werden.
 \end{mathbem}
 \subsection{Wahl der Interpolationspunkte}
-Wir wollen direkt am Anfang darauf hinweisen, dass im mehrdimensionalen für $N>1$ die Wahl der Knotenpunkte für die Interpolation ein nicht vollständig verstandenes Problem darstellt. Das Konzept der Lagrange-Interpolation, die im eindimensionalen für jede beliebige Knotenmenge möglich ist, lässt sich wie in \autocite{San07} gezeigt konzeptuell auf den mehrdimensionalen Fall erweitern. Allerdings benötigt sie die entsprechende Bedingung $\det(A)\neq 0$, welche besagt, dass die Interpolation durch die gegebenen Knotenpunkte eindeutig ist. Die Beziehung dieser Bedingung zur Wahl der Knotenpunkte stellt ein "'komplexes Problem"' dar.
+Wir wollen direkt am Anfang darauf hinweisen, dass im Mehrdimensionalen für $N>1$ die Wahl der Knotenpunkte für die Interpolation ein nicht vollständig verstandenes Problem darstellt. Das Konzept der Lagrange-Interpolation, die im Eindimensionalen für jede beliebige Knotenmenge möglich ist, lässt sich wie in \autocite{San07} gezeigt konzeptuell auf den mehrdimensionalen Fall erweitern. Allerdings benötigt sie die entsprechende Bedingung $\det(A)\neq 0$, welche besagt, dass die Interpolation durch die gegebenen Knotenpunkte eindeutig ist. Die Beziehung dieser Bedingung zur Wahl der Knotenpunkte stellt ein "'komplexes Problem"' dar.
 \subsubsection*{Grundlagen der eindimensionalen Interpolation}
 Der Satz von Cauchy ist der erste Orientierungspunkt für die Abhängigkeit der Interpolationsgüte zur Wahl der Knotenpunkte für den eindimensionalen Fall und einem kompakten Intervall.
 \begin{maththeorem}[Cauchy]
@@ -85,9 +85,9 @@ Also gilt $A\widetilde{w}=\hat{f}=A\hat{w}$ und da $A$ regulär ist somit $\wide
 Wir wollen nun dem technischen Satz \ref{th:interpol_and_proj} Leben einhauchen und seine Relevanz verdeutlichen.
 \begin{itemize}
 \item
-Die vorausgesetzte Existenz einer Quadraturformel aus $M+1$ verschiedenen Quadraturpunkten und Exaktheitsgrad $2M$ ist durch die später vorgestellte Gauss-Quadratur erfüllt. Die Quadraturpunkte sind dabei die Nullstellen des $M+1$-ten Basispolynoms und daher paarweise verschieden. Die Quadraturgewichte lassen sich über die erste Komponente dessen Einheitsvektors bestimmen, der beim Golub-Welsch-Algorithmus auch die entsprechende Nullstelle des Polynoms berechnet.
+Die vorausgesetzte Existenz einer Quadraturformel aus $M+1$ verschiedenen Quadraturpunkten und Exaktheitsgrad $2M$ ist durch die später vorgestellte Gauss-Quadratur erfüllt. Die Quadraturpunkte sind dabei die Nullstellen des $M+1$-ten Basispolynoms und daher paarweise verschieden. Die Quadraturgewichte lassen sich über die erste Komponente des zugehörigen normierten Eigenvektors bestimmen.
 \item
-Wir sehen, dass sich im eindimensionalen bei bekannter Quadraturformel die Interpolationskoeffizienten $\hat{w}_m$ auch einzeln ohne Lösen eines linearen Gleichungssystems berechnen lassen. Diese Darstellung führt auf den später vorgestellten zweiten Ansatz zur stochastischen Collocation.
+Wir sehen, dass sich im Eindimensionalen bei bekannter Quadraturformel die Interpolationskoeffizienten $\hat{w}_m$ auch einzeln ohne Lösen eines linearen Gleichungssystems berechnen lassen. Diese Darstellung führt auf den später vorgestellten zweiten Ansatz zur stochastischen Collocation.
 \item
 Die Darstellung $\hat{w}_i=\sum_{j=0}^M\Phi_i(y_j)a_jf(y_j)$ kann als Approximation an die Koeffizienten $\int_I \Phi_i(y)f(y)w(y)dy$ der Bestapproximation $P_Mf$ in $L_w^2(I)$ aufgefasst werden. Mithilfe der Dreiecksungleichung lässt sich dann der Fehler der Interpolation beschreiben durch
 \begin{align*}
@@ -176,9 +176,9 @@ Ist nun $(y_i,a_i)_{i=0,\dots,Q}$ eine Quadraturformel für das Gewicht $\rho_Y$
 \[w_{M,Q}(T,x_j,Y)=\sum_{m=0}^M\hat{w}_m^{(j)}\Phi_m(Y)\] wobei für die Koeffizienten gilt
 \[\hat{w}_m^{(j)}=\sum_{i=0}^Qu(T,x_j,y_i)\Phi_m(y_i)a_i\approx \int_{I_Y} u(T,x_j,y)\Phi_m(y)\rho_Y(y)dy\]
 \end{mathdef}
-Satz \ref{th:interpol_and_proj} zeigt, dass für $Q=M$ und eine Quadraturformel mit paarweise verschiedenen Quadraturpunkten und Exaktheitsgrad $2M$ die beiden Ansätze im eindimensionalen äquivalent sind. Aus der Bemerkung nach Satz \ref{th:interpol_and_proj} folgt auch, dass sich der Fehler der diskreten Projektion mithilfe der Dreiecksungleichung durch den Fehler der Bestapproximation und einen Quadraturfehler, den Aliasing Fehler, abschätzen lässt.
+Satz \ref{th:interpol_and_proj} zeigt, dass für $Q=M$ und eine Quadraturformel mit paarweise verschiedenen Quadraturpunkten und Exaktheitsgrad $2M$ die beiden Ansätze im Eindimensionalen äquivalent sind. Aus der Bemerkung nach Satz \ref{th:interpol_and_proj} folgt auch, dass sich der Fehler der diskreten Projektion mithilfe der Dreiecksungleichung durch den Fehler der Bestapproximation und einen Quadraturfehler, den Aliasing Fehler, abschätzen lässt.
 
-\subsection{Gauss-Quadratur im eindimensionalen}
+\subsection{Gauss-Quadratur im Eindimensionalen}
 Wir wollen nun eine möglichst exakte Quadraturformel konstruieren, welche auf natürliche Weise das jeweilige Gewicht $\rho$ des Integrals berücksichtigt.
 \begin{maththeorem}[Gauss-Quadratur]
 Sei $Q_0,\dots,Q_{n+1}\in L_\rho^2(I)$ eine Orthogonalbasis von Polynomen bezüglich des Gewichts $\rho$. Es sei $\text{deg}(Q_j)=j$ für $j=0,\dots,n+1$. Seien $y_0,\dots,y_n$ die Nullstellen des Polynoms $Q_{n+1}$. Dann ist die Quadraturformel $(y_i,a_i)$ mit 
@@ -284,7 +284,7 @@ In diesem Abschnitt werden wir die beiden Ansätze für die Collocation miteinan
 \begin{tabular}{p{0.47\linewidth}|p{0.47\linewidth}}
 Interpolation & Diskrete Projektion\\
 \hhline{=|=}
-\multicolumn{2}{c}{Für Gauss-Stützstellen im eindimensionalen äquivalent (siehe Satz \ref{th:interpol_and_proj})}\\
+\multicolumn{2}{c}{Für Gauss-Stützstellen im Eindimensionalen äquivalent (siehe Satz \ref{th:interpol_and_proj})}\\
 \hline
 Collocationspunkte "'beliebig"' & Collocationspunkte entsprechen Quadraturpunkten\\
 \hline
@@ -321,13 +321,13 @@ Bei der Interpolation lässt sich die Varianz wegen des überbestimmten Systems 
 \label{fig:collocation_comparison_trial8}
 \end{figure}
 
-\subsubsection*{Unstetige Koeffizienten im eindimensionalen}
+\subsubsection*{Unstetige Koeffizienten im Eindimensionalen}
 Abbildung \ref{fig:collocation_comparison_trialdiscontsimple} zeigt für $N=1$ ein Beispiel, wo die Koeffizienten $\alpha$ und $\beta$ unstetig in $y$ sind. Dabei ist für $y\in[-1,1]$
 \begin{align*}
 \alpha(y)&=\begin{cases}2,\quad y>0\\ 1, \quad y\le 0\end{cases}\\
 \beta(x,y)&=\begin{cases}2+\sin(x+y),\quad y>0\\ 2+\cos(x+y),\quad y\le 0\end{cases}\\
 \end{align*}
-Wir erkennen ein unterschiedliches Verhalten für eine gerade bzw. ungerade Anzahl an Quadraturpunkten, die im eindimensionalen einer gerade bzw. ungerade Anzahl an Basispolynomen entsprechen. Für eine gerade Anzahl an Polynomen konvergieren Erwartungswert und Varianz vergleichbar mit bisherigen Beispielen.
+Wir erkennen ein unterschiedliches Verhalten für eine gerade bzw. ungerade Anzahl an Quadraturpunkten, die im Eindimensionalen einer gerade bzw. ungerade Anzahl an Basispolynomen entsprechen. Für eine gerade Anzahl an Polynomen konvergieren Erwartungswert und Varianz vergleichbar mit bisherigen Beispielen.
 \begin{figure}[!htb]
 \includegraphics[width=\textwidth]{Figures/collocation_midp_trialdiscontsimple.png}
 \caption{Konvergenz der Collocation für \nameref{trial:discontsimple} mit $N=1$ anhand der Anzahl benötigter Collocationspunkte.}

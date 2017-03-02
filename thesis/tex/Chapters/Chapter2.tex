@@ -1,11 +1,11 @@
 % Chapter 2
 
 \chapter{Stochastische Hintergründe}
-In diesem Kapitel werden wir erläutern, wie man stochastische Einflüsse auf die KGG darstellen kann. Anschließend werden wir mit der Monte-Carlo-Methode bereits ein erstes Verfahren kennen lernen, um den Erwartungswert und die Varianz der zufallsabhängigen Lösung der KGG zu bestimmen.
+In diesem Kapitel werden wir erläutern, wie man stochastische Einflüsse auf die KGG darstellen kann. Anschließend werden wir mit der Monte-Carlo-Methode bereits ein erstes Verfahren kennenlernen, um den Erwartungswert und die Varianz der zufallsabhängigen Lösung der KGG zu bestimmen.
 
 
 \section{Grundbegriffe}
-Wir geben keine Einführung in die klassische Wahrscheinlichkeitstheorie, werden aber die relevanten Begriffe und Definitionen an dieser Stelle kurz wiederholen. Es sei angemerkt, dass neben den vorgestellten stetigen Verteilungen auch diskrete Verteilungen wie die Poisson-Verteilung existieren und sich durch die selbe Theorie beschreiben lassen. Um die Notation zu vereinfachen, werden wir jedoch ausschließlich stetige Verteilungen betrachten.
+Wir geben keine Einführung in die klassische Wahrscheinlichkeitstheorie, werden aber die relevanten Begriffe und Definitionen an dieser Stelle kurz wiederholen. Es sei angemerkt, dass neben den vorgestellten stetigen Verteilungen auch diskrete Verteilungen wie die Poisson-Verteilung existieren und sich durch dieselbe Theorie beschreiben lassen. Um die Notation zu vereinfachen, werden wir jedoch ausschließlich stetige Verteilungen betrachten.
 
 \begin{mathdef}[Wahrscheinlichkeitsraum]
 Ein Wahrscheinlichkeitsraum $(\Omega,\mathcal{F},P)$ ist ein Tripel bestehend aus 
@@ -27,7 +27,7 @@ so nennen wir diese die Dichte von $F_Y$.\\
 Für stetige Zufallsvariablen folgt die Existenz aus dem Satz von Radon-Nikodým.
 \end{mathdef}
 \begin{mathdef}[Stochastische Unabhängigkeit]
-Ist $(\Omega,\mathcal{F},P)$ ein Wahrscheinlichkeitsraum und $Y_1, Y_2\colon \Omega\to\R$ zwei reelle Zufallsvariablen, so nennt man $Y_1$ und $Y_2$ (stochastisch) unabhängig, genau dann wenn
+Ist $(\Omega,\mathcal{F},P)$ ein Wahrscheinlichkeitsraum und $Y_1, Y_2\colon \Omega\to\R$ zwei reelle Zufallsvariablen, so nennt man $Y_1$ und $Y_2$ (stochastisch) unabhängig genau dann wenn
 \[P(Y_1\in B_1,Y_2\in B_2)=P(Y_1\in B_1)P(Y_2\in B_2)\]
 für alle $B_1,B_2\in \mathcal{B}(\R)$, der Borelschen $\sigma$-Algebra über $\R$.
 \end{mathdef}
@@ -39,12 +39,12 @@ Ist $\mathcal{U}(a,b)$ die Gleichverteilung auf $(a,b)$ so gilt für ihre Dichte
 \end{mathbsp}
 Folgende Definitionen werden die später hauptsächlich untersuchten Eigenschaften von zufallsabhängigen Größen darstellen.
 \begin{mathdef}[Erwartungswert und Varianz]
-Ist $Y\colon\R\to\R$ eine reelle Zufallsvariable mit Dichte $\rho_Y$ so ist definieren wir den Erwartungswert von $Y$ als
+Ist $Y\colon\R\to\R$ eine reelle Zufallsvariable mit Dichte $\rho_Y$ so definieren wir den Erwartungswert von $Y$ als
 \[\mu_Y=\E[Y]=\int_{-\infty}^\infty y\rho_Y(y)dy\]
 und die Varianz von $Y$ als 
 \[\sigma_Y^2=\text{var}(Y)=\int_{-\infty}^\infty (y-\mu_Y)^2\rho_Y(y)dy=\E[Y^2]-\E[Y]^2\]
 \end{mathdef}
-Ohne Beweis präsentieren wir die Inversionsmethode. Diese ist nützlich, um aus Zufallsvariablen einer bestimmten Verteilung Zufallsvariablen einer anderen Verteilung zu gewinnen. In der Numerik ist dies ist essentiell für die Generation von Pseudozufallszahlen von beliebigen Verteilungen. Die Methode ist aber auch wichtig für die "`stochastische Normierung"' von verschiedenen Zufallsvariablen zu einem gemeinsamen Wahrscheinlichkeitsraum, auf dem dann Erwartungswerte berechnet werden können.
+Ohne Beweis präsentieren wir die Inversionsmethode. Diese ist nützlich um aus Zufallsvariablen einer bestimmten Verteilung Zufallsvariablen einer anderen Verteilung zu gewinnen. In der Numerik ist dies ist essentiell für die Generation von Pseudozufallszahlen von beliebigen Verteilungen. Die Methode ist aber auch wichtig für die "`stochastische Normierung"' von verschiedenen Zufallsvariablen zu einem gemeinsamen Wahrscheinlichkeitsraum, auf dem dann Erwartungswerte berechnet werden können.
 \begin{maththeorem}[Inversionsmethode]
 \label{thinversionsmethode}
 Ist $Y$ eine reelle Zufallsvariable mit Verteilungsfunktion $F_Y$, so definieren wir deren Quantilfunktion als
@@ -55,7 +55,7 @@ Dann gilt
 \item Falls $Z$ gleichverteilt in $(0,1)$ ist, dann hat $F_Y^{-1}(Z)$ die Verteilungsfunktion $F_Y$. 
 \end{itemize}
 \end{maththeorem}
-Der auch Gesetz der großen Zahlen genannte Zentrale Grenzwertsatz sei ebenfalls genannt, da er die Grundlage für das erste Verfahren zur Berechnung von Erwartungswert und Varianz darstellt.
+Der auch \emph{Gesetz der großen Zahlen} genannte Zentrale Grenzwertsatz bildet die Grundlage für das erste Verfahren zur Berechnung von Erwartungswert und Varianz.
 \begin{maththeorem}[Zentraler Grenzwertsatz]
 \label{thzentralgrenzwert}
 Seien $Y_1,Y_2,\dots,Y_n$ unabhängige und identisch verteilte Zufallsvariablen mit $\E[Y_i]=\mu$ und $\text{var}(Y_i)=\sigma^2<\infty$ Der Mittelwert sei definiert als
@@ -80,26 +80,26 @@ Weitere wichtige Begriffe, die aber in dieser Arbeit nicht in den Vordergrund r�
 
 \section{Endliche Parametrisierung}
 \label{secfiniteparam}
-Dieser Abschnitt beschäftigt sich mit der Frage, wie man, ausgehend von einem potentiell unendlich dimensionalen Wahrscheinlichkeitsraum, eine endliche Charakterisierung desselben durch einen $n$-dimensionalen Zufallsvektor mit unabhängigen Komponenten erhalten kann. Die Bedingung der Unabhängigkeit ist dabei theoretisch zwar wenig einschränkend, aber eine sehr wichtige Grundlage für viele praktische numerische Verfahren.\\
+Dieser Abschnitt beschäftigt sich mit der Frage, wie man, ausgehend von einem potentiell unendlich-dimensionalen Wahrscheinlichkeitsraum, eine endliche Charakterisierung desselben durch einen $n$-dimensionalen Zufallsvektor mit unabhängigen Komponenten erhalten kann. Die Bedingung der Unabhängigkeit ist dabei theoretisch zwar wenig einschränkend, aber eine sehr wichtige Grundlage für viele praktische numerische Verfahren.\\
 Diese Frage tritt beispielsweise auf, wenn die Zufallsabhängigkeit im Modell nicht explizit über die Parameter einfließt, sondern ein zeitabhängiger stochastischer Prozess ist. Möglich wäre auch, dass die Zufallsabhängigkeit in endlich oder abzählbar vielen Modellparametern steckt, die einzelnen Parameter jedoch nicht stochastisch unabhängig sind.\\
-Wir werden später stets davon ausgehen, dass bereits eine endliche Parametrisierung durch unabhängige Zufallsvariablen mit bekannter Verteilung vorliegt. Der Vollständigkeit aber seien hier kurz Methoden genannt, um das Parametrisierungsproblem zu lösen. Man beachte jedoch, dass einige der Methoden numerisch nicht umsetzbar oder ad-hoc Lösungen sind, die spezielle Annahmen benötigen. Dieser Abschnitt wurde aus \autocite[Kapitel 4.1+4.2]{dongbinxiu2010} übernommen, wo auch Visualisierungen und kleine Beispiele zu finden sind.
+Wir werden später stets davon ausgehen, dass bereits eine endliche Parametrisierung durch unabhängige Zufallsvariablen mit bekannter Verteilung vorliegt. Der Vollständigkeit aber seien hier kurz Methoden genannt, um das Parametrisierungsproblem zu lösen. Man beachte jedoch, dass einige der Methoden numerisch nicht umsetzbar oder ad-hoc-Lösungen sind, die spezielle Annahmen benötigen. Dieser Abschnitt wurde aus \autocite[Kapitel 4.1+4.2]{dongbinxiu2010} übernommen, wo auch Visualisierungen und kleine Beispiele zu finden sind.
 
 \subsection{Unabhängigkeit von endlich vielen Parametern}
-Wenn die Zufallsabhängigkeit des Modells bereits durch endlich viele Modellparameter vorliegt, ist die Parameterisierung bereits gegeben. Wichtig ist dann, die unabhängigen Parameter zu identifizieren bzw. die Abhängigkeit zu konkretisieren.\\
+Wenn die Zufallsabhängigkeit des Modells bereits durch endlich viele Modellparameter vorliegt, ist die Parameterisierung auf natürliche Art gegeben. Wichtig ist dann, die unabhängigen Parameter zu identifizieren bzw. die Abhängigkeit zu konkretisieren.\\
 Für normalverteilte Parameter ist dies auch auf einfache Weise möglich:
 \begin{maththeorem}
 \label{thgaussunabhg}
-Sei $Y=(Y_1,\dots,Y_n)$ ein $\mathcal{N}(0,C)$ verteilter Zufallsvektor mit Kovarianzmatrix $C\in\R^{n\times n}$. Sei $Z\sim\mathcal{N}(0,I_n)$, wobei $I_n$ die n-dimensionale Einheitsmatrix ist, ein unkorrelierter Zufallsvektor. Für die Gaussverteilung ist Unkorreliertheit äquivalent zu Unabhängigkeit und die Komponenten von $Z$ sind somit unabhängig. Da $C$ reell und symmetrisch ist, existiert die Choleskyzerlegung $C=AA^T$ und es gilt
+Sei $Y=(Y_1,\dots,Y_n)$ ein $\mathcal{N}(0,C)$ verteilter Zufallsvektor mit Kovarianzmatrix $C\in\R^{n\times n}$. Sei $Z\sim\mathcal{N}(0,I_n)$, wobei $I_n$ die n-dimensionale Einheitsmatrix ist, ein unkorrelierter Zufallsvektor. Für die Gaussverteilung ist Unkorreliertheit äquivalent zu Unabhängigkeit und die Komponenten von $Z$ sind somit unabhängig. Da $C$ reell und symmetrisch ist, existiert die Cholesky-Zerlegung $C=AA^T$ und es gilt
 \[Y=AZ\sim\mathcal{N}(0,AA^T)=\mathcal{N}(0,C)\]
 besitzt die gegebene Verteilung. Wir können folglich $Y$ durch stochastisch unabhängige Parameter $Z_1,\dots,Z_n$ darstellen.
 \end{maththeorem}
-Sind die Parameter nicht normalverteilt, so wird das Problem deutlich schwieriger und bis jetzt gibt es keine zufriedenstellende numerische Transformation, die entsprechendes zu Satz \ref{thgaussunabhg} leistet. Eine theoretische Möglichkeit bietet sich jedoch über die Rosenblatt Transformation, welche auf den in der Praxis selten bekannten bedingten Wahrscheinlichkeiten basiert.
+Sind die Parameter nicht normalverteilt, so wird das Problem deutlich schwieriger und bis jetzt gibt es keine zufriedenstellende numerische Transformation, die entsprechendes zu Satz \ref{thgaussunabhg} leistet. Eine theoretische Möglichkeit bietet sich jedoch über die Rosenblatt-Transformation, welche auf den in der Praxis selten bekannten bedingten Wahrscheinlichkeiten basiert.
 
 \subsection{Parametrisierung von Zufallsprozessen}
-Häufig sind die Zufallsabhängigkeiten des Modells nur durch Beobachtungen oder Messungen von Zufallsvariablen möglich. Wir schreiben diese als stochastischen Prozess $(Y_t,t\in T)$, wobei $T$ der Indexraum ist und $Y_t$ die beobachteten Zufallsvariablen. Wir suchen dann eine Transformation $R$, welche die Darstellung $Y_t=R(Z)$ mit Zufallsvektor $Z=(Z_1,\dots,Z_n)$ und unabhängigen Komponenten $Z_i$ erlaubt. Da $T$ potentiell ein unendlich dimensionaler Raum ist, kann diese Transformation nicht exakt sein und wir suchen nun eine in einem gewissen Sinne bestmögliche Approximation.\\
-Die am häufigsten verwendete Technik ist dabei die Karhunen-Loeve Reihendarstellung.
-\begin{mathdef}[Karhunen-Loeve Darstellung]
-Sei $\mu_Y(t)$ der Erwartungswert des Prozesses $Y_t$ am Punkt $t$ und sei $C(t,s)=\text{cov}(Y_t,Y_s)$ die Kovarianzfunktion. Dann ist die Karhunen-Loeve Darstellung definiert als
+Häufig sind die Zufallsabhängigkeiten des Modells nur durch Beobachtungen oder Messungen von Zufallsvariablen möglich. Wir schreiben diese als stochastischen Prozess $(Y_t,t\in T)$, wobei $T$ der Indexraum ist und $Y_t$ die beobachteten Zufallsvariablen. Wir suchen dann eine Transformation $R$, welche die Darstellung $Y_t=R(Z)$ mit Zufallsvektor $Z=(Z_1,\dots,Z_n)$ und unabhängigen Komponenten $Z_i$ erlaubt. Da $T$ potentiell ein unendlich-dimensionaler Raum ist, kann diese Transformation nicht exakt sein und wir suchen nun eine in einem gewissen Sinne bestmögliche Approximation.\\
+Die am häufigsten verwendete Technik ist dabei die Karhunen-Loeve-Darstellung.
+\begin{mathdef}[Karhunen-Loeve-Darstellung]
+Sei $\mu_Y(t)$ der Erwartungswert des Prozesses $Y_t$ am Punkt $t$ und sei $C(t,s)=\text{cov}(Y_t,Y_s)$ die Kovarianzfunktion. Dann ist die Karhunen-Loeve-Darstellung definiert als
 \[Y_t(\omega)=\mu_Y(t)+\sum_{i=1}^\infty \sqrt{\lambda_i}\Psi_i(t)Z_i(\omega)\] wobei $\Psi_i$ die orthogonalen Eigenfunktionen und $\lambda_i$ die zugehörigen Eigenwerte des Eigenwertproblems
 \[\int_T C(t,s)\Psi_i(s)ds=\lambda_i\Psi_i(t),\quad t\in T\]
 sind. Die paarweise unkorrelierten Zufallsvariablen $Z_i(\omega)$ erfüllen
@@ -108,9 +108,9 @@ und sind definiert durch
 \[Z_i(\omega)=\frac{1}{\sqrt{\lambda_i}}\int_T (Y_t(\omega)-\mu_Y(t))\Psi_i(t)dt\]
 Um eine endliche Approximation zu erhalten wird die Reihe bei einem gewissen Index $n\in\N$ abgebrochen.
 \end{mathdef}
-Wiederrum erhält man daraus für normalverteilte Prozesse eine endliche Menge von unabhängigen Zufallsvariablen. Für nicht-normalverteilte Prozesse wird häufig dennoch die Karhunen-Loeve Darstellung verwendet und zusätzlich angenommen, dass die $Z_i$ unabhängig sind. Diese Vorgehensweise ist nicht sehr zufriedenstellend und ein offenes Forschungsproblem.
+Wiederrum erhält man daraus für normalverteilte Prozesse eine endliche Menge von unabhängigen Zufallsvariablen. Für nicht-normalverteilte Prozesse wird häufig dennoch die Karhunen-Loeve-Darstellung verwendet und zusätzlich angenommen, dass die $Z_i$ unabhängig sind. Diese Vorgehensweise ist nicht sehr zufriedenstellend und ein offenes Forschungsproblem.
 
-\section{Formulierung der stochastischen KGG}
+\section{Formulierung der stochastischen Klein-Gordon-Gleichung}
 In Analogie zur Klein-Gordon-Gleichung (\ref{kgg}) definieren wir für einen Wahrscheinlichkeitsraum $(\Omega,\mathcal{F},P)$ und $Y\colon\Omega\to\R^N$ die stochastische Klein-Gordon-Gleichung (sKGG) für $y=Y(\omega)$ durch
 \begin{align}
 \label{skgg}
@@ -119,7 +119,7 @@ u(0,x,y)&=u_0(x,y), \: x\in \Torus^d\\
 \dt{u}(0,x,y)&=v_0(x,y), \: x\in \Torus^d
 \end{align}
 Die Lösung \[u(t,x,y)\colon [0,T]\times\Torus^d\times \R^N\to\R\] ist also eine zufallsabhängige Größe.\\
-Dabei ist die grundlegende Annahme, dass (\ref{skgg}) $P$-fast-sicher wohl gestellt ist, d.h. die Menge an Punkten $\omega$ für welche die partielle Differentialgleichung mit fixem $y=Y(\omega)$ keine eindeutige Lösung besitzt ist eine Nullmenge bezüglich des Wahrscheinlichkeitmaßes $P$.\\
+Dabei ist die grundlegende Annahme, dass (\ref{skgg}) $P$-fast-sicher wohl gestellt ist, d.h. die Menge an Punkten $\omega$, für welche die partielle Differentialgleichung mit fixem $y=Y(\omega)$ keine eindeutige Lösung besitzt, ist eine Nullmenge bezüglich des Wahrscheinlichkeitmaßes $P$.\\
 Wie bereits in Kapitel \ref{secfiniteparam} diskutiert, werden wir stets annehmen, dass die Komponenten $Y_i$ von $Y$ stochastisch unabhängige Zufallsvariablen mit bekannter Verteilung sind.
 \begin{mathbsp}
 \label{bsp:trial1}
@@ -139,12 +139,12 @@ Um einen potentiellen Denkfehler zu vermeiden, weisen wir an dieser Stelle expli
 \[\E[u(t,x,Y)]=\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\quad \neq \quad 2\sin(\hat{x})\cos(\frac{5}{2}t)=u(t,x,\E[Y])\]
 Dies erkennt man beispielsweise am Zeitpunkt $t=\frac{\pi}{2}$, wo gilt
 \[\E[u(t,x,Y)]=-\sin(\hat{x})\pi \neq -\sin(\hat{x})\sqrt{2}=u(t,x,\E[Y])\]
-Der Erwartungswert ist linear, die Abhängigkeiten von $y$ sind es aber nicht. Diese erste fehlgeschlagene Idee den Erwartungswert durch das Lösen eines deterministischen Systems zu erhalten, ist jedoch nicht vollends vergebens. Wir werden am Beispiel der Monte-Carlo-Methode sehen, dass wir dazu allerdings weit mehr als ein deterministisches System lösen müssen.
+Der Erwartungswert ist linear, die Abhängigkeiten von $y$ sind es aber nicht. Diese erste fehlgeschlagene Idee, den Erwartungswert durch das Lösen eines deterministischen Systems zu erhalten, ist jedoch nicht vollends vergebens. Wir werden am Beispiel der Monte-Carlo-Methode sehen, dass wir dazu allerdings weit mehr als ein deterministisches System lösen müssen.
 \end{mathbsp}
 
 \section{Die Monte-Carlo-Methode} % offizieller Name; auch: Monte-Carlo-Simulation
-Die Monte-Carlo-Methode (auch: Monte-Carlo-Simulation) ist ein in vielen Disziplinen bekanntes Verfahren, welches auf wiederholtem Durchführen von "`Zufallsexperimenten"' in sehr großer Zahl basiert. So können analytisch nicht --oder nur sehr aufwändig-- lösbare Probleme auf Basis des Gesetz der großen Zahlen approximiert werden.\\
-Algorithmus \ref{algmc} beschreibt die Grundstruktur des Algorithmus, angewandt auf die stochastische KGG zur Berechnung des Erwartungswertes und der Varianz. .
+Die Monte-Carlo-Methode (auch: Monte-Carlo-Simulation) ist ein in vielen Disziplinen bekanntes Verfahren, welches auf wiederholtem Durchführen von "`Zufallsexperimenten"' in sehr großer Zahl basiert. So können analytisch nicht --oder nur sehr aufwändig--  lösbare Probleme auf Basis des Gesetzes der großen Zahlen approximiert werden.\\
+Algorithmus \ref{algmc} beschreibt die Grundstruktur des Algorithmus, angewandt auf die stochastische KGG zur Berechnung des Erwartungswertes und der Varianz.
 \begin{algorithm}[ht]
     \caption{Monte-Carlo}
     \label{algmc}
@@ -158,19 +158,19 @@ Algorithmus \ref{algmc} beschreibt die Grundstruktur des Algorithmus, angewandt 
                 \State Speichere Lösung der KGG
                 \State $r\gets r+1$
             \EndWhile
-            \State $e\gets$ Mittelwert der gespeicherten Lösungen
+            \State $e\gets$ Schätzung des Erwartungswertes der gespeicherten Lösungen
             \State $v\gets$ Schätzung der Varianz der gespeicherten Lösungen
-            \State \textbf{return} $e, v$\Comment{Geschätzter Erwartungswert und Varianz}
+            \State \textbf{return} $e, v$
         \EndFunction
     \end{algorithmic}
 \end{algorithm}
-Doch die Pseudocode Beschreibung von der Funktion \emph{MonteCarloKGG} wirft einige neue Fragen auf:
+Doch die Pseudocode-Beschreibung von der Funktion \emph{MonteCarloKGG} wirft einige neue Fragen auf:
 \begin{enumerate}
 \item Wie generieren wir die Zufallszahlen numerisch? \label{mcgeneraterandom}
 \item Wie groß muss \emph{\texttt{max\_runs}} sein, d.h. wie schnell konvergiert die Methode?
 \item Ist der determinische Löser schnell genug für viele Durchläufe? Wie können wir den Algorithmus beschleunigen?\label{mcalgspeed}
 \item Wie speichern wir die vielen Zwischenergebnisse? \label{mcsaveresults}
-\item Wie berechnen wir den Mittelwert und wie schätzen wir die Varianz? \label{mcestimations}
+\item Wie schätzen wir den Erwartungswert und die Varianz? \label{mcestimations}
 \end{enumerate}
 Im Folgenden werden wir die obigen Fragen ausführlich diskutieren und verschiedene Möglichkeiten aufzeigen, sie zu beantworten.
 \subsection{Generierung von Pseudozufallszahlen}
@@ -202,7 +202,7 @@ Die Halton-Sequenz für $N=2$ Dimensionen beginnt mit den Zahlen
 (c_2(n),c_3(n))_{n\in\N}=\left(\left(\frac{1}{2},\frac{1}{3}\right),\left(\frac{1}{4},\frac{2}{3}\right),\left(\frac{3}{4},\frac{1}{9}\right),\left(\frac{1}{8},\frac{4}{9}\right),\left(\frac{5}{8},\frac{7}{9}\right),\left(\frac{3}{8},\frac{2}{9}\right),\dots\right)
 \end{equation*}
 \end{mathbsp}
-In höheren Dimensionen (ab ungefähr $N=6$) beobachtet man allerdings stärkere lineare Korrelation zwischen den Komponenten, siehe beispielsweise Sequenzen für $p=17$ und $p=19$. Die Komponenten sind also abhängig und somit kein guter Ersatz für Pseudozufallszahlen. Genauere Untersuchungen werden in \autocite{Morokoff1995218} erläutert, wo auch vorgeschlagen wird für höhere Dimensionen die Sobol-Sequenz zu verwenden oder ein gewisses Offset für den Startindex der Halton-Sequenz einzuführen.\\
+In höheren Dimensionen (ab ungefähr $N=6$) beobachtet man allerdings stärkere lineare Korrelation zwischen den Komponenten, siehe beispielsweise Sequenzen für $p=17$ und $p=19$. Die Komponenten sind also abhängig und somit kein guter Ersatz für Pseudozufallszahlen. Genauere Untersuchungen werden in \autocite{Morokoff1995218} erläutert, wo auch vorgeschlagen wird, für höhere Dimensionen die Sobol-Sequenz zu verwenden oder ein gewisses Offset für den Startindex der Halton-Sequenz einzuführen.\\
 Wie man an Abbildung \ref{fig:halton_numbers} erkennt, deckt die Halton-Sequenz die Fläche deutlich gleichmäßiger ab als eine Generierung von der selben Anzahl an Pseudozufallszahlen. Dies ist eine Motivation dafür, bessere Konvergenzeigenschaften zu erwarten.
 \begin{figure}
 \includegraphics[width=\textwidth]{Figures/halton_numbers.png}
@@ -212,7 +212,7 @@ Wie man an Abbildung \ref{fig:halton_numbers} erkennt, deckt die Halton-Sequenz 
 Benötigt man wiederum Zufallszahlen mit einer anderen Verteilungsfunktion, so sind diese durch Anwendung der Inversionsmethode von Satz \ref{thinversionsmethode} erzeugbar.
 
 \subsection{Approximation von Erwartungswert und Varianz}
-Bevor wir den Kern der Schleife betrachten, wollen wir uns zuerst mit den eng miteinander zusammenhängenden Fragen \ref{mcsaveresults} und \ref{mcestimations} beschäftigen. Diese Fragen über die Verwendung der einzelnen Zwischenergebnisse zur Approximation des Erwartungswertes und der Varianz können wiederum vielseitig beantwortet werden.
+Bevor wir den Kern der Schleife betrachten, wollen wir uns zuerst mit den eng miteinander zusammenhängenden Fragen \ref{mcsaveresults} und \ref{mcestimations} beschäftigen. Diese Fragen beziehen sich auf die Verwendung der einzelnen Zwischenergebnisse zur Approximation des Erwartungswertes und der Varianz und können wiederum vielseitig beantwortet werden.
 \subsubsection*{Verarbeitung am Ende des Algorithmus}
 Gegeben sei ein Zeitpunkt $T>0$ und die stochastische KGG (\ref{skgg}) zu einer Zufallsvariablen $Y$ und gesucht seien $\E[u(T,x,Y)]$ und $\text{var}(u(T,x,Y))$. Sind für $i=1,\dots,R$ die deterministischen Lösungen $u_i(T,x,y_i)$ gespeichert, so verwenden wir als Approximationen
 \begin{align*}
@@ -222,13 +222,13 @@ Gegeben sei ein Zeitpunkt $T>0$ und die stochastische KGG (\ref{skgg}) zu einer 
 Wieso diese Approximationen sinnvoll sind, zeigt sich teilweise aus dem zentralen Grenzwertsatz \ref{thzentralgrenzwert}. Es folgt für unabhängige Stichproben $y_i$ die Aussage \[\sqrt{R}(m_R-\E[u(T,x,Y)])\xrightarrow{R\to\infty}\mathcal{N}(0,\text{var}(u(T,x,Y)))\]
 und schlussendlich 
 \[m_R=\E[u(T,x,Y)] + \mathcal{O}\left(\frac{1}{\sqrt{R}}\right)\]
-In welchem Konvergenz Sinne die letzte Aussage zu verstehen ist und welche Faktoren dabei in den letzten Term einfließen, sei an dieser Stelle nicht weiter ausgeführt. Wir werden diese Konvergenzordnung in Beispielen jedoch empirisch bestätigen.\\[0.2cm]
+In welchem Konvergenz-Sinne die letzte Aussage zu verstehen ist und welche Faktoren dabei in den letzten Term einfließen, sei an dieser Stelle nicht weiter ausgeführt. Wir werden diese Konvergenzordnung in Beispielen jedoch empirisch bestätigen.\\[0.2cm]
 Die für die Approximation der Varianz verwendete Darstellung nennt man auch \emph{korrigierte Stichprobenvarianz}. Sie ist ein erwartungstreuer Schätzer der Varianz einer Stichprobe und ein Werkzeug aus der Statistik, welches wir hier nicht weiter erläutern werden.
 \subsubsection*{Fortlaufende Berechnung}
 Die Verarbeitung am Ende besitzt zwei große Nachteile:
 \begin{itemize}
 \item Sämtliche Zwischenergebnisse müssen gespeichert werden. Für die Mittelwertbildung alleine wäre dies zwar nicht nötig, jedoch für die Approximation der Varianz. An einer Beispielsrechnung soll der benötigte Arbeitsspeicher kurz verdeutlicht werden: Wird der eindimensionale Raum in 256 Punkten diskretisiert und benötigt jeder Punkt 8 Byte Speicher und führt man (durchaus realistisch) $R=100000$ Simulationen durch, so ergibt sich bereits ein Speicherbedarf von $\frac{256*100000*8\text{B}}{1024^2}\approx 200\text{MB}$. Dies ist also bereits für eine räumliche Dimension ein nicht unerheblicher Aufwand.
-\item Die Methode zur Approximation der Varianz ist nicht stabil und stark anfällig für numerische Rechenfehler, insbesondere Überläufe (vgl. \autocite{cook08}). Aus diesem Grunde schlug Welford in \autocite{welford62} eine alternative Berechnungsmethode vor, welche wir im folgenden erklären werden.
+\item Die Methode zur Approximation der Varianz ist nicht stabil und stark anfällig für numerische Rechenfehler, insbesondere Überläufe (vgl. \autocite{cook08}). Aus diesem Grunde schlug Welford in \autocite{welford62} eine alternative Berechnungsmethode vor, welche wir im Folgenden erklären werden.
 \end{itemize}
 \begin{maththeorem}
 \label{thiterativemk}
@@ -275,7 +275,7 @@ s_k&=\sum_{j=1}^k(x_j-m_k)^2\stackrel{(\ref{eqn:mcvar2})}{=}\sum_{j=1}^{k-1}(x_j
 \end{proof}
 Teilen wir nun $s_k$ noch durch $k-1$, so erhalten wir wieder die korrigierte Stichprobenvarianz. Wir benötigen dafür nur den vorherigen Wert $s_{k-1}$, die beiden letzten Mittelwerte, die neuste Stichprobe $x_k$ und die Stichprobenanzahl.
 \subsection{Numerische Ergebnisse}
-Man bemerkt schon an der Pseudocode Darstellung der Monte-Carlo-Methode, dass das Bottleneck des Algorithmus in der Berechnung der Lösung der deterministischen KGG liegt. Der Zeitaufwand für alle anderen Operationen ist in Relation dazu vernachlässigbar klein. Ein großer Vorteil des Algorithmus ist seine \emph{embarrassingly parallel} Eigenschaft: Es ist quasi kein Aufwand nötig die Schleife zu parallelisieren und somit skaliert er perfekt mit der Anzahl an zur Verfügung stehenden Prozessoren. Dies ist eine erste Antwort auf Frage \ref{mcalgspeed}, jedoch sollte klar sein, dass das Lösen des deterministischen Systems dennoch so effizient wie möglich passieren muss. Ein Löser, der nur 0.1 Sekunden für ein einziges System benötigt und $R=100000$ Durchgänge erledigt, läuft ohne Parallelisierung bereits etwa 3 Stunden.\\
+Man bemerkt schon an der Pseudocode-Darstellung der Monte-Carlo-Methode, dass das Bottleneck des Algorithmus in der Berechnung der Lösung der deterministischen KGG liegt. Der Zeitaufwand für alle anderen Operationen ist in Relation dazu vernachlässigbar klein. Ein großer Vorteil des Algorithmus ist seine \emph{embarrassingly parallel} Eigenschaft: Es ist kein nennenswerter Aufwand nötig, die Schleife zu parallelisieren und somit skaliert er perfekt mit der Anzahl an zur Verfügung stehenden Prozessoren. Dies ist eine erste Antwort auf Frage \ref{mcalgspeed}, jedoch sollte klar sein, dass das Lösen des deterministischen Systems dennoch so effizient wie möglich passieren muss. Ein Löser, der nur 0.1 Sekunden für ein einziges System benötigt und $R=100000$ Durchgänge erledigt, läuft ohne Parallelisierung bereits etwa 3 Stunden.\\
 \subsubsection*{Konvergenz}
 Anhand von Abbildung \ref{fig:mc_convergence_trial1} erkennen wir für Beispiel \ref{bsp:trial1} die (probabilistische) Konvergenz des Erwartungswertes und der Varianz mit ungefährer Ordnung $0.5$ für die Monte-Carlo-Methode. Vergleichen wir dazu die Quasi-Monte-Carlo-Methode anhand desselben Beispiels in Abbildung \ref{fig:quasi_mc_convergence_trial1}, so erkennen wir eine bessere Konvergenzordnung und ein weniger chaotisches Verhalten des Fehlers.\\
 Dennoch macht diese schlechte Konvergenzordnung das Verfahren sehr unattraktiv. Wir benötigen selbst für das simple Beispiel \ref{bsp:trial1} und die Quasi-Monte-Carlo-Methode bereits $R=100000$ Durchläufe für einen Fehler des Erwartungswertes in die Größenordnung $10^{-5}$.
@@ -287,7 +287,7 @@ Dennoch macht diese schlechte Konvergenzordnung das Verfahren sehr unattraktiv. 
 \begin{figure}
 \includegraphics[width=\textwidth]{Figures/quasi_mc_convergence_trial1.png}
 \caption{Konvergenz des Erwartungswertes und der Varianz von Beispiel \ref{bsp:trial1} mithilfe der Quasi-Monte-Carlo-Methode zum Zeitpunkt $T=0.5$. Ordnungsplot mit Referenzlinie $0.08\frac{1}{\sqrt{R}}$.}
-Einen Vorteil allerdings bietet das Verfahren: Unabhängig von der Größe des Zufallsvektors $Y$ erhalten wir jeweils dieselbe Konvergenzordnung und benötigen bis auf die Generierung der Komponenten keinen zeitlichen Mehraufwand für die Ausführung des Algorithmus im Vergleich zu eindimensionalen Zufallsvektoren. Diese Eigenschaft wird von keinem anderen Verfahren, das wir noch vorstellen werden geteilt. Deren Rechenaufwand wird exponentiell in der Größe des Zufallsvektors steigen. 
+Einen Vorteil allerdings bietet das Verfahren: Unabhängig von der Größe des Zufallsvektors $Y$ erhalten wir jeweils dieselbe Konvergenzordnung und benötigen bis auf die Generierung der Komponenten keinen zeitlichen Mehraufwand für die Ausführung des Algorithmus im Vergleich zu eindimensionalen Zufallsvektoren. Diese Eigenschaft wird von keinem anderen Verfahren, die wir noch vorstellen werden, geteilt. Deren Rechenaufwand wird exponentiell mit der Größe des Zufallsvektors steigen. 
 \label{fig:quasi_mc_convergence_trial1}
 \end{figure}
 

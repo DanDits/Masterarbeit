@@ -90,7 +90,7 @@ headsepline, % Uncomment to get a line under the header
 %	THESIS INFORMATION
 %----------------------------------------------------------------------------------------
 
-\thesistitle{Uncertainty quantification für die Klein-Gordon Gleichung} % Your thesis title, this is used in the title and abstract, print it elsewhere with \ttitle
+\thesistitle{Uncertainty Quantification für die Klein-Gordon Gleichung} % Your thesis title, this is used in the title and abstract, print it elsewhere with \ttitle
 \supervisor{Prof. Dr. Tobias \textsc{Jahnke}} % Your supervisor's name, this is used in the title page, print it elsewhere with \supname
 \examiner{} % Your examiner's name, this is not currently used anywhere in the template, print it elsewhere with \examname
 \degree{Master of Science} % Your degree name, this is used in the title page and abstract, print it elsewhere with \degreename
@@ -168,7 +168,7 @@ headsepline, % Uncomment to get a line under the header
 
 \begin{declaration}
 \addchaptertocentry{\authorshipname} % Add the declaration to the table of contents
-\noindent Ich, \authorname , versichere wahrheitsgemäß, die Arbeit selbstständig verfasst, alle benutzten Quellen und Hilfsmittel vollständig und genau angegeben und alles kenntlich gemacht zu haben, was aus Arbeiten anderer unverändert oder mit Abänderungen entnommen wurde sowie die Satzung des KIT zur Sicherung guter wissenschaftlicher Praxis in der jeweils gültigen Fassung beachtet zu haben.
+\noindent Ich, Daniel Dittmar, versichere wahrheitsgemäß, die Arbeit selbstständig verfasst, alle benutzten Quellen und Hilfsmittel vollständig und genau angegeben und alles kenntlich gemacht zu haben, was aus Arbeiten anderer unverändert oder mit Abänderungen entnommen wurde sowie die Satzung des KIT zur Sicherung guter wissenschaftlicher Praxis in der jeweils gültigen Fassung beachtet zu haben.
  \\[0.5cm]
 \noindent Unterschrift:\\
 \rule[0.5em]{25em}{0.5pt} % This prints a line for the signature
@@ -182,20 +182,20 @@ headsepline, % Uncomment to get a line under the header
 %----------------------------------------------------------------------------------------
 %	QUOTATION PAGE
 %----------------------------------------------------------------------------------------
-
-\vspace*{0.2\textheight}
-
-\noindent\enquote{\itshape If you can't explain something to a first year student, then you haven't really understood it.}\bigbreak
-
-\hfill Richard Feynman, et al.
-
+%
+%\vspace*{0.2\textheight}
+%
+%\noindent\enquote{\itshape If you can't explain something to a first year student, then %you haven't really understood it.}\bigbreak
+%
+%\hfill Richard Feynman, et al.
+%
 %----------------------------------------------------------------------------------------
 %	ABSTRACT PAGE
 %----------------------------------------------------------------------------------------
 
 \begin{abstract}
 \addchaptertocentry{\abstractname} % Add the abstract to the table of contents
-\todo{Am Ende eine gute Schreiben} Die \it{uncertainty quantification} ermöglicht es, partielle Differentialgleichungen aus einem stochastischen Blickwinkel zu betrachten. Diese Arbeit untersucht am Beispiel der linearen Klein-Gordon-Gleichung den Einfluss von stochastischen Parametern auf Erwartungswert und Varianz der Lösung. Dabei werden verschiedene Lösungsansätze und Beispiele auf Implementierungsebene miteinander verglichen.
+\todo[inline]{Am Ende eine gute Schreiben: Research Quest nochmal kurz, Relevanz (direkt im Modell, besseres Modell,...)} Die \it{uncertainty quantification} ermöglicht es, partielle Differentialgleichungen aus einem stochastischen Blickwinkel zu betrachten. Diese Arbeit untersucht am Beispiel der linearen Klein-Gordon-Gleichung den Einfluss von stochastischen Parametern auf Erwartungswert und Varianz der Lösung. Dabei werden verschiedene Lösungsansätze und Beispiele auf Implementierungsebene miteinander verglichen.
 \end{abstract}
 
 %----------------------------------------------------------------------------------------
@@ -205,8 +205,8 @@ headsepline, % Uncomment to get a line under the header
 \begin{acknowledgements}
 \addchaptertocentry{\acknowledgementname} % Add the acknowledgements to the table of contents
 Hiermit danke ich allen, die mir während meines Studiums hilfreich zur Seite standen und mich immer unterstützt haben. Im Speziellen danke ich meine Eltern, Großeltern und meinem Bruder Fabian für ihre uneingeschränkte Unterstützung.\\ 
-Für die Unterstützung bei meiner Masterarbeit und für hilfreiche Ratschläge danke ich insbesondere meinem Betreuer Herrn Jahnke. \todo{weitere Korrekturleser o.ä.?}\\
-Für die verwendete \LaTeX Vorlage veröffentlicht auf \emph{www.LaTeXTemplates.com} danke ich Steve Gunn und Sunil Patel.
+Für die Unterstützung bei meiner Masterarbeit und für hilfreiche Ratschläge danke ich insbesondere meinem Betreuer Herrn Jahnke.\\
+Ein großes Dankeschön geht an Verena Volkmer für ihr konstruktives Korrekturlesen und ihre vielen Verbesserungsvorschläge.
 \end{acknowledgements}
 
 %----------------------------------------------------------------------------------------
@@ -227,7 +227,8 @@ Für die verwendete \LaTeX Vorlage veröffentlicht auf \emph{www.LaTeXTemplates.
 
 \textbf{KGG} & \textbf{K}lein-\textbf{G}ordon-\textbf{G}leichung\\
 \textbf{sKGG} & \textbf{s}tochastische \textbf{K}lein-\textbf{G}ordon-\textbf{G}leichung\\
-\textbf{gPC} & \textbf{g}eneral \textbf{P}olynomial \textbf{C}haos\\
+\textbf{FFT} & \textbf{F}ast-\textbf{F}ourier-\textbf{T}ransformation\\
+\textbf{gPC} & \textbf{g}eneral \textbf{P}olynomial-\textbf{C}haos\\
 \textbf{MC} & \textbf{M}onte-\textbf{C}arlo\\
 \textbf{QMC} & \textbf{Q}uasi-\textbf{M}onte-\textbf{C}arlo\\
 \textbf{LGS} & \textbf{L}ineares \textbf{G}leichungs\textbf{s}ystem\\
@@ -288,6 +289,7 @@ $d$ & räumliche Dimension & $d\in\N$\\
 %	BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
 % \nocite{*}  % uncomment if we do not cite everything but want to include full .bib file
+\nocite{latextemplate}
 \printbibliography[heading=bibintoc]
 
 %----------------------------------------------------------------------------------------

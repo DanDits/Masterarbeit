@@ -8,17 +8,17 @@ from stochastic_equations.galerkin.galerkin import galerkin_approximation
 
 
 domain = [(-np.pi, np.pi)]
-trial = st.trial_2_1  # requires us to get expectancy and variances at all stop_times!!
+trial = st.trial_8  # requires us to get expectancy and variances at all stop_times!!
 grid_size = trial.get_parameter("grid_size", 128)
 start_time = 0.
-stop_times = [0.1, 0.2, 0.3, 0.4, 0.5]
+stop_times = [0.1, 0.2, 0.3, 0.4, 0.5, 1., 1.25, 1.5, 1.75, 2.]
 delta_time = 0.0001
-max_poly_degree = 3
+max_poly_degree = 2
 wave_weight = 1.
 
 if len(trial.variable_distributions) == 1:
     quadrature_method = "full_tensor"
-    quadrature_param = [max_poly_degree + 5] * len(trial.variable_distributions)
+    quadrature_param = [max_poly_degree + 30] * len(trial.variable_distributions)
 else:
     quadrature_method = "sparse"
     quadrature_param = max_poly_degree
@@ -44,19 +44,26 @@ for stop_time, (xs, xs_mesh, exp, var, quadrature_nodes_count) in zip(stop_times
           "quad=", quadrature_param, "EXP:", error_exp, "VAR:", error_var)
 
 
-def target(p):
-    return lambda time: np.exp((p / 2 + 1) * time)
+#def target(p):
+#    return lambda time: np.exp((p / 2 + 1) * time)
+
+
+def fit_exponential(x_data, y_data):
+    # fits y=Ae^(Bx) <=> log(y)=log(A)+Bx
+    coeffs = np.polyfit(x_data, np.log(y_data), deg=1)  # highest power first
+    A = np.exp(coeffs[1])
+    B = coeffs[0]
+    print("Fitting result: {}*e^({}x)".format(A, B))
+    return lambda x: A * np.exp(B * x)
 
 plt.figure()
 plt.title("Galerkin-Approximation, $P={}$, $\\tau={}$".format(max_poly_degree, delta_time))
 plt.plot(stop_times, errors_exp, label="Erwartungswert")
 if len(stop_times) == len(errors_var):
     plt.plot(stop_times, errors_var, label="Varianz")
-target_func = target(max_poly_degree)
-plt.plot(stop_times, errors_exp[1] / target_func(stop_times[1]) * target_func(np.array(stop_times)),
-         label="Erwartungswertziel")
-plt.plot(stop_times, errors_var[1] / target_func(stop_times[1]) * target_func(np.array(stop_times)),
-         label="Varianzziel")
+fitted_func = fit_exponential(stop_times, errors_exp)
+fitted_x = np.linspace(min(stop_times), max(stop_times), num=50, endpoint=True)
+plt.plot(fitted_x, fitted_func(fitted_x), label="Fitted")
 plt.yscale('log')
 plt.xlabel('Stopzeit $T$')
 plt.legend(loc='best')

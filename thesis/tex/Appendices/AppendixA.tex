@@ -1,28 +1,28 @@
 % Appendix A
 
-\chapter{Orthogonale Polynome im Askey Schema} % Main appendix title
+\chapter{Orthogonale Polynome im Askey-Schema} % Main appendix title
 
 \label{AppendixA} % For referencing this appendix elsewhere, use \ref{AppendixA}
 
 \section{Geschichtliche Entstehung}
 Die Entstehung des \emph{general Polynomial Chaos}(gPC) ist eine Geschichte über den Versuch, stochastische Abhängigkeit und Integrationstheorie zu kombinieren. Sie wurzelte in der Arbeit von Wiener (\autocite{norbertwiener1938}), wo er das \emph{homogene Chaos} einführte, um die Entwicklung von Unsicherheit in einem dynamischen, chaotischen, physikalischen System zu konkretisieren. Dies erklärt auch den Ursprung der Bezeichnung "`Chaos"' im Kontext der chaotischen Brownschen Bewegung im Wiener-Prozess.\\
 Ghanem verwendete dann Hermite Polynome um mithilfe dieser Orthogonalbasis gaußsche Prozesse darzustellen. Dies wendete er erfolgreich auf einige Probleme aus den Ingenieurswissenschaften an, ein Überblick wird in \autocite{GhaSpa91} gegeben.\\
-Xiu verallgemeinerte in seiner Arbeit \autocite{xiu2002} diesen Ansatz auf andere Kombinationen aus stochastischer Verteilung und Polynombasis. Gemäß dem Askey Schema (siehe Abbildung \ref{askeyscheme}) werden Beziehungen einiger bekannter Polynom Orthonormalbasen verdeutlicht. Man beobachtet außerdem, dass einige Gewichte den Dichtefunktionen von bekannten Verteilungen entsprechen und möchte nun zu einer gegebenen Verteilung die bestmögliche Polynombasis verwenden. An Modellproblemen demonstrierte Xiu jeweils optimale exponentielle Konvergenz für die verschiedenen Paarungen.\\
+Xiu verallgemeinerte in seiner Arbeit \autocite{xiu2002} diesen Ansatz auf andere Kombinationen aus stochastischer Verteilung und Polynombasis. Gemäß dem Askey-Schema (siehe Abbildung \ref{askeyscheme}) werden Beziehungen einiger bekannter Polynom Orthonormalbasen verdeutlicht. Man beobachtet außerdem, dass einige Gewichte den Dichtefunktionen von bekannten Verteilungen entsprechen und möchte nun zu einer gegebenen Verteilung die bestmögliche Polynombasis verwenden. An Modellproblemen demonstrierte Xiu jeweils optimale exponentielle Konvergenz für die verschiedenen Paarungen.\\
 \begin{figure}
 \center
 \includegraphics[width=0.8\linewidth]{Figures/askeyscheme.png}
-\caption{Askey Schema; Ein Pfeil symbolisiert den Übergang einer Basis in eine andere durch Grenzwertbildung eines Parameters; Quelle: \autocite{webaskey}}
+\caption{Askey-Schema; Ein Pfeil symbolisiert den Übergang einer Basis in eine andere durch Grenzwertbildung eines Parameters; Quelle: \autocite{webaskey}}
 \label{askeyscheme}
 \end{figure}
-\begin{mathbsp}[Grenzwertbildung im Askey Schema]
-Es gilt für die Jacobi Polynome $P_n^{(\alpha,\beta)}(x)$ und die Hermite Polynome $H_n(x)$ die Beziehung
+\begin{mathbsp}[Grenzwertbildung im Askey-Schema]
+Es gilt für die Jacobi-Polynome $P_n^{(\alpha,\beta)}(x)$ und die Hermite-Polynome $H_n(x)$ die Beziehung
 \[\lim\limits_{\alpha\to\infty}\alpha^{-\onehalf n}P_n^{(\alpha,\alpha)}\left(\frac{x}{\sqrt{\alpha}}\right)=\frac{H_n(x)}{2^nn!}\]
-Für eine genauere Betrachtung der Beziehungen der hypergeometrischen Polynome im Askey Schema sei auf \autocite{koekoekswart98} verwiesen.
+Für eine genauere Betrachtung der Beziehungen der hypergeometrischen Polynome im Askey-Schema sei auf \autocite{koekoekswart98} verwiesen.
 \end{mathbsp}
 
-\section{Auflisting von Polynombasen und Verteilungen}
-Wir präsentieren hier eine Auswahl der von uns verwendeten Orthogonalpolynome, insbesondere ihre Definition, Darstellung als Drei Term Rekursion, Gewichtsfunktion und ihre Beziehung zu stochastischen Verteilungen. Für weitere Eigenschaften wie die Darstellung als Lösung einer Differentialgleichung oder die Rodriguez Formel sei beispielsweise auf den Anhang von \autocite{dongbinxiu2010} verwiesen.\\
-Eine schöne Übersichtstabelle findet sich unter \url{http://dlmf.nist.gov/18.3}, man beachte, dass dort die verwendeten Polynome und Gewichte teilweise von unserer Notation abweichen. Dies ist der Tatsache geschuldet, dass die Beziehung zu Verteilungen und entsprechende Normierungsanforderungen keine Rolle spielen. Ebenso gibt es verschiedene Varianten die untere Grenze für die Parameter $\alpha$ und $\beta$ der Jacobi und Laguerre Polynome zu definieren.\\
+\section{Auflistung von Polynombasen und Verteilungen}
+Wir präsentieren hier eine Auswahl der von uns verwendeten Orthogonalpolynome, insbesondere ihre Definition, Darstellung als Drei-Term-Rekursion, Gewichtsfunktion und ihre Beziehung zu stochastischen Verteilungen. Für weitere Eigenschaften wie die Darstellung als Lösung einer Differentialgleichung oder die Rodriguez Formel sei beispielsweise auf den Anhang von \autocite{dongbinxiu2010} verwiesen.\\
+Eine schöne Übersichtstabelle findet sich unter \url{http://dlmf.nist.gov/18.3}, man beachte, dass dort die verwendeten Polynome und Gewichte teilweise von unserer Notation abweichen. Dies ist der Tatsache geschuldet, dass die Beziehung zu Verteilungen und entsprechende Normierungsanforderungen keine Rolle spielen. Ebenso gibt es verschiedene Varianten die untere Grenze für die Parameter $\alpha$ und $\beta$ der Jacobi und Laguerre-Polynome zu definieren.\\
 Benötigt man Referenzwerte für Nullstellen und Gewichte einer zugehörigen Gauss Quadratur, so findet sich unter\\\url{http://keisan.casio.com/exec/system/1281279441} ein Onlinerechner.\\
 Hierbei sei wieder auf abweichende Notation hingewiesen, insbesondere die fehlende Normierung der Gewichte um einen Faktor.\\
 Um die Polynome möglichst kompakt darzustellen zu können, werden folgende Definitionen nützlich sein.
@@ -41,10 +41,10 @@ Beachte, dass dies auch \emph{steigende Fakultät} genannt wird und nicht mit de
 Zu $r,s\in\N_0$ ist die hypergeometrische Funktion $_rF_s$ definiert durch
 \[_rF_s(a_1,\dots,a_r;b_1,\dots,b_s;z)\coloneqq \sum_{k=0}^\infty \frac{(a_1)_k\dots (a_r)_kz^k}{(b_1)_k\dots(b_s)_kk!}\]
 \end{mathdef}
-Für weitere Polynome aus dem Askey Schema (siehe Abbildung \ref{askeyscheme}), insbesondere diese mit diskreten Verteilungen, sei wieder beispielsweise auf \autocite{dongbinxiu2010} verwiesen. \\
+Für weitere Polynome aus dem Askey-Schema (siehe Abbildung \ref{askeyscheme}), insbesondere diese mit diskreten Verteilungen, sei wieder beispielsweise auf \autocite{dongbinxiu2010} verwiesen. \\
 Für eine Methode zum Berechnen der Nullstellen aus der Drei-Term-Rekursion steht der Golub-Welsch-Algorithmus (vgl. \ref{golubwelschalg}) zur Verfügung.\\
 Für die Drei-Term-Rekursion der nicht normalisierten orthogonalen Polynome $\Psi_n$ gilt stets $\Psi_{-1}\equiv 0$ und $\Psi_{0}\equiv 1$.
-\subsection{Hermite Polynome und Gauß Verteilung}
+\subsection{Hermite-Polynome und Normalverteilung}
 Träger:
 \[I=\R\]
 Definition:
@@ -57,10 +57,10 @@ Normalisierungsfaktor:
 \[\gamma_n=n!\]
 Stochastische Verteilung $\mathcal{N}(0,1)$:
 \begin{center}
-normalisierte Gauß Verteilung mit Dichtefunktion $\rho(x)=w(x)$
+Normalverteilung mit Dichtefunktion $\rho(x)=w(x)$
 \end{center}
 
-\subsection{Laguerre Polynome und Gamma Verteilung}
+\subsection{Laguerre-Polynome und Gammaverteilung}
 Träger:
 \[I=(0,\infty)\]
 Definition:
@@ -73,11 +73,11 @@ Normalisierungsfaktor:
 \[\gamma_n=\frac{(\alpha)_n}{n!}\]
 Stochastische Verteilung $\gamma(\alpha,1)$:
 \begin{center}
-Gamma Verteilung mit $\alpha>0,\beta=1$ und Dichtefunktion
+Gammaverteilung mit $\alpha>0,\beta=1$ und Dichtefunktion
 \[\rho(x)=\frac{x^{\alpha-1}e^{-\frac{x}{\beta}}}{\beta^{\alpha}\Gamma(\alpha)}\]
 \end{center}
 
-\subsection{Jacobi Polynome und Beta Verteilung}
+\subsection{Jacobi-Polynome und Betaverteilung}
 Träger:
 \[I=(-1,1)\]
 Definition:
@@ -91,7 +91,7 @@ P_n^{(\alpha, \beta)}(x)&=\left(f_nx-\frac{f_n(\beta^2-\alpha^2)}{(2n + \alpha +
 \end{align*}
 Man beachte, dass dies einige Definitionslücken aufweist:
 \begin{itemize}
-\item Für $\alpha=\beta=0$ stimmen die Jacobi Polynome exakt mit den Legendre Polynomen überein und die Betaverteilung mit der Gleichverteilung (siehe \ref{seclegendre}).
+\item Für $\alpha=\beta=0$ stimmen die Jacobi-Polynome exakt mit den Legendre-Polynomen überein und die Betaverteilung mit der Gleichverteilung (siehe \ref{seclegendre}).
 \item Für $\alpha+\beta=0,n=1$ gilt $P_1^{(\alpha,\beta)}(x)=x-\frac{\beta-\alpha}{2}$
 \item Für $\alpha+\beta=-1,n=1$ gilt $P_1^{(\alpha,\beta)}(x)=\frac{x}{2}-\frac{\beta-\alpha}{2}$
 \end{itemize}
@@ -102,13 +102,13 @@ Normalisierungsfaktor:
 \[\gamma_n=\frac{(\alpha+1)_n(\beta+1)_n}{n!(2n+\alpha+\beta+1)(\alpha+\beta+2)_{n-1}}\]
 Stochastische Verteilung $Beta(\alpha,\beta)$:
 \begin{center}
-Beta Verteilung auf $(-1,1)$ mit $\alpha,\beta>-1$ und Dichtefunktion
+Betaverteilung auf $(-1,1)$ mit $\alpha,\beta>-1$ und Dichtefunktion
 \[\rho(x)=\frac{(1 - x)^\alpha(1 + x)^\beta}{2^{\alpha + \beta + 1}B(\alpha+1,\beta+1)}=w(x),\quad B\text{ ist Eulersche Betafunktion}\]
 \end{center}
 
-\subsection{Legendre Polynome und Gleichverteilung}
+\subsection{Legendre-Polynome und Gleichverteilung}
 \label{seclegendre}
-Als wichtiger Spezialfall der Jacobi Polynome seien die Legendre Polynome an dieser Stelle explizit erwähnt.\\
+Als wichtiger Spezialfall der Jacobi-Polynome seien die Legendre-Polynome an dieser Stelle explizit erwähnt.\\
 Träger:
 \[I=[-1,1]\]
 Definition:

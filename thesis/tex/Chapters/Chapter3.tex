@@ -1,12 +1,12 @@
 % Chapter 3
 
-\chapter{General Polynomial Chaos}
-Die hier aufgezeigte Einführung in das general Polynomial Chaos (gPC) ist angelehnt an Xiu in \autocite{dongbinxiu2010}.
+\chapter{General Polynomial-Chaos}
+Die hier aufgezeigte Einführung in das general Polynomial-Chaos (gPC) ist angelehnt an Xiu in \autocite{dongbinxiu2010}.
 \section{Approximation von Zufallsvariablen}
 Anhand des Beispiels \ref{bsp:hermitechaos} des Hermite-Chaos haben wir bereits gesehen, dass für gewisse Orthonormalbasen von Polynomen $\lbrace H_i\rbrace$ und Zufallsvariablen $Y$ mit passenden stochastischen Verteilungen die Beziehung
 \[\langle H_i(x),H_j(x)\rangle_{L_w^2(S)} =\E_Y \left[H_i(Y)H_j(Y)\right]=\delta_{ij}\]
-erfüllt wird. Beachte, dass die Polynome einmal mit reellem Argument und einmal mit der Zufallsvariable $Y$ als Argument aufgefasst werden.
-\begin{mathdef}[General Polynomial Chaos Basis]
+erfüllt wird. Ein feiner Unterschied ist dabei, dass die Polynome einmal mit reellem Argument und einmal mit der Zufallsvariable $Y$ als Argument aufgefasst werden.
+\begin{mathdef}[General Polynomial-Chaos Basis]
 \label{def:gpc}
 Sei $Y$ eine reelle Zufallsvariable mit Verteilungsfunktion $F_Y(y)=P(Y\le y)$ und endlichen Momenten
 \[\E\left[|Y|^{2\ell}\right]=\int |y|^{2\ell}dF_Y(y)<\infty,\quad \ell\in \N_0\]
@@ -15,7 +15,7 @@ Existieren Polynome $\Phi_i\in\Poly_i$, also insbesondere $\Phi_0\equiv const$, 
 \label{eqn:gpc_basicortho}
 \E\left[\Phi_i(Y)\Phi_j(Y)\right]=\delta_{ij},\quad i,j\in\N_0
 \end{equation}
-erfüllen, so nennt man diese \emph{general Polynomial Chaos Basis Funktionen}.\\
+erfüllen, so nennt man diese \emph{general Polynomial-Chaos Basis-Funktionen}.\\
 Ist $Y$ stetig, so existiert eine Dichtefunktion $\rho>0$, so dass $dF_Y(y)=\rho(y)dy$ auf $I$. In diesem Fall lässt sich die Bedingung (\ref{eqn:gpc_basicortho}) schreiben als
 \begin{equation}
 \label{eqn:gpc_ortho}
@@ -33,7 +33,7 @@ Eine Übersicht von einigen bekannten Verteilungen und Polynombasen ist in Tabel
 \begin{table}
 \centering
 \begin{tabular}{c|ccc}
- & Verteilung von $Y$ & gPC Basispolynome & Träger \\ 
+ & Verteilung von $Y$ & gPC-Basispolynome & Träger \\ 
 \hline 
 Stetig & Normal & Hermite & $(-\infty,\infty)$ \\ 
  & Gamma & Laguerre & $[0,\infty)$ \\ 
@@ -45,17 +45,17 @@ Diskret & Poisson & Charlier & $\lbrace 0,1,2,\dots\rbrace$ \\
  & Negativ Binomial & Meixner & $\lbrace 0,1,2,\dots\rbrace$ \\  
  & Hypergeometrisch & Hahn & $\lbrace 0,1,\dots,E\rbrace$
 \end{tabular}
-\caption{gPC Beziehung zwischen orthogonalen Polynombasen und stochastischen Verteilungen. $E\in\N_0$ ist dabei ein beliebiger Parameter für gewisse diskrete Verteilungen.}
+\caption{gPC-Beziehung zwischen orthogonalen Polynombasen und stochastischen Verteilungen. $E\in\N_0$ ist dabei ein beliebiger Parameter für gewisse diskrete Verteilungen.}
 \label{table:chaos}
 \end{table}
 
-Das Ziel ist es nun, mithilfe einer gPC Orthonormalbasis eine Funktion $f(Y)$ einer Zufallsvariablen $Y$ zu approximieren. Wir wollen nun einen Einblick dazu bekommen, was an dieser Stelle mit "`approximieren"' gemeint ist.
-\begin{mathdef}[Starke gPC Konvergenz]
-Sei $f(Y)$ eine Funktion einer Zufallsvariablen $Y$ mit Dichte $\rho_Y$ und Träger $I_Y$. Eine general Polynomial Chaos Approximation $f_M(Y)\in\Poly_M(Y)$ konvergiert in einem starken Sinne gegen $f(Y)$, wenn \[\norm{f(Y)-f_M(Y)}_{L_{\rho_Y}^2(I_Y)}\to 0\text{ für }{M\to\infty}\]
+Das Ziel ist nun, mithilfe einer gPC-Orthonormalbasis eine Funktion $f(Y)$ einer Zufallsvariablen $Y$ zu approximieren. Wir wollen nun einen Einblick dazu bekommen, was an dieser Stelle mit "`approximieren"' gemeint ist.
+\begin{mathdef}[Starke gPC-Konvergenz]
+Sei $f(Y)$ eine Funktion einer Zufallsvariablen $Y$ mit Dichte $\rho_Y$ und Träger $I_Y$. Eine general Polynomial-Chaos Approximation $f_M(Y)\in\Poly_M(Y)$ konvergiert in einem starken Sinne gegen $f(Y)$, wenn \[\norm{f(Y)-f_M(Y)}_{L_{\rho_Y}^2(I_Y)}\to 0\text{ für }{M\to\infty}\]
 \end{mathdef}
-Die starke gPC Konvergenz entspricht also direkt der in Kapitel \ref{sec:poly_approx} vorgestellten spektralen Konvergenz, entsprechend ist die Konvergenzordnung abhängig von der Glattheit der Funktion $f$. Ohne Beweis folgt aus der starken gPC Konvergenz auch die Konvergenz in Wahrscheinlichkeit und schlussendlich die Konvergenz in Verteilung.
+Die starke gPC-Konvergenz entspricht also direkt der in Kapitel \ref{sec:poly_approx} vorgestellten spektralen Konvergenz, entsprechend ist die Konvergenzordnung abhängig von der Glattheit der Funktion $f$. Ohne Beweis folgt aus der starken gPC-Konvergenz auch die Konvergenz in Wahrscheinlichkeit und schlussendlich die Konvergenz in Verteilung.
 \begin{mathbem}
-Ist die Funktion $f$ oder ihre Abhängigkeit von der Zufallsvariablen $Y$ nicht konkret bekannt, sondern liegt diese beispielsweise nur als Verteilungsfunktion vor, so ist es dennoch möglich eine gPC Approximation in einem schwachen Sinne zu erhalten. Für Details sei auf \autocite[Kapitel 5.1.2]{dongbinxiu2010} verwiesen.\\
+Ist die Funktion $f$ oder ihre Abhängigkeit von der Zufallsvariablen $Y$ nicht konkret bekannt, sondern liegt diese beispielsweise nur als Verteilungsfunktion vor, so ist es dennoch möglich eine gPC-Approximation in einem schwachen Sinne zu erhalten. Für Details sei auf \autocite[Kapitel 5.1.2]{dongbinxiu2010} verwiesen.\\
 Ein illustratives Beispiel ist in Abbildung \ref{fig:gpcweakconv} gegeben. Dort verwenden wir die Bestapproximation bezüglich $L_\rho^2(-\infty,\infty)$, wobei $\rho$ die Dichtefunktion der Normalverteilung ist, die Orthonormalbasis aus den Hermite-Polynomen $H_m$ besteht und $Y$ eine normalverteilte Zufallsvariable ist. Es ist
 \[f_M(Y)=\sum_{m=0}^M\hat{f}_mH_m(Y), \quad \hat{f}_m=\E[f(Y)H_m(Y)]\]
 die Bestapproximation an die Funktion $f(Y)$ in $\Poly_M(Y)$. Wir nehmen an, dass wir nur die Verteilung von $Z=f(Y)$ kennen und $Z\sim\text{Beta}(0.2,3.)$ in $[-1,1]$.\\
@@ -64,20 +64,20 @@ Dann tritt bei der Berechnung von $\E[ZH_m(Y)]$ eine Schwierigkeit auf: Es ist i
 und $f_M(Y)$ konvergiert in Verteilung gegen $f(Y)$ für $M\to\infty$.
 \begin{figure}[!htb]
 \includegraphics[width=\textwidth]{Figures/gpc_weak_convergence.png}
-\caption{Schwache Konvergenz von Hermite gPC Approximation zu einer $\text{Beta}(0.2,3.)$ verteilten Zufallsvariablen. Dargestellt sind Approximationen an die Dichtefunktionen, welche über Histogramme von 50 gleich großen Intervallen angenähert werden.}
+\caption{Schwache Konvergenz von Hermite gPC-Approximation zu einer $\text{Beta}(0.2,3.)$ verteilten Zufallsvariablen. Dargestellt sind Approximationen an die Dichtefunktionen, welche über Histogramme von 50 gleich großen Intervallen angenähert werden.}
 \label{fig:gpcweakconv}
 \end{figure}
 \end{mathbem}
 
 \section{Mehrdimensionale Zufallsräume}
-Wie bereits diskutiert, sei der Zufallsraum durch einen Zufallsvektor $Y=(Y_1,\dots,Y_N)^T$ mit stochastisch unabhängigen Komponenten $Y_i$ mit bekannter Verteilung vollständig parametrisiert. Als mehrdimensionale Erweiterung von Definition \ref{def:gpc} führen wir an dieser Stelle das multivariate gPC ein.
+Wie bereits diskutiert, sei der Zufallsraum durch einen Zufallsvektor $Y=(Y_1,\dots,Y_N)^T$ mit stochastisch unabhängigen Komponenten $Y_i$ mit bekannter Verteilung vollständig parametrisiert. Als mehrdimensionale Erweiterung von Definition \ref{def:gpc} führen wir an dieser Stelle das multivariate gPC-ein.
 \begin{mathdef}[Multivariate gPC]
-Sei $P\in\N_0$ der fest gewählte maximale Polynomgrad. Sei weiter $Y=(Y_1,\dots,Y_N)^T$ ein Zufallsvektor, dessen unabhängige Komponenten $Y_k$ eine gPC Basis $\lbrace \Phi_i^{(k)}\in\Poly_P(Y_k)\mid i=0,\dots,P\rbrace$ besitzen. Ist $m=(m_1,\dots,m_N)\in\N_0^N$ ein Multi-Index mit $|m|=m_1+\dots+m_N$, so sind die $N$-variate gPC Basis Funktionen vom Grad $P$ definiert als 
+Sei $P\in\N_0$ der fest gewählte maximale Polynomgrad. Sei weiter $Y=(Y_1,\dots,Y_N)^T$ ein Zufallsvektor, dessen unabhängige Komponenten $Y_k$ eine gPC-Basis $\lbrace \Phi_i^{(k)}\in\Poly_P(Y_k)\mid i=0,\dots,P\rbrace$ besitzen. Ist $m=(m_1,\dots,m_N)\in\N_0^N$ ein Multi-Index mit $|m|=m_1+\dots+m_N$, so sind die $N$-variate gPC-Basis-Funktionen vom Grad $P$ definiert als 
 \[\Phi_m(Y)=\Phi_{m_1}(Y_1)\cdot\ldots\cdot\Phi_{m_N}(Y_N),\quad 0\le |m|\le P\]
 \end{mathdef}
 
 \begin{mathbem}
-Der von den multivariate gPC Funktionen aufgespannte Raum $\Poly_P^N$ ist der Raum aller Polynome vom Grad höchstens $P$ in $N$ Variablen
+Der von den multivariate gPC-Funktionen aufgespannte Raum $\Poly_P^N$ ist der Raum aller Polynome vom Grad höchstens $P$ in $N$ Variablen
 \[\Poly_P^N(Y)\coloneqq \left\lbrace p\colon I_Y\to \R \mid p(Y)=\sum_{|m|\le P}c_m\Phi_m(Y)\right\rbrace\]
 Die Dimension des Raumes ist $\dim\Poly_P^N=\binom{P+N}{P}=\frac{(P+N)!}{P!N!}$.
 \end{mathbem}
@@ -87,13 +87,13 @@ Da die Monome $x^m=x_1^{m_1}\dots x_N^{m_N}$ für verschiedene $m=(m_1,\dots,m_N
 \[\binom{P+N}{P}=\#\lbrace m\in\N_0^N \mid |m|\le P\rbrace\] 
 Wir berechnen dazu $a_j=\#\lbrace m\in\N_0^N \mid |m|=j\rbrace$ für $j=0,\dots,P$. Dazu überlegen wir uns, dass $a_j=\#\lbrace \overline{m}\in\N^N \mid |\overline{m}|=j+N\rbrace$ wegen der Bijektion $m=(m_1,\dots,m_N)=(\overline{m}_1-1,\dots,\overline{m}_N-1)=\overline{m}-(1,\dots,1)$. Wir wollen nun herausfinden, wieviele Zerlegungen der Zahl $j+N=|\overline{m}|$ möglich sind und schreiben dazu symbolisch
 \[\overline{m}=\underbrace{(1\_1\_1\_\dots 1\_1)}_{j+N\text{ Einsen getrennt von } j+N-1 \text{ Blanks}}\]
-Um eine mögliche Darstellung zu bekommen, ersetzen wir $N-1$ Blanks durch ein Komma und die restlichen durch ein Plus, beispielsweise für $j=4,N=3$
+Um eine aller möglichen Darstellung zu bekommen, ersetzen wir $N-1$ Blanks durch ein Komma und die restlichen durch ein Plus, beispielsweise für $j=4,N=3$
 \[(1+1+1,1,1+1+1+1+1)=(3,1,5)=\overline{m}\]
-Dies sind exakt alle Möglichkeiten $N$ positive Zahlen deren Summe $j+N$ ist zu erhalten und es ist $a_j=\binom{j+N-1}{N-1}$.
+Dies sind exakt alle Möglichkeiten, $N$ positive Zahlen, deren Summe $j+N$ ist, zu erhalten, und es ist $a_j=\binom{j+N-1}{N-1}$.
 Schlussendlich gilt für die Summe von verschobenen Binomialkoeffizienten 
 \[\sum_{j=0}^Pa_j=\sum_{j=0}^P\binom{j+N-1}{N-1}\stackrel{\text{ind.}}{=}\binom{N+P}{N}=\binom{N+P}{P}\]
 \end{proof}
-In Zukunft wird es sowohl für die theoretische Notation, als auch die konkrete Implementierung häufig praktischer sein, die Multi-Indices $m\in\N_0^M$ durchzunummerieren und äquivalent zum eindimensionalen Fall zu benutzen. Dies ist gerechtfertigt, da sich die zugehörigen multivariaten Polynome ähnlich wie die eindimensionalen Polynome verhalten. Zum Beispiel gilt aufgrund des gewählten Tensorproduktansatzes und der stochastischen Unabhängigkeit der Komponenten von $Y$ das mehrdimensionale Pendant zur Orthogonalitätsbedingung (\ref{eqn:gpc_ortho}) für $i,j\in\N_0^N$
+Im Folgenden wird es sowohl für die theoretische Notation, als auch die konkrete Implementierung häufig praktischer sein, die Multi-Indices $m\in\N_0^M$ durchzunummerieren und äquivalent zum eindimensionalen Fall zu benutzen. Dies ist gerechtfertigt, da sich die zugehörigen multivariaten Polynome ähnlich wie die eindimensionalen Polynome verhalten. Zum Beispiel gilt aufgrund des gewählten Tensorproduktansatzes und der stochastischen Unabhängigkeit der Komponenten von $Y$ das mehrdimensionale Pendant zur Orthogonalitätsbedingung (\ref{eqn:gpc_ortho}) für $i,j\in\N_0^N$
 \begin{equation}
 \label{eqn:gpc_ortho_mv}
 \begin{split}
@@ -132,7 +132,7 @@ $P$ & $\binom{P+N}{P}$ & $(P+1)^N$\\
 \label{table:poly_space_dim}
 \end{table}
 \end{mathbem}
-Als weitere Motivation für unsere Wahl des Polynomraums geben wir ein Beispiel an, wo wir das Verhalten der Koeffizienten der Bestapproximation beobachten.
+Als weitere Motivation für unsere Wahl des Polynomraums geben wir ein Beispiel an, anhand dessen wir das Verhalten der Koeffizienten der Bestapproximation beobachten können.
 \begin{mathbsp}
 \label{bsp:bestapproxcoeffs2d}
 Sei $N=2, Y=(Y_1,Y_2)^T$ mit $Y_1\sim \mathcal{U}(-1,1), Y_2\sim\mathcal{N}(0,1)$ und die zu approximierende Funktion $f(y)=f(y_1,y_2)=(2+\sin(y_1\cdot y_2))^{-2}$.\\
@@ -147,9 +147,9 @@ In Abbildung \ref{fig:bestapproxcoeffs2d} ist der Betrag der Koeffizienten $|\ha
 \end{mathbsp}
 
 \section{Extraktion von Statistiken}
-Gegeben sei die multivariate gPC Approximation mit Summenschranke $P$ zu einer Funktion $f(Y)$ und einem Zufallsvektor $Y$ der Dimension $N$, also
+Gegeben sei die multivariate gPC-Approximation mit Summenschranke $P$ zu einer Funktion $f(Y)$ und einem Zufallsvektor $Y$ der Dimension $N$, also
 \[f(Y)\approx f_M(Y)=\sum_{|m|\le P}\hat{f}_m\Phi_m(Y)\in\Poly_P^N,\quad m\in\N_0^N\]
-Unter Ausnutzung der Orthogonalitätsbedingung (\ref{eqn:gpc_ortho_mv}) der Polynombasen lassen sich gewisse Statistiken der gPC Approximation auf sehr einfache Art und Weise berechnen. Schlussendlich ist dies eine der größten Motivationen dafür, die Orthogonalbasis passend zur gegebenen Verteilung zu wählen.\\
+Unter Ausnutzung der Orthogonalitätsbedingung (\ref{eqn:gpc_ortho_mv}) der Polynombasen lassen sich gewisse Statistiken der gPC-Approximation auf sehr einfache Art und Weise berechnen. Schlussendlich ist dies eine der größten Motivationen dafür, die Orthogonalbasis passend zur gegebenen Verteilung zu wählen.\\
 Es ist $\gamma_{(0,\dots,0)}=1$, da für das nicht normalisierte Polynom $\Psi_0\equiv 1$ und eine Wahrscheinlichkeitsverteilung $F_Y$ gilt $\gamma_0=\E[\Psi_0^2(Y)]=\int 1\cdot 1dF_Y(y)=1$. Folglich gilt $\Phi_{(0,\dots,0)}(Y)= \frac{\Psi_0(Y)}{\sqrt{\gamma_0}}\equiv 1$ und für den Erwartungswert $\mu_f$
 \begin{equation}
 \label{eqn:gpc_approx_exp}
@@ -168,7 +168,7 @@ Die Varianz lässt sich dann berechnen als
 \end{align*}
 Die Standardabweichung ist folglich gegeben durch
 \[\sigma_f=\sqrt{\text{var}(f(Y))}\approx\sqrt{\sum_{0<|m|\le P}\hat{f}_m^2}\]
-Ist man an einer Approximation der Dichtefunktion von $f(Y)$ interessiert, so lässt sich diese mittels eines Histogramms und Samplings der Funktion $f_N(Y)=\sum_{|m|\le P}\hat{f}_m\Phi_m(Y)$ erhalten.\\[0.2cm]
+Ist man an einer Approximation der Dichtefunktion von $f(Y)$ interessiert, so lässt sich diese mittels eines Histogramms und Samplings der Funktion $f_N(Y)=\sum_{|m|\le P}\hat{f}_m\Phi_m(Y)$ näherungsweise darstellen.\\[0.2cm]
 Für höhere Momente gilt
 \begin{align*}
 \E[f^\ell(Y)]\approx \sum_{|m^{(1)}|,\dots,|m^{(\ell)}|\le P} \hat{f}_{m^{(1)}}\dots\hat{f}_{m^{(\ell)}}\underbrace{\E[\Phi_{m^{(1)}}(Y)\dots\Phi_{m^{(\ell)}}(Y)]}_{=\mathcal{T}_{m^{(1)},\dots m^{(\ell)}}}

@@ -1,7 +1,8 @@
 % Chapter 1
 
 \chapter{Einführung}
-In diesem Kapitel werden wir die zu untersuchende Klein-Gordon-Gleichung (KGG) vorstellen und uns mit den zugehörigen häufig verwendeten Parametern vertraut machen. Anschließend gewinnen wir einen numerischen Lösungsansatz aus der Idee des Operatorsplittings. Die in dieser Arbeit untersuchte \emph{uncertainty} in Gestalt von Zufallsvariablen wird allerdings erst in den folgenden Kapiteln in die KGG einfließen. Zuletzt beschreibt dieses Kapitel relevante Ergebnisse aus der polynomialen Approximationstheorie und bietet einen ersten Einblick in die Beziehung von orthogonalen Polynomen und stochastischen Verteilungen.
+In diesem Kapitel werden wir die zu untersuchende Klein-Gordon-Gleichung (KGG) vorstellen und uns mit den zugehörigen häufig verwendeten Parametern vertraut machen. Anhand dieser Differentialgleichung wollen wir in späteren Kapiteln Methoden der \emph{uncertainty quantification} miteinander vergleichen. Die Grundidee ist dabei, dass die vorkommenden Parameter oder die Anfangswerte stochastische Größen sind. So kann man beispielsweise natürliche Schwankungen beim Messen der Parameter in der Gleichung durch normalverteilte Zufallsvariablen modellieren. Wir erhalten eine stochastische Variante der KGG, welche eine zufallsabhängige Lösung besitzt. Das Ziel dieser Arbeit ist ein Vergleich der Güte und des Aufwands verschiedener Ansätze zum Erhalt gewisser statistischer Kenngrößen der zufallsabhängigen Lösung.\\
+Als wichtiges Fundament für viele Algorithmen gewinnen wir zunächst einen numerischen Lösungsansatz für die KGG aus der Idee des Operatorsplittings. Anschließend beschreibt dieses Kapitel noch relevante Ergebnisse aus der polynomialen Approximationstheorie und bietet einen ersten Einblick in die Beziehung von orthogonalen Polynomen und stochastischen Verteilungen.
 \label{Chapter1}
 
 \section{Die Klein-Gordon-Gleichung}
@@ -14,7 +15,7 @@ u(0,x)&=u_0(x), \: x\in \Torus^d\\
 \end{align}
 Im Folgenden werden wir auf den, hier zur Betonung verwendeten, Index $x$ des Laplace Operators $\Laplace=\Laplace_x=\frac{\text{d}^2}{\text{d}x^2_1}+\dots+\frac{\text{d}^2}{\text{d}x^2_d}$ verzichten.\\
 Bevor wir Abhängigkeiten von einer Zufallsvariablen hinzufügen, ist es hilfreich, die Gleichung für deterministische Parameter besser zu verstehen. Diese Mühe ist nicht vergebens, da einige numerische Verfahren zur Bestimmung der Lösung der zufallsabhängigen Gleichung stark auf einem robusten und schnellen Löser der deterministischen Gleichung basieren. Dazu seien als Stichworte Monte-Carlo-Verfahren und Collocations-Verfahren genannt, die wir im späteren Verlauf genauer betrachten werden.
-\subsection{(Physikalische) Definitionen}
+\subsection{Physikalische Definitionen}
 Die KGG ist eine relativistische Feldgleichung, welche die Kinematik von spin-freien Teilchen, wie dem Pion, beschreibt. Auch das 2012 entdeckte Higgs-Boson ist ein spin-freies Teilchen, es ist jedoch noch unklar, ob es wirklich das von dem Standardmodell der Teilchenphysik vorhergesagte Teilchen ist und sich vom Standardmodell beschreiben lässt \autocite{cern2016}.\\
 Dabei ist
 \begin{itemize}
@@ -22,22 +23,23 @@ Dabei ist
 \item die periodische Randbedingung eine vereinfachte Beschreibung des Verhaltens der Lösung ohne Einflüsse von Rändern. Solche Einflüsse, wie sie beispielsweise bei Dirichlet- oder Neumann-Randwerten auftreten, werden vernachlässigt und die Lösung als auf einem großen Träger lebend betrachtet.
 \item $\absolute{u(t,x)}^2$ physikalisch als Ladungsdichte des Teilchens zum Zeitpunkt $t$ und Ort $x$ interpretierbar \autocite{kleingordon2016}. 
 \item $\alpha>0$ das Quadrat der Wellengeschwindigkeit.
-\item $\beta(x)>0, \forall x\in \Torus^d,$ in der physikalischen Interpretation das Quadrat aus einer Kombination von Wellengeschwindigkeit, Masse und planckschem Wirkungsquantum. Die Abhängigkeit des Potentialteils der KGG vom Ort $x$ ist dabei eine Verallgemeinerung der klassischen Gleichung.
+\item $\beta(x)>0, \forall x\in \Torus^d,$ in der physikalischen Interpretation das Quadrat aus dem Produkt von quadratischer Wellengeschwindigkeit, Masse und inversem planckschem Wirkungsquantum. Die Abhängigkeit des Potentialteils der KGG vom Ort $x$ ist dabei eine Verallgemeinerung der klassischen Gleichung.
+\item die Differentialgleichung im Gegensatz zur physikalischen Darstellung reellwertig. Insbesondere fordern wir, dass $u$, $u_0$ und $v_0$ reellwertig und die Anfangswerte $u_0$ und $v_0$ periodisch in $(-\pi,\pi)^d$ sind. \todo{(Reelle) Existenztheorie?}
 \end{itemize}
-Wir betrachten im Gegensatz zur physikalischen Darstellung nur reellwertige Funktionen $u$, $u_0$ und $v_0$ und fordern (implizit), dass die Anfangswerte $u_0$ und $v_0$ periodisch in $(-\pi,\pi)$ sind. \todo{(Reelle) Existenztheorie?}
 
 \subsection{Exakte Lösungen}
-Für spezielle Konfigurationen der Parameter und Anfangswerte können wir exakte Lösungen angeben. Diese sind hilfreich, um die Korrektheit von Implementierungen schnell und zuverlässig testen zu können. Außerdem zeigen sich so schnell die Grenzen und eventuelle Schwächen der Verfahren für gut gestellte Probleme auf.\\[1cm]
-Mithilfe des Separationsansatzes $u(t,x)=g(x)f(t)$ ergibt sich aus (\ref{kgg}) 
+Für spezielle Konfigurationen der Parameter und Anfangswerte können wir exakte Lösungen angeben. Diese sind hilfreich, um die Korrektheit von Implementierungen schnell und zuverlässig testen zu können. Außerdem werden so schnell die Grenzen und eventuelle Schwächen der Verfahren für gut gestellte Probleme deutlich.\\[0.5cm]
+Mithilfe des Separationsansatzes $u(t,x)=g(x)f(t)$ erhalten wir aus (\ref{kgg}) die Darstellung
 \begin{equation*}
 (\alpha\Laplace g(x)-\beta(x)g(x))f(t) = g(x)f''(t)
 \end{equation*}
-womit sich aus Lösungen von
+Diese können wir trennen und bekommen die zwei Differentialgleichungen
 \begin{align*}
 \alpha\Laplace g(x)-\beta(x)g(x)&=\lambda g(x), \: \lambda\in\R\\
 \mu f(t)&=f''(t), \: \mu\in \R
 \end{align*}
-Lösungen der KGG ergeben. Für $\beta(x) \equiv \beta>0$ ergibt sich das Eigenwertproblem $-\Laplace g(x)=-\frac{\beta + \lambda}{\alpha}g(x)$ mit periodischen Randbedingungen und eine lineare gewöhnliche Differentialgleichung.\\Die Anfangswerte $u_0$ und $v_0$ der KGG werden dann entsprechend passend gewählt.\\[1cm]
+Für $\beta(x) \equiv \beta>0$ ergibt sich das Eigenwertproblem $-\Laplace g(x)=-\frac{\beta + \lambda}{\alpha}g(x)$ mit periodischen Randbedingungen und eine lineare gewöhnliche Differentialgleichung.\\
+Schlussendlich gewinnen wir daraus Lösungen für die ursprüngliche KGG. Die Anfangswerte $u_0$ und $v_0$ der KGG werden dann entsprechend passend gewählt.\\[1cm]
 Beispiele für exakte Lösungen ($d=1$) sind
 \begin{align*}
 u(t,x)&=\sin(\lambda x)(c_1 \sin(\mu t) + c_2 \cos(\mu t)), \quad \mu^2=\beta+\alpha \lambda^2\\ 
@@ -50,39 +52,39 @@ Diese Lösungen lassen sich auch auf höhere Dimensionen erweitern, beispielswei
 u(t,x)=\exp(-\cos(x_1+\dots+x_d))\sin(\mu t)\\
 \beta(x)=\mu^2+d(\cos(x_1+\dots+x_d)+\sin^2(x_1+\dots+x_d)), \, \mu\in\R \nonumber
 \end{eqnarray}
-
+Um einen kleinen Einblick in die Gestalt einer einfachen expliziten Lösung der KGG zu erhalten, sind in Abbildung \ref{fig:exactsolonedim} und \ref{fig:exactsoltwodim} die Lösungen mit Parametern $\alpha=1$, $\beta(x)=4+d(\cos(\sum_{j=1}^dx_j)+\sin^2(\sum_{j=1}^dx_j))$ zum Zeitpunkt $t=0.5$ dargestellt.
 % Visualize exact solutions by giving two example plots
 \begin{figure}[!htb]
 \minipage{0.5\textwidth}
   \includegraphics[width=\linewidth]{Figures/kgg_exact_solution_example1d.png}
   \caption{Exakte Lösung für $d=1$}
+  \label{fig:exactsolonedim}
 \endminipage
 \minipage{0.5\textwidth}
   \includegraphics[width=\linewidth]{Figures/kgg_exact_solution_example2d.png}
   \caption{Exakte Lösung für $d=2$}
+  \label{fig:exactsoltwodim}
 \endminipage
 \captionsetup{labelformat=empty}
-\caption{Lösung zum Zeitpunkt $t=0.5$ für die KGG (\ref{kgg}) mit Parametern $\alpha=1$, $
-\beta(x)=4+d(\cos(\sum_{j=1}^dx_j)+\sin^2(\sum_{j=1}^dx_j))$.}
 \end{figure}
 
 Eine Sammlung von nicht-periodischen Lösungen finden sich in \autocite{andreipolyanin2004}.
 
 \section{Operatorsplitting}
 Als numerischen Ansatz für approximative Lösungen der KGG wählen wir ein klassisches Operatorsplitting. Dabei wiederholen wir an dieser Stelle zuerst kurz die relevante Approximationstheorie und diskutieren mögliche Varianten.
-\subsection{Generelle Idee}
-Angenommen wir stehen vor dem Problem die Differentialgleichung 
+\subsection{Grundlegende Idee}
+Angenommen, wir stehen vor dem Problem die Differentialgleichung 
 \begin{equation}
 \label{gencompdgl}
 \dt{u}(t)=(L+R)u(t), \, t>0, \quad u(0)=u_0
 \end{equation}
-zu lösen. Dabei ist im einfachsten Fall $u$ eine vektorwertige Funktion und $L$ bzw. $R$ zwei Matrizen.\\
+lösen zu wollen. Dabei ist im einfachsten Fall $u$ eine vektorwertige Funktion und $L$ bzw. $R$ zwei Matrizen.\\
 Sind beispielsweise $L$ eine untere und $R$ eine obere Dreiecksmatrix, so sind die Gleichungen 
 \begin{align*}
 \dt{v}(t)&=Lv(t), \quad v(0)=v_0\\
 \dt{w}(t)&=Rw(t), \quad w(0)=w_0
 \end{align*}
-einfacher zu lösen als die Gleichung (\ref{gencompdgl}). Das Ziel des Operatorsplittings ist es aus den Lösungen $v$ und $w$ eine Approximation an $u$ zu gewinnen.\\
+einfacher zu lösen als die Gleichung (\ref{gencompdgl}). Das Ziel des Operatorsplittings ist es, aus den Lösungen $v$ und $w$ eine Approximation an $u$ zu gewinnen.\\
 Wir \emph{teilen} (engl. split) die Gleichung also in zwei neue Gleichungen auf. Häufig lässt sich dann eine der gewonnen Gleichungen sogar exakt lösen. Dieser Ansatz funktioniert auch für (nicht-lineare) Operatoren anstelle von Matrizen.\\
 Diese zentrale Idee werden wir verwenden, um die KGG 
 \begin{equation*}
@@ -92,7 +94,7 @@ zu splitten. Dabei wird der Operator $\alpha\Laplace$ in $L$ einfließen und $-\
 
 \subsection{Lie-Trotter-Splitting}
 \label{seclietrotter}
-Wir beginnen mit einer rigerosen Einführung in Splittingverfahren. Als zentrales Ergebnis werden wir dabei das Strang-Splitting erhalten, welches einen Fehler $\mathcal{O}(\deltat^2)$ in Abhängigkeit von der Zeitschrittweite $\deltat$ besitzt.\\
+Wir beginnen mit einer rigorosen Einführung in Splittingverfahren. Als zentrales Ergebnis werden wir dabei das Strang-Splitting erhalten, welches einen Fehler $\mathcal{O}(\deltat^2)$ in Abhängigkeit von der Zeitschrittweite $\deltat$ besitzt.\\
 Die folgende Einführung ist angelehnt an \autocite{patrickdiplom}, welche wiederum aus \autocite[Kapitel II.3 bis II.5]{HairerLubichWanner} übernommen wurde.
 \begin{mathdef}[Fluss einer Differentialgleichung]
 Der Fluss $\varphi_t$ einer reversiblen Differentialgleichung
@@ -112,7 +114,7 @@ Ist $\Phi_{\deltat}\colon\R^d\to\R^d$ ein Einschrittverfahren so definieren wir 
 Das bedeutet, dass $y_1=\Phi_{\deltat}^*(y_0)$ implizit durch $\Phi_{-\deltat}(y_1)=y_0$ definiert wird.\\
 Ist $\Phi_{\deltat}^*=\Phi_{\deltat}$ so nennen wir das Verfahren symmetrisch.
 \end{mathdef}
-Beispielsweise sind das explizite Euler Verfahren $\Phi_{\deltat}^E$ und das implizite Euler Verfahren $\Phi_{\deltat}^{IE}$ zueinander adjungiert: 
+Beispielsweise sind das explizite Euler-Verfahren $\Phi_{\deltat}^E$ und das implizite Euler-Verfahren $\Phi_{\deltat}^{IE}$ zueinander adjungiert: 
 \[\Phi_{-\deltat}^E(y_1)=y_0\implies y_1+(-\deltat)f(y_1)=y_0\implies y_1=y_0+\deltat f(y_1)=\Phi_{\deltat}^{IE}(y_0)\] \\
 Ohne Beweis sei bemerkt, dass $(\Phi_{\deltat}^*)^*=\Phi_{\deltat}$ und 
 \begin{equation}
@@ -142,14 +144,14 @@ Sind nun $\varphi_{\deltat}^A$ und $\varphi_{\deltat}^B$ die exakten Flüsse der
 \dt{y}&=B(y) \label{splitsimple2}
 \end{align}
 so gewinnen wir daraus ein Verfahren zur Lösung der ursprünglichen Gleichung.\\
-Hierzu starten wir von einem gegebenen Anfangswert $y_0$ und lösen das System (\ref{splitsimple1}) um einen Zwischenwert $y_{\onehalf}$ zu erhalten. Verwenden wir diesen als neuen Startwert für das System (\ref{splitsimple2}), so erhalten wir einen daraus einen Wert $y_1$, welcher eine Approximation an die Lösung $\varphi_{\deltat}(y_0)$ des ursprünglichen Systems ist.\\[1cm]
+Hierzu starten wir von einem gegebenen Anfangswert $y_0$ und lösen das System (\ref{splitsimple1}) um einen Zwischenwert $y_{\onehalf}$ zu erhalten. Verwenden wir diesen als neuen Startwert für das System (\ref{splitsimple2}), so erhalten wir daraus einen Wert $y_1$, welcher eine Approximation an die Lösung $\varphi_{\deltat}(y_0)$ des ursprünglichen Systems ist.\\[1cm]
 \noindent\begin{minipage}{0.3\textwidth}
 \input{tikz/splitting_lie_flow}
 \input{tikz/splitting_lie_flow_adj}
 \end{minipage}%
 \hfill%
 \begin{minipage}{0.7\textwidth}
-Die Reihenfolge $A\to B$ ist willkürlich und kann auch umgekehrt werden. Tatsächlich sind die resultierenden Verfahren zueinander adjungiert wegen (\ref{adjlemma}) und der Tatsache, dass der exakte Fluss wegen $y_1=\varphi_{-\deltat}^{-1}(y_0)=\varphi_{\deltat}^*(y_0)=\varphi_{\deltat}(y_0)$ als symmetrisches Einschrittverfahren auffassbar ist. Kurz:\\
+Die Reihenfolge $A\to B$ ist willkürlich und kann auch umgekehrt werden. Tatsächlich sind die resultierenden Verfahren aufgrund von (\ref{adjlemma}) zueinander adjungiert, da der exakte Fluss wegen $y_1=\varphi_{-\deltat}^{-1}(y_0)=\varphi_{\deltat}^*(y_0)=\varphi_{\deltat}(y_0)$ als symmetrisches Einschrittverfahren auffassbar ist. Kurz:\\
 \begin{align}
 \label{liesplittings}
 \Phi_{\deltat}=\varphi_{\deltat}^B \circ \varphi_{\deltat}^A\\
@@ -191,8 +193,8 @@ von Ordnung $p+1$, wenn
 \sum_{j=1}^sa_j^{p+1}+(-1)^pb_j^{p+1}&=0
 \end{align*}
 \end{maththeorem}
-Um das Lie-Trotter-Splitting zur Ordnung 2 zu erweitern motiviert der Satz die Wahl $\alpha_1=\beta_1=\onehalf$. Wir wollen nun ein Verfahren $\Phi_{\deltat}^S$ mit Ordnung $p=2$ gewinnen. Dieses sollte möglichst den selben Zeitaufwand wie das Lie-Trotter-Splitting besitzen. Daher definieren wir
-\[\Phi_{\deltat}^S=\Phi_{\deltathalf}^*\circ\Phi_{\deltathalf}\]
+Um das Lie-Trotter-Splitting zur Ordnung 2 zu erweitern motiviert der Satz die Wahl $\alpha_1=\beta_1=\onehalf$. Wir wollen nun ein Verfahren $\Phi_{\deltat}^S$ mit Ordnung $p=2$ gewinnen. Idealerweise benötigt das neue Verfahren eine ähnliche Berechnungszeit wie das Lie-Trotter-Splitting. Daher definieren wir
+\[\Phi_{\deltat}^S=\Phi_{\deltathalf}^*\circ\Phi_{\deltathalf}=\left(\Phi_{\deltat}^S\right)^*\]
 Wir erkennen sofort, dass es sich hierbei um ein symmetrisches Verfahren handelt. Als Komposition von Verfahren mit Ordnung 1 (siehe Satz \ref{lieorder1}) ist es ebenfalls mindestens von Ordnung 1. Als zusätzlich symmetrisches Verfahren gilt mit Satz \ref{adjfloworder}, dass das Verfahren mindestens von Ordnung 2 ist.\\
 Dieses sogenannte \emph{Strang-Splitting} lässt sich unter Verwendung der aufgeteilten Flüsse (\ref{liesplittings}) auch darstellen als 
 
@@ -230,13 +232,13 @@ Insbesondere ist das Strang-Splitting immer noch von Ordnung 2, wenn alle verwen
 \end{maththeorem}
 \begin{proof}[Beweisidee]
 Am Beispiel von $\varphi_{\deltat}^A$ und $p=1$:\\
-Man verwendet die Darstellung $\varphi_{\deltat}^A(y_0)=y_0+\deltat f^A(y_0)+\mathcal{O}(\deltat^2)$ und ersetzt $\varphi_{\deltat}^A$ durch $\Phi_{\deltat}^A$. Die Vorgehensweise in den Beweisen muss dann höchstens minimal angepasst werden.\\
+Man verwendet die Darstellung $\varphi_{\deltat}^A(y_0)=y_0+\deltat f^A(y_0)+\mathcal{O}(\deltat^2)$ und ersetzt $\varphi_{\deltat}^A$ durch $\Phi_{\deltat}^A$. Die Vorgehensweise in den Beweisen benötigt dann minimale Anpassungen.\\
 Man beachte hierbei, dass nun $\Phi_{\deltat}^A$ im Gegensatz zu $\varphi_{\deltat}^A$ nicht mehr symmetrisch ist. Die Argumentation über die Ordnung von symmetrischen Verfahren kann daher nicht direkt verwendet werden, um $p=2$ für das Strang-Splittings zu begründen. Außerdem kann dies die Möglichkeit, das Strang-Splitting durch Kombination der Halbschritte zu beschleunigen, zunichte machen.
 \end{proof}
 
-\subsection{Numerischer Löser der KGG}
+\subsection{Numerischer Löser der Klein-Gordon-Gleichung}
 \label{chapter:solver_kgg}
-Dieser Abschnitt ist das wichtige Fundament, auf dem viele numerischen Lösungsverfahren basieren werden. Um ein Operatorsplitting auf die KGG anwenden zu können, muss diese zuerst in eine Gleichung mit Zeitableitung erster Ordnung in der Form von (\ref{orddgl}) umgeschrieben werden. Formal:
+Dieser Abschnitt bildet das Fundament, auf dem viele numerischen Lösungsverfahren basieren werden. Um ein Operatorsplitting auf die KGG anwenden zu können muss diese zuerst in eine Gleichung mit Zeitableitung erster Ordnung in der Form von (\ref{orddgl}) umgeschrieben werden. Formal:
 \begin{align}
 \dtt{u}(t,x)&=\alpha \Laplace u(t,x) - \beta(x)u(t,x)\nonumber\\
 \iff
@@ -256,16 +258,16 @@ v
 \end{align}
 für ein Gewicht $w\in [0,1]$. Doch bevor wir dies als Grundlage für ein Splitting verwenden, müssen wir den Operator $\Laplace$ genauer untersuchen.
 \subsubsection*{Ortsdiskretisierung durch Fourier Pseudo-Spectral Methode}
-Um einen numerischen Zugang zum Laplace Operator $\Laplace$ zu bekommen, benötigen wir zuerst eine Diskretisierung des Ortes $x_j=-\pi+2\pi\frac{j}{N}\in [-\pi,\pi)$ für $j=0,\dots,N-1$ und $N\in\N$. Da wir periodische Lösungen $u$ der KGG suchen, bietet es sich an, die endliche Fourier-Approximation von $u$ zu verwenden. Wir werden den Ansatz zuerst ausführlich für $d=1$ erläutern und später die Verallgemeinerung auf höhere Dimensionen aufzeigen.\\
+Um einen numerischen Zugang zum Laplace Operator $\Laplace$ zu bekommen benötigen wir zuerst eine Diskretisierung des Ortes $x_j=-\pi+2\pi\frac{j}{N}\in [-\pi,\pi)$ für $j=0,\dots,N-1$ und $N\in\N$. Da wir periodische Lösungen $u$ der KGG suchen, bietet es sich an, die endliche Fourier-Approximation von $u$ zu verwenden. Wir werden den Ansatz zuerst ausführlich für $d=1$ erläutern und später die Verallgemeinerung auf höhere Dimensionen aufzeigen.\\
 Die Fourier-Approximation ist für jedes $t>0$, $N\in 2\N$ und eine Indexmenge $\mathcal{I}_N=\left\lbrace -\frac{N}{2},\dots,-1,0,1,\dots,\frac{N}{2}-1\right\rbrace$ definiert durch
 \begin{equation}
 \label{eqn:fourier_approx}
 u(t,x)\approx \sum_{k\in\mathcal{I}_N}\fourier{u}_k(t)e^{ikx}, \quad x\in\Torus^d
 \end{equation}
 wobei für die Fourier-Koeffizienten $\fourier{u}_k(t)=\frac{1}{2\pi}\int_{-\pi}^\pi u(t,x)e^{-ikx}dx\in\Complex$ gilt. \\
-Um die Konvergenz der Fourier-Approximation einer Funktion zu erhalten, benötigen wir gewisse Anforderungen an die Glattheit der Funktion. Dabei ist bereits Stetigkeit und stückweise stetige Differenzierbarkeit ausreichend für eine gleichförmige Konvergenz. 
+Um die Konvergenz der Fourier-Approximation einer Funktion zu erhalten benötigen wir gewisse Anforderungen an die Glattheit der Funktion. Dabei sind bereits Stetigkeit und stückweise stetige Differenzierbarkeit ausreichend für eine gleichförmige Konvergenz. 
 \begin{mathbsp}
-Als Demonstration der Konvergenz der Fourierapproximation und der Möglichkeit, Ableitungen im Fourierraum durchzuführen, seien an dieser Stelle zwei Beispiele gemacht.\\
+Die Konvergenz der Fourierapproximation und die Möglichkeit, Ableitungen im Fourierraum durchzuführen, demonstrieren wir an dieser Stelle durch zwei Beispiele.\\
 Wir betrachten zu einer periodischen Funktion $f\colon\Torus\to\R$ die diskrete Fourierapproximation
 \[f(x)\approx \sum_{k=-N}^N\fourier{f}_ke^{ikx}\]
 und die approximierte Ableitung $p$-ter Ordnung
@@ -279,7 +281,7 @@ für die Beispiele $f_1(x)=-\sin(x)e^{-\sin(x)}$ und $f_2(x)=|x|$.
   \includegraphics[width=0.9\linewidth]{Figures/spectral_derivative_error_discont.png}
   \caption{Konvergenz der spektralen Ableitung zweiter Ordnung von $f_2$.}
 \end{figure}
-Wir erkennen, dass die analytische Funktion $f_1$ eine exponentielle Konvergenz aufweist und bereits für $N=64$ Punkte im Bereich der Maschinengenauigkeit liegt. Rechenfehler sorgen für größeres $N$ für eine Aufsummierung von kleinen Überschwingungen und einen langsam wachsenden Fehler.\\
+Wir erkennen, dass die analytische Funktion $f_1$ eine exponentielle Konvergenz aufweist und bereits für $N=64$ Punkte im Bereich der Maschinengenauigkeit liegt. Rechenfehler sorgen bei $N>64$ für eine Aufsummierung von kleinen Überschwingungen und einen langsam wachsenden Fehler.\\
 Die stetige Funktion $f_2$ mit stückweise stetiger nicht-periodischer Ableitung leidet bei der Approximation unter dem Gibbs-Phänomen und deutlich langsamerer Konvergenz.
 \end{mathbsp}
 
@@ -289,7 +291,7 @@ Die lineare Abbildung $\mathcal{F}_N\colon\Complex^N\to\Complex^N$ definiert dur
 \[\mathcal{F}_Nz=\fourier{z},\qquad\text{mit}\quad \fourier{z}_k=\sum_{j=0}^{N-1}e^{-2\pi i\frac{jk}{N}}z_j\]
 heißt diskrete Fourier-Transformation.
 \end{mathdef}
-Anstelle die direkte Implementierung von $\mathcal{F}_N$ zu verwenden, welche $\mathcal{O}(N^2)$ Rechenschritte benötigt, werden wir auf die deutlich schnellere Berechnung der Abbildung in $\mathcal{O}(N\log N)$ Schritten zurückgreifen, bekannt unter dem Namen \emph{Fast Fourier Transform} (fft). Da diese auf der Annahme $N=2^p$ für ein $p\in\N$ basiert, werden wir in Zukunft nur noch solche Approximationen verwenden. Dies ist essentiell, um eine schnelle Berechnung der Lösung der KGG zu gewährleisten. Ohne Beweis gilt $\mathcal{F}_N\overline{\mathcal{F}}_N=NI$ und somit hat die inverse Fourier-Transformation beinahe die selbe Gestalt wie die Fourier-Transformation selbst und kann ebenso schnell berechnet werden.\\
+Anstelle die direkte Implementierung von $\mathcal{F}_N$ zu verwenden, welche $\mathcal{O}(N^2)$ Rechenschritte benötigt, werden wir auf die deutlich schnellere Berechnung der Abbildung in $\mathcal{O}(N\log N)$ Schritten zurückgreifen. Diese ist unter dem Namen \emph{Fast-Fourier-Transformation} (FFT) bekannt. Da diese auf der Annahme $N=2^p$ für ein $p\in\N$ basiert, werden wir in Zukunft nur noch solche Approximationen verwenden. Dies ist essentiell, um eine schnelle Berechnung der Lösung der KGG zu gewährleisten. Ohne Beweis gilt $\mathcal{F}_N\overline{\mathcal{F}}_N=NI$ und somit hat die inverse Fourier-Transformation beinahe die selbe Gestalt wie die Fourier-Transformation selbst und kann ebenso schnell berechnet werden.\\
 Im Folgenden nehmen wir an, die Fourier-Approximation (\ref{eqn:fourier_approx}) von $u$ sei exakt und berechnen für den $j$-ten Punkt $x_j$ der Diskretisierung
 \begin{equation}
 \label{eqn:laplace_approxu}
@@ -343,24 +345,24 @@ Man beachte, dass die Sortierung der Fourier-Koeffizienten in verschiedenen Prog
 wobei Matlab die ähnliche Konvention
 \[\mathcal{I}_8=\left( 0,  1,  2,  3, 4, -3, -2, -1\right)\]
 verwendet.\\[0.3cm]
-Obige Erläuterungen waren für eine räumliche Dimension $d=1$. Will man nun den Ansatz auf mehrere Dimensionen erweitern, so erhält man ein sehr ähnliches Ergebnis.
+Obige Erläuterungen gelten für eine räumliche Dimension $d=1$. Will man nun den Ansatz auf mehrere Dimensionen erweitern, so erhält man ein sehr ähnliches Ergebnis.
 Führt man die Fourier-Transformation in jeder Dimension durch, so ergibt sich für $d=2$ die Approximation
 \[u(t,x)\approx\sum_{k_1\in\mathcal{I}_N}\fourier{u}_{k_1}(t,x_2)e^{ik_1x_1}=\sum_{k_1\in\mathcal{I}_N}\sum_{k_2\in\mathcal{I}_N}\fourier{u}_{k_1,k_2}(t)e^{i(k_1x_1+k_xx_2)}\]
 und analog zu der Approximation (\ref{eqn:laplace_approxu}) erhält man
 \[\Laplace u(t,x)=\sum_{k_1\in\mathcal{I}_N}-k_1^2\fourier{u}_{k_1}(t,x_2) e^{ik_1x_1}=\sum_{k_1,k_2\in\mathcal{I}_N}-(k_1^2+k_2^2)\fourier{u}_{k_1,k_2}(t)e^{i(k_1x_1+k_2x_2)}\]
-Das Vorgehen im mehrdimensionalen unterscheidet sich also nur durch eine aufwändigere Indizierung, ist jedoch im Kern dieselbe. Ersetzt man in obigen Ausführungen für $d=1$ sämtliche $|k|$ durch \[\norm{k}_2=\sqrt{k_1^2+\dots+k_d^2}\]so erhält man, bei passender Indizierung der diskreten Fourier-Approximation, eine Darstellung der Lösung für beliebige Dimensionen $d\in\N$.
+Das Vorgehen im Mehrdimensionalen unterscheidet sich also nur durch eine aufwändigere Indizierung, ist jedoch im Kern dieselbe. Ersetzt man in obigen Ausführungen für $d=1$ sämtliche $|k|$ durch \[\norm{k}_2=\sqrt{k_1^2+\dots+k_d^2}\]so erhält man, bei passender Indizierung der diskreten Fourier-Approximation, eine Darstellung der Lösung für beliebige Dimensionen $d\in\N$.
 \subsubsection*{Method of lines für zweiten Teil des Splittings}
-Einen Löser für den zweiten Teil (\ref{eqn:kgg_discrete_first_order_part1}) der im Ort diskretisierten KGG erhält man auf ähnliche Weise. Wir suchen für $t>0$, $\beta(x)>0$ und ein Gewicht $\tilde{w}=1-w\in [0,1]$ die Lösung der Differentialgleichung
+Einen numerischen Löser für den zweiten Teil (\ref{eqn:kgg_discrete_first_order_part1}) der im Ort diskretisierten KGG erhält man auf ähnliche Weise. Wir suchen für $t>0$, $\beta(x)>0$ und ein Gewicht $\tilde{w}=1-w\in [0,1]$ die Lösung der Differentialgleichung
 \begin{equation*}
 \dt{\begin{pmatrix}u_N\\v_N\end{pmatrix}}(t)=
 \begin{pmatrix}0 & \tilde{w}I_N\\ -\diag({\beta_N}) & 0\end{pmatrix}
 \begin{pmatrix}u_N\\v_N\end{pmatrix}(t)
 \end{equation*}
-Wiederum lässt sich die Lösung der Differentialgleichung mithilfe der Matrixexponentialfunktion darstellen. Die Matrixexponentialfunktion der Blockmatrix wiederum ist äquivalent zu einer umsortierten Blockdiagonalmatrix für welche gilt
+Die Struktur der Differentialgleichung zeigt, dass sich ihre Lösung ebenfalls mithilfe der Matrixexponentialfunktion darstellen lässt. Die Matrixexponentialfunktion der Blockmatrix wiederum ist äquivalent zu einer umsortierten Blockdiagonalmatrix für welche gilt
 \[\exp\begin{pmatrix}0 & \tilde{w}t\\ -t\beta(x_j) & 0\end{pmatrix}=
 \begin{pmatrix}\cos(t\sqrt{\beta(x_j)\tilde{w}}) & \sinc(t\sqrt{\beta(x_j)\tilde{w}})\tilde{w}t\\
 -\sinc(t\sqrt{\beta(x_j)\tilde{w}})\beta(x_j)t & \cos(t\sqrt{\beta(x_j)\tilde{w}})\end{pmatrix}\]
-Daraus erhalten wir also zu den Anfangswerten $g$ und $h$ für festes $x\in \Torus^d$ die explizite Lösung des zweiten Teil des Splittings durch
+Daraus erhalten wir zu den Anfangswerten $g$ und $h$ für festes $x\in \Torus^d$ die explizite Lösung des zweiten Teil des Splittings durch
 \[\begin{pmatrix}u\\v\end{pmatrix}(t,x)=
 \begin{pmatrix}\cos(t\sqrt{\beta(x)\tilde{w}}) & \sinc(t\sqrt{\beta(x)\tilde{w}})\tilde{w}t\\
 -\sinc(t\sqrt{\beta(x)\tilde{w}})\beta(x)t & \cos(t\sqrt{\beta(x)\tilde{w}})\end{pmatrix}
@@ -373,6 +375,18 @@ Wir haben nun also zwei separate Einschrittverfahren, die zusammen mit dem Stran
     \caption{Strang-Splitting für KGG}
     \label{alg:kgg_solver}
     \begin{algorithmic}[1] % The number tells where the line numbering should start
+    	\Function{Fast\_Strang}{$N,u_0,v_0,\alpha,\beta,w,\tau,T$}
+    		\State $x_N\gets (-\pi+\frac{2\pi j}{N})_{j=0,\dots,N-1}^T$
+            \State $g,h\gets u_0(x_N), v_0(x_N)$
+            \State $g,h\gets \text{First\_Part\_Solver}(N, g, h, \alpha, w, \frac{\tau}{2})$
+            \State $g,h\gets \text{Second\_Part\_Solver}(x_N, g, h, \beta, 1-w, \tau)$
+            \For{$i=1,\dots,\frac{T}{\tau}-1$} \Comment{Annahme: $\frac{T}{\tau}\in\N$} 
+            	\State $g,h\gets \text{First\_Part\_Solver}(N, g, h, \alpha, w, \tau)$
+            	\State $g,h\gets \text{Second\_Part\_Solver}(x_N, g, h, \beta, 1-w, \tau)$
+            \EndFor
+            \State $u_1,v_1\gets \text{First\_Part\_Solver}(N, g, h, \alpha, w, \frac{\tau}{2})$            
+            \State \textbf{return} $u_1, v_1$ \Comment{Approximation an $u(T,x_N)$ und $\dt{u}(T,x_N)$}
+    	\EndFunction
         \Function{Strang\_Step\_KGG}{$N,u_0,v_0,\alpha,\beta,w,\tau$} 
             \State $x_N\gets (-\pi+\frac{2\pi j}{N})_{j=0,\dots,N-1}^T$
             \State $g,h\gets u_0(x_N), v_0(x_N)$
@@ -415,7 +429,7 @@ u(t,x)&=\frac{\cos(t)}{\sin(x)+c}\\
 u_0(x)&=\frac{1}{\sin(x)+c}\\
 v_0(x)&\equiv 0\\
 \end{align*}
-eine Lösung der eindimensionalen KGG (\ref{kgg}) mit $\alpha=c-2$ und $\beta(x)=1+(c-2)\left(\frac{\sin(x)}{\sin(x)+c}+\frac{2\cos^2(x)}{(\sin(x)+c)^2}\right)$. Wir lösen nun die KGG mithilfe verschiedener Splitting Varianten und beobachten in Abbildung \ref{fig:splitting_convergence}
+eine Lösung der eindimensionalen KGG (\ref{kgg}) mit $\alpha=c-2$ und $\beta(x)=1+(c-2)\left(\frac{\sin(x)}{\sin(x)+c}+\frac{2\cos^2(x)}{(\sin(x)+c)^2}\right)$. Wir lösen nun die KGG mithilfe verschiedener Splitting-Varianten und beobachten in Abbildung \ref{fig:splitting_convergence}
 \begin{itemize}
 \item für das Strang-Splitting die erwartete Konvergenz von Ordnung 2.
 \item für das Lie-Trotter-Splitting die erwartete Konvergenz von Ordnung 1.
@@ -425,7 +439,7 @@ eine Lösung der eindimensionalen KGG (\ref{kgg}) mit $\alpha=c-2$ und $\beta(x)
 \end{itemize}
 \begin{figure}[!htb]
 \includegraphics[width=\textwidth]{Figures/splitting_convergence_fix_weight_frog2_cfl.png}
-\caption{Konvergenzordnung für verschiedene Splitting Varianten anhand von Beispiel \ref{bsp:trialfrog2} mit $c=3$, $d=1$, $N=512$, $w=0.5$ zum Zeitpunkt $T=1$.}
+\caption{Konvergenzordnung für verschiedene Splitting-Varianten anhand von Beispiel \ref{bsp:trialfrog2} mit $c=3$, $d=1$, $N=512$, $w=0.5$ zum Zeitpunkt $T=1$.}
 \label{fig:splitting_convergence}
 \end{figure}
 Für die beobachtete Instabilität spielt der Gewichtsfaktor $w$ eine große Rolle. Wäre $w=0$, so entspricht der Löser des ersten Teil des Splittings der Vorschrift
@@ -437,7 +451,7 @@ u(t,x_N)&=\mathcal{F}_N^{-1}\left(\mathcal{F}_Ng(x_N)\right)=g(x_N)=u(0,x_N)\\
 &\approx t\dtt{u}(0,x_N)+\dt{u}(0,x_N)
 \end{align*}
 Somit wird in diesem Randfall nur die erste Ableitung geändert und dieses Update entspricht einem expliziten Eulerschritt für die erste Ableitung. Das Splittingverfahren ist dann äquivalent zu einem sogenannten Leapfrog-Verfahren, welches schneller zu berechnen ist, da eine Anwendung von $\mathcal{F}_N^{-1}$ entfällt. Wir erhalten für die Stabilität eine \emph{Courant-Friedrichs-Lewy-Bedingung} (CFL-Bedingung) der Form $\tilde{c}\tau\le h=\frac{2\pi}{N}$. Im Fall $k=0$ entspricht die CFL-Zahl $\tilde{c}$ der CFL-Zahl des expliziten Eulers.\\[0.3cm]
-Wir beobachten an Abbildung \ref{fig:splitting_cfl}, dass die CFL-Zahl abhängig von $w$ ist und für $w=1$ ein Minimum annimmt. Die Kurven für verschiedene $N$ weichen dabei voneinander ab, da die Schätzung des kleinsten Zeitpunkts, für welchen die Berechnung instabil ist, heuristisch ist. Wir definieren die Berechnung als instabil, wenn die absolute Steigung im Ordnungsplot kleiner 1 oder größer 3 ist oder der beobachtete Fehler größer als 1 ist. Diese Instabilitätseffekte beobachtet man für $w\to 1$ erst für große $\tau$, die bei $T=1$ nur sehr wenigen Splittingschritten entsprechen.
+Wir beobachten an Abbildung \ref{fig:splitting_cfl}, dass die CFL-Zahl abhängig von $w$ ist und für $w=1$ ein Minimum annimmt. Die Kurven für verschiedene $N$ weichen dabei voneinander ab, da die Schätzung des kleinsten Zeitpunkts, für welchen die Berechnung instabil ist, heuristisch ist. Wir definieren die Berechnung als instabil, wenn die absolute Steigung im Ordnungsplot kleiner als 1 oder größer als 3 ist oder der beobachtete relative Fehler größer als 1 ist. Diese Instabilitätseffekte beobachtet man für $w\to 1$ erst für große $\tau$, die bei $T=1$ nur sehr wenigen Splittingschritten entsprechen.
 \begin{figure}[!htb]
 \includegraphics[width=\textwidth]{Figures/cfl_estimations_frog2.png}
 \caption{Abhängigkeit der CFL-Zahl anhand von Beispiel \ref{bsp:trialfrog2} mit $c=3$ und $d=1$ zum Zeitpunkt $T=1$.}
@@ -448,7 +462,7 @@ Wie man an Abbildung \ref{fig:splitting_convergence_w1} erkennt, verhält sich f
 
 \begin{figure}[!htb]
 \includegraphics[width=\textwidth]{Figures/splitting_convergence_fix_weight_frog2_cfl_corrected.png}
-\caption{Konvergenzordnung für verschiedene Splitting Varianten anhand von Beispiel \ref{bsp:trialfrog2} mit $c=3$, $d=1$, $N=512$, $w=1$ zum Zeitpunkt $T=1$.}
+\caption{Konvergenzordnung für verschiedene Splitting-Varianten anhand von Beispiel \ref{bsp:trialfrog2} mit $c=3$, $d=1$, $N=512$, $w=1$ zum Zeitpunkt $T=1$.}
 \label{fig:splitting_convergence_w1}
 \end{figure}
 Zuletzt sei aber erwähnt, dass die Wahl $w=1$ aus Sicht des minimalen Fehlers selten optimal ist. An Abbildung \ref{fig:splitting_dependence_on_weight} erkennen wir für verschiedene bekannte Lösungen der KGG, dass das Minimum des Fehlers in Abhängigkeit vom Gewicht $w$ sowohl an beiden Rändern, als auch als lokales Minimum auftreten kann. Das genaue Minimum zu bestimmen und dies mit der CFL-Zahl zu kombinieren, um das optimale $w$ zu wählen, kann ein möglicher Ansatz zur Verbesserung des Algorithmus sein. Wir werden dies jedoch nicht weiter verfolgen und uns in den meisten Fällen auf $w=1$ beschränken, da eine Verbesserung des Fehlers dann mit einer Verringerung der Schrittweite $\tau$ besser kontrollierbar ist.
@@ -459,7 +473,7 @@ Zuletzt sei aber erwähnt, dass die Wahl $w=1$ aus Sicht des minimalen Fehlers s
 \end{figure}
 \end{mathbsp}
 \section{Polynome und Verteilungen}
-Die Theorie des general Polynomial Chaos ist die Grundlage für später vorgestellte Verfahren zum Lösen von der stochastischen Klein-Gordon-Gleichung. Im Mittelpunkt dieser Theorie stehen orthogonale Polynombasen. Die Verflechtung mit der Stochastik geschieht dann auf natürliche Weise durch die passende Wahl des zugrunde liegenden Skalarproduktes.
+Die Theorie des general Polynomial-Chaos ist die Grundlage für später vorgestellte Verfahren zum Lösen von der stochastischen Klein-Gordon-Gleichung. Im Mittelpunkt dieser Theorie stehen orthogonale Polynombasen. Die Verflechtung mit der Stochastik geschieht dann auf natürliche Weise durch die passende Wahl des zugrunde liegenden Skalarproduktes.
 \subsection{Orthogonale Polynome}
 Wir beginnen mit grundlegender Notation und Namensgebung um das zentrale Werkzeug der Polynomapproximation festzulegen. Später werden diese Polynome verwendet, um die Zufallsabhängigkeit der auftretenden Funktionen darzustellen, indem das Orthogonalitätsmaß der Dichtefunktion entspricht.
 
@@ -486,16 +500,16 @@ und zugehöriger Norm
 Das Hermite Chaos ist ein motivierendes Beispiel dafür, dass gewisse orthogonale Polynombasen auf natürlicher Weise mit stochastischen Verteilungen verbunden sind.
 \begin{mathbsp}[Hermite Chaos]
 \label{bsp:hermitechaos}
-Ist $I=(-\infty,\infty)$, $w(x)=\frac{1}{\sqrt{2\pi}}e^{-\frac{x^2}{2}}$ die Dichtefunktion der Gauss-Verteilung und verwenden wir diese als Dichte des Maßes $\alpha$, so sind die Hermite Polynome
+Ist $I=(-\infty,\infty)$, $w(x)=\frac{1}{\sqrt{2\pi}}e^{-\frac{x^2}{2}}$ die Dichtefunktion der Gauss-Verteilung und verwenden wir diese als Dichte des Maßes $\alpha$, so sind die Hermite-Polynome
 \[H_0(x)\equiv 1,\quad H_1(x)=x,\quad H_2(x)=x^2-1,\quad H_n(x)=xH_{n-1}(x)-(n-1)H_{n-2}(x)\]
 ein Orthogonalsystem bezüglich $\langle\cdot,\cdot\rangle_{L_w^2(I)}$ mit Normalisierungskonstanten $\gamma_n=n!$.\\
 Der Erwartungswert der Gauss-Verteilung
-\[\E_w[Z]= \int_{-\infty}^\infty Z(x)w(x)dx\] erfüllt also die entscheidende Beziehung des Polynomial Chaos
+\[\E_w[Z]= \int_{-\infty}^\infty Z(x)w(x)dx\] erfüllt also die entscheidende Beziehung des Polynomial-Chaos
 \[\langle H_n,H_m\rangle_{L_w^2(I)} =\E_w \left[H_nH_m\right]=\gamma_n\delta_{nm}\]
-Man beachte, dass diese Definition der Hermite Polynome leicht von der in der Literatur üblichen abweicht. Dies ist der Tatsache geschuldet, dass dort die entsprechende Gewichtsfunktion einen zusätzlichen Faktor $\sqrt{2}$ besitzt. Sie stellt somit keine Dichte einer Wahrscheinlichkeitsverteilung dar und ist für unsere Zwecke unpraktisch und wird nicht verwendet. 
+Man beachte, dass diese Definition der Hermite-Polynome leicht von der in der Literatur üblichen abweicht. Dies ist der Tatsache geschuldet, dass dort die entsprechende Gewichtsfunktion einen zusätzlichen Faktor $\sqrt{2}$ besitzt. Sie stellt somit keine Dichte einer Wahrscheinlichkeitsverteilung dar und ist für unsere Zwecke unpraktisch und wird nicht verwendet. 
 \end{mathbsp}
 Wir werden in dieser Arbeit auf Polynombasen, die diskreten Verteilungen entsprechen, verzichten. Es sei jedoch bemerkt, dass dies keine Einschränkung der Methode ist, sondern lediglich die Notation vereinfacht. Konkret werden wir uns mit Laguerre-, Jacobi-, Hermite- und Legendre-Polynomen beschäftigen, wobei letztere ein Spezialfall der Jacobipolynome darstellen. Details und Eigenschaften sind im Anhang \ref{AppendixA} zu finden.\\[0.3cm]
-Eine wichtige Eigenschaft von Orthogonalsystemen von Polynomen ist eine besondere Art der rekursiven Darstellung, wie wir sie bereits bei den Hermite Polynomen gesehen haben.
+Eine wichtige Eigenschaft von Orthogonalsystemen von Polynomen ist eine besondere Art der rekursiven Darstellung, wie wir sie bereits bei den Hermite-Polynomen gesehen haben.
 \begin{maththeorem}[Drei-Term-Rekursion]
 \label{threetermexist}
 Ein Orthogonalsystem $\left\lbrace Q_n(x),\: n\in\N_0\right\rbrace$ von Polynomen erfüllt eine Drei-Term-Rekursion
@@ -520,7 +534,7 @@ Somit folgt für $k<n-2$ wegen $\text{deg}(xQ_k(x))<n-1$ dass $r_k=0$. Damit erf
 Nun definieren wir $b_n=r_{n-1}$, $c_n=-r_{n-2}$ und berechnen schlussendlich
 \[r_{n-2}\gamma_{n-2}=\langle -a_nxQ_{n-1}(x),Q_{n-2}(x)\rangle =-a_n\langle Q_{n-1}(x),xQ_{n-2}(x)\rangle=-a_n\frac{k_{n-2}}{k_{n-1}}\gamma_{n-1}\]
 \end{proof}
-Diese und noch viele weitere Eigenschaften von den verschiedenen Orthogonalsystemen von Polynomen finden sich in \autocite{weborthopoly} und in vielen weiteren Werken über Polynome. Beispielsweise lässt sich auch die Umkehrung zeigen (unter milden Anforderungen an die Koeffizienten): Zu jeder durch eine Drei-Term-Rekursion definierte Menge an Polynomen existiert ein Maß $\alpha$, bezüglich dessen die Polynome ein Orthogonalsystem bilden (Satz von Favard).\\[0.3cm]
+Diese und noch viele weitere Eigenschaften der verschiedenen Orthogonalsysteme von Polynomen finden sich in \autocite{weborthopoly} und in vielen weiteren Werken über Polynome. Beispielsweise lässt sich auch die Umkehrung zeigen (unter milden Anforderungen an die Koeffizienten): Zu jeder durch eine Drei-Term-Rekursion definierte Menge an Polynomen existiert ein Maß $\alpha$, bezüglich dessen die Polynome ein Orthogonalsystem bilden (Satz von Favard).\\[0.3cm]
 Die auftretenden Integrale in den Skalarprodukten werden wir später mit Gauss-Quadraturformeln approximieren. Unter anderem dafür werden wir später die Nullstellen der Polynome als Stützstellen benötigen. Basierend auf den Koeffizienten der Drei-Term-Rekursion entwickelten Golub und Welsch in \autocite{GolubWelsch} einen effizienten stabilen Algorithmus, der für die Berechnung der Nullstellen mit der Berechnung der Eigenwerte einer symmetrischen Tridiagonalmatrix auskommt.
 
 \begin{maththeorem}[Golub Welsch Algorithmus]
@@ -561,22 +575,22 @@ x\cdot
 \end{equation*}
 In kompakter Form lässt sich dies darstellen als
 \[xQ(x)=TQ(x)+\frac{1}{a_n}Q_n(x)e_n\]
-wobei $e_n=(0,\dots,0,1)^T$ der n-te Einheitsvektor ist. Hieran erkennt man sofort, dass $Q_n(x_j)=0\equivalent x_j\text{ ist Eigenwert von }T$.\\
-Weiterhin erhalten wir aus Satz \ref{threetermexist}, dass $\frac{c_i}{a_i}=\frac{1}{a_{i-1}}\frac{\gamma_i}{\gamma_{i-1}}$ und somit wäre $T=J$ bereits symmetrisch, wenn die $Q_i$ eine Orthonormalbasis bilden.\\
+wobei $e_n=(0,\dots,0,1)^T$ der n-te Einheitsvektor ist. Hieran erkennt man sofort \[Q_n(x_j)=0\equivalent x_j\text{ ist Eigenwert von }T\]
+Weiterhin erhalten wir aus Satz \ref{threetermexist}, dass $\frac{c_i}{a_i}=\frac{1}{a_{i-1}}\frac{\gamma_i}{\gamma_{i-1}}$ und somit wäre $T=J$ bereits symmetrisch, wenn die $Q_i$ eine Orthonormalbasis bildeten.\\
 Andernfalls führen wir eine Äquivalenztransformation durch mit der Diagonalmatrix $D=\text{diag}\left((d_1,\dots,d_n)^T\right)$, so dass $J=DTD^{-1}$. Koeffizientenvergleich ergibt die Bedingung $d_{i+1}=d_i\sqrt{\frac{a_{i+1}}{c_{i+1}a_i}}$. Mit einer möglichen Wahl $d_1=1$ des freien Parameters $d_1$ erhalten wir somit die gewünschte symmetrische Matrix.
 \end{proof}
 Wir bemerken zusätzlich ohne Beweis, dass das Polynom $Q_n$ für $n\ge 1$ insgesamt $n$ verschiedene reelle Nullstellen besitzt. Dies ist eine fundamentale Aussage über Orthogonalpolynome und lässt sich induktiv einsehen unter Ausnutzung von $n$ Vorzeichenwechseln, die durch die Orthogonalität vorhanden sein müssen.
 
 \subsection{Polynomiale Approximationstheorie}
 \label{sec:poly_approx}
-Es gibt sehr viele Ergebnisse über die Approximation von Funktionen $f\colon \R\to\R$ durch Polynome $p\in\Poly_n$. Um ein Gefühl für die Mächtigkeit und auch für die Grenzen von polynomialer Approximation zu bekommen, werden an dieser Stelle einige zentrale Sätze genannt. Auf Beweise werden wir größtenteils verzichten, jedoch basierend auf \autocite{Trefethen} eine Diskussion der Interpretation dieser Ergebnisse aus dem numerischen Blickwinkel der Interpolation und Quadratur geben.
+Es gibt sehr viele Ergebnisse zur Approximation von Funktionen $f\colon \R\to\R$ durch Polynome $p\in\Poly_n$. Um ein Gefühl für die Mächtigkeit und auch für die Grenzen von polynomialer Approximation zu bekommen, werden an dieser Stelle einige zentrale Sätze genannt. Auf Beweise werden wir größtenteils verzichten, jedoch basierend auf \autocite{Trefethen} eine Diskussion der Interpretation dieser Ergebnisse aus dem numerischen Blickwinkel der Interpolation und Quadratur geben.
 \begin{maththeorem}[Weierstrass]
 Ist $I$ ein beschränktes Intervall und $f\in C^0(\bar{I})$ stetig, dann gibt es für jedes $\epsilon >0$ ein $n\in\N$ und $p\in\Poly_n$, so dass
 \[|f(x)-p(x)|<\epsilon,\quad \forall x\in\bar{I}\]
 \end{maththeorem}
 Folglich gilt für die \emph{gleichmäßige Bestapproximation} $\phi_n$, welche zu $f\in C^0(\bar{I})$ eine eindeutige Lösung $\phi_n(f)\in\Poly_n$ mit minimalem Abstand bezüglich der Maximumsnorm ergibt, die Aussage
 \[\lim\limits_{n\to\infty}\norm{f-\phi_n(f)}_\infty=0\] 
-Dieses Ergebnis sieht sehr vielversprechend aus und Interpolation ist eine naheliegende erste Idee, wie $\phi_n(f)$ berechenbar sein könnte. Jedoch wurde von Faber in \autocite{faber14} gezeigt, dass es kein Interpolationsschema gibt, das für alle stetigen Funktionen auf diese Weise konvergiert. Doch dieser vermeintliche Rückschlag ist in der Praxis selten von Bedeutung. Problematisch sind nur Interpolationsschemata, die auf gleichverteilten Knotenpunkten basieren und dann unter dem Runge-Phänomen leiden, welches bei Funktionen wie $f(x)=\frac{1}{1+x^2}$ an den Rändern für eine schlechte Approximationsgüte sorgt. Erfüllt $f$ jedoch minimale Glattheitsanforderungen (wie bereits Lipschitzstetigkeit) und verwendet man \chebyspace Interpolationspunkte, so ist die Approximationsgüte bereits bereits für kleines $n$ gesichert.\\
+Dieses Ergebnis sieht sehr vielversprechend aus. Eine erste Idee zur Berechnung von $\phi_n(f)$ ist die Interpolation. Jedoch wurde von Faber in \autocite{faber14} gezeigt, dass es kein Interpolationsschema gibt, das für alle stetigen Funktionen auf diese Weise konvergiert. Doch dieser vermeintliche Rückschlag ist in der Praxis selten von Bedeutung. Problematisch sind nur Interpolationsschemata, die auf gleichverteilten Knotenpunkten basieren und dann unter dem Runge-Phänomen leiden, welches bei Funktionen wie $f(x)=\frac{1}{1+x^2}$ an den Rändern für eine schlechte Approximationsgüte sorgt. Erfüllt $f$ jedoch minimale Glattheitsanforderungen (wie bereits Lipschitzstetigkeit) und verwendet man \chebyspace Interpolationspunkte, so ist die Approximationsgüte bereits bereits für kleines $n$ gesichert.\\
 Man beachte, dass der Name "`Bestapproximation"' sich strikt auf die verwendete Norm bezieht. Punktweise Aussagen lassen sich somit im Allgemeinen nicht treffen. 
 \begin{mathbsp}
 Als Beispiel vergleichen wir die Bestapproximation bezüglich der Maximumsnorm und die \chebyspace Interpolation vom Grad $N=100$ von der Funktion $f(x)=|x-\frac{1}{4}|$ in $[-1,1]$. Wie wir an Abbildung \ref{polyapproxcomp} erkennen, ist der maximale Fehler der Bestapproximation zwar geringer, aber tritt an $N+2$ Punkten auf, wohingegen der Fehler der \chebyspace Approximation zu den Rändern hin stark abnimmt. Dies soll verdeutlichen, dass die Bestapproximation nicht immer in jedem Sinne die "`beste"' Approximation darstellt.
@@ -603,7 +617,7 @@ Für jedes $f\in L_w^2(I)$ gilt
 \[\lim\limits_{N\to\infty}\norm{f-P_Nf}_{L_w^2(I)}=0\]
 \end{maththeorem}
 Die Konvergenzordnung ist hierbei abhängig von der Regularität von $f$ und der Art der für die Projektion verwendeten Orthogonalpolynome. Man nennt diese Art der Konvergenz in der Literatur auch \emph{spektrale Konvergenz}, da die Konvergenzrate abhängig von der Glattheit der Funktion ist. Man muss also aufpassen eine hohe Approximationsordnung $N$ nicht mit einer hohen Approximationsgenauigkeit zu verwechseln.\\
-Für das Beispiel der Legendre Polynome, also mit konstanter Gewichtsfunktion $w$, zeigt Xiu in \autocite[Theorem 3.6]{dongbinxiu2010} folgendes Ergebnis.
+Für das Beispiel der Legendre-Polynome, also mit konstanter Gewichtsfunktion $w$, zeigt Xiu in \autocite[Theorem 3.6]{dongbinxiu2010} folgendes Ergebnis.
 \begin{maththeorem}
 \label{spectralconvth}
 Für jedes $f\in H_w^p[-1,1]\coloneqq \left\lbrace v\colon I\to\R | \frac{d^mv}{dx^m}\in L_w^2(I),0\le m\le p\right\rbrace$ mit $p\ge 0, w\equiv 1$ gibt es eine Konstante $C$ unabhängig von $N$, so dass
@@ -613,7 +627,7 @@ Für jedes $f\in H_w^p[-1,1]\coloneqq \left\lbrace v\colon I\to\R | \frac{d^mv}{
 Als Veranschaulichung von Satz \ref{spectralconvth} approximieren wir verschiedene Funktionen $f\colon [-1,1]\to\R$ durch die orthogonale Projektion $P_Nf$ für steigendes $N\in\N$. In Abbildung \ref{figurespectralconverg} sind dafür die Fehler der Approximationen dargestellt. Dabei sind die $f$ unterschiedlich glatt und man erkennt unterschiedliche Konvergenzordnungen. Insbesondere erahnt man für die analytische Funktion $f(x)=\sin(\pi x)$ exponentielle Konvergenz in $N$. Da der General-Purpose Integrator, der für die Berechnung der Fourierkoeffizienten verwendet wurde für zu hohe Polynomgrade versagt, bricht die Darstellung an der entsprechenden Stelle ab.
 \begin{figure}[h]
 \includegraphics[width=\textwidth]{Figures/spectral_convergence_legendre.png}
-\caption{Spektrale Konvergenz der Bestapproximation von Funktionen verschiedener Glattheit mithilfe von Legendre Polynomen und Gewichtsfunktion $w\equiv \onehalf$ auf $[-1,1]$.}
+\caption{Spektrale Konvergenz der Bestapproximation von Funktionen verschiedener Glattheit mithilfe von Legendre-Polynomen und Gewichtsfunktion $w\equiv \onehalf$ auf $[-1,1]$.}
 \label{figurespectralconverg}
 \end{figure}
 \end{mathbsp}
