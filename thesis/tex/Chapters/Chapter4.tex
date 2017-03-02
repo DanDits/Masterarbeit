@@ -12,7 +12,7 @@ Die stochastische KGG (\ref{skgg}) für $d$ räumliche Dimensionen, $N$ stochast
 u(0,x,y)&=u_0(x,y), \: x\in \Torus^d\\
 \dt{u}(0,x,y)&=v_0(x,y), \: x\in \Torus^d
 \end{align*}
-Im klassischen Sinne bedeutet Collocation, dass eine Approximation für eine diskrete Knotenmenge $\Theta_Y=\lbrace y_i\in\R^N\mid i=1,\dots,S\rbrace$ exakt ist. Auf die stochastische KGG übertragen, muss also für $y=y_i\in\Theta_Y$ die Lösung $u(t,x,y_i)$ für $x\in\Torus^d$ und $t>0$ vorliegen und die Approximation $w$ erfüllt $w(t,x,y_i)=u(t,x,y_i)$ für $i=1,\dots,S$. Da wir die exakte Lösung $u(t,x,y_i)$ nicht kennen, sondern für einen Zeitpunkt $T>0$ und eine Knotenmenge $\lbrace x_j\in\Torus^d\mid j=1,\dots,H\rbrace$ nur mithilfe des Strang-Splittings approximieren können, gilt also für festes $x_j$ die Collocationsbedingung lediglich approximativ:
+Im klassischen Sinne bedeutet Collocation, dass eine Approximation für eine diskrete Knotenmenge $\Theta_Y=\lbrace y_i\in\R^N\mid i=1,\dots,S\rbrace$ exakt ist. Auf die stochastische KGG übertragen, muss also für $y=y_i\in\Theta_Y$ die Lösung $u(t,x,y_i)$ für $x\in\Torus^d$ und $t>0$ vorliegen und die Approximation $w$ erfüllt $w(t,x,y_i)=u(t,x,y_i)$ für $i=1,\dots,S$. Da wir die exakte Lösung $u(t,x,y_i)$ nicht kennen, sondern für einen Zeitpunkt $T>0$ und eine Knotenmenge $\lbrace x_j\in\Torus^d\mid j=1,\dots,H\rbrace$ nur mithilfe des Strang-Splittings approximieren können, gilt für festes $x_j$ die Collocationsbedingung lediglich approximativ:
 \[w(T,x_j,y_i)=u(T,x_j,y_i)\approx \tilde{u}(T,x_j,y_i),\quad i=1,\dots,S\]
 Wir wählen daher $\tau$ so klein, dass dieser Fehler im Vergleich zum eigentlichen Collocationsfehler vernachlässigbar gering ist. Zur Vereinfachung der Notation nehmen wir im Folgenden an, die Lösung $u(T,x_j,y_i)$ liege exakt vor.
 
@@ -34,16 +34,17 @@ A\hat{w}=u
 mit 
 \begin{align*}
 A&=(\Phi_m(y_i))_{i=1,\dots,S;m=0,\dots,M}\in\R^{S\times M+1}\\
-\hat{w}&=(\hat{w}_m^{(j)})^T_{m=0,\dots,M;j=1,\dots,H}\in\R^{M+1\times H}\\
-u&=(u(T,x_j,y_i)^T_{i=1,\dots,S;j=1,\dots,H}\in\R^{S\times H}\\
+\hat{w}&=(\hat{w}_m^{(j)})_{m=0,\dots,M;j=1,\dots,H}\in\R^{M+1\times H}\\
+u&=(u(T,x_j,y_i))_{i=1,\dots,S;j=1,\dots,H}\in\R^{S\times H}\\
 \end{align*}
-Für jeden Knotenpunkt $x_j$ ist also ein lineares Gleichungssystem der Größe $S\times M+1$ zu lösen. Die obige Schreibweise erlaubt es in vielen Programmiersprachen die Systeme gleichzeitig zu lösen und bietet somit einen starken Laufzeitvorteil gegenüber dem Lösen von $H$ separaten Gleichungen. Um sicherzustellen, dass das System nicht unterbestimmt ist, muss gelten $S\ge M+1=\binom{N+P}{P}$. Ist $S\neq M+1$, so verwenden wir die Pseudoinverse von $A$. Später werden wir an verschiedenen Beispielen Konsequenzen dieser Bedingung genauer betrachten.
+Für jeden Knotenpunkt $x_j$ ist ein lineares Gleichungssystem der Größe $S\times M+1$ zu lösen. Die obige Schreibweise erlaubt es in vielen Programmiersprachen die Systeme gleichzeitig zu lösen und bietet somit einen starken Laufzeitvorteil gegenüber dem Lösen von $H$ separaten Gleichungen. Um sicherzustellen, dass das System nicht unterbestimmt ist, muss gelten $S\ge M+1=\binom{N+P}{P}$. Ist $S\neq M+1$, so verwenden wir die Pseudoinverse von $A$. Später werden wir an verschiedenen Beispielen Konsequenzen dieser Bedingung genauer betrachten.
 \begin{mathbem}
 In Gleichung (\ref{eqn:gpc_approx_exp}) wurde gezeigt, dass sich der Erwartungswert an der Stelle $x_j$ approximieren lässt durch
 \[\E[u(t,x_j,Y)]\approx \hat{w}_0^{(j)}\]
 Da die Gleichungen gekoppelt sind, müssen aber trotzdem auch alle anderen $\hat{w}_m$ berechnet werden.
 \end{mathbem}
 \subsection{Wahl der Interpolationspunkte}
+\label{chapter:interpolation_points}
 Wir wollen direkt am Anfang darauf hinweisen, dass im Mehrdimensionalen für $N>1$ die Wahl der Knotenpunkte für die Interpolation ein nicht vollständig verstandenes Problem darstellt. Das Konzept der Lagrange-Interpolation, die im Eindimensionalen für jede beliebige Knotenmenge möglich ist, lässt sich wie in \autocite{San07} gezeigt konzeptuell auf den mehrdimensionalen Fall erweitern. Allerdings benötigt sie die entsprechende Bedingung $\det(A)\neq 0$, welche besagt, dass die Interpolation durch die gegebenen Knotenpunkte eindeutig ist. Die Beziehung dieser Bedingung zur Wahl der Knotenpunkte stellt ein "'komplexes Problem"' dar.
 \subsubsection*{Grundlagen der eindimensionalen Interpolation}
 Der Satz von Cauchy ist der erste Orientierungspunkt für die Abhängigkeit der Interpolationsgüte zur Wahl der Knotenpunkte für den eindimensionalen Fall und einem kompakten Intervall.
@@ -152,6 +153,37 @@ Ein Beispiel sei für $N=2$ und $P=14$ gemacht, wo für Legendre- und Laguerre-P
 \end{figure}
 
 Wir werden später basierend auf Smolyaks Konstruktion einen effizienteren dünne Gitter Ansatz kennen lernen, der nicht nur für Interpolation verwendbar ist, sondern sich auch auf generelle Operatoren übertragen lässt. Dieser basiert allerdings auf vollen Tensorprodukten von Operatoren und ist daher nur übertragbar, wenn wir volle Tensorprodukte von Polynombasen zulassen (d.h. ohne die zusätzliche Bedingung $|m|\le P$). Da dies einen erheblichen Rechenaufwand impliziert, werden wir keine dünnen Gitter Ansätze für die Interpolation verwenden.
+\subsection{Algorithmus}
+In Algorithmus \ref{alg:collocation_mi} ist das Collocationsverfahren für den eindimensionalen Fall $d=1$ skizziert. Diese Variante der Collocation durch Interpolation wird in der Literatur auch mit \emph{Matrix-Invertierung} (MI) bezeichnet. Die Matrix $A$ muss nicht explizit invertiert werden, trotzdem besteht der Kern des Verfahrens aus dem Lösen der linearen Gleichungssysteme.\\
+\begin{tabular}{c|c}
+Parameter & \\
+\hline
+$H$ & Anzahl an Punkten der Ortsdiskretisierung\\
+$\kappa\in [0,1]$ & Gewicht für das Splittingverfahren zur Approximation von $u(T,x,Y)$\\
+$Y$ & $N$-dimensionaler Zufallsvektor zu dem eine gPC-Basis existiert\\
+$M+1$ & Anzahl an multivariaten gPC-Basispolynomen\\
+$S$ & Anzahl an Interpolationspunkten gemäß einer der möglichen Ansätze
+\end{tabular}
+\begin{algorithm}[ht]
+    \caption{Collocation durch Interpolation mithilfe von Matrix-Invertierung.}
+    \label{alg:collocation_mi}
+    \begin{algorithmic}[1] % The number tells where the line numbering should start
+        \Function{Collocation\_Interpolation\_MI}{$H, u_0, v_0, \alpha,\beta,\kappa,Y, M, S,\tau, T$} 
+            \State $\Phi_m\gets$ $m$-te orthonormale gPC-Basis-Funktion zu $Y$, $\quad m=0,\dots,M$
+            \State $y_i\gets$ (multivariate) Interpolationspunkte (siehe Kapitel \ref{chapter:interpolation_points}), $\quad i=1,\dots,S$
+            \State $A\gets (\Phi_m(y_i))_{i=1,\dots,S;m=0,\dots,M}\in\R^{S\times M+1}$
+            \For{$i=1,\dots,S$}
+           		\State $\tilde{u}_{ij}\gets \text{Fast\_Strang}(H,u_0(\cdot, y_i),v_0(\cdot, y_i),\alpha(y_i),\beta(\cdot, y_i),\kappa,\tau,T)_j$
+           	\EndFor
+            \State $u\gets (\tilde{u}_{ij})_{i=1,\dots,S;j=1,\dots,H}\in\R^{S\times H}$
+            \State $\hat{w}\gets A^{-1}u\in\R^{S\times H}$
+            \State \Comment{Lösen der linearen Gleichungssysteme, evtl. mit Pseudoinversen}
+			\State $\mu\gets \hat{w}_{0,j=1,\dots,H}$ \Comment{Approximation an Erwartungswert}
+			\State $\sigma^2_j\gets \sum_{m=1,\dots,M}\hat{w}^2_{mj}$\Comment{Approximation an Varianz an der Stelle $x_j$}
+			\State \textbf{return} $\mu,\sigma^2$ \Comment{Approximation an Erwartungswert und Varianz}        
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
 \subsection{Vergleiche der Ansätze}
 Wir reduzieren uns für $N=1$ auf die Nullstellen derjenigen Orthogonalpolynome, die gemäß des gPC zu der Verteilung von $Y$ gehören. Für das kompakte Interval $I=[-1,1]$ wäre es ebenso möglich die \chebyspace Interpolationspunkte zu verwenden. Diese bieten aber nach unseren Beobachtungen keinen Vorteil.\\
 Für $N>1$ besteht die Möglichkeit das volle Tensorprodukt der jeweiligen eindimensionalen Interpolationspunkte zu den Komponenten von $Y$ zu wählen. Da dies jedoch im Allgemeinen mehr Punkte umfasst als die vorhandenen $M+1$ Polynome, ist das lineare Gleichungssystem überbestimmt und wir beobachten eine hohe Kondition der Matrix. Dies sorgt insbesondere dafür, dass die Approximation der Varianz, welche jede Komponente des Lösungsvektors benötigt, bereits für $P>3$ instabil ist.\\
@@ -209,16 +241,17 @@ Das Gewicht ist somit das Quadrat des ersten Eintrags des Eigenvektors, siehe \a
 \end{itemize}
 \end{mathbem}
 \subsection{Mehrdimensionale Quadratur}
+\label{chapter:multivariatequad}
 Um den Ansatz der diskreten Projektion für einen mehrdimensionalen Zufallsvektor mit $N>1$ durchzuführen, benötigen wir eine mehrdimensionale Quadratur. Im Gegensatz zur mehrdimensionalen Interpolation liegt die Schwierigkeit nicht nur darin eine Menge von Collocationspunkten zu finden, sondern auch die zugehörige Menge der Quadraturgewichte zu bestimmen.\\
 Die numerischen Möglichkeiten der mehrdimensionalen Integration (engl. \emph{cubature}) umfassen unter anderem adaptive Verfahren und Monte-Carlo-Methoden. Da diese auf einer großen Menge an Funktionsauswertungen basieren und in unserem Fall eine Funktionsauswertung das aufwändige Lösen einer Instanz der sKGG bedeutet, benötigen wir somit angepasste Integrationsverfahren.
-\subsubsection{Tensorkonstruktion}
+\subsubsection*{Tensorkonstruktion}
 Sei $Y$ ein Zufallsvektor und $L_{Y_i}$ ein eindimensionaler Quadraturoperator bezüglich des Gewichts $\rho_{Y_i}$, beispielsweise die Gauss-Quadratur. Dann erhalten wir mithilfe einer Tensorkonstruktion die mehrdimensionale Quadratur
 \[L_Y=L_{Y_1}\otimes\dots\otimes L_{Y_N}\]
 Für die Menge an Quadraturpunkten gilt wie schon bei der Interpolation
 \[\Theta_Y=\Theta_{Y_1}\otimes\dots\otimes \Theta_{Y_N}\]
 Die Anzahl der Quadraturpunkte $Q=Q_1\dots Q_N$ wächst daher wiederum sehr stark und dies macht den Ansatz bereits für geringe Dimensionen $N$ sehr rechenaufwändig. Andererseits sehen wir sofort, dass sich die polynomiale Exaktheit der Gauss-Quadraturen direkt auf den mehrdimensionalen Fall übertragen lässt. Die Quadratur $L_Y$ ist exakt für alle Polynome in
 \[\Poly_{2Q_1-1}(Y_1)\otimes\dots\otimes\Poly_{2Q_N-1}(Y_N)\]
-\subsubsection{Smolyaks dünne Gitter}
+\subsubsection*{Smolyaks dünne Gitter}
 Basierend auf \autocite{ConradMarzouk} geben wir eine kurze Einführung in die Konstruktion von Smolyaks dünnen Gittern. Sei $L_{Y_i}^{Q_i}$ ein linearer Operator für die $i$-te Komponente von $Y$. Im Folgenden wird $L_{Y_i}^{Q_i}$ einen Quadraturoperator darstellen, die Konstruktion ist aber beispielsweise auch für Interpolationsoperatoren gültig.\\
 Es sei $L_{Y_i}^{Q_i}\to L_{Y_i}$ für $Q_i\to\infty$ konvergent zum entsprechenden exakten Operator. Im Fall der Quadratur bedeutet dies für glatte integrierbare Funktionen $f\colon I\to\R$
 \[L^Qf=\sum_{j=0}^Q a_jf(y_j)\xrightarrow[]{Q\to\infty}\int_If(y)dy=Lf\]
@@ -273,10 +306,28 @@ Die Glenshaw-Curtis Quadratur basierend auf den Knotenpunkten
 ist eine häufig genutzte Quadraturformel mit vollständig geschachtelten Quadraturpunkten. Die Gewichte lassen sich in $\mathcal{O}(n\log n)$ Schritten berechnen.\\
 Diese Quadratur ist für das kompakte Intervall $[-1,1]$ ausgelegt. Für die Legendre-Polynome und die Jacobi-Polynome mit $\alpha,\beta>0$ stimmt der Träger mit dem Träger der zugehörigen stochastischen Verteilung überein. Es gilt
 \[\\E[Y]=\int_{[-1,1]}f(y)\rho(y)dy\approx\sum_{i=0}^Qf(y_i)\rho(y_i)a_i\]
-Die Dichte $\rho$ wird also explizit ausgewertet und ist nicht Teil der Quadraturformel, wie dies bei der Gauss-Quadratur der Fall war.\\
+Die Dichte $\rho$ wird hier explizit ausgewertet und ist nicht Teil der Quadraturformel, wie dies bei der Gauss-Quadratur der Fall war.\\
 Für Hermite-Polynome mit zugehörigem Träger $(-\infty,\infty)$ bzw. Laguerre-Polynome mit zugehörigem Träger $(0,\infty)$ ist daher eine Transformation des Integrals nötig. Da $[-1,1]$ kompakt ist existiert aber keine Bijektion zwischen den Mengen. Heuristische Ansätze wie das Ignorieren der Randpunkte und anschließender Verwendung des Transformationssatzes auf $(-1,1)$ liefert schlechte Approximationen.\\
 Unseren Beobachtungen nach bietet die Glenshaw-Curtis Quadratur keine Vorteile gegenüber der Gauss-Quadratur. Die polynomiale Exaktheit ist lediglich $n$ bei $n$ Quadraturpunkten und verwendet die Dichtefunktion der Verteilung nicht implizit. Die Dichte muss somit ebenfalls durch die Quadratur approximiert werden, was den nötigen Polynomgrad noch weiter erhöht. Schlussendlich erhöhen die Polynome $\Phi_m$, die bei der Approximation der Varianz unter dem Integral auftauchen, die benötigte polynomiale Exaktheit.
-
+\subsection{Algorithmus}
+Algorithmus \ref{alg:collocation_dp} skizziert die Berechnung der Approximation von Erwartungswert und Varianz mithilfe von Collocation durch diskrete Projektion.
+\begin{algorithm}[ht]
+    \caption{Collocation durch diskrete Projektion.}
+    \label{alg:collocation_dp}
+    \begin{algorithmic}[1] % The number tells where the line numbering should start
+        \Function{Collocation\_Diskrete\_Projektion}{$H, u_0, v_0, \alpha,\beta,\kappa,Y, M, Q,\tau, T$} 
+            \State $\Phi_m\gets$ $m$-te orthonormale gPC-Basis-Funktion zu $Y$, $\quad m=0,\dots,M$
+            \State $a_i, y_i\gets$ (multivariate) Quadraturformel (siehe Kapitel \ref{chapter:multivariatequad}), $\quad i=0,\dots,Q$
+            \For{$i=1,\dots,S$}
+           		\State $\tilde{u}_{ij}\gets \text{Fast\_Strang}(H,u_0(\cdot, y_i),v_0(\cdot, y_i),\alpha(y_i),\beta(\cdot, y_i),\kappa,\tau,T)_j$
+           	\EndFor
+            \State $\hat{w}_m^{(j)}\gets \sum_{i=0,\dots,Q}\tilde{u}_{ij}\Phi_m(y_i)a_i$
+			\State $\mu\gets \hat{w}_{0,j=1,\dots,H}$ \Comment{Approximation an Erwartungswert}
+			\State $\sigma^2_j\gets \sum_{m=1,\dots,M}\hat{w}^2_{mj}$\Comment{Approximation an Varianz an der Stelle $x_j$}
+			\State \textbf{return} $\mu,\sigma^2$ \Comment{Approximation an Erwartungswert und Varianz}        
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
 \section{Vergleich der Ansätze Interpolation und diskrete Projektion}
 In diesem Abschnitt werden wir die beiden Ansätze für die Collocation miteinander vergleichen. Dabei werden wir für die Interpolation die Gauss-Stützstellen verwenden und ebenso für die diskrete Projektion die Gauss-Quadratur. Wir betrachten Beispiele mit $N=1$ und $N=4$ und verwenden im mehrdimensionalen Fall den vollen Tensorprodukt Ansatz. Für die mehrdimensionale Quadratur bei der diskreten Projektion vergleichen wir zusätzlich den vollen Tensorprodukt Ansatz mit der dünnen Gitter Quadratur nach Smolyak.
 \subsection*{Allgemeiner Vergleich}

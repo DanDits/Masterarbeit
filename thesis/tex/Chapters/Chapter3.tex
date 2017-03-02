@@ -10,7 +10,7 @@ erfüllt wird. Ein feiner Unterschied ist dabei, dass die Polynome einmal mit re
 \label{def:gpc}
 Sei $Y$ eine reelle Zufallsvariable mit Verteilungsfunktion $F_Y(y)=P(Y\le y)$ und endlichen Momenten
 \[\E\left[|Y|^{2\ell}\right]=\int |y|^{2\ell}dF_Y(y)<\infty,\quad \ell\in \N_0\]
-Existieren Polynome $\Phi_i\in\Poly_i$, also insbesondere $\Phi_0\equiv const$, welche die Bedingung
+Existieren Polynome $\Phi_i\in\Poly_i$, insbesondere $\Phi_0\equiv const$, welche die Bedingung
 \begin{equation}
 \label{eqn:gpc_basicortho}
 \E\left[\Phi_i(Y)\Phi_j(Y)\right]=\delta_{ij},\quad i,j\in\N_0
@@ -173,7 +173,7 @@ Für höhere Momente gilt
 \begin{align*}
 \E[f^\ell(Y)]\approx \sum_{|m^{(1)}|,\dots,|m^{(\ell)}|\le P} \hat{f}_{m^{(1)}}\dots\hat{f}_{m^{(\ell)}}\underbrace{\E[\Phi_{m^{(1)}}(Y)\dots\Phi_{m^{(\ell)}}(Y)]}_{=\mathcal{T}_{m^{(1)},\dots m^{(\ell)}}}
 \end{align*}
-Die Berechnung benötigt also für $\ell>2$ eine einmalige Berechnung des Tensors $\mathcal{T}$. Dieser ist unabhängig von der betrachten Funktion $f$ und kann somit wieder verwendet werden.
+Diese Berechnung benötigt für $\ell>2$ eine einmalige Berechnung des Tensors $\mathcal{T}$. Dieser ist unabhängig von der betrachten Funktion $f$ und kann somit wieder verwendet werden.
 \begin{mathbsp}
 Für $N=1$ und $\ell=3$ ist der Momententensor $\mathcal{T}$ für $Y\sim \mathcal{N}(0,1)$ und zugehöriger orthonormaler Polynombasis $H_m$ der Hermite-Polynome für $P=2$ gegeben durch
 \[\mathcal{T}=

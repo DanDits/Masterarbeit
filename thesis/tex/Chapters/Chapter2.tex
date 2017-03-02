@@ -118,7 +118,7 @@ In Analogie zur Klein-Gordon-Gleichung (\ref{kgg}) definieren wir für einen Wah
 u(0,x,y)&=u_0(x,y), \: x\in \Torus^d\\
 \dt{u}(0,x,y)&=v_0(x,y), \: x\in \Torus^d
 \end{align}
-Die Lösung \[u(t,x,y)\colon [0,T]\times\Torus^d\times \R^N\to\R\] ist also eine zufallsabhängige Größe.\\
+Die Lösung \[u(t,x,y)\colon [0,T]\times\Torus^d\times \R^N\to\R\] ist folglich eine zufallsabhängige Größe.\\
 Dabei ist die grundlegende Annahme, dass (\ref{skgg}) $P$-fast-sicher wohl gestellt ist, d.h. die Menge an Punkten $\omega$, für welche die partielle Differentialgleichung mit fixem $y=Y(\omega)$ keine eindeutige Lösung besitzt, ist eine Nullmenge bezüglich des Wahrscheinlichkeitmaßes $P$.\\
 Wie bereits in Kapitel \ref{secfiniteparam} diskutiert, werden wir stets annehmen, dass die Komponenten $Y_i$ von $Y$ stochastisch unabhängige Zufallsvariablen mit bekannter Verteilung sind.
 \begin{mathbsp}
@@ -202,7 +202,7 @@ Die Halton-Sequenz für $N=2$ Dimensionen beginnt mit den Zahlen
 (c_2(n),c_3(n))_{n\in\N}=\left(\left(\frac{1}{2},\frac{1}{3}\right),\left(\frac{1}{4},\frac{2}{3}\right),\left(\frac{3}{4},\frac{1}{9}\right),\left(\frac{1}{8},\frac{4}{9}\right),\left(\frac{5}{8},\frac{7}{9}\right),\left(\frac{3}{8},\frac{2}{9}\right),\dots\right)
 \end{equation*}
 \end{mathbsp}
-In höheren Dimensionen (ab ungefähr $N=6$) beobachtet man allerdings stärkere lineare Korrelation zwischen den Komponenten, siehe beispielsweise Sequenzen für $p=17$ und $p=19$. Die Komponenten sind also abhängig und somit kein guter Ersatz für Pseudozufallszahlen. Genauere Untersuchungen werden in \autocite{Morokoff1995218} erläutert, wo auch vorgeschlagen wird, für höhere Dimensionen die Sobol-Sequenz zu verwenden oder ein gewisses Offset für den Startindex der Halton-Sequenz einzuführen.\\
+In höheren Dimensionen (ab ungefähr $N=6$) beobachtet man allerdings stärkere lineare Korrelation zwischen den Komponenten, siehe beispielsweise Sequenzen für $p=17$ und $p=19$. Die Komponenten sind daher abhängig und somit kein guter Ersatz für Pseudozufallszahlen. Genauere Untersuchungen werden in \autocite{Morokoff1995218} erläutert, wo auch vorgeschlagen wird, für höhere Dimensionen die Sobol-Sequenz zu verwenden oder ein gewisses Offset für den Startindex der Halton-Sequenz einzuführen.\\
 Wie man an Abbildung \ref{fig:halton_numbers} erkennt, deckt die Halton-Sequenz die Fläche deutlich gleichmäßiger ab als eine Generierung von der selben Anzahl an Pseudozufallszahlen. Dies ist eine Motivation dafür, bessere Konvergenzeigenschaften zu erwarten.
 \begin{figure}
 \includegraphics[width=\textwidth]{Figures/halton_numbers.png}
@@ -250,7 +250,7 @@ k(k+1)m_{k+1}&=(k+1)\sum_{j=1}^kx_j+kx_{k+1}-\sum_{j=1}^kx_j\\
 \implies m_{k+1}&=\frac{1}{k+1}\sum_{j=1}^{k+1}x_j
 \end{align*}
 \end{proof}
-Wir haben nun also eine iterative Methode zur Berechnung des Mittelwertes gewonnen, die nur den vorherigen Mittelwert, die neue Stichprobe und die Anzahl an Stichproben benötigt. Diese Methode ist robust gegen Überläufe und numerisch stabil. Viel wichtiger ist jedoch die iterative Berechnung des Varianzschätzers, welche auf ähnlichen Ideen basiert. Die Äquivalenz zur ursprünglichen Methode ist dabei allerdings schwieriger zu erkennen.
+Wir haben nun eine iterative Methode zur Berechnung des Mittelwertes gewonnen, die nur den vorherigen Mittelwert, die neue Stichprobe und die Anzahl an Stichproben benötigt. Diese Methode ist robust gegen Überläufe und numerisch stabil. Viel wichtiger ist jedoch die iterative Berechnung des Varianzschätzers, welche auf ähnlichen Ideen basiert. Die Äquivalenz zur ursprünglichen Methode ist dabei allerdings schwieriger zu erkennen.
 \begin{maththeorem}
 Für $x_1,\dots,x_k\in\R$, $m_k$ wie in Satz \ref{thiterativemk} und $s_k=\sum_{j=1}^k(x_j-m_k)^2$ gilt für $k\in\N$ die iterative Darstellung
 \[s_k=s_{k-1}+(x_k-m_k)(x_k-m_{k-1}),\quad\text{mit }s_0=0\]

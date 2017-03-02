@@ -370,7 +370,7 @@ Daraus erhalten wir zu den Anfangswerten $g$ und $h$ für festes $x\in \Torus^d$
 Wir benötigen im Gegensatz zum ersten Teil keine feste Ortsdiskretisierung und bekommen sogar eine exakte Lösung des Teilproblems. Da die Punkte für die verschiedenen Teile des Splittings zusammen passen müssen, sind wir jedoch durch die Anforderung festgelegt, die die Fourierapproximation an die Punkte stellt.\\
 Mithilfe der \emph{method of lines}, d.h. punktweiser Auswertung der Lösung für alle benötigten $x$, bekommt man schlussendlich eine numerische Lösung.
 \subsubsection*{Konkretisierung des Algorithmus}
-Wir haben nun also zwei separate Einschrittverfahren, die zusammen mit dem Strang-Splitting Framework einen guten Löser für die KGG ergeben. Dieses Lösungsverfahren ist für $d=1$ schematisch als Algorithmus \ref{alg:kgg_solver} dargestellt.
+Wir haben nun zwei separate Einschrittverfahren, die zusammen mit dem Strang-Splitting Framework einen guten Löser für die KGG ergeben. Dieses Lösungsverfahren ist für $d=1$ schematisch als Algorithmus \ref{alg:kgg_solver} dargestellt.
 \begin{algorithm}[ht]
     \caption{Strang-Splitting für KGG}
     \label{alg:kgg_solver}
@@ -385,7 +385,7 @@ Wir haben nun also zwei separate Einschrittverfahren, die zusammen mit dem Stran
             	\State $g,h\gets \text{Second\_Part\_Solver}(x_N, g, h, \beta, 1-w, \tau)$
             \EndFor
             \State $u_1,v_1\gets \text{First\_Part\_Solver}(N, g, h, \alpha, w, \frac{\tau}{2})$            
-            \State \textbf{return} $u_1, v_1$ \Comment{Approximation an $u(T,x_N)$ und $\dt{u}(T,x_N)$}
+            \State \textbf{return} $u_1$ \Comment{Approximation an $u(T,x_N)$}
     	\EndFunction
         \Function{Strang\_Step\_KGG}{$N,u_0,v_0,\alpha,\beta,w,\tau$} 
             \State $x_N\gets (-\pi+\frac{2\pi j}{N})_{j=0,\dots,N-1}^T$
