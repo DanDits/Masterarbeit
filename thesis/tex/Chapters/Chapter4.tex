@@ -5,7 +5,6 @@ Wie bereits die Monte-Carlo-Methode basieren auch stochastische Collocationsverf
 Dies ist ein großer Unterschied zu den hier vorgestellten stochastischen Collocationsverfahren. Für diese werden die Collocationspunkte nicht zufällig, sondern so gewählt, dass mithilfe von ihnen eine Polynominterpolation oder Quadratur möglich ist. Konvergenz ist dann abhängig davon, wie gut sich die approximierte stochastische Größe durch Polynome von Zufallsvariablen approximieren lässt.\\
 Die beiden Ansätze \emph{Interpolation} und \emph{diskrete Projektion} (auch \emph{pseudospektraler Ansatz} genannt) werden für die stochastische KGG im Folgenden detailliert vorgestellt und miteinander verglichen.
 \section*{Collocation für die stochastische KGG}
-\todo[inline]{Algorithmen für Ansätze mit Pseudocode}
 Die stochastische KGG (\ref{skgg}) für $d$ räumliche Dimensionen, $N$ stochastische Dimensionen und $y\in\R^N$ war definiert durch
 \begin{align*}
 \dtt{u}(t,x,y)&=\alpha(y) \Laplace_x u(t,x,y) - \beta(x,\omega)u(t,x,y), \: t>0, \, x\in \Torus^d\\
@@ -17,6 +16,7 @@ Im klassischen Sinne bedeutet Collocation, dass eine Approximation für eine dis
 Wir wählen daher $\tau$ so klein, dass dieser Fehler im Vergleich zum eigentlichen Collocationsfehler vernachlässigbar gering ist. Zur Vereinfachung der Notation nehmen wir im Folgenden an, die Lösung $u(T,x_j,y_i)$ liege exakt vor.
 
 \section{Interpolation}
+\todo[inline]{Für Interpolation auch volles Tensorprodukt der Räume probieren zusammen mit full tensor der Knotenpunkte}
 Sei $Y$ ein $N$-dimensionaler Zufallsvektor mit stochastisch unabhängigen Komponenten und $\Theta_Y\subset I_Y$ eine zu den Verteilungen von $Y_i$ passende $S$ elementige Knotenmenge. Seien weiter $\lbrace \Phi_m \mid |m|\le P \rbrace$ die zu den Verteilungen passenden gPC Basisfunktionen und im Folgenden mit $m=0,\dots,M=\binom{N+P}{P}-1$ durchnummeriert. Eine Diskussion zur Nummerierung findet man im vorherigen Kapitel.\\
 Dann wählen wir als Interpolationspolynom die Funktion
 \begin{equation}
@@ -176,7 +176,7 @@ $S$ & Anzahl an Interpolationspunkten gemäß einer der möglichen Ansätze
            		\State $\tilde{u}_{ij}\gets \text{Fast\_Strang}(H,u_0(\cdot, y_i),v_0(\cdot, y_i),\alpha(y_i),\beta(\cdot, y_i),\kappa,\tau,T)_j$
            	\EndFor
             \State $u\gets (\tilde{u}_{ij})_{i=1,\dots,S;j=1,\dots,H}\in\R^{S\times H}$
-            \State $\hat{w}\gets A^{-1}u\in\R^{S\times H}$
+            \State $\hat{w}\gets A^{-1}u\in\R^{M+1\times H}$
             \State \Comment{Lösen der linearen Gleichungssysteme, evtl. mit Pseudoinversen}
 			\State $\mu\gets \hat{w}_{0,j=1,\dots,H}$ \Comment{Approximation an Erwartungswert}
 			\State $\sigma^2_j\gets \sum_{m=1,\dots,M}\hat{w}^2_{mj}$\Comment{Approximation an Varianz an der Stelle $x_j$}
