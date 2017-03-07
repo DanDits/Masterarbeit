@@ -8,17 +8,19 @@ from stochastic_equations.galerkin.galerkin import galerkin_approximation
 
 
 domain = [(-np.pi, np.pi)]
-trial = st.trial_8  # requires us to get expectancy and variances at all stop_times!!
+trial = st.trial_1  # requires us to get expectancy and variances at all stop_times!!
 grid_size = trial.get_parameter("grid_size", 128)
 start_time = 0.
-stop_times = [0.1, 0.2, 0.3, 0.4, 0.5, 1., 1.25, 1.5, 1.75, 2.]
+stop_times = np.arange(0.1, 10., 0.1)
 delta_time = 0.0001
-max_poly_degree = 2
+max_poly_degree = 7
 wave_weight = 1.
+plot_fitted = False
+plot_expectancy = False
 
 if len(trial.variable_distributions) == 1:
     quadrature_method = "full_tensor"
-    quadrature_param = [max_poly_degree + 30] * len(trial.variable_distributions)
+    quadrature_param = [max_poly_degree + 3] * len(trial.variable_distributions)
 else:
     quadrature_method = "sparse"
     quadrature_param = max_poly_degree
@@ -58,13 +60,17 @@ def fit_exponential(x_data, y_data):
 
 plt.figure()
 plt.title("Galerkin-Approximation, $P={}$, $\\tau={}$".format(max_poly_degree, delta_time))
-plt.plot(stop_times, errors_exp, label="Erwartungswert")
+if plot_expectancy:
+    plt.plot(stop_times, errors_exp, label="Erwartungswert")
 if len(stop_times) == len(errors_var):
     plt.plot(stop_times, errors_var, label="Varianz")
 fitted_func = fit_exponential(stop_times, errors_exp)
 fitted_x = np.linspace(min(stop_times), max(stop_times), num=50, endpoint=True)
-plt.plot(fitted_x, fitted_func(fitted_x), label="Fitted")
+if plot_fitted:
+    plt.plot(fitted_x, fitted_func(fitted_x), label="Fitted")
 plt.yscale('log')
-plt.xlabel('Stopzeit $T$')
+plt.xlabel('Stoppzeit $T$')
+plt.ylabel('Relativer Fehler in diskreter L2-Norm')
+plt.ylim(ymax=1)
 plt.legend(loc='best')
 plt.show()

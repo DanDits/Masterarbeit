@@ -128,7 +128,7 @@ In Algorithmus \ref{alg:galerkin} ist die Vorgehensweise für den Galerkin-Ansat
         \Function{Galerkin}{$H, u_0, v_0, \alpha,\beta,\kappa,Y, M,\tau, T$} 
             	\State $\Phi_m\gets$ $m$-te orthonormale gPC-Basis-Funktion zu $Y$, $\quad m=0,\dots,M$
               \State $A_{mk}\gets \E[\alpha(Y)\Phi_m(Y)\Phi_k(Y)],\quad m,k=0,\dots,M$
-              \State $A=S_1D_1S_1^T$, $S_1$ orthonormal, $D_1$ diagonal
+              \State $A=S_1D_1S_1^T, \quad S_1$ orthonormal, $D_1$ diagonal
               \State $x_H\gets$ Ortsdiskretisierung der Größe $H$
               \For{$x\in x_H$}
               	\State $B_{mk}(x)\gets \E[\beta(x,Y)\Phi_m(Y)\Phi_k(Y)],\quad m,k=0,\dots,M$
@@ -136,8 +136,8 @@ In Algorithmus \ref{alg:galerkin} ist die Vorgehensweise für den Galerkin-Ansat
               \EndFor
               \State
               \LineComment{FastStrang Splitting für entkoppelte Systeme:}
-              \State $g(x)\gets S_1^T\cdot (\E[u_0(x,Y)\Phi_m(Y)])_{m=0,\dots,M}$
-              \State $h(x)\gets S_1^T\cdot (\E[v_0(x,Y)\Phi_m(Y)])_{m=0,\dots,M}$
+              \State $g\gets S_1^T\cdot (\E[u_0(x_H,Y)\Phi_m(Y)])_{m=0,\dots,M}$
+              \State $h\gets S_1^T\cdot (\E[v_0(x_H,Y)\Phi_m(Y)])_{m=0,\dots,M}$
               \State $g,h\gets \text{Multi\_First\_Part\_Solver}(H, g, h, \diag(D_1), \kappa, \frac{\tau}{2})$
             \State $g,h\gets \text{Multi\_Second\_Part\_Solver}(x_H, g, h, \diag(D_2), S_2, 1-\kappa, \tau)$
             \For{$i=1,\dots,\frac{T}{\tau}-1$} \Comment{Annahme: $\frac{T}{\tau}\in\N$} 
@@ -171,7 +171,89 @@ In Algorithmus \ref{alg:galerkin} ist die Vorgehensweise für den Galerkin-Ansat
 \section{Numerische Ergebnisse}
 \todo[inline]{Numerische Ergebnisse (über Stopzeit, pro Knotenpunkt,...}
 \begin{maththeorem}[Adaption von Theorem 2.2 aus \autocite{davidgottliebdongbinxiu2008}]
-
+\label{th:adapted22}
+Ziel: Abschätzung für 
+\begin{align*}
+\E\left[\norm{u-v_M}_2^2\right]&=\E\left[\int_{-\pi}^{\pi}\left(u(t,x,Y)-v_M(t,x,Y)\right)^2dx\right]\\
+&=\int_{-\pi}^\pi\norm{u(t,x,y)-v_M(t,x,y)}_{L_\rho^2}^2dx\\
+&\stackrel{\text{Parseval}}{=}\int_{-\pi}^\pi\sum_{m=0}^\infty |\langle u(t,x,y)-v_M(t,x,y),\Phi_m(y)\rangle_{L_\rho^2}|^2dx\\
+&=\int_{-\pi}^\pi\sum_{m=0}^\infty\left(\hat{u}_m(t,x)-\hat{v}_m(t,x)\right)^2dx,\quad \hat{v}_m=0 \text{ für } m>M\\
+&=\sum_{m=0}^\infty\norm{\hat{u}_m-\hat{v}_m}_2^2\\
+&\le \frac{K}{M^{2\ell}}+\sum_{m=0}^M\norm{\hat{u}_m-\hat{v}_m}_2^2
+\end{align*}
+\todo[inline]{Problem1: In Vorlage geht Summe nur bis $M$, nicht unendlich.}
+\todo[inline]{Problem2: In Vorlage gibt es Voraussetzung 
+\[\norm{\hat{u}_m}_2^2\le \norm{\hat{u}_m}_1^2=\int_{-\pi}^\pi\left(\hat{u}^2_m+\left(\dx{\hat{u}_m}\right)^2\right)dx\le \frac{K}{m^{2\ell}},\quad K,\ell>0, m \text{ groß}.\]
+Zusammen mit der Summe bis unendlich würde dies einen additiven Term $\frac{K}{M^{2\ell}}$ auf der rechten Seite der Gesamtabschätzung ergeben. Wie kommt es, dass dieser beim Autor nicht auftaucht?}
 \end{maththeorem}
-\todo[inline]{Adaption von Beweis von Theorem 2.2}
+\begin{proof}[Beweisideen]
+Sei 
+\[e_m(t,x)\coloneqq \hat{u}_m(t,x)-\hat{v}_m(t,x),\quad m=0,\dots,M\]
+Verwenden wir den Galerkin-Ansatz (\ref{eqn:galerkinOrtho}) für die Reihendarstellung von $u$ anstelle von $v_M$, so erhalten wir analog zum Ergebnis für $v_M$ die Gleichungen
+\begin{equation}
+\dtt{\hat{u}}_k(t,x)=\sum_{m=0}^\infty \Laplace \hat{u}_m(t,x)a_{mk}-\sum_{m=0}^\infty \hat{u}_m(t,x)b_{mk}(x),\quad k=0,\dots,M
+\end{equation}
+Subtrahieren wir davon die Gleichungen
+\begin{equation}
+\dtt{\hat{v}}_k(t,x)=\sum_{m=0}^M\Laplace \hat{v}_m(t,x)a_{mk}-\sum_{m=0}^M\hat{v}_m(t,x)b_{mk}(x),\quad k=0,\dots,M
+\end{equation}
+so erhalten wir für $k=0,\dots,M$
+\begin{equation}
+\label{eqn:error_eq_1}
+\begin{split}
+\dtt{e_k}(t,x)&=\sum_{m=0}^M\Laplace e_m(t,x)a_{mk}-\sum_{m=0}^M e_m(t,x)b_{mk}(x)\\
+&\quad +\sum_{m=M+1}^\infty \Laplace \hat{u}_m(t,x)a_{mk}-\hat{u}_m(t,x)b_{mk}(x)
+\end{split}
+\end{equation}
+Nun definieren wir $e\coloneqq (e_0,\dots,e_M)^T, f\coloneqq S_1^Te$ und schreiben Gleichung (\ref{eqn:error_eq_1}) kompakt als
+\begin{equation}
+\label{eqn:error_eq2}
+\dtt{f}=D_1\Laplace f-S_1^TB(x)S_1f+r
+\end{equation}
+Dabei ist $S_1D_1S_1^T=A$ und $r$ der Restterm der Gleichung mit
+\[r_{i}(t,x)=\sum_{k=0}^Ms_{ki}\sum_{m=M+1}^\infty \Laplace \hat{u}_m(t,x)a_{mk}-\hat{u}_m(t,x)b_{mk}(x)\]
+Wir multiplizieren Gleichung (\ref{eqn:error_eq2}) nun von links mit $f^T$ und integrieren über $x$
+\begin{align*}
+\int_{-\pi}^\pi f^T(t,x)\dtt{f}(t,x)dx&=\sum_{i=0}^M d_i\int_{-\pi}^\pi f_i(t,x)\Laplace f_i(t,x)dx\\
+&\quad -\int_{-\pi}^\pi f^T(t,x)S_1^TB(x)S_1f(t,x)dx+\int_{-\pi}^\pi f^Trdx
+\end{align*}
+Ist $\alpha(y)>c>0$, so ist nach Satz \ref{th:galerkin_posdef} auch $d_i>c$. Weiterhin gilt aufgrund der periodischen Randbedingung mit dem Satz von Green
+\[\int_{-\pi}^\pi f_i(t,x)\Laplace f_i(t,x)dx=-\int_{-\pi}^\pi \norm{\nabla f_i(t,x)}^2dx+\underbrace{\oint f_i(t,x)(\nabla f_i\cdot n)d\sigma}_{=0}\le 0\]
+Daher ergibt sich die Abschätzung
+\begin{equation}
+\int_{-\pi}^\pi f^T(t,x)\dtt{f}(t,x)dx\le \int_{-\pi}^\pi f^Tr\,dx\le \norm{f}_2\norm{r}_2 
+\end{equation}
+\todo[inline]{Problem3: Ich finde keine gute Möglichkeit daraus eine Abschätzung für $\norm{f}_2$ zu erhalten. Mithilfe dieser hätte ich dann auch eine Abschätzung für $\norm{e}_2$ und somit für den Satz. Evtl. mit einer anderen Norm als der verwendeten $\norm{g}_2^2\coloneqq \int_{-\pi}^\pi g^2(x)dx$ um die Ableitung nach der Zeit zweiter Ordnung besser in den Griff zu bekommen?}
+\end{proof}
+\todo[inline]{Okay die Varianz scheint ja erstmal nicht direkt was mit dem Fehler aus dem Satz zutun zu haben, mach die Bilder nochmal neu, diesmal verwende die Koeffizienten direkt, dazu brauchen wir Fourierkoeffizienten der exakten Lösung.}
+Wir beobachten in Abbildung \ref{fig:galerkin_bystoptime_trial1} das Verhalten für wachsende Stoppzeit $T$ anhand der einfachen \nameref{trial:1}. Die anderen Parameter wie Polynomgrad und Quadraturformel zur Berechnung der Erwartungswerte sind dabei hoch genug gewählt um als relevante Fehlerquellen ausgeschlossen werden zu können. Für $T<5$ beobachten wir einen Abwärtstrend, der für größere $T>5$ durch einen gewissen Aufwärtstrend abgelöst wird.
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=0.75\linewidth]{Figures/galerkin_bystoptime_trial1_fixedhighdegree.png}
+\caption{Approximation der Varianz von \nameref{trial:1} mit fixem Polynomgrad $P=M+1=35$ und Quadraturformel mit $Q=38$ Knotenpunkten durch Galerkin-Ansatz mit $\tau=0.0001$.}
+\label{fig:galerkin_bystoptime_trial1}
+\end{figure}\\
+In Abbildung \ref{fig:galerkin_bystoptime_trial1_low} ist das gleiche Setup für einen kleinen Polynomgrad dargestellt. Hier erkennen wir klar, dass für größere $T$ der Fehler der Approximation exponentiell in $T$ wächst.\\
+\todo[inline]{Problem4: Es ist nicht ganz klar, was eigentlich rauskommen soll. Durch fehlende Referenzlösungen für die Varianz an vielen verschiedenen Zeitpunkten ist es schwierig, beliebige Beispiele zu beobachten.}
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=0.75\linewidth]{Figures/galerkin_bystoptime_trial1_fixedlowdegree.png}
+\caption{Approximation der Varianz von \nameref{trial:1} mit fixem Polynomgrad $P=M+1=7$ und Quadraturformel mit $Q=10$ Knotenpunkten durch Galerkin-Ansatz mit $\tau=0.0001$.}
+\label{fig:galerkin_bystoptime_trial1_low}
+\end{figure}
+Schlussendlich sehen wir in den Abbildungen \ref{fig:galerkin_bydegree_trial1_t1} und \ref{fig:galerkin_bydegree_trial1_t5} das Verhalten des Fehlers in Abhängigkeit von der Anzahl an Polynomen $P=M+1$. Zum Zeitpunkt $T=1$ wird für $P>5$ der Fehler minimal, für $T=5$ passiert die bestmögliche Approximation allerdings erst für $P>8$. Diese benötigte Grenze wächst mit größerem $T$. 
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=0.5\linewidth]{Figures/galerkin_bydegree_trial1_t1.png}
+\caption{Approximation des Erwartungswert und der Varianz von \nameref{trial:1} zu fixem Zeitpunkt $T=1$ durch Galerkin-Ansatz mit $\tau=0.0001$ und verschiedenen Polynomgraden.}
+\label{fig:galerkin_bydegree_trial1_t1}
+\end{figure}
+\todo[inline]{T5 wiederholen mit der besseren QF sodass die gleiche verwendet wird wie bei T1, }
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=0.5\linewidth]{Figures/galerkin_bydegree_trial1_t5.png}
+\caption{Approximation des Erwartungswert und der Varianz von \nameref{trial:1} zu fixem Zeitpunkt $T=5$ durch Galerkin-Ansatz mit $\tau=0.0001$ und verschiedenen Polynomgraden.}
+\label{fig:galerkin_bydegree_trial1_t5}
+\end{figure}
+\subsection{Vergleich Galerkin und Collocation}
 \todo[inline]{Vergleiche mehrdim, unstetig, nicht diffbar mit Collocation}
