@@ -32,7 +32,7 @@ for trial in trials:
         configs = kg.make_klein_gordon_wave_linhyp_configs(domain, [grid_size_N], trial.alpha, trial.beta, weight)
         splitting = Splitting.make_fast_strang(*configs, "FastStrang", start_time, trial.start_position,
                                                trial.start_velocity, delta_time)
-        splitting.progress(stop_time, delta_time, 0)
+        splitting.progress(splitting.approx_steps_to_end_time(stop_time, delta_time), delta_time, 0)
         if xs_mesh is None:
             xs_mesh = splitting.get_xs_mesh()
         trial.error_function = error_l2_relative

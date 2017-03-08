@@ -43,7 +43,7 @@ for delta_time in delta_times:
                                              start_time, trial.start_position, trial.start_velocity, delta_time)]
 
     for i, splitting in enumerate(splittings):
-        splitting.progress(stop_time, delta_time, 0)
+        splitting.progress(splitting.approx_steps_to_end_time(stop_time, delta_time), delta_time, 0)
         if xs_mesh is None:
             xs_mesh = splitting.get_xs_mesh()
         if len(errors_per_delta_time) <= i:

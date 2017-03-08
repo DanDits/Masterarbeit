@@ -27,7 +27,7 @@ def cached_collocation_point(spatial_domain, grid_size, trial, wave_weight, star
                                                        trial.beta, wave_weight)
     splitting = Splitting.make_fast_strang(*configs, "FastStrang",
                                            start_time, trial.start_position, trial.start_velocity, delta_time)
-    splitting.progress(stop_time, delta_time, 0)
+    splitting.progress(splitting.approx_steps_to_end_time(stop_time, delta_time), delta_time, 0)
     last_solution = splitting.solutions()[-1]
     if real_only:
         last_solution = last_solution.real

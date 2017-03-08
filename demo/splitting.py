@@ -12,7 +12,7 @@ from util.analysis import error_l2_relative
 import diff_equation.klein_gordon as kg
 from util.trial import Trial
 
-dimension = 2
+dimension = 1
 grid_size_N = 64 if dimension >= 2 else 128
 domain = list(repeat([-pi, pi], dimension))
 delta_time = 0.001
@@ -159,7 +159,7 @@ if __name__ == "__main__":
 
     for splitting in splittings:
         measure_start = time.time()
-        splitting.progress(stop_time, delta_time, save_every_x_solution)
+        splitting.progress(splitting.approx_steps_to_end_time(stop_time, delta_time), delta_time, save_every_x_solution)
         print(splitting.name, "took", (time.time() - measure_start))
 
     ref_splitting = splittings[0]

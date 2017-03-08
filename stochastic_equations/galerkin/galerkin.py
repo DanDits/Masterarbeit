@@ -16,8 +16,8 @@ cache_name_poly_count = "Poly"
 cache_name_quadrature = "Quad"
 
 
-def galerkin_approximation(trial, max_poly_degree, domain, grid_size, start_time, stop_time, delta_time, wave_weight,
-                           quadrature_method, quadrature_param):
+def galerkin_approximation(trial, max_poly_degree, domain, grid_size, start_time, steps_list, delta_time, wave_weight,
+                           quadrature_method, quadrature_param, retrieve_coeffs=False):
     global parameter_validation_for_cache
     if parameter_validation_for_cache is None:
         parameter_validation_for_cache = {"grid_size": grid_size,
@@ -57,13 +57,15 @@ def galerkin_approximation(trial, max_poly_degree, domain, grid_size, start_time
     print("Betas calculation finished.")
     splitting = make_splitting(domain, grid_size, wave_speeds,
                                basis, betas, matrix_r, matrix_s, start_time, trial, chaos, delta_time, wave_weight)
-    if isinstance(stop_time, collections.Iterable):
-        for stop in stop_time:
-            expectancy, variance = calculate_expectancy_variance(splitting, stop, delta_time)
-            yield xs, xs_mesh, expectancy, variance, chaos.quadrature_rule.get_nodes_count()
-    else:
-        expectancy, variance = calculate_expectancy_variance(splitting, stop_time, delta_time)
-        yield xs, xs_mesh, expectancy, variance, chaos.quadrature_rule.get_nodes_count()
+    if not isinstance(steps_list, collections.Iterable):
+        steps_list = [steps_list]
+    for steps in steps_list:
+        expectancy, variance, coeffs = calculate_expectancy_variance(splitting, steps, delta_time)
+        results = xs, xs_mesh, expectancy, variance, chaos.quadrature_rule.get_nodes_count()
+        if retrieve_coeffs:
+            yield (*results, coeffs)
+        else:
+            yield (*results,)
 
 
 @cache_by_first_parameter([cache_name_quadrature])
@@ -272,9 +274,11 @@ def make_splitting(domain, grid_size, wave_speeds,
     return splitting
 
 
-def calculate_expectancy_variance(splitting, stop_time, delta_time):
-    print("Starting progressing splitting.")
-    splitting.progress(stop_time, delta_time, 0)
+def calculate_expectancy_variance(splitting, steps, delta_time):
+    print("Starting progressing splitting: Current time:", repr(splitting.get_current_time()),
+          "Making", steps, "steps with dt=", delta_time)
+    splitting.progress(steps, delta_time, 0)
+    print("Finished progressing splitting: Current time:", repr(splitting.get_current_time()))
     last_coefficients = splitting.solutions()[-1]
     # this is now a list of length N+1, one vector for each index k, each of length 'grid_size'
     # first we need to transpose this construct in order to be able to retransform the coefficients with the matrix S
@@ -288,8 +292,6 @@ def calculate_expectancy_variance(splitting, stop_time, delta_time):
     if grid_coeffs.shape[1] > 1:
         # for variance we need all coefficients except for the zeroth one,
         # polynomials are normalized so no need for gammas
-        grid_coeffs = grid_coeffs[:, 1:]  # ignore zeroth coefficient
-        np.square(grid_coeffs, out=grid_coeffs)
-        variance = np.sum(grid_coeffs, axis=1)
+        variance = np.sum(np.square(grid_coeffs[:, 1:]), axis=1, out=variance)
 
-    return expectancy, variance
+    return expectancy, variance, grid_coeffs

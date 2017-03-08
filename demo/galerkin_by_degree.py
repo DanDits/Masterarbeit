@@ -12,6 +12,7 @@ grid_size = trial.get_parameter("grid_size", 128)
 start_time = 0.
 stop_time = trial.get_parameter("stop_time", 5)
 delta_time = 0.0001
+steps = stop_time / delta_time
 max_poly_degrees = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 wave_weight = 1.
 
@@ -34,7 +35,7 @@ for max_poly_degree, quadrature_param in zip(max_poly_degrees, quadrature_params
     error_var = None
 
     xs, xs_mesh, exp, var, quadrature_nodes_count = next(galerkin_approximation(trial, max_poly_degree, domain,
-                                                                           grid_size, start_time, stop_time,
+                                                                           grid_size, start_time, steps,
                                                                            delta_time, wave_weight,
                                                                            quadrature_method, quadrature_param))
     if trial_exp is None:
@@ -56,5 +57,7 @@ if len(max_poly_degrees) == len(errors_var):
     plt.plot(max_poly_degrees, errors_var, label="Varianz")
 plt.yscale('log')
 plt.xlabel('Maximaler Polynomgrad $P$')
+plt.ylabel('Relativer Fehler in diskreter L2-Norm')
+plt.ylim(ymax=1)
 plt.legend(loc='best')
 plt.show()

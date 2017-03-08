@@ -46,8 +46,9 @@ for max_poly_degree, quadrature_param in zip(max_poly_degrees, quadrature_params
     error_var = None
     for delta_time in delta_times:
         print("Curr dt", delta_time, "of all", delta_times)
+        steps = int(stop_time / delta_time)
         xs, xs_mesh, exp, var, quadrature_nodes_count = galerkin_approximation(trial, max_poly_degree, domain,
-                                                                               grid_size, start_time, stop_time,
+                                                                               grid_size, start_time, steps,
                                                                                delta_time, wave_weight,
                                                                                quadrature_method, quadrature_param)
         if trial_exp is None:

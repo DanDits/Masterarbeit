@@ -95,7 +95,7 @@ def simulate(stochastic_trial, simulations_count, keep_solutions_at_steps,
                                                         stochastic_trial.beta)
         splitting = Splitting.make_fast_strang(*configs, "FastStrang", start_time, stochastic_trial.start_position,
                                                stochastic_trial.start_velocity, delta_time)
-        splitting.progress(stop_time, delta_time, 0)
+        splitting.progress(splitting.approx_steps_to_end_time(stop_time, delta_time), delta_time, 0)
         if xs is None:
             xs = splitting.get_xs()
             xs_mesh = splitting.get_xs_mesh()
