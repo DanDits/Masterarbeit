@@ -14,7 +14,7 @@ grid_size = trial.get_parameter("grid_size", 128)
 start_time = 0.
 delta_time = 0.0001
 stop_time = 3
-max_poly_degree = 35
+max_poly_degree = 15
 wave_weight = 1.
 xs, xs_mesh = config.SolverConfig.make_spatial_discretization(domain, [grid_size])
 
@@ -26,9 +26,9 @@ else:
     quadrature_param = max_poly_degree
 
 
-coeffs = pc.get_solution_coefficients(stop_time, xs_mesh, trial, max_poly_degree, quadrature_method, quadrature_param)
-
-coeffs_norm = norm(coeffs, 2, axis=1) ** 2
+coeffs_calc = pc.solution_coefficients_calculator(trial, max_poly_degree, quadrature_method, quadrature_param)
+coeffs = coeffs_calc(stop_time, xs_mesh)
+coeffs_norm = norm(coeffs, 2, axis=0)
 
 plt.figure()
 plt.plot(range(len(coeffs_norm)), coeffs_norm)

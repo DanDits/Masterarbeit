@@ -1,7 +1,7 @@
 # Plots the error of the galerkin approximation over different stop times using the same delta time and approximation
 # degree (which should be good enough so that the splitting error does not fall into account)
 from itertools import accumulate
-from stochastic_equations.galerkin.projection_coefficients import get_solution_coefficients
+from stochastic_equations.galerkin.projection_coefficients import solution_coefficients_calculator
 from util.analysis import error_l2_relative
 import numpy as np
 import demo.stochastic_trials as st
@@ -11,14 +11,14 @@ from numpy.linalg import norm
 
 
 domain = [(-np.pi, np.pi)]
-trial = st.trial_1  # requires us to get expectancy and variances at all stop_times!!
+trial = st.trial_3  # requires us to get expectancy and variances at all stop_times!!
 grid_size = trial.get_parameter("grid_size", 128)
 start_time = 0.
 delta_time = 0.0001
 steps_delta = 100  # if 1, this will plot for every single delta_time step making fast strang splitting to a normal strang, if higher the plot is refined worse
 stop_time = 10
 steps_list = [steps_delta] * int(stop_time / delta_time / steps_delta)
-max_poly_degree = 15
+max_poly_degree = 5
 wave_weight = 1.
 plot_coeff_error_only = True
 
@@ -31,18 +31,21 @@ else:
 
 errors_exp, errors_var, errors_coeffs = [], [], []
 stop_times = []
+coeff_calc = None
 for total_steps, (xs, xs_mesh, exp, var, quadrature_nodes_count, coeffs) \
         in zip(accumulate(steps_list), galerkin_approximation(trial, max_poly_degree, domain,
                                                               grid_size, start_time, steps_list,
                                                               delta_time, wave_weight,
                                                               quadrature_method, quadrature_param,
                                                               retrieve_coeffs=True)):
+    if not coeff_calc:
+        coeff_calc = solution_coefficients_calculator(trial, max_poly_degree, quadrature_method, quadrature_param)
     stop_time = total_steps * delta_time
 
-    reference_coeffs = get_solution_coefficients(stop_time, xs_mesh, trial, max_poly_degree, quadrature_method,
-                                                 quadrature_param)
+    reference_coeffs = coeff_calc(stop_time, xs_mesh)
 
-    coeffs_norm = norm(coeffs - reference_coeffs, 2, axis=1) ** 2  # norms for each degree
+    coeffs_norm = norm(coeffs - reference_coeffs, 2, axis=0) ** 2 / grid_size  # norms for each degree
+    assert len(coeffs_norm) == max_poly_degree + 1  # in 1d
     coeffs_norm = np.sum(coeffs_norm)  # sum over all degrees
     errors_coeffs.append(coeffs_norm)
 
@@ -57,7 +60,7 @@ for total_steps, (xs, xs_mesh, exp, var, quadrature_nodes_count, coeffs) \
         error_var = error_l2_relative(var, trial_var)
         errors_var.append(error_var)
     print("Error for ", trial.name, "dt=", delta_time, "stop_time=", stop_time, "degree", max_poly_degree,
-          "quad=", quadrature_param, "EXP:", error_exp, "VAR:", error_var)
+          "quad=", quadrature_param, "EXP:", error_exp, "VAR:", error_var, "COEFFS:", coeffs_norm)
 
 
 #def target(p):
@@ -82,6 +85,8 @@ if not plot_coeff_error_only:
     fitted_x = np.linspace(min(stop_times), max(stop_times), num=50, endpoint=True)
     plt.plot(fitted_x, fitted_func(fitted_x), label="Fitted")
 else:
+    print("StopTimes:", stop_times)
+    print("Errors coeffs:", errors_coeffs)
     plt.plot(stop_times, errors_coeffs, label="Fourier-Koeffizienten")
 plt.yscale('log')
 plt.xlabel('Stoppzeit $T$')

@@ -33,8 +33,7 @@ def _get_solution_coefficients(time, xs_mesh, project_trial, basis, chaos):
     return np.array(coefficients)
 
 
-def get_solution_coefficients(time, xs_mesh, trial, max_poly_degree, quadrature_method, quadrature_param):
-    old_flag = trial.flag_raw_attributes
+def solution_coefficients_calculator(trial, max_poly_degree, quadrature_method, quadrature_param):
     trial.flag_raw_attributes = True
     distrs = trial.variable_distributions
     random_dim = len(distrs)
@@ -45,6 +44,4 @@ def get_solution_coefficients(time, xs_mesh, trial, max_poly_degree, quadrature_
 
     poly_count = multi_index_bounded_sum_length(random_dim, sum_bound)
     basis = [chaos.normalized_basis(i) for i in range(poly_count)]
-    coeffs = _get_solution_coefficients(time, xs_mesh, trial, basis, chaos)
-    trial.flag_raw_attributes = old_flag
-    return coeffs
+    return partial(_get_solution_coefficients, project_trial=trial, basis=basis, chaos=chaos)
