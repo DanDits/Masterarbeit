@@ -13,8 +13,8 @@ trial = st.trial_1  # requires us to get expectancy and variances at all stop_ti
 grid_size = trial.get_parameter("grid_size", 128)
 start_time = 0.
 delta_time = 0.0001
-stop_time = 3
-max_poly_degree = 15
+stop_time = 10
+max_poly_degree = 25
 wave_weight = 1.
 xs, xs_mesh = config.SolverConfig.make_spatial_discretization(domain, [grid_size])
 

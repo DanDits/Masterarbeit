@@ -2,25 +2,24 @@
 # degree (which should be good enough so that the splitting error does not fall into account)
 from itertools import accumulate
 from stochastic_equations.galerkin.projection_coefficients import solution_coefficients_calculator
-from util.analysis import error_l2_relative
+from util.analysis import error_l2
 import numpy as np
 import demo.stochastic_trials as st
 import matplotlib.pyplot as plt
 from stochastic_equations.galerkin.galerkin import galerkin_approximation
-from numpy.linalg import norm
 
 
 domain = [(-np.pi, np.pi)]
-trial = st.trial_3  # requires us to get expectancy and variances at all stop_times!!
+trial = st.trial_1  # requires us to get expectancy and variances at all stop_times!!
 grid_size = trial.get_parameter("grid_size", 128)
 start_time = 0.
 delta_time = 0.0001
-steps_delta = 100  # if 1, this will plot for every single delta_time step making fast strang splitting to a normal strang, if higher the plot is refined worse
+steps_delta = 300  # if 1, this will plot for every single delta_time step making fast strang splitting to a normal strang, if higher the plot is refined worse but calculation is faster
 stop_time = 10
 steps_list = [steps_delta] * int(stop_time / delta_time / steps_delta)
 max_poly_degree = 5
 wave_weight = 1.
-plot_coeff_error_only = True
+plot_coeff_error_only = False
 
 if len(trial.variable_distributions) == 1:
     quadrature_method = "full_tensor"
@@ -44,7 +43,7 @@ for total_steps, (xs, xs_mesh, exp, var, quadrature_nodes_count, coeffs) \
 
     reference_coeffs = coeff_calc(stop_time, xs_mesh)
 
-    coeffs_norm = norm(coeffs - reference_coeffs, 2, axis=0) ** 2 / grid_size  # norms for each degree
+    coeffs_norm = error_l2(coeffs, reference_coeffs, axis=0) ** 2  # errors for each degree
     assert len(coeffs_norm) == max_poly_degree + 1  # in 1d
     coeffs_norm = np.sum(coeffs_norm)  # sum over all degrees
     errors_coeffs.append(coeffs_norm)
@@ -54,10 +53,10 @@ for total_steps, (xs, xs_mesh, exp, var, quadrature_nodes_count, coeffs) \
 
     trial_exp = trial.obtain_evaluated_expectancy(xs, xs_mesh, stop_time)
     trial_var = trial.obtain_evaluated_variance(xs, xs_mesh, stop_time)
-    error_exp = error_l2_relative(exp, trial_exp)
+    error_exp = error_l2(exp, trial_exp)
     errors_exp.append(error_exp)
     if var is not None and trial_var is not None:
-        error_var = error_l2_relative(var, trial_var)
+        error_var = error_l2(var, trial_var)
         errors_var.append(error_var)
     print("Error for ", trial.name, "dt=", delta_time, "stop_time=", stop_time, "degree", max_poly_degree,
           "quad=", quadrature_param, "EXP:", error_exp, "VAR:", error_var, "COEFFS:", coeffs_norm)
@@ -78,19 +77,22 @@ def fit_exponential(x_data, y_data):
 plt.figure()
 plt.title("Galerkin-Approximation, $P={}$, $\\tau={}$".format(max_poly_degree, delta_time))
 if not plot_coeff_error_only:
-    plt.plot(stop_times, errors_exp, label="Erwartungswert")
+    plt.plot(stop_times, errors_exp, label="Erwartungswert $\\left\\Vert\\hat{u}_0-\\hat{v}_0\\right\\Vert$")
     if len(stop_times) == len(errors_var):
-        plt.plot(stop_times, errors_var, label="Varianz")
-    fitted_func = fit_exponential(stop_times, errors_exp)
-    fitted_x = np.linspace(min(stop_times), max(stop_times), num=50, endpoint=True)
-    plt.plot(fitted_x, fitted_func(fitted_x), label="Fitted")
-else:
-    print("StopTimes:", stop_times)
-    print("Errors coeffs:", errors_coeffs)
-    plt.plot(stop_times, errors_coeffs, label="Fourier-Koeffizienten")
+        plt.plot(stop_times, errors_var, label="Varianz $\\left\\Vert\\sum_{m=1}^P\\hat{u}_m^2-\\hat{v}_m^2\\right\\Vert$")
+    #fitted_func = fit_exponential(stop_times, errors_exp)
+    #fitted_x = np.linspace(min(stop_times), max(stop_times), num=50, endpoint=True)
+    #plt.plot(fitted_x, fitted_func(fitted_x), label="Fitted")
+
+print("StopTimes:", stop_times)
+print("Errors coeffs:", errors_coeffs)
+plt.plot(stop_times, errors_coeffs, linestyle="dotted",
+         label="Fourier $\\sum_{m=0}^P\\left\\Vert\\hat{u}_m-\\hat{v}_m\\right\\Vert^2$")
+
 plt.yscale('log')
 plt.xlabel('Stoppzeit $T$')
-plt.ylabel('Relativer Fehler in diskreter L2-Norm')
+plt.ylabel('Absoluter Fehler in diskreter L2-Norm')
 plt.ylim(ymax=1)
 plt.legend(loc='best')
+plt.tight_layout()
 plt.show()

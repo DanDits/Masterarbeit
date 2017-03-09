@@ -168,6 +168,7 @@ In Algorithmus \ref{alg:galerkin} ist die Vorgehensweise für den Galerkin-Ansat
         
     \end{algorithmic}
 \end{algorithm}
+Beachte, dass die auftretenden Erwartungswerte zur Berechnung von $A$ und $B(x)$ numerisch mithilfe von Quadraturformeln gelöst werden können. Mögliche Varianten wurden --insbesondere auch für mehrdimensionale Quadratur-- in Kapitel \ref{sec:discrete_proj} vorgestellt. Wir werden die Gauss-Quadratur verwenden, da diese eine hohe polynomiale Exaktheit besitzt und die Wahrscheinlichkeitsdichten implizit berücksichtigt.
 \section{Numerische Ergebnisse}
 \todo[inline]{Numerische Ergebnisse (über Stopzeit, pro Knotenpunkt,...}
 \begin{maththeorem}[Adaption von Theorem 2.2 aus \autocite{davidgottliebdongbinxiu2008}]
@@ -179,12 +180,12 @@ Ziel: Abschätzung für
 &\stackrel{\text{Parseval}}{=}\int_{-\pi}^\pi\sum_{m=0}^\infty |\langle u(t,x,y)-v_M(t,x,y),\Phi_m(y)\rangle_{L_\rho^2}|^2dx\\
 &=\int_{-\pi}^\pi\sum_{m=0}^\infty\left(\hat{u}_m(t,x)-\hat{v}_m(t,x)\right)^2dx,\quad \hat{v}_m=0 \text{ für } m>M\\
 &=\sum_{m=0}^\infty\norm{\hat{u}_m-\hat{v}_m}_2^2\\
-&\le \frac{K}{M^{2\ell}}+\sum_{m=0}^M\norm{\hat{u}_m-\hat{v}_m}_2^2
+&\le \sum_{m=0}^M\norm{\hat{u}_m-\hat{v}_m}_2^2 + \sum_{m=M+1}^\infty \frac{K}{m^{2\ell}}
 \end{align*}
 \todo[inline]{Problem1: In Vorlage geht Summe nur bis $M$, nicht unendlich.}
 \todo[inline]{Problem2: In Vorlage gibt es Voraussetzung 
 \[\norm{\hat{u}_m}_2^2\le \norm{\hat{u}_m}_1^2=\int_{-\pi}^\pi\left(\hat{u}^2_m+\left(\dx{\hat{u}_m}\right)^2\right)dx\le \frac{K}{m^{2\ell}},\quad K,\ell>0, m \text{ groß}.\]
-Zusammen mit der Summe bis unendlich würde dies einen additiven Term $\frac{K}{M^{2\ell}}$ auf der rechten Seite der Gesamtabschätzung ergeben. Wie kommt es, dass dieser beim Autor nicht auftaucht?}
+Zusammen mit der Summe bis unendlich würde dies einen weiteren Term $\sum_{m=M+1}^\infty \frac{K}{m^{2\ell}}$ auf der rechten Seite der Gesamtabschätzung ergeben. Für $\ell\le\onehalf$ wäre diese Reihe nicht mal konvergent. Wie kommt es, dass dieser Term beim Autor nicht auftaucht?}
 \end{maththeorem}
 \begin{proof}[Beweisideen]
 Sei 
@@ -225,22 +226,19 @@ Daher ergibt sich die Abschätzung
 \end{equation}
 \todo[inline]{Problem3: Ich finde keine gute Möglichkeit daraus eine Abschätzung für $\norm{f}_2$ zu erhalten. Mithilfe dieser hätte ich dann auch eine Abschätzung für $\norm{e}_2$ und somit für den Satz. Evtl. mit einer anderen Norm als der verwendeten $\norm{g}_2^2\coloneqq \int_{-\pi}^\pi g^2(x)dx$ um die Ableitung nach der Zeit zweiter Ordnung besser in den Griff zu bekommen?}
 \end{proof}
-\todo[inline]{Okay die Varianz scheint ja erstmal nicht direkt was mit dem Fehler aus dem Satz zutun zu haben, mach die Bilder nochmal neu, diesmal verwende die Koeffizienten direkt, dazu brauchen wir Fourierkoeffizienten der exakten Lösung.}
-Wir beobachten in Abbildung \ref{fig:galerkin_bystoptime_trial1} das Verhalten für wachsende Stoppzeit $T$ anhand der einfachen \nameref{trial:1}. Die anderen Parameter wie Polynomgrad und Quadraturformel zur Berechnung der Erwartungswerte sind dabei hoch genug gewählt um als relevante Fehlerquellen ausgeschlossen werden zu können. Für $T<5$ beobachten wir einen Abwärtstrend, der für größere $T>5$ durch einen gewissen Aufwärtstrend abgelöst wird.
+Wir beobachten in den Abbildungen \ref{fig:galerkin_bystoptime_trial1_low} und \ref{fig:galerkin_bystoptime_trial1_high} das Verhalten für wachsende Stoppzeit $T$ anhand der einfachen \nameref{trial:1}. Die Parameter für die Quadratur sind dabei hoch genug gewählt um als relevante Fehlerquellen ausgeschlossen werden zu können. 
+\todo[inline]{Beobachtungen?!}
 \begin{figure}[!htb]
-\centering
-\includegraphics[width=0.75\linewidth]{Figures/galerkin_bystoptime_trial1_fixedhighdegree.png}
-\caption{Approximation der Varianz von \nameref{trial:1} mit fixem Polynomgrad $P=M+1=35$ und Quadraturformel mit $Q=38$ Knotenpunkten durch Galerkin-Ansatz mit $\tau=0.0001$.}
-\label{fig:galerkin_bystoptime_trial1}
-\end{figure}\\
-In Abbildung \ref{fig:galerkin_bystoptime_trial1_low} ist das gleiche Setup für einen kleinen Polynomgrad dargestellt. Hier erkennen wir klar, dass für größere $T$ der Fehler der Approximation exponentiell in $T$ wächst.\\
-\todo[inline]{Problem4: Es ist nicht ganz klar, was eigentlich rauskommen soll. Durch fehlende Referenzlösungen für die Varianz an vielen verschiedenen Zeitpunkten ist es schwierig, beliebige Beispiele zu beobachten.}
-\begin{figure}[!htb]
-\centering
-\includegraphics[width=0.75\linewidth]{Figures/galerkin_bystoptime_trial1_fixedlowdegree.png}
-\caption{Approximation der Varianz von \nameref{trial:1} mit fixem Polynomgrad $P=M+1=7$ und Quadraturformel mit $Q=10$ Knotenpunkten durch Galerkin-Ansatz mit $\tau=0.0001$.}
-\label{fig:galerkin_bystoptime_trial1_low}
+\minipage{0.55\textwidth}
+  \includegraphics[width=\linewidth]{Figures/galerkin_bystoptime_trial1_fixeddegree5.png}
+\endminipage
+\minipage{0.55\textwidth}
+  \includegraphics[width=\linewidth]{Figures/galerkin_bystoptime_trial1_fixeddegree25.png}
+\endminipage
+  \label{fig:galerkin_bystoptime_trial1}
+  \caption{Verschiedene Fehler von \nameref{trial:1} mit fixem Polynomgrad und hinreichend guter Quadraturformel.}
 \end{figure}
+\todo[inline]{Problem4: Es ist nicht ganz klar, was eigentlich rauskommen soll. Durch fehlende Referenzlösungen für die Varianz an vielen verschiedenen Zeitpunkten ist es schwierig, beliebige Beispiele zu beobachten.}
 Schlussendlich sehen wir in den Abbildungen \ref{fig:galerkin_bydegree_trial1_t1} und \ref{fig:galerkin_bydegree_trial1_t5} das Verhalten des Fehlers in Abhängigkeit von der Anzahl an Polynomen $P=M+1$. Zum Zeitpunkt $T=1$ wird für $P>5$ der Fehler minimal, für $T=5$ passiert die bestmögliche Approximation allerdings erst für $P>8$. Diese benötigte Grenze wächst mit größerem $T$. 
 \begin{figure}[!htb]
 \centering
@@ -248,7 +246,7 @@ Schlussendlich sehen wir in den Abbildungen \ref{fig:galerkin_bydegree_trial1_t1
 \caption{Approximation des Erwartungswert und der Varianz von \nameref{trial:1} zu fixem Zeitpunkt $T=1$ durch Galerkin-Ansatz mit $\tau=0.0001$ und verschiedenen Polynomgraden.}
 \label{fig:galerkin_bydegree_trial1_t1}
 \end{figure}
-\todo[inline]{T5 wiederholen mit der besseren QF sodass die gleiche verwendet wird wie bei T1, }
+
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=0.5\linewidth]{Figures/galerkin_bydegree_trial1_t5.png}

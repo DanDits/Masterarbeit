@@ -10,10 +10,10 @@ domain = [(-np.pi, np.pi)]
 trial = st.trial_1
 grid_size = trial.get_parameter("grid_size", 128)
 start_time = 0.
-stop_time = trial.get_parameter("stop_time", 5)
+stop_time = trial.get_parameter("stop_time", 10)
 delta_time = 0.0001
-steps = stop_time / delta_time
-max_poly_degrees = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+steps = int(stop_time / delta_time)
+max_poly_degrees = list(range(1, 17))
 wave_weight = 1.
 
 if len(trial.variable_distributions) == 1:

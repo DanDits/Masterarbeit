@@ -61,31 +61,35 @@ def rising_factorial(alpha: float, n: int):
 
 
 # noinspection PyTypeChecker
-def error_l2(approx_y, solution_y):
+def error_l2(approx_y, solution_y, axis=None):
     """
     Calculates the discrete L2 distance between the given nd-arrays of the same shape.
     Does not take into account to length of the interval this approximation lives on. To get
     the exact integral multiply by sqrt of the area of the domain.
     :param approx_y: First nd-array
     :param solution_y: Second nd-array
+    :param axis: The axis to sum over
     :return: The real distance, which is the (up to a constant factor)
     the discrete L2 integral between the functions.
     """
     assert approx_y.shape == solution_y.shape
-    return np.sqrt(np.sum(np.abs(approx_y - solution_y) ** 2) / approx_y.size)
+    axis_length = solution_y.size if axis is None else solution_y.shape[axis]
+    return np.sqrt(np.sum(np.abs(approx_y - solution_y) ** 2, axis=axis) / axis_length)
 
 
-def error_l2_relative(approx_y, solution_y):
+def error_l2_relative(approx_y, solution_y, axis=None):
     """
     Like error_l2 this calculates the distance between of the two given nd-arrays.
     Furthermore this scaled the returned error by dividing through the discrete l2 error of solution_y.
     :param approx_y: The approximation
     :param solution_y: The exact solution
+    :param axis: The axis to sum over.
     :return: The distance (relativized) between the given nd-arrays.
     """
     assert approx_y.shape == solution_y.shape
-    solution_error = np.sqrt(np.sum(np.abs(solution_y) ** 2.) / solution_y.size)
-    return error_l2(approx_y, solution_y) / solution_error
+    axis_length = solution_y.size if axis is None else solution_y.shape[axis]
+    solution_error = np.sqrt(np.sum(np.abs(solution_y) ** 2., axis=axis) / axis_length)
+    return error_l2(approx_y, solution_y, axis=axis) / solution_error
 
 
 def error_maximum(approx_y, solution_y):
