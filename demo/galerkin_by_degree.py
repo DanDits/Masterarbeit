@@ -7,13 +7,13 @@ from stochastic_equations.galerkin.galerkin import galerkin_approximation
 
 
 domain = [(-np.pi, np.pi)]
-trial = st.trial_1
+trial = st.trial_discont_simple_gauss
 grid_size = trial.get_parameter("grid_size", 128)
 start_time = 0.
-stop_time = trial.get_parameter("stop_time", 10)
+stop_time = trial.get_parameter("stop_time", 1)
 delta_time = 0.0001
 steps = int(stop_time / delta_time)
-max_poly_degrees = list(range(1, 17))
+max_poly_degrees = list(range(1, 15))  # do not put a number >=7 here for 4 dimensional problems as this kills my laptop
 wave_weight = 1.
 
 if len(trial.variable_distributions) == 1:

@@ -216,18 +216,33 @@ Dabei ist $S_1D_1S_1^T=A$ und $r$ der Restterm der Gleichung mit
 Wir multiplizieren Gleichung (\ref{eqn:error_eq2}) nun von links mit $f^T$ und integrieren über $x$
 \begin{align*}
 \int_{-\pi}^\pi f^T(t,x)\dtt{f}(t,x)dx&=\sum_{i=0}^M d_i\int_{-\pi}^\pi f_i(t,x)\Laplace f_i(t,x)dx\\
-&\quad -\int_{-\pi}^\pi f^T(t,x)S_1^TB(x)S_1f(t,x)dx+\int_{-\pi}^\pi f^Trdx
+&\quad -\int_{-\pi}^\pi f^T(t,x)S_1^TB(x)S_1f(t,x)dx+\int_{-\pi}^\pi f^T(t,x)r(t,x)dx
 \end{align*}
 Ist $\alpha(y)>c>0$, so ist nach Satz \ref{th:galerkin_posdef} auch $d_i>c$. Weiterhin gilt aufgrund der periodischen Randbedingung mit dem Satz von Green
 \[\int_{-\pi}^\pi f_i(t,x)\Laplace f_i(t,x)dx=-\int_{-\pi}^\pi \norm{\nabla f_i(t,x)}^2dx+\underbrace{\oint f_i(t,x)(\nabla f_i\cdot n)d\sigma}_{=0}\le 0\]
+Ist für $x\in\Torus^d$ beliebig $\beta(x,y)>c>0$, so ist $B(x)$ positiv definit und es gilt
+\[-\int_{-\pi}^\pi f^T(t,x)S_1^TB(x)S_1f(t,x)dx\le 0\]
 Daher ergibt sich die Abschätzung
 \begin{equation}
-\int_{-\pi}^\pi f^T(t,x)\dtt{f}(t,x)dx\le \int_{-\pi}^\pi f^Tr\,dx\le \norm{f}_2\norm{r}_2 
+\int_{-\pi}^\pi f^T(t,x)\dtt{f}(t,x)dx\le \int_{-\pi}^\pi f^T(t,x)r(t,x)\,dx\le \norm{f}_2\norm{r}_2 
 \end{equation}
 \todo[inline]{Problem3: Ich finde keine gute Möglichkeit daraus eine Abschätzung für $\norm{f}_2$ zu erhalten. Mithilfe dieser hätte ich dann auch eine Abschätzung für $\norm{e}_2$ und somit für den Satz. Evtl. mit einer anderen Norm als der verwendeten $\norm{g}_2^2\coloneqq \int_{-\pi}^\pi g^2(x)dx$ um die Ableitung nach der Zeit zweiter Ordnung besser in den Griff zu bekommen?}
 \end{proof}
-Wir beobachten in den Abbildungen \ref{fig:galerkin_bystoptime_trial1_low} und \ref{fig:galerkin_bystoptime_trial1_high} das Verhalten für wachsende Stoppzeit $T$ anhand der einfachen \nameref{trial:1}. Die Parameter für die Quadratur sind dabei hoch genug gewählt um als relevante Fehlerquellen ausgeschlossen werden zu können. 
-\todo[inline]{Beobachtungen?!}
+Zur Beobachtung, wie der maximale Polynomgrad $P$ und Stoppzeit $T$ zusammenhängen, betrachten wir die Konvergenz des Erwartungswerts und der Varianz von \nameref{trial:1}. In diesem eindimensionalen Problem gilt $M=P$ und wir können den exakten Erwartungswert und Varianz als Referenz zur Berechnung deren Approximationsfehler verwenden.\\
+In Abbildung \ref{fig:galerkin_bydegree_trial1} erkennen wir, dass für $T=1$ die Wahl $P\ge 5$ ausreicht für die bestmögliche Approximation des Erwartungswerts und der Varianz. Für $T=10$ benötigen wir hingegen $P\ge 14$. In diesem Fall erkennen wir auch eine exponentielle Konvergenz des Fehlers der Varianz bezüglich des Polynomgrads $P=M$.
+\begin{figure}[!htb]
+\minipage{0.5\textwidth}
+  \includegraphics[width=\linewidth]{Figures/galerkin_bydegree_trial1_t1.png}
+\endminipage
+\minipage{0.5\textwidth}
+  \includegraphics[width=\linewidth]{Figures/galerkin_bydegree_trial1_t10.png}
+\endminipage
+  \caption{Approximation des Erwartungswert und der Varianz von \nameref{trial:1} zu fixen Zeitpunkten durch Galerkin-Ansatz mit $\tau=0.0001$ und verschiedenen Polynomgraden.}
+  \label{fig:galerkin_bydegree_trial1}
+\end{figure}
+\newline
+Anschließend beobachten wir in Abbildung \ref{fig:galerkin_bystoptime_trial1} das Verhalten für wachsende Stoppzeit $T$, ebenfalls anhand der einfachen \nameref{trial:1}. Die Parameter für die Quadratur sind dabei hoch genug gewählt um als relevante Fehlerquellen ausgeschlossen werden zu können. Die Wahl $P=25$ schließt, begründet durch die Beobachtungen aus Abbildung \ref{fig:galerkin_bydegree_trial1}, den Einfluss des Polynomgrads als Fehlerquelle für die Zeitspanne $T\le 10$ aus.\\
+Wir erkennen, dass im linken Fall der niedrige Polynomgrad mit $P=5$ dafür sorgt, dass die Approximationen ab $T=1$ zunehmend schlechter werden. Im rechten Fall mit $P=25$ ist keine Verschlechterung der Fehler im Erwartungswert und Varianz zu beobachten. Der Fourier-Fehler im Sinne von Satz \ref{th:adapted22} hingegen zeigt einen gewissen Aufwärtstrend bezüglich der Zeit $T$.
 \begin{figure}[!htb]
 \minipage{0.55\textwidth}
   \includegraphics[width=\linewidth]{Figures/galerkin_bystoptime_trial1_fixeddegree5.png}
@@ -235,23 +250,18 @@ Wir beobachten in den Abbildungen \ref{fig:galerkin_bystoptime_trial1_low} und \
 \minipage{0.55\textwidth}
   \includegraphics[width=\linewidth]{Figures/galerkin_bystoptime_trial1_fixeddegree25.png}
 \endminipage
-  \label{fig:galerkin_bystoptime_trial1}
   \caption{Verschiedene Fehler von \nameref{trial:1} mit fixem Polynomgrad und hinreichend guter Quadraturformel.}
+  \label{fig:galerkin_bystoptime_trial1}
 \end{figure}
-\todo[inline]{Problem4: Es ist nicht ganz klar, was eigentlich rauskommen soll. Durch fehlende Referenzlösungen für die Varianz an vielen verschiedenen Zeitpunkten ist es schwierig, beliebige Beispiele zu beobachten.}
-Schlussendlich sehen wir in den Abbildungen \ref{fig:galerkin_bydegree_trial1_t1} und \ref{fig:galerkin_bydegree_trial1_t5} das Verhalten des Fehlers in Abhängigkeit von der Anzahl an Polynomen $P=M+1$. Zum Zeitpunkt $T=1$ wird für $P>5$ der Fehler minimal, für $T=5$ passiert die bestmögliche Approximation allerdings erst für $P>8$. Diese benötigte Grenze wächst mit größerem $T$. 
+\newline
+In Abbildung \ref{fig:galerkin_bystoptime_trial3}, welche die Fehler der eindimensionalen \nameref{trial:3} mit $Y\sim\mathcal{U}(10,50)$, beobachten wir zusätzlich auch einen leichten Aufwärtstrend der Fehler des Erwartungswerts und der Varianz bezüglich der Zeit $T$.
 \begin{figure}[!htb]
 \centering
-\includegraphics[width=0.5\linewidth]{Figures/galerkin_bydegree_trial1_t1.png}
-\caption{Approximation des Erwartungswert und der Varianz von \nameref{trial:1} zu fixem Zeitpunkt $T=1$ durch Galerkin-Ansatz mit $\tau=0.0001$ und verschiedenen Polynomgraden.}
-\label{fig:galerkin_bydegree_trial1_t1}
+\includegraphics[width=0.75\linewidth]{Figures/galerkin_bystoptime_trial3_fixeddegree25_big.png}
+\caption{Verschiedene Fehler von \nameref{trial:3} mit fixem Polynomgrad und hinreichend guter Quadraturformel.}
+\label{fig:galerkin_bystoptime_trial3}
 \end{figure}
+\todo[inline]{Problem4: Es ist nicht ganz klar, was eigentlich rauskommen soll. Durch fehlende Referenzlösungen für die Varianz an vielen verschiedenen Zeitpunkten ist es schwierig, beliebige Beispiele (insbesondere mehrdimensionale) zu beobachten.}
 
-\begin{figure}[!htb]
-\centering
-\includegraphics[width=0.5\linewidth]{Figures/galerkin_bydegree_trial1_t5.png}
-\caption{Approximation des Erwartungswert und der Varianz von \nameref{trial:1} zu fixem Zeitpunkt $T=5$ durch Galerkin-Ansatz mit $\tau=0.0001$ und verschiedenen Polynomgraden.}
-\label{fig:galerkin_bydegree_trial1_t5}
-\end{figure}
 \subsection{Vergleich Galerkin und Collocation}
 \todo[inline]{Vergleiche mehrdim, unstetig, nicht diffbar mit Collocation}
