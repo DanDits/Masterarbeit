@@ -2,6 +2,7 @@ import numpy as np
 from itertools import product
 from util.analysis import mul_prod
 from util.quadrature.helpers import multi_index_bounded_sum
+from scipy.integrate import nquad
 
 
 class QuadratureRule:
@@ -11,6 +12,9 @@ class QuadratureRule:
     def apply(self, function):
         return self.get_weights().dot(np.apply_along_axis(function, 1, self.get_nodes()))
 
+    def supports_simultaneous_application(self):
+        return True
+
     def get_nodes(self):
         raise NotImplementedError
 
@@ -19,6 +23,29 @@ class QuadratureRule:
 
     def get_nodes_count(self):
         raise NotImplementedError
+
+
+class GeneralPurposeQuadrature(QuadratureRule):
+    def __init__(self, distributions):
+        self.supports = [distr.support for distr in distributions]
+
+    def apply_to_all_nodes_simultaneously(self, function):
+        raise ValueError("Cannot be used with general purpose integrator as it has no fixed nodes.")
+
+    def supports_simultaneous_application(self):
+        return False
+
+    def apply(self, function):
+        return nquad(function, self.supports)[0]
+
+    def get_nodes(self):
+        pass
+
+    def get_weights(self):
+        pass
+
+    def get_nodes_count(self):
+        pass
 
 
 class FullTensorQuadrature(QuadratureRule):

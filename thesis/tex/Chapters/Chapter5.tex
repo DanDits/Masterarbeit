@@ -79,7 +79,7 @@ z^TAz&=\int \alpha(y)\left(\sum_{i=0}^M\Phi_i(y)z_i\right)\tilde{z}(y)\rho(y)dy\
 Die Abschätzung nach oben ergibt sich ähnlich, da für einen Eigenvektor $z\neq 0$ zum Eigenwert $\lambda$ gilt
 \[|\lambda| z^Tz=|z^TAz|=\left|\int \alpha(y)\tilde{z}^2(y)\rho(y)dy\right|\leq \norm{\alpha}_\infty z^Tz\]
 \end{proof}
-Unter entsprechenden Voraussetzungen an $B(x)$ gelten die Aussagen von Satz \ref{th:galerkin_posdef} punktweise auch für $B(x)$.
+Unter entsprechenden Voraussetzungen an $\beta(x,y)$ gelten die Aussagen von Satz \ref{th:galerkin_posdef} punktweise auch für $B(x)$.
 \subsection{Entkopplung des ersten Teils}
 Wir können $A\in\R^{M+1\times M+1}$ zerlegen in
 \[A=S_1D_1S_1^T,\quad \text{$D_1$ diagonal und $S_1$ orthogonal}\]
@@ -168,9 +168,13 @@ In Algorithmus \ref{alg:galerkin} ist die Vorgehensweise für den Galerkin-Ansat
         
     \end{algorithmic}
 \end{algorithm}
-Beachte, dass die auftretenden Erwartungswerte zur Berechnung von $A$ und $B(x)$ numerisch mithilfe von Quadraturformeln gelöst werden können. Mögliche Varianten wurden --insbesondere auch für mehrdimensionale Quadratur-- in Kapitel \ref{sec:discrete_proj} vorgestellt. Wir werden die Gauss-Quadratur verwenden, da diese eine hohe polynomiale Exaktheit besitzt und die Wahrscheinlichkeitsdichten implizit berücksichtigt.
+\subsubsection*{Berechnung der Erwartungswerte}
+Die auftretenden Erwartungswerte zur Berechnung von $A$, $B(x)$, $g$ und $h$ können numerisch mithilfe von Quadraturformeln gelöst werden können. Mögliche Varianten wurden --insbesondere auch für mehrdimensionale Quadratur-- in Kapitel \ref{sec:discrete_proj} vorgestellt.\\
+Sind $\alpha$, $\beta$ und die Anfangswerte glatte Funktionen, so bietet sich die Verwendung der Gauss-Quadratur an. Diese besitzt eine hohe polynomiale Exaktheit und berücksichtigt die Wahrscheinlichkeitsdichten implizit. Da die benötigten Stützstellen und ihre Anzahl feststehen, ist der Zeitaufwand dieser Quadratur im Vorhinein bekannt und vergleichsweise gering.\\[0.2cm]
+Sind die Funktionen nicht glatt und besitzen beispielsweise Unstetigkeitsstellen, so bietet sich die Verwendung eines general-purpose Integrators an. Beachte, dass dieser die Wahrscheinlichkeitsdichten von $Y$ explizit auswerten muss. Diese Integratoren werden von verschiedenen Bibliotheken zur Verfügung gestellt und versuchen unter anderem Intervalle anhand der Unstetigkeitsstellen zu unterteilen. Dafür werden deutlich mehr Funktionsauswertungen benötigt und der Zeitaufwand lässt sich bei solchen Black-Box-Algorithmen nicht im Vorhinein bestimmen. Im Gegensatz zur Collocation mithilfe von diskreter Projektion, wo eine Funktionsauswertung das Lösen einer Instanz der KGG entsprach, ist es hier jedoch möglich, die zu integrierende Funktion schnell und für beliebige $y\in\R^N$ auszuwerten.\\[0.2cm]
+Weiterhin sei bemerkt, dass die Berechnungen der Erwartungswerte einmalig am Anfang passieren und unabhängig von der Stoppzeit $T$ sind. Variiert man die Polynomgrenze $P$, so kann man bereits berechnete Koeffizienten entsprechend wiederverwenden.
 \section{Numerische Ergebnisse}
-\todo[inline]{Numerische Ergebnisse (über Stopzeit, pro Knotenpunkt,...}
+\todo[inline]{Weitere Ergebnisse (über Stoppzeit, pro Knotenpunkt,...)}
 \begin{maththeorem}[Adaption von Theorem 2.2 aus \autocite{davidgottliebdongbinxiu2008}]
 \label{th:adapted22}
 Ziel: Abschätzung für 
@@ -264,4 +268,4 @@ In Abbildung \ref{fig:galerkin_bystoptime_trial3}, welche die Fehler der eindime
 \todo[inline]{Problem4: Es ist nicht ganz klar, was eigentlich rauskommen soll. Durch fehlende Referenzlösungen für die Varianz an vielen verschiedenen Zeitpunkten ist es schwierig, beliebige Beispiele (insbesondere mehrdimensionale) zu beobachten.}
 
 \subsection{Vergleich Galerkin und Collocation}
-\todo[inline]{Vergleiche mehrdim, unstetig, nicht diffbar mit Collocation}
+\todo[inline]{Vergleiche mehrdimensionale, unstetige, nicht diff'bare Beispiele mit Collocation (Problem: Quadratur ist in beiden Fällen schlecht bei unstetigen Funktionen)}

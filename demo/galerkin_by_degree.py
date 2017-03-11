@@ -23,6 +23,9 @@ if len(trial.variable_distributions) == 1:
 
     # might be slightly better, but curve is more irregular for trial1
     #quadrature_params = [[max(max_poly_degrees) + 2] * len(trial.variable_distributions) for _ in max_poly_degrees]
+
+    quadrature_method = "general_purpose"
+    quadrature_param = None
 else:
     quadrature_method = "sparse"
     quadrature_params = max_poly_degrees

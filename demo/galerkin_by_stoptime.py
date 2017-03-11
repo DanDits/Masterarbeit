@@ -10,20 +10,23 @@ from stochastic_equations.galerkin.galerkin import galerkin_approximation
 
 
 domain = [(-np.pi, np.pi)]
-trial = st.trial_1  # requires us to get expectancy and variances at all stop_times!!
+trial = st.trial_3  # requires us to get expectancy and variances at all stop_times!!
 grid_size = trial.get_parameter("grid_size", 128)
 start_time = 0.
 delta_time = 0.0001
 steps_delta = 300  # if 1, this will plot for every single delta_time step making fast strang splitting to a normal strang, if higher the plot is refined worse but calculation is faster
 stop_time = 10
 steps_list = [steps_delta] * int(stop_time / delta_time / steps_delta)
-max_poly_degree = 5
+max_poly_degree = 25
 wave_weight = 1.
 plot_coeff_error_only = False
 
 if len(trial.variable_distributions) == 1:
     quadrature_method = "full_tensor"
     quadrature_param = [max_poly_degree + 3] * len(trial.variable_distributions)
+
+    quadrature_method = "general_purpose"
+    quadrature_param = None
 else:
     quadrature_method = "sparse"
     quadrature_param = max_poly_degree

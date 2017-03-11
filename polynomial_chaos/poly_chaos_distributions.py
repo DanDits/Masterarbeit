@@ -3,7 +3,8 @@ import polynomial_chaos.poly as poly
 import polynomial_chaos.distributions as distr
 from functools import lru_cache
 from util.analysis import rising_factorial
-from util.quadrature.rules import CentralizedDiamondQuadrature, FullTensorQuadrature, SparseQuadrature, PseudoSparseDiamond
+from util.quadrature.rules import CentralizedDiamondQuadrature, FullTensorQuadrature, SparseQuadrature, PseudoSparseDiamond, \
+    GeneralPurposeQuadrature
 from util.quadrature.nesting import get_nesting_for_name
 from util.quadrature.closed_fully_nested import ClosedFullNesting
 from util.quadrature.glenshaw_curtis import calculate_transformed_nodes_and_weights
@@ -52,6 +53,9 @@ class PolyChaosDistribution:
             level = param
             nodes_and_weights_funcs = [calculate_transformed_nodes_and_weights(d) for d in distrs]
             self.quadrature_rule = SparseQuadrature(level, nesting, nodes_and_weights_funcs)
+        elif method == "general_purpose":
+            distrs = self.get_distributions()
+            self.quadrature_rule = GeneralPurposeQuadrature(distrs)
         else:
             raise ValueError("Unknown quadrature method:" + method)
 

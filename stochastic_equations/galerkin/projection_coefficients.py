@@ -5,6 +5,7 @@ import numpy as np
 import polynomial_chaos.multivariation as mv
 from polynomial_chaos.poly_chaos_distributions import get_chaos_by_distribution
 from util.quadrature.helpers import multi_index_bounded_sum_length
+from util.analysis import mul_prod
 
 
 def get_projection_coefficients(function, project_trial, basis, chaos):
@@ -17,7 +18,13 @@ def get_projection_coefficients(function, project_trial, basis, chaos):
         res2 = np.apply_along_axis(basis[i], 1, nodes_matrix)
         return res1 * res2
 
-    return [chaos.integrate(partial(integrate_func, i=i), function_parameter_is_nodes_matrix=True)
+    def integrate_func_simple(*ys, i):
+        res3 = mul_prod(distr.weight(y) for y, distr in zip(ys, chaos.get_distributions()))
+        return function(project_trial.transform_values(ys)) * basis[i](ys) * res3
+
+    supports_multiple = chaos.quadrature_rule.supports_simultaneous_application()
+    to_integrate = integrate_func if supports_multiple else integrate_func_simple
+    return [chaos.integrate(partial(to_integrate, i=i), function_parameter_is_nodes_matrix=supports_multiple)
             for i in range(len(basis))]
 
 

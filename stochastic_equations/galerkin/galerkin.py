@@ -10,6 +10,7 @@ from diff_equation.pseudospectral_solver import WaveSolverConfig
 from diff_equation.ode_solver import LinhypSolverConfig
 from diff_equation.splitting import Splitting
 import collections
+from util.analysis import mul_prod
 
 parameter_validation_for_cache = None
 cache_name_poly_count = "Poly"
@@ -49,7 +50,7 @@ def galerkin_approximation(trial, max_poly_degree, domain, grid_size, start_time
 
     # diagonalize symmetric positive definite matrix A where a_ik=E[alpha(y)phi_i(y)phi_k(y)], A=SDS^T
     wave_speeds, matrix_s = calculate_wave_speed_transform(poly_count, trial, basis, chaos)
-    print("Wave speeds calculation finished.")
+    print("Wave speeds calculation finished:", wave_speeds)
     # diagonalize transformed symmetric positive definite matrix B(x) for each x, so S^TB(x)S=R(x)D(x)R(x)^T
     # the dependence on x will be performed for every x in xs and the results stacked in a layer of matrices
     # assumes that xs do not change between runs
@@ -91,7 +92,13 @@ def calculate_wave_speed_transform(poly_count, trial, basis, chaos):
         res2 = get_evaluated_polys((i, k), basis, chaos)
         return res1 * res2
 
-    matrix_a = calculate_expectancy_matrix_sym(chaos, alpha_expectancy_func, poly_count)
+    def alpha_expectancy_func_simple(*ys, i, k):
+        res1 = trial.alpha(trial.transform_values(ys))
+        res2 = basis[i](ys) * basis[k](ys)
+        res3 = mul_prod(distr.weight(y) for y, distr in zip(ys, chaos.get_distributions()))
+        return res1 * res2 * res3
+
+    matrix_a = calculate_expectancy_matrix_sym(chaos, (alpha_expectancy_func, alpha_expectancy_func_simple), poly_count)
     diag, transform_s = eigh(matrix_a)  # now holds A=S*D*S^T, S is orthonormal, D a diagonal matrix
     wave_speeds = np.sqrt(diag)
     return wave_speeds, transform_s
@@ -110,9 +117,13 @@ def calculate_transformed_betas(poly_count, trial, basis, chaos, transform_s, xs
         res2 = get_evaluated_polys((i, k), basis, chaos)
         return res1 * res2
 
+    def beta_expectancy_func_simple(*ys, i, k, x):
+        res3 = mul_prod(distr.weight(y) for y, distr in zip(ys, chaos.get_distributions()))
+        return trial.beta([x], trial.transform_values(ys)) * basis[i](ys) * basis[k](ys) * res3
+
     x_nodes = xs[0]  # one dimensional only
     # tensor.shape = (nodes_count,poly_count,poly_count), so one matrix B(x) per layer
-    tensor = calculate_expectancy_tensor(chaos, beta_expectancy_func, poly_count, x_nodes)
+    tensor = calculate_expectancy_tensor(chaos, (beta_expectancy_func, beta_expectancy_func_simple), poly_count, x_nodes)
     # apply the transformation matrix s on the tensor
     tensor = np.matmul(tensor, transform_s)  # application of transform_s on the right for each layer
     tensor = np.matmul(transform_s.T, tensor)  # application of transposed transform_s on the left for each layer
@@ -126,7 +137,10 @@ def calculate_transformed_betas(poly_count, trial, basis, chaos, transform_s, xs
 
 @cache_by_first_parameter([cache_name_quadrature])
 def calculate_beta_integral(ikj, x, chaos, to_expect):  # j needs to be cached as well as this corresponds to x
-    return chaos.integrate(partial(to_expect, i=ikj[0], k=ikj[1], x=x), function_parameter_is_nodes_matrix=True)
+    if chaos.quadrature_rule.supports_simultaneous_application():
+        return chaos.integrate(partial(to_expect[0], i=ikj[0], k=ikj[1], x=x), function_parameter_is_nodes_matrix=True)
+    else:
+        return chaos.integrate(partial(to_expect[1], i=ikj[0], k=ikj[1], x=x))
 
 
 def calculate_expectancy_tensor(chaos, to_expect, poly_count, x_nodes):
@@ -149,7 +163,10 @@ def calculate_expectancy_matrix_sym(chaos, to_expect, poly_count):
     for i in range(poly_count):
         # we know it is symmetric and therefore only calculate upper triangle
         for k in range(i, poly_count):
-            exp_value = chaos.integrate(partial(to_expect, i=i, k=k), function_parameter_is_nodes_matrix=True)
+            if chaos.quadrature_rule.supports_simultaneous_application():
+                exp_value = chaos.integrate(partial(to_expect[0], i=i, k=k), function_parameter_is_nodes_matrix=True)
+            else:
+                exp_value = chaos.integrate(partial(to_expect[1], i=i, k=k))
             # use symmetry to fill matrix
             matrix[i, k] = exp_value
             matrix[k, i] = exp_value
@@ -172,8 +189,14 @@ def get_projection_coefficients(name_and_poly_count, function, project_trial, ba
         res2 = get_evaluated_poly(i, basis, chaos)
         return res1 * res2
 
-    return [chaos.integrate(partial(integrate_func, i=i),
-                            function_parameter_is_nodes_matrix=True)
+    def integrate_func_simple(*ys, i):
+        res3 = mul_prod(distr.weight(y) for y, distr in zip(ys, chaos.get_distributions()))
+        return function(project_trial.transform_values(ys)) * basis[i](ys) * res3
+
+    supports_multiple = chaos.quadrature_rule.supports_simultaneous_application()
+    to_integrate = integrate_func if supports_multiple else integrate_func_simple
+    return [chaos.integrate(partial(to_integrate, i=i),
+                            function_parameter_is_nodes_matrix=supports_multiple)
             for i in range(len(basis))]
 
 
