@@ -174,6 +174,19 @@ Sind $\alpha$, $\beta$ und die Anfangswerte glatte Funktionen, so bietet sich di
 Sind die Funktionen nicht glatt und besitzen beispielsweise Unstetigkeitsstellen, so bietet sich die Verwendung eines general-purpose Integrators an. Beachte, dass dieser die Wahrscheinlichkeitsdichten von $Y$ explizit auswerten muss. Diese Integratoren werden von verschiedenen Bibliotheken zur Verfügung gestellt und versuchen unter anderem Intervalle anhand der Unstetigkeitsstellen zu unterteilen. Dafür werden deutlich mehr Funktionsauswertungen benötigt und der Zeitaufwand lässt sich bei solchen Black-Box-Algorithmen nicht im Vorhinein bestimmen. Im Gegensatz zur Collocation mithilfe von diskreter Projektion, wo eine Funktionsauswertung das Lösen einer Instanz der KGG entsprach, ist es hier jedoch möglich, die zu integrierende Funktion schnell und für beliebige $y\in\R^N$ auszuwerten.\\[0.2cm]
 Weiterhin sei bemerkt, dass die Berechnungen der Erwartungswerte einmalig am Anfang passieren und unabhängig von der Stoppzeit $T$ sind. Variiert man die Polynomgrenze $P$, so kann man bereits berechnete Koeffizienten entsprechend wiederverwenden.
 \section{Numerische Ergebnisse}
+\subsection{Einfluss der Zeitschrittweite $\tau$}
+Anhand der vierdimensionalen \nameref{trial:8} beobachten wir für verschiedene Werte von $P$ mit $M=\binom{4+P}{P}$ Polynomen den Einfluss der Zeitschrittweite $\tau$ auf die Approximationsgenauigkeit. Dieser Einfluss ist in Abbildung \ref{fig:galerkin_bydt_trial8} durch den Fehler des Erwartungswerts und der Varianz dargestellt. Wir erkennen, dass für $P\le 5$ die Wahl $\tau=10^{-3}$ ausreichend ist für eine bestmögliche Approximation. Der Fehler konvergiert quadratisch bezüglich des Parameters $\tau$, der bestmögliche Fehler ist aber durch den Parameter $P$ eingeschränkt und die Konvergenz endet vorzeitig.\\
+Für $P=5$ ist $M=126$ und es steckt bereits ein großer Aufwand darin, die Matrizen $B(x)$ der Größe $126\times 126$ für jeden der 128 Knotenpunkte $x\in\Torus$ zu berechnen, da jeweils eine dünne Gitter Quadratur mit 9065 Punkten verwendet werden muss.
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{Figures/galerkin_trial8_sparse.png}
+\caption{Fehler der Galerkin-Approximation von \nameref{trial:8} anhand von der für das Strang-Splitting verwendeten Zeitschrittweite $\tau$.}
+\label{fig:galerkin_bydt_trial8}
+\end{figure}
+
+\subsection{Einfluss des Polynomgrads $P$}
+
+\subsection{Abschätzung für den Fehler der Fourier-Koeffizienten}
 \todo[inline]{Weitere Ergebnisse (über Stoppzeit, pro Knotenpunkt,...)}
 \begin{maththeorem}[Adaption von Theorem 2.2 aus \autocite{davidgottliebdongbinxiu2008}]
 \label{th:adapted22}

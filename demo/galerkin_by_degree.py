@@ -7,19 +7,19 @@ from stochastic_equations.galerkin.galerkin import galerkin_approximation
 
 
 domain = [(-np.pi, np.pi)]
-trial = st.trial_discont_simple_gauss
+trial = st.trial_8
 grid_size = trial.get_parameter("grid_size", 128)
 start_time = 0.
 stop_time = trial.get_parameter("stop_time", 1)
 delta_time = 0.0001
 steps = int(stop_time / delta_time)
-max_poly_degrees = list(range(1, 15))  # do not put a number >=7 here for 4 dimensional problems as this kills my laptop
+max_poly_degrees = list(range(1, 6))  # do not put a number >=7 here for 4 dimensional problems as this kills my laptop
 wave_weight = 1.
 
 if len(trial.variable_distributions) == 1:
     # needs to be by one bigger than max(max_poly_degrees) in 1D
-    quadrature_method = "full_tensor"
-    quadrature_params = [[n + 3] * len(trial.variable_distributions) for n in max_poly_degrees]
+    #quadrature_method = "full_tensor"
+    #quadrature_params = [[n + 3] * len(trial.variable_distributions) for n in max_poly_degrees]
 
     # might be slightly better, but curve is more irregular for trial1
     #quadrature_params = [[max(max_poly_degrees) + 2] * len(trial.variable_distributions) for _ in max_poly_degrees]
