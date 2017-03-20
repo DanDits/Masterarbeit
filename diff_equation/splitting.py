@@ -23,7 +23,8 @@ class Splitting:
         return next_position, next_velocity
 
     def get_current_time(self):
-        return self.solver_configs[0].start_time
+        time = self.solver_configs[0].start_time
+        return 0 if time is None else time
 
     def approx_steps_to_end_time(self, end_time, time_step_size):  # can be inaccurate due to floating errors
         return int((end_time - self.get_current_time()) / time_step_size)

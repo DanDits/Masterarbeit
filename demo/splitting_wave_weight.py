@@ -10,8 +10,8 @@ grid_size_N = 2 ** 7
 domain = list(repeat([-np.pi, np.pi], dimension))
 
 
-wave_weights = np.arange(0., 1.001, 0.02)
-trials = [ds.trial_1, ds.trial_2, ds.trial_3, ds.trial_frog]
+wave_weights = np.arange(0., 1.001, 0.025)
+trials = [ds.trial_3]
 start_time = 0.
 delta_time = 0.005
 stop_time = 1
@@ -38,6 +38,8 @@ for trial in trials:
         trial.error_function = error_l2_relative
         errors.append(trial.error(xs_mesh, splitting.times()[-1], splitting.solutions()[-1]))
 
-    plt.plot(wave_weights, errors, label="{}".format(trial.name))
+    plt.plot(wave_weights, errors, label="{}, $\\alpha={}, \\beta(0)={}$".format(trial.name, trial.alpha(),
+                                                                              trial.beta([0])))
     print(errors)
+plt.legend()
 plt.show()

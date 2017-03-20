@@ -184,10 +184,31 @@ Für $P=5$ ist $M=126$ und es steckt bereits ein großer Aufwand darin, die Matr
 \label{fig:galerkin_bydt_trial8}
 \end{figure}
 
-\subsection{Einfluss des Polynomgrads $P$}
-
-\subsection{Abschätzung für den Fehler der Fourier-Koeffizienten}
-\todo[inline]{Weitere Ergebnisse (über Stoppzeit, pro Knotenpunkt,...)}
+\subsection{Einfluss des Quadraturfehlers}
+Wie bereits bei der Collocation betrachten wir wieder die \nameref{trial:discontsimple} mit unstetigen Koeffizienten $\alpha$ und $\beta$. In Abbildung \ref{fig:galerkin_bydegree_trialdiscontsimple} ist der Fehler der Approximationen in Abhängigkeit vom Polynomgrad $P$ dargestellt. Der linke Plot erinnert an das Verhalten der Approximation mithilfe von Collocation mithilfe von diskreter Projektion. Die dort verwendete Quadratur verwendet als Stützstellen Lösungen der deterministischen KGG. Dies macht einen general-purpose Integrator unpraktikabel. Hier jedoch erkennen wir, dass es möglich ist einen monoton fallenden Fehler zu erhalten, wenn die Berechnung von $A$ und $B(x)$ exakt ist. 
+\begin{figure}[!htb]
+\minipage{0.5\textwidth}
+  \includegraphics[width=\linewidth]{Figures/galerkin_bydegree_trialsimple_gauss.png}
+\endminipage
+\minipage{0.5\textwidth}
+  \includegraphics[width=\linewidth]{Figures/galerkin_bydegree_trial_simple_genpurp.png}
+\endminipage
+  \caption{Galerkin Approximation von \nameref{trial:discontsimple}. Links mit Gauss-Quadratur, rechts mit einem general-purpose Integrator.}
+  \label{fig:galerkin_bydegree_trialdiscontsimple}
+\end{figure}
+\newline
+Eine ähnliche Beobachtung machen wir auch für die \nameref{trial:disconttriple} mit 2 Unstetigkeitsstellen in $\alpha$ und stetigem $\beta$ in Abbildung \ref{fig:galerkin_bydegree_trialtriple}. Im Gegensatz zur Collocation die einfache Möglichkeit einen monoton fallenden Fehler zu erhalten ohne große Laufzeitprobleme.
+ \begin{figure}[!htb]
+\minipage{0.5\textwidth}
+  \includegraphics[width=\linewidth]{Figures/galerkin_bydegree_trialdisconttriple_gauss.png}
+\endminipage
+\minipage{0.5\textwidth}
+  \includegraphics[width=\linewidth]{Figures/galerkin_bydegree_trialdisconttriple_genpurp.png}
+\endminipage
+  \caption{Galerkin Approximation von \nameref{trial:disconttriple}. Links mit Gauss-Quadratur, rechts mit einem general-purpose Integrator.}
+  \label{fig:galerkin_bydegree_trialtriple}
+\end{figure}
+\subsection{Einfluss der Stoppzeit}
 \begin{maththeorem}[Adaption von Theorem 2.2 aus \autocite{davidgottliebdongbinxiu2008}]
 \label{th:adapted22}
 Ziel: Abschätzung für 
@@ -279,6 +300,3 @@ In Abbildung \ref{fig:galerkin_bystoptime_trial3}, welche die Fehler der eindime
 \label{fig:galerkin_bystoptime_trial3}
 \end{figure}
 \todo[inline]{Problem4: Es ist nicht ganz klar, was eigentlich rauskommen soll. Durch fehlende Referenzlösungen für die Varianz an vielen verschiedenen Zeitpunkten ist es schwierig, beliebige Beispiele (insbesondere mehrdimensionale) zu beobachten.}
-
-\subsection{Vergleich Galerkin und Collocation}
-\todo[inline]{Vergleiche mehrdimensionale, unstetige, nicht diff'bare Beispiele mit Collocation (Problem: Quadratur ist in beiden Fällen schlecht bei unstetigen Funktionen)}

@@ -25,8 +25,8 @@ show_errors = True
 show_reference = True
 do_animate = True
 
-param_g1 = 7  # some parameter greater than one
-alpha_1 = 2  # smaller than param_g1 ** 2 / dimension to ensure beta>0
+param_g1 = 6  # some parameter greater than one
+alpha_1 = 25  # smaller than param_g1 ** 2 / dimension to ensure beta>0
 trial_1 = Trial(lambda xs: np.sin(sum(xs)),
                 lambda xs: param_g1 * np.cos(sum(xs)),
                 lambda xs, t: np.sin(sum(xs) + param_g1 * t),
@@ -47,8 +47,8 @@ trial_2 = Trial(lambda xs: np.zeros(shape=sum(xs).shape),
                     "alpha", lambda: alpha_small)
 
 # probably needs to be adapted for higher dimensional case
-param_1, param_2, param_n1, param_3, alpha_g0 = 0.3, 0.5, 2, 1.2, 0.3
-assert param_n1 * alpha_g0 < param_3  # to ensure beta > 0
+param_1, param_2, param_n1, param_3, alpha_g0 = 0.3, 0.5, 2, 10, 0.45
+assert param_n1 * np.sqrt(alpha_g0) < param_3  # to ensure beta > 0
 trial_3 = Trial(lambda xs: param_1 * np.cos(param_n1 * sum(xs)),
                 lambda xs: param_2 * param_3 * np.cos(param_n1 * sum(xs)),
                 lambda xs, t: np.cos(param_n1 * sum(xs)) * (param_1 * np.cos(param_3 * t)
