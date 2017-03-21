@@ -24,9 +24,76 @@ Dabei ist
 \item $\absolute{u(t,x)}^2$ physikalisch als Ladungsdichte des Teilchens zum Zeitpunkt $t$ und Ort $x$ interpretierbar \autocite{kleingordon2016}. 
 \item $\alpha>0$ das Quadrat der Wellengeschwindigkeit.
 \item $\beta(x)>0, \forall x\in \Torus^d,$ in der physikalischen Interpretation das Quadrat aus dem Produkt von quadratischer Wellengeschwindigkeit, Masse und inversem planckschem Wirkungsquantum. Die Abhängigkeit des Potentialteils der KGG vom Ort $x$ ist dabei eine Verallgemeinerung der klassischen Gleichung.
-\item die Differentialgleichung im Gegensatz zur physikalischen Darstellung reellwertig. Insbesondere fordern wir, dass $u$, $u_0$ und $v_0$ reellwertig und die Anfangswerte $u_0$ und $v_0$ periodisch in $(-\pi,\pi)^d$ sind. \todo{(Reelle) Existenztheorie?}
+\item die Differentialgleichung im Gegensatz zur physikalischen Darstellung reellwertig. Insbesondere fordern wir, dass $u$, $u_0$ und $v_0$ reellwertig und die Anfangswerte $u_0$ und $v_0$ periodisch in $(-\pi,\pi)^d$ sind.
 \end{itemize}
 
+\subsection{Existenztheorie}
+Um den analytischen Rahmen für die Existenz und Eindeutigkeit von Lösungen der KGG zu schaffen werden wir die Halbgruppentheorie verwenden. Die verwendete Theorie ist übernommen aus \autocite{HundSchnau} und \autocite{EngelNagel}, dort finden sich auch weitere Details und Beweise der verwendeten Theoreme.
+\begin{mathdef}
+Sei der Raum der beliebig häufig differenzierbaren periodischen Funktionen definiert als
+\[C_\text{per}^\infty (\Torus^d)\coloneqq \lbrace v\colon \Torus^d\to\R \mid v \text{ beliebig häufig stetig differenzierbar und periodisch in }[-\pi,\pi]\rbrace\]
+Definieren wir zu $v\in C^\infty(\Torus^d)$ und $k\in\N_0$ die Sobolev-Norm $\norm{v}_{k,2}$ durch
+\[\norm{v}_{k,2}^2\coloneqq \sum_{|m|\le k}\norm{\dxp{v}{m}}_{L^2((-\pi,\pi)^d)}^2,\quad \text{Multiindex }\, |m|=m_1+\dots + m_d\]
+so erhalten wir bei Verwendung der schwachen Ableitung und mit Vervollständigung die Sobolev-Räume $H^k((-\pi,\pi)^d)$.\\
+Wir definieren einen vollständigen Unterraum --und somit einen Banachraum-- des Sobolev-Raums $H^k((-\pi,\pi)^d)$ durch
+\[H_\text{per}^k(\Torus^d)\coloneqq \text{Abschluss von } C_\text{per}^\infty(\Torus^d) \text{ bezüglich der Norm von } H^k((-\pi,\pi)^d)\]
+\end{mathdef}
+Zunächst definieren wir die benötigte Halbgruppe $S(\cdot)$ und ihren Generator $A$.
+\begin{mathdef}
+Zu einem Banachraum $R$ heißt die Abbildung $S(\cdot)\colon \R_+\to L(R)$, die einer Zeit $t$ einen beschränken linearen Operator zuordnet, eine Operatorhalbgruppe, wenn
+\[S(0)=I,\quad S(t+s)=S(t)S(s)\quad \forall t,s\ge 0\]
+$S(\cdot)$ heißt $C_0$-Halbgruppe bzw. stark stetig, wenn zusätzlich gilt
+\[\forall r\in R\colon S_\text{Orbit}(\cdot)\colon \R_+\to R,\: t\mapsto S(t)r \text{ ist stetig}\]
+Den Generator $A$ von $S(\cdot)$ erhält man, indem der Definitionsbereich definiert wird als
+\[D(A)\coloneqq \lbrace r\in R\mid \text{ der Grenzwert } \lim\limits_{t\to0+}\frac{1}{t}(S(t)r-r)\text { existiert in }R\rbrace\]
+und man anschließend für $r\in D(A)$ definiert
+\[Ar\coloneqq \lim\limits_{t\to0+}\frac{1}{t}(S(t)r-r)\]
+\end{mathdef}
+Im folgenden Theorem wird die Verwendung der Halbgruppentheorie zum Erhalten von eindeutigen Lösungen der KGG klar. Inspiriert ist diese Betrachtungsweise durch den endlich dimensionalen Fall, wo $S(t)r=e^{At}r$ explizit über die Matrixexponentialfunktion gegeben ist.
+\begin{maththeorem}[{\autocite[Proposition 2.8]{HundSchnau}}]
+Ist $A$ Generator der $C_0$-Halbgruppe $S(\cdot)$ und $r\in D(A)$, dann ist für alle $t\ge 0\colon \,S(t)r\in D(A)$ und
+\[v\colon \R_+\to R,\quad t\mapsto S(t)r\]
+die eindeutige Lösung des Cauchy-Problems
+\begin{equation}
+\begin{split}
+v'(t)&=Av(t),\quad t\ge 0\\
+v(0)&=r
+\end{split}
+\end{equation}
+\end{maththeorem}
+Formulieren wir unsere KGG als ein Cauchy-Problem obiger Gestalt, so ist also nur noch zu zeigen, dass der Generator eine $C_0$-Halbgruppe generiert.\\
+Den Generator $C=A+B$ der KGG teilen wir auf und erhalten zuerst den Teilgenerator $A$
+\[A=\begin{pmatrix}0 & \kappa I\\ \alpha\Laplace & 0\end{pmatrix},\quad \kappa \in [0,1],\alpha>0\]
+Wir definieren den Hilbertraum $R=H^1_\text{per}(\Torus^d)\times H^0_\text{per}(\Torus^d)$ mit zugehörigem leicht abgewandelten Skalarprodukt 
+\[\langle \begin{pmatrix}v_1\\v_2\end{pmatrix}, \begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle =\int_{[-\pi,\pi]^d}\alpha \nabla v_1\nabla w_1+\kappa v_2w_2dx\] 
+Es ist $D(A)=H^2_\text{per}(\Torus^d)\times H^1_\text{per}(\Torus^d)\subset R$ dicht in $R$, da bereits $C_\text{per}^\infty\times C_\text{per}^\infty$ dicht in $R$ ist.\\
+Stones Theorem besagt, dass $A$ genau dann eine $C_0$-Halbgruppe von unitären Operatoren generiert, wenn $A$ schiefadjungiert bezüglich des Skalarprodukt des Hilbertraums ist. Wir rechnen nach:
+\begin{align*}
+\langle A\begin{pmatrix}v_1\\v_2\end{pmatrix}, \begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle
+&=\langle \begin{pmatrix}\kappa v_2\\\alpha \Laplace v_1\end{pmatrix}, \begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle\\
+&=\int_{[-\pi,\pi]^d}\kappa \alpha \nabla v_2\nabla w_1 + \kappa \alpha \Laplace v_1 w_2dx\\
+&\stackrel{\text{Green}}{=}-\int_{[-\pi,\pi]^d}\alpha\kappa v_2\Laplace w_1+ \alpha\kappa \nabla v_1\nabla w_2dx,\quad \text{da $v_1,v_2,w_1,w_2$ periodisch}\\
+&=-\langle \begin{pmatrix} v_1\\ v_2\end{pmatrix}, \begin{pmatrix}\kappa w_2\\\alpha \Laplace w_1\end{pmatrix}\rangle=-\langle \begin{pmatrix}v_1\\v_2\end{pmatrix}, A\begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle
+\end{align*}
+Um den vollen Generator $C$ der KGG zu erhalten benötigen wir noch den zweiten Teiloperator $B$ definiert durch
+\[B=\begin{pmatrix}0 & (1-\kappa)I\\-\beta(x) & 0\end{pmatrix}\]
+Dazu verwenden wir das Theorem über beschränkte Störungen eines stark stetigen Generators.
+\begin{maththeorem}[{\autocite[Theorem 1.3, Kapitel III]{EngelNagel}}]
+Ist $A$ Generator einer stark stetigen Halbgruppe $S(\cdot)$ mit Definitionsbereich $D(A)$ auf einem Banachraum $R$ und $B\colon R\to R$ ein beschränkter linearer Operator, so ist
+$C=A+B$ mit $D(C)\coloneqq D(A)$ ebenfalls Generator einer stark stetigen Halbgruppe.
+\end{maththeorem}
+Wir verwenden daher den Banachraum $R_B=H_\text{per}^0\times H_\text{per}^0\supset R=H_\text{per}^1\times H_\text{per}^0$ mit der Norm 
+\[\norm{\begin{pmatrix}v_1\\v_2\end{pmatrix}}_B^2=\int_{[-\pi,\pi]^d}v_1^2+v_2^2dx\le 
+\norm{\begin{pmatrix}v_1\\v_2\end{pmatrix}}^2_{H_\text{per}^1\times H_\text{per}^0}\]
+Dann gilt
+\begin{align*}
+\norm{B\begin{pmatrix}v_1\\v_2\end{pmatrix}}^2_B&=\int_{[-\pi,\pi]^d}(1-\kappa)^2v_2^2+(\beta(x))^2v_1^2dx\\
+&\le c\int_{[-\pi,\pi]^d}v_1^2+v_2^2dx=c\norm{\begin{pmatrix}v_1\\v_2\end{pmatrix}}_B^2
+\end{align*}
+Insgesamt ist somit der Generator 
+\[C=\begin{pmatrix}0 & I\\ \alpha\Laplace - \beta(x) & 0\end{pmatrix}\]
+der Klein-Gordon-Gleichung Generator einer $C_0$-Halbgruppe und das zugehörige Cauchy-Problem besitzt eine eindeutige Lösung in $D(A)$. Dies impliziert auch eine eindeutige Lösung der KGG in $H_\text{per}^2(\Torus^d)$.
+\todo[inline]{Passt das mit der Norm für $B$? Können BRe auch einfach reell sein?}
 \subsection{Exakte Lösungen}
 Für spezielle Konfigurationen der Parameter und Anfangswerte können wir exakte Lösungen angeben. Diese sind hilfreich, um die Korrektheit von Implementierungen schnell und zuverlässig testen zu können. Außerdem werden so schnell die Grenzen und eventuelle Schwächen der Verfahren für gut gestellte Probleme deutlich.\\[0.5cm]
 Mithilfe des Separationsansatzes $u(t,x)=g(x)f(t)$ erhalten wir aus (\ref{kgg}) die Darstellung
