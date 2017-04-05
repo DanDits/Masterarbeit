@@ -1,22 +1,22 @@
 % Chapter 4
 
-\chapter{Stochastische Collocation}
-Wie bereits die Monte-Carlo-Methode basieren auch stochastische Collocationsverfahren auf \emph{sampling}, d.h. der wiederholten Auswertung von vielen Zufallsexperimenten. Bei der Monte-Carlo-Methode werden die Punkte dabei abhängig von der gegebenen Verteilung unabhängig und zufällig gewählt. Die Konvergenz ist in einem stochastischen Sinne durch das Gesetz der großen Zahlen gegeben.\\
-Dies ist ein großer Unterschied zu den hier vorgestellten stochastischen Collocationsverfahren. Für diese werden die Collocationspunkte nicht zufällig, sondern so gewählt, dass mithilfe von ihnen eine Polynominterpolation oder Quadratur möglich ist. Konvergenz ist dann abhängig davon, wie gut sich die approximierte stochastische Größe durch Polynome von Zufallsvariablen approximieren lässt.\\
+\chapter{Stochastische Kollokation}
+\label{Chapter4}
+Wie bereits die Monte-Carlo-Methode basieren auch stochastische Kollokationsverfahren auf \emph{sampling}, d.h. der wiederholten Auswertung von vielen Zufallsexperimenten. Bei der Monte-Carlo-Methode werden die Punkte dabei abhängig von der gegebenen Verteilung unabhängig und zufällig gewählt. Die Konvergenz ist in einem stochastischen Sinne durch das Gesetz der großen Zahlen gegeben.\\
+Dies ist ein großer Unterschied zu den hier vorgestellten stochastischen Kollokationsverfahren. Für diese werden die Kollokationspunkte nicht zufällig, sondern so gewählt, dass mithilfe von ihnen eine Polynominterpolation oder Quadratur möglich ist. Konvergenz ist dann abhängig davon, wie gut sich die approximierte stochastische Größe durch Polynome von Zufallsvariablen approximieren lässt.\\
 Die beiden Ansätze \emph{Interpolation} und \emph{diskrete Projektion} (auch \emph{pseudospektraler Ansatz} genannt) werden für die stochastische KGG im Folgenden detailliert vorgestellt und miteinander verglichen.
-\section*{Collocation für die stochastische KGG}
+\section*{Kollokation für die stochastische KGG}
 Die stochastische KGG (\ref{skgg}) für $d$ räumliche Dimensionen, $N$ stochastische Dimensionen und $y\in\R^N$ war definiert durch
 \begin{align*}
 \dtt{u}(t,x,y)&=\alpha(y) \Laplace_x u(t,x,y) - \beta(x,\omega)u(t,x,y), \: t>0, \, x\in \Torus^d\\
 u(0,x,y)&=u_0(x,y), \: x\in \Torus^d\\
 \dt{u}(0,x,y)&=v_0(x,y), \: x\in \Torus^d
 \end{align*}
-Im klassischen Sinne bedeutet Collocation, dass eine Approximation für eine diskrete Knotenmenge $\Theta_Y=\lbrace y_i\in\R^N\mid i=1,\dots,S\rbrace$ exakt ist. Auf die stochastische KGG übertragen, muss also für $y=y_i\in\Theta_Y$ die Lösung $u(t,x,y_i)$ für $x\in\Torus^d$ und $t>0$ vorliegen und die Approximation $w$ erfüllt $w(t,x,y_i)=u(t,x,y_i)$ für $i=1,\dots,S$. Da wir die exakte Lösung $u(t,x,y_i)$ nicht kennen, sondern für einen Zeitpunkt $T>0$ und eine Knotenmenge $\lbrace x_j\in\Torus^d\mid j=1,\dots,H\rbrace$ nur mithilfe des Strang-Splittings approximieren können, gilt für festes $x_j$ die Collocationsbedingung lediglich approximativ:
+Im klassischen Sinne bedeutet Kollokation, dass eine Approximation für eine diskrete Knotenmenge $\Theta_Y=\lbrace y_i\in\R^N\mid i=1,\dots,S\rbrace$ exakt ist. Auf die stochastische KGG übertragen, muss also für $y=y_i\in\Theta_Y$ die Lösung $u(t,x,y_i)$ für $x\in\Torus^d$ und $t>0$ vorliegen und die Approximation $w$ erfüllt $w(t,x,y_i)=u(t,x,y_i)$ für $i=1,\dots,S$. Da wir die exakte Lösung $u(t,x,y_i)$ nicht kennen, sondern für einen Zeitpunkt $T>0$ und eine Knotenmenge $\lbrace x_j\in\Torus^d\mid j=1,\dots,H\rbrace$ nur mithilfe des Strang-Splittings approximieren können, gilt für festes $x_j$ die Kollokationsbedingung lediglich approximativ:
 \[w(T,x_j,y_i)=u(T,x_j,y_i)\approx \tilde{u}(T,x_j,y_i),\quad i=1,\dots,S\]
-Wir wählen daher $\tau$ so klein, dass dieser Fehler im Vergleich zum eigentlichen Collocationsfehler vernachlässigbar gering ist. Zur Vereinfachung der Notation nehmen wir im Folgenden an, die Lösung $u(T,x_j,y_i)$ liege exakt vor.
+Wir wählen daher $\tau$ so klein, dass dieser Fehler im Vergleich zum eigentlichen Kollokationsfehler vernachlässigbar gering ist. Zur Vereinfachung der Notation nehmen wir im Folgenden an, die Lösung $u(T,x_j,y_i)$ liege exakt vor.
 
 \section{Interpolation}
-\todo[inline]{Für Interpolation auch volles Tensorprodukt der Räume probieren zusammen mit full tensor der Knotenpunkte}
 Sei $Y$ ein $N$-dimensionaler Zufallsvektor mit stochastisch unabhängigen Komponenten und $\Theta_Y\subset I_Y$ eine zu den Verteilungen von $Y_i$ passende $S$ elementige Knotenmenge. Seien weiter $\lbrace \Phi_m \mid |m|\le P \rbrace$ die zu den Verteilungen passenden gPC Basisfunktionen und im Folgenden mit $m=0,\dots,M=\binom{N+P}{P}-1$ durchnummeriert. Eine Diskussion zur Nummerierung findet man im vorherigen Kapitel.\\
 Dann wählen wir als Interpolationspolynom die Funktion
 \begin{equation}
@@ -88,7 +88,7 @@ Wir wollen nun dem technischen Satz \ref{th:interpol_and_proj} Leben einhauchen 
 \item
 Die vorausgesetzte Existenz einer Quadraturformel aus $M+1$ verschiedenen Quadraturpunkten und Exaktheitsgrad $2M$ ist durch die später vorgestellte Gauss-Quadratur erfüllt. Die Quadraturpunkte sind dabei die Nullstellen des $M+1$-ten Basispolynoms und daher paarweise verschieden. Die Quadraturgewichte lassen sich über die erste Komponente des zugehörigen normierten Eigenvektors bestimmen.
 \item
-Wir sehen, dass sich im Eindimensionalen bei bekannter Quadraturformel die Interpolationskoeffizienten $\hat{w}_m$ auch einzeln ohne Lösen eines linearen Gleichungssystems berechnen lassen. Diese Darstellung führt auf den später vorgestellten zweiten Ansatz zur stochastischen Collocation.
+Wir sehen, dass sich im Eindimensionalen bei bekannter Quadraturformel die Interpolationskoeffizienten $\hat{w}_m$ auch einzeln ohne Lösen eines linearen Gleichungssystems berechnen lassen. Diese Darstellung führt auf den später vorgestellten zweiten Ansatz zur stochastischen Kollokation.
 \item
 Die Darstellung $\hat{w}_i=\sum_{j=0}^M\Phi_i(y_j)a_jf(y_j)$ kann als Approximation an die Koeffizienten $\int_I \Phi_i(y)f(y)w(y)dy$ der Bestapproximation $P_Mf$ in $L_w^2(I)$ aufgefasst werden. Mithilfe der Dreiecksungleichung lässt sich dann der Fehler der Interpolation beschreiben durch
 \begin{align*}
@@ -105,7 +105,7 @@ Wir vergleichen anhand von \nameref{trial:1} für $d=1$ zwei Möglichkeiten zur 
 \item die $M+1$ Nullstellen des Legendre-Polynoms vom Grad $M+1$ (genannt \textit{full\_tensor}).
 \item die $M+1$ Nullstellen des \chebyspace Polynoms vom Grad $M+1$ (siehe Bemerkung \ref{bem:cheby}).
 \end{enumerate}
-In Abbildung \ref{fig:collocation_trial1} ist die Approximationsgüte der Interpolation dargestellt, links für $\tau=0.001$ und rechts für $\tau=0.0001$, gemessen durch die Fehler an den Erwartungswert und die Varianz. Man erkennt, dass die \chebyspace Interpolation langsamer konvergiert als die Legendre-Interpolation. Die Konvergenz stoppt bei einer gewissen Genauigkeit, die abhängig ist von $\tau$. Dies ist dadurch begründet, dass die Punkte $u(T,x_j,y_i)$ nicht exakt vorliegen sondern lediglich mithilfe eines Strang-Splittings mit Schrittweite $\tau$ approximiert werden. Dies betont die Wichtigkeit der Wahl eines kleinen $\tau$, allerdings bedeutet ein kleineres $\tau$ gleichzeitig eine entsprechende multiplikative Vergrößerung der Berechnungszeit.
+In Abbildung \ref{fig:Kollokation_trial1} ist die Approximationsgüte der Interpolation dargestellt, links für $\tau=0.001$ und rechts für $\tau=0.0001$, gemessen durch die Fehler an den Erwartungswert und die Varianz. Man erkennt, dass die \chebyspace Interpolation langsamer konvergiert als die Legendre-Interpolation. Die Konvergenz stoppt bei einer gewissen Genauigkeit, die abhängig ist von $\tau$. Dies ist dadurch begründet, dass die Punkte $u(T,x_j,y_i)$ nicht exakt vorliegen sondern lediglich mithilfe eines Strang-Splittings mit Schrittweite $\tau$ approximiert werden. Dies betont die Wichtigkeit der Wahl eines kleinen $\tau$, allerdings bedeutet ein kleineres $\tau$ gleichzeitig eine entsprechende multiplikative Vergrößerung der Berechnungszeit.
 \begin{figure}[!htb]
 \minipage{0.5\textwidth}
   \includegraphics[width=\linewidth]{Figures/collocation_mi_trial1_tau001.png}
@@ -114,7 +114,7 @@ In Abbildung \ref{fig:collocation_trial1} ist die Approximationsgüte der Interp
   \includegraphics[width=\linewidth]{Figures/collocation_mi_trial1_tau0001.png}
 \endminipage
 \caption{Vergleich von verschiedenen Interpolationspunkten und der Abhängigkeit der bestmöglichen Interpolation von der Genauigkeit der Interpolationspunkte anhand von \nameref{trial:1} zum Zeitpunkt $T=0.5$ und für $d=1$.}
-\label{fig:collocation_trial1}
+\label{fig:Kollokation_trial1}
 \end{figure}
 \end{mathbsp}
 \subsubsection*{Mehrdimensionale Interpolation durch volles Tensorprodukt}
@@ -154,7 +154,7 @@ Ein Beispiel sei für $N=2$ und $P=14$ gemacht, wo für Legendre- und Laguerre-P
 
 Wir werden später basierend auf Smolyaks Konstruktion einen effizienteren dünne Gitter Ansatz kennen lernen, der nicht nur für Interpolation verwendbar ist, sondern sich auch auf generelle Operatoren übertragen lässt. Dieser basiert allerdings auf vollen Tensorprodukten von Operatoren und ist daher nur übertragbar, wenn wir volle Tensorprodukte von Polynombasen zulassen (d.h. ohne die zusätzliche Bedingung $|m|\le P$). Da dies einen erheblichen Rechenaufwand impliziert, werden wir keine dünnen Gitter Ansätze für die Interpolation verwenden.
 \subsection{Algorithmus}
-In Algorithmus \ref{alg:collocation_mi} ist das Collocationsverfahren für den eindimensionalen Fall $d=1$ skizziert. Diese Variante der Collocation durch Interpolation wird in der Literatur auch mit \emph{Matrix-Invertierung} (MI) bezeichnet. Die Matrix $A$ muss nicht explizit invertiert werden, trotzdem besteht der Kern des Verfahrens aus dem Lösen der linearen Gleichungssysteme.\\
+In Algorithmus \ref{alg:Kollokation_mi} ist das Kollokationsverfahren für den eindimensionalen Fall $d=1$ skizziert. Diese Variante der Kollokation durch Interpolation wird in der Literatur auch mit \emph{Matrix-Invertierung} (MI) bezeichnet. Die Matrix $A$ muss nicht explizit invertiert werden, trotzdem besteht der Kern des Verfahrens aus dem Lösen der linearen Gleichungssysteme.\\
 \begin{tabular}{c|c}
 Parameter & \\
 \hline
@@ -165,10 +165,10 @@ $M+1$ & Anzahl an multivariaten gPC-Basispolynomen\\
 $S$ & Anzahl an Interpolationspunkten gemäß einer der möglichen Ansätze
 \end{tabular}
 \begin{algorithm}[ht]
-    \caption{Collocation durch Interpolation mithilfe von Matrix-Invertierung.}
-    \label{alg:collocation_mi}
+    \caption{Kollokation durch Interpolation mithilfe von Matrix-Invertierung.}
+    \label{alg:Kollokation_mi}
     \begin{algorithmic}[1] % The number tells where the line numbering should start
-        \Function{Collocation\_Interpolation\_MI}{$H, u_0, v_0, \alpha,\beta,\kappa,Y, M, S,\tau, T$} 
+        \Function{Kollokation\_Interpolation\_MI}{$H, u_0, v_0, \alpha,\beta,\kappa,Y, M, S,\tau, T$} 
             \State $\Phi_m\gets$ $m$-te orthonormale gPC-Basis-Funktion zu $Y$, $\quad m=0,\dots,M$
             \State $y_i\gets$ (multivariate) Interpolationspunkte (siehe Kapitel \ref{chapter:interpolation_points}), $\quad i=1,\dots,S$
             \State $A\gets (\Phi_m(y_i))_{i=1,\dots,S;m=0,\dots,M}\in\R^{S\times M+1}$
@@ -187,19 +187,19 @@ $S$ & Anzahl an Interpolationspunkten gemäß einer der möglichen Ansätze
 \subsection{Vergleiche der Ansätze}
 Wir reduzieren uns für $N=1$ auf die Nullstellen derjenigen Orthogonalpolynome, die gemäß des gPC zu der Verteilung von $Y$ gehören. Für das kompakte Interval $I=[-1,1]$ wäre es ebenso möglich die \chebyspace Interpolationspunkte zu verwenden. Diese bieten aber nach unseren Beobachtungen keinen Vorteil.\\
 Für $N>1$ besteht die Möglichkeit das volle Tensorprodukt der jeweiligen eindimensionalen Interpolationspunkte zu den Komponenten von $Y$ zu wählen. Da dies jedoch im Allgemeinen mehr Punkte umfasst als die vorhandenen $M+1$ Polynome, ist das lineare Gleichungssystem überbestimmt und wir beobachten eine hohe Kondition der Matrix. Dies sorgt insbesondere dafür, dass die Approximation der Varianz, welche jede Komponente des Lösungsvektors benötigt, bereits für $P>3$ instabil ist.\\
-Anhand der \nameref{trial:8} aus dem Appendix mit $N=4$ vergleichen wir die beiden Ansätze in Abbildung \ref{fig:collocation_trial8}. 
+Anhand der \nameref{trial:8} aus dem Appendix mit $N=4$ vergleichen wir die beiden Ansätze in Abbildung \ref{fig:Kollokation_trial8}. 
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=\linewidth]{Figures/collocation_mi_trial8_ft_pseudosparse.png}
-\caption{Approximation des Erwartungswerts und der Varianz von \nameref{trial:8} mithilfe von Collocation durch Interpolation und verschiedenen Ansätzen bis zu $P=14$.}
-\label{fig:collocation_trial8}
+\caption{Approximation des Erwartungswerts und der Varianz von \nameref{trial:8} mithilfe von Kollokation durch Interpolation und verschiedenen Ansätzen bis zu $P=14$.}
+\label{fig:Kollokation_trial8}
 \end{figure}
 Wir sehen, dass sich der Erwartungswert mit beiden Ansätzen approximieren lässt. Bis zu $P=11$ ist die Approximation mit dem pseudo\_sparse Ansatz dabei um einen Faktor 10 genauer. Die Kondition der Matrix ist für $P=11$ jedoch bereits in der Größenordnung $\mathcal{O}(10^{13})$ mit wachsender Tendenz, was Approximationen mit $P>11$ zunehmend schlechter werden lässt.\\
 Die Varianz ist durch das überbestimmte System beim full\_tensor Ansatz nicht berechenbar (für $P=9$ ergibt sich ein System der Größe $6^4\times \binom{4+9}{9} =1296\times 715$). Erhöht man $P$ weiter, so beobachtet man auch für den pseudo\_sparse Ansatz zunehmende Instabilität.
 
 \section{Diskrete Projektion}
 \label{sec:discrete_proj}
-Der zweite Ansatz zur stochastischen Collocation basiert auf der Bestapproximation in $L_{\rho_Y}^2$.
+Der zweite Ansatz zur stochastischen Kollokation basiert auf der Bestapproximation in $L_{\rho_Y}^2$.
 \begin{mathdef}[Diskrete Projektion]
 Sei $Y$ ein Zufallsvektor und $\Phi_m(Y)$ für $m=0,\dots,M$ die zugehörigen orthonormalen gPC Basisfunktionen. Dann ist die Bestapproximation der sKGG zu einem Zeitpunkt $T>0$ und für eine Stelle $x_j$ definiert als
 \[P_Mu(T,x_j,Y)=\sum_{m=0}^M\hat{u}_m^{(j)}\Phi_m(Y)\]
@@ -243,7 +243,7 @@ Das Gewicht ist somit das Quadrat des ersten Eintrags des Eigenvektors, siehe \a
 \end{mathbem}
 \subsection{Mehrdimensionale Quadratur}
 \label{chapter:multivariatequad}
-Um den Ansatz der diskreten Projektion für einen mehrdimensionalen Zufallsvektor mit $N>1$ durchzuführen, benötigen wir eine mehrdimensionale Quadratur. Im Gegensatz zur mehrdimensionalen Interpolation liegt die Schwierigkeit nicht nur darin eine Menge von Collocationspunkten zu finden, sondern auch die zugehörige Menge der Quadraturgewichte zu bestimmen.\\
+Um den Ansatz der diskreten Projektion für einen mehrdimensionalen Zufallsvektor mit $N>1$ durchzuführen, benötigen wir eine mehrdimensionale Quadratur. Im Gegensatz zur mehrdimensionalen Interpolation liegt die Schwierigkeit nicht nur darin eine Menge von Kollokationspunkten zu finden, sondern auch die zugehörige Menge der Quadraturgewichte zu bestimmen.\\
 Die numerischen Möglichkeiten der mehrdimensionalen Integration (engl. \emph{cubature}) umfassen unter anderem adaptive Verfahren und Monte-Carlo-Methoden. Da diese auf einer großen Menge an Funktionsauswertungen basieren und in unserem Fall eine Funktionsauswertung das aufwändige Lösen einer Instanz der sKGG bedeutet, benötigen wir somit angepasste Integrationsverfahren.
 \subsubsection*{Tensorkonstruktion}
 Sei $Y$ ein Zufallsvektor und $L_{Y_i}$ ein eindimensionaler Quadraturoperator bezüglich des Gewichts $\rho_{Y_i}$, beispielsweise die Gauss-Quadratur. Dann erhalten wir mithilfe einer Tensorkonstruktion die mehrdimensionale Quadratur
@@ -270,9 +270,9 @@ L_Y^\ell &= \sum_{|m|\le \ell} \varDelta_{Y_1}^{m_1}\otimes\dots\otimes \varDelt
 &= \sum_{|m|\le \ell} c_m L_{Y_1}^{m_1}\otimes\dots\otimes L_{Y_N}^{m_N}\\
 &= \sum_{\ell - N+1\le |m|\le \ell} (-1)^{\ell - |m|}\binom{N-1}{\ell - |m|}L_{Y_1}^{m_1}\otimes\dots\otimes L_{Y_N}^{m_N}\\
 \end{align*}
-Die Menge an benötigten Collocationspunkten ist dann 
+Die Menge an benötigten Kollokationspunkten ist dann 
 \[\Theta_Y^\ell=\bigcup_{\ell - N+1\le |m|\le \ell} \Theta_{Y_1}^{m_1}\times\dots\times \Theta_{Y_N}^{m_N}\]
-Die Gestalt und Größe der Menge $\Theta_Y^\ell$ ist abhängig davon, wie die Teilmengen geschachtelt (engl. \emph{nested}) sind. Dies ist eine entscheidende Bedingung für eine eventuelle Reduktion der benötigten Collocationspunkte. In Abbildung \ref{fig:grids} sehen wir zwei Beispiele für dünne Gitter. Die zugrunde liegenden Knotenmengen $\Theta_{Y_1}^j$ und $\Theta_{Y_2}^j$ sind dabei die Nullstellen der Legendre- bzw. Hermite-Polynome mit Grad $j$.
+Die Gestalt und Größe der Menge $\Theta_Y^\ell$ ist abhängig davon, wie die Teilmengen geschachtelt (engl. \emph{nested}) sind. Dies ist eine entscheidende Bedingung für eine eventuelle Reduktion der benötigten Kollokationspunkte. In Abbildung \ref{fig:grids} sehen wir zwei Beispiele für dünne Gitter. Die zugrunde liegenden Knotenmengen $\Theta_{Y_1}^j$ und $\Theta_{Y_2}^j$ sind dabei die Nullstellen der Legendre- bzw. Hermite-Polynome mit Grad $j$.
 \begin{figure}[!htb]
 \minipage{0.5\textwidth}
   \includegraphics[width=\linewidth]{Figures/sparse_grid_legendre_legendre.png}
@@ -280,11 +280,11 @@ Die Gestalt und Größe der Menge $\Theta_Y^\ell$ ist abhängig davon, wie die T
 \minipage{0.5\textwidth}
   \includegraphics[width=\linewidth]{Figures/sparse_grid_hermite_legendre.png}
 \endminipage
-\caption{Dünne Gitter nach Smolyak mit $N=2$ und Legendre- bzw. Hermite-Collocationspunkten für das Level $\ell=6$.}
+\caption{Dünne Gitter nach Smolyak mit $N=2$ und Legendre- bzw. Hermite-Kollokationspunkten für das Level $\ell=6$.}
 \label{fig:grids}
 \end{figure}
 Die Nullstellen der Legendre- und Hermite sind schwach geschachtelt (engl. \emph{weakly nested}), da für ungerade Polynomgrade die Zahl $0$ eine Nullstelle ist. Dies ist jedoch die einzige Wiederholung eines Knotenpunktes. Die Nullstellen der Laguerre- und Jacobi-Polynome besitzen im Allgemeinen keinerlei Schachtelung.\\
-Im Gegensatz zu Gittern, die beispielsweise auf Glenshaw-Curtis Knotenpunkten basieren und vollständig geschachtelt sind, bieten schwach geschachtelte Gitter somit wenig Zeitersparnis durch Wiederverwendung von Collocationspunkten. Der Vorteil liegt hauptsächlich in der geschickten Approximation des vollen Tensorprodukts der exakten Operatoren.\\
+Im Gegensatz zu Gittern, die beispielsweise auf Glenshaw-Curtis Knotenpunkten basieren und vollständig geschachtelt sind, bieten schwach geschachtelte Gitter somit wenig Zeitersparnis durch Wiederverwendung von Kollokationspunkten. Der Vorteil liegt hauptsächlich in der geschickten Approximation des vollen Tensorprodukts der exakten Operatoren.\\
 Eine Implementierung für vollständig geschachtelte, schwach geschachtelte und nicht geschachtelte dünne Gitter in Matlab und C++ ist durch die Sandia Sparse Bibliothek (siehe \autocite{Sandia}) gegeben. Die Schwierigkeit liegt dabei darin, für schwach geschachtelte Gitter die einzelnen wieder auftauchenden Knotenstellen korrekt zu identifizieren.
 \begin{figure}[!htb]
 \includegraphics[width=\textwidth]{Figures/collocation_dp_trial8.png}
@@ -298,7 +298,7 @@ In Abbildung \ref{fig:dp_trial8} wird die Konvergenz der diskreten Projektion f�
 \item Die maximal mögliche Genauigkeit der Varianz ist abhängig von $P$. 
 \item Für größeres $P$ ist der Fehler der Varianz geringer, allerdings gilt dies erst, wenn die Quadraturformel die zusätzlich unter dem Integral auftauchenden Polynome $\Phi_m$ für $|m|=P$ exakt integriert.
 \item Bei der Varianz zeigt der dünne Gitter Ansatz keine klaren Vorteile, da der Gesamtfehler stärker von $P$ als vom Quadraturfehler abhängig ist.
-\item Will man die Varianz besser approximieren, so benötigt man mehr Koeffizienten $\hat{w}_m^{(j)}=\sum_{i=0}^Qu(t,x_j,y_i)\Phi_m(y_i)a_i$. Dies bedeutet, dass mehr Quadraturformeln durchgeführt werden müssen, die Collocationsstellen $u(t,x_j,y_i)$, die unabhängig von $m$ sind, allerdings wieder verwendet werden können.
+\item Will man die Varianz besser approximieren, so benötigt man mehr Koeffizienten $\hat{w}_m^{(j)}=\sum_{i=0}^Qu(t,x_j,y_i)\Phi_m(y_i)a_i$. Dies bedeutet, dass mehr Quadraturformeln durchgeführt werden müssen, die Kollokationsstellen $u(t,x_j,y_i)$, die unabhängig von $m$ sind, allerdings wieder verwendet werden können.
 \end{itemize} 
 
 \subsubsection*{Glenshaw-Curtis Quadratur}
@@ -311,12 +311,12 @@ Die Dichte $\rho$ wird hier explizit ausgewertet und ist nicht Teil der Quadratu
 Für Hermite-Polynome mit zugehörigem Träger $(-\infty,\infty)$ bzw. Laguerre-Polynome mit zugehörigem Träger $(0,\infty)$ ist daher eine Transformation des Integrals nötig. Da $[-1,1]$ kompakt ist existiert aber keine Bijektion zwischen den Mengen. Heuristische Ansätze wie das Ignorieren der Randpunkte und anschließender Verwendung des Transformationssatzes auf $(-1,1)$ liefert schlechte Approximationen.\\
 Unseren Beobachtungen nach bietet die Glenshaw-Curtis Quadratur keine Vorteile gegenüber der Gauss-Quadratur. Die polynomiale Exaktheit ist lediglich $n$ bei $n$ Quadraturpunkten und verwendet die Dichtefunktion der Verteilung nicht implizit. Die Dichte muss somit ebenfalls durch die Quadratur approximiert werden, was den nötigen Polynomgrad noch weiter erhöht. Schlussendlich erhöhen die Polynome $\Phi_m$, die bei der Approximation der Varianz unter dem Integral auftauchen, die benötigte polynomiale Exaktheit.
 \subsection{Algorithmus}
-Algorithmus \ref{alg:collocation_dp} skizziert die Berechnung der Approximation von Erwartungswert und Varianz mithilfe von Collocation durch diskrete Projektion.
+Algorithmus \ref{alg:Kollokation_dp} skizziert die Berechnung der Approximation von Erwartungswert und Varianz mithilfe von Kollokation durch diskrete Projektion.
 \begin{algorithm}[ht]
-    \caption{Collocation durch diskrete Projektion.}
-    \label{alg:collocation_dp}
+    \caption{Kollokation durch diskrete Projektion.}
+    \label{alg:Kollokation_dp}
     \begin{algorithmic}[1] % The number tells where the line numbering should start
-        \Function{Collocation\_Diskrete\_Projektion}{$H, u_0, v_0, \alpha,\beta,\kappa,Y, M, Q,\tau, T$} 
+        \Function{Kollokation\_Diskrete\_Projektion}{$H, u_0, v_0, \alpha,\beta,\kappa,Y, M, Q,\tau, T$} 
             \State $\Phi_m\gets$ $m$-te orthonormale gPC-Basis-Funktion zu $Y$, $\quad m=0,\dots,M$
             \State $a_i, y_i\gets$ (multivariate) Quadraturformel (siehe Kapitel \ref{chapter:multivariatequad}), $\quad i=0,\dots,Q$
             \For{$i=1,\dots,S$}
@@ -330,7 +330,7 @@ Algorithmus \ref{alg:collocation_dp} skizziert die Berechnung der Approximation 
     \end{algorithmic}
 \end{algorithm}
 \section{Vergleich der Ansätze Interpolation und diskrete Projektion}
-In diesem Abschnitt werden wir die beiden Ansätze für die Collocation miteinander vergleichen. Dabei werden wir für die Interpolation die Gauss-Stützstellen verwenden und ebenso für die diskrete Projektion die Gauss-Quadratur. Wir betrachten Beispiele mit $N=1$ und $N=4$ und verwenden im mehrdimensionalen Fall den vollen Tensorprodukt Ansatz. Für die mehrdimensionale Quadratur bei der diskreten Projektion vergleichen wir zusätzlich den vollen Tensorprodukt Ansatz mit der dünnen Gitter Quadratur nach Smolyak.
+In diesem Abschnitt werden wir die beiden Ansätze für die Kollokation miteinander vergleichen. Dabei werden wir für die Interpolation die Gauss-Stützstellen verwenden und ebenso für die diskrete Projektion die Gauss-Quadratur. Wir betrachten Beispiele mit $N=1$ und $N=4$ und verwenden im mehrdimensionalen Fall den vollen Tensorprodukt Ansatz. Für die mehrdimensionale Quadratur bei der diskreten Projektion vergleichen wir zusätzlich den vollen Tensorprodukt Ansatz mit der dünnen Gitter Quadratur nach Smolyak.
 \subsection*{Allgemeiner Vergleich}
 \begin{center}
 \begin{tabular}{p{0.47\linewidth}|p{0.47\linewidth}}
@@ -338,7 +338,7 @@ Interpolation & Diskrete Projektion\\
 \hhline{=|=}
 \multicolumn{2}{c}{Für Gauss-Stützstellen im Eindimensionalen äquivalent (siehe Satz \ref{th:interpol_and_proj})}\\
 \hline
-Collocationspunkte "'beliebig"' & Collocationspunkte entsprechen Quadraturpunkten\\
+Kollokationspunkte "'beliebig"' & Kollokationspunkte entsprechen Quadraturpunkten\\
 \hline
 Benötigt Interpolationspunkte & Benötigt zusätzlich Quadraturgewichte zu Quadraturpunkten\\
 \hline
@@ -357,24 +357,24 @@ Die Beziehung der beiden freien Parameter $P$ für den eindimensionalen Polynomg
 \subsection*{Numerischer Vergleich}
 
 \subsubsection*{Eindimensionaler Fall anhand von \nameref{trial:7}}
-Wir sehen in Abbildung \ref{fig:collocation_comparison_trial7} für den eindimensionalen Fall die Äquivalenz der diskreten Projektion und der Interpolation bei Verwendung von Nullstellen der orthogonalen Polynome als Collocationspunkte. Die Äquivalenz ist dann gegeben, wenn die Anzahl verwendeter Polynome $P+1$ der Anzahl verwendeter Quadraturpunkte $Q+1$ entspricht.
+Wir sehen in Abbildung \ref{fig:Kollokation_comparison_trial7} für den eindimensionalen Fall die Äquivalenz der diskreten Projektion und der Interpolation bei Verwendung von Nullstellen der orthogonalen Polynome als Kollokationspunkte. Die Äquivalenz ist dann gegeben, wenn die Anzahl verwendeter Polynome $P+1$ der Anzahl verwendeter Quadraturpunkte $Q+1$ entspricht.
 \begin{figure}[!htb]
 \includegraphics[width=\textwidth]{Figures/collocation_midp_trial7.png}
-\caption{Konvergenz der Collocation für \nameref{trial:7} mit $N=1$ anhand der Anzahl benötigter Collocationspunkte.}
-\label{fig:collocation_comparison_trial7}
+\caption{Konvergenz der Kollokation für \nameref{trial:7} mit $N=1$ anhand der Anzahl benötigter Kollokationspunkte.}
+\label{fig:Kollokation_comparison_trial7}
 \end{figure}
 
 \subsubsection*{Vierdimensionaler Fall anhand von \nameref{trial:8}}
-Wir sehen in Abbildung \ref{fig:collocation_comparison_trial8} den vierdimensionalen Fall. Hier ist der Erwartungswert wiederum für beide Ansätze gleich gut approximierbar unter Verwendung des vollen Tensorprodukts. Die dünne Gitter Quadratur bietet für den Erwartungswert klare Vorteile in Bezug auf die benötigten Collocationspunkte.\\
+Wir sehen in Abbildung \ref{fig:Kollokation_comparison_trial8} den vierdimensionalen Fall. Hier ist der Erwartungswert wiederum für beide Ansätze gleich gut approximierbar unter Verwendung des vollen Tensorprodukts. Die dünne Gitter Quadratur bietet für den Erwartungswert klare Vorteile in Bezug auf die benötigten Kollokationspunkte.\\
 Bei der Interpolation lässt sich die Varianz wegen des überbestimmten Systems nicht zuverlässig berechnen. Bei der diskreten Projektion ist die Konvergenz in $P$ vergleichsweise langsam.
 \begin{figure}[!htb]
 \includegraphics[width=\textwidth]{Figures/collocation_midp_trial8.png}
-\caption{Konvergenz der Collocation für \nameref{trial:8} mit $N=4$ anhand der Anzahl benötigter Collocationspunkte.}
-\label{fig:collocation_comparison_trial8}
+\caption{Konvergenz der Kollokation für \nameref{trial:8} mit $N=4$ anhand der Anzahl benötigter Kollokationspunkte.}
+\label{fig:Kollokation_comparison_trial8}
 \end{figure}
 
 \subsubsection*{Unstetige Koeffizienten im Eindimensionalen}
-Abbildung \ref{fig:collocation_comparison_trialdiscontsimple} zeigt für $N=1$ ein Beispiel, wo die Koeffizienten $\alpha$ und $\beta$ unstetig in $y$ sind. Dabei ist für $y\in[-1,1]$
+Abbildung \ref{fig:Kollokation_comparison_trialdiscontsimple} zeigt für $N=1$ ein Beispiel, wo die Koeffizienten $\alpha$ und $\beta$ unstetig in $y$ sind. Dabei ist für $y\in[-1,1]$
 \begin{align*}
 \alpha(y)&=\begin{cases}2,\quad y>0\\ 1, \quad y\le 0\end{cases}\\
 \beta(x,y)&=\begin{cases}2+\sin(x+y),\quad y>0\\ 2+\cos(x+y),\quad y\le 0\end{cases}\\
@@ -382,14 +382,14 @@ Abbildung \ref{fig:collocation_comparison_trialdiscontsimple} zeigt für $N=1$ e
 Wir erkennen ein unterschiedliches Verhalten für eine gerade bzw. ungerade Anzahl an Quadraturpunkten, die im Eindimensionalen einer gerade bzw. ungerade Anzahl an Basispolynomen entsprechen. Für eine gerade Anzahl an Polynomen konvergieren Erwartungswert und Varianz vergleichbar mit bisherigen Beispielen.
 \begin{figure}[!htb]
 \includegraphics[width=\textwidth]{Figures/collocation_midp_trialdiscontsimple.png}
-\caption{Konvergenz der Collocation für \nameref{trial:discontsimple} mit $N=1$ anhand der Anzahl benötigter Collocationspunkte.}
-\label{fig:collocation_comparison_trialdiscontsimple}
+\caption{Konvergenz der Kollokation für \nameref{trial:discontsimple} mit $N=1$ anhand der Anzahl benötigter Kollokationspunkte.}
+\label{fig:Kollokation_comparison_trialdiscontsimple}
 \end{figure}
-Fügen wir in \nameref{trial:disconttriple} eine weitere Unstetigkeitsstelle für $\alpha$ hinzu und entfernen die Unstetigkeit für $\beta$, so ist in Abbildung \ref{fig:collocation_comparison_trialdisconttriple} nur noch mit großer Mühe ein Konvergenzverhalten zu erkennen.
+Fügen wir in \nameref{trial:disconttriple} eine weitere Unstetigkeitsstelle für $\alpha$ hinzu und entfernen die Unstetigkeit für $\beta$, so ist in Abbildung \ref{fig:Kollokation_comparison_trialdisconttriple} nur noch mit großer Mühe ein Konvergenzverhalten zu erkennen.
 \begin{figure}[!htb]
 \includegraphics[width=\textwidth]{Figures/collocation_midp_trialdisconttriple.png}
-\caption{Konvergenz der Collocation für \nameref{trial:disconttriple} mit $N=1$ anhand der Anzahl benötigter Collocationspunkte.}
-\label{fig:collocation_comparison_trialdisconttriple}
+\caption{Konvergenz der Kollokation für \nameref{trial:disconttriple} mit $N=1$ anhand der Anzahl benötigter Kollokationspunkte.}
+\label{fig:Kollokation_comparison_trialdisconttriple}
 \end{figure}
 Für solche Probleme bieten sich adaptive Quadratur- und Interpolationsverfahren an, welche den Träger an bekannten oder unbekannten (Unstetigkeits)stellen aufteilen. Dafür ist es hilfreich die Theorie des gPC auf stückweise Polynome zu erweitern und entsprechende Quadraturverfahren zu verwenden.
 

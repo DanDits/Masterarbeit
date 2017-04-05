@@ -32,8 +32,9 @@ singlespacing, % Single line spacing, alternatives: onehalfspacing or doublespac
 %liststotoc, % Uncomment to add the list of figures/tables/etc to the table of contents
 %toctotoc, % Uncomment to add the main table of contents to the table of contents
 %parskip, % Uncomment to add space between paragraphs
-%nohyperref, % Uncomment to not load the hyperref package
+nohyperref, % Uncomment to not load the hyperref package
 headsepline, % Uncomment to get a line under the header
+hidelinks,
 %chapterinoneline, % Uncomment to place the chapter title next to the number on one line
 %consistentlayout, % Uncomment to change the layout of the declaration, abstract and acknowledgements pages to match the default layout
 ]{MastersDoctoralThesis} % The class file specifying the document structure
@@ -111,7 +112,7 @@ headsepline, % Uncomment to get a line under the header
 \hypersetup{pdfkeywords=\keywordnames} % Set the PDF's keywords to your keywords
 \hypersetup{colorlinks=false} % Links in pdf but not in printed
 }
-
+\setcounter{chapter}{-1}
 \include{defs}
 
 \begin{document}
@@ -197,7 +198,7 @@ headsepline, % Uncomment to get a line under the header
 \begin{abstract}
 \addchaptertocentry{\abstractname} % Add the abstract to the table of contents
 Die \it{uncertainty quantification} ermöglicht es, partielle Differentialgleichungen aus einem stochastischen Blickwinkel zu betrachten. Dies ermöglicht es solche Parameter der Gleichung, die auf schwankenden Messwerten oder intrinsischem Zufall basieren, direkt im Modell ohne weitere Vereinfachung zu verankern.\\
-Diese Arbeit untersucht am Beispiel einer verallgemeinerten linearen Klein-Gordon-Gleichung den Einfluss von stochastischen Parametern auf Erwartungswert und Varianz der zufallsabhängigen Lösung. Dabei werden verschiedene Lösungsansätze und Beispiele auf Implementierungsebene miteinander verglichen. Das Ziel ist es, Stärken und Schwächen der Ansätze besser zu verstehen und Einblicke in die Wahl von Hyperparametern, wie beispielsweise dem benötigten Polynomgrad, zu bekommen. Ein weiterer Fokus liegt auf der Praktikabilität der Methoden für mehrdimensionale Zufallsvariablen; der Einfachheit halber werden sich gezeigte Beispiele aber auf eine räumliche Dimension beschränken.
+Diese Arbeit untersucht am Beispiel einer verallgemeinerten linearen Klein"=Gordon"=Gleichung den Einfluss von stochastischen Parametern auf Erwartungswert und Varianz der zufallsabhängigen Lösung. Dabei werden verschiedene Lösungsansätze und Beispiele auf Implementierungsebene miteinander verglichen. Das Ziel ist es, Stärken und Schwächen der Ansätze besser zu verstehen und Einblicke in die Wahl von Hyperparametern, wie beispielsweise dem benötigten Polynomgrad, zu bekommen. Ein weiterer Fokus liegt auf der Praktikabilität der Methoden für mehrdimensionale Zufallsvariablen; der Einfachheit halber werden sich gezeigte Beispiele aber auf eine räumliche Dimension beschränken.
 \end{abstract}
 
 %----------------------------------------------------------------------------------------
@@ -234,8 +235,8 @@ Ein großes Dankeschön geht an Verena Volkmer für ihr konstruktives Korrekturl
 \textbf{MC} & \textbf{M}onte-\textbf{C}arlo\\
 \textbf{QMC} & \textbf{Q}uasi-\textbf{M}onte-\textbf{C}arlo\\
 \textbf{LGS} & \textbf{L}ineares \textbf{G}leichungs\textbf{s}ystem\\
-\textbf{MI} & \textbf{M}atrix-\textbf{I}nvertierung (Collocation durch Interpolation)\\
-\textbf{DP} & \textbf{D}iskrete \textbf{P}rojektion (Collocation durch diskrete Projektion)\\
+\textbf{MI} & \textbf{M}atrix-\textbf{I}nvertierung (Kollokation durch Interpolation)\\
+\textbf{DP} & \textbf{D}iskrete \textbf{P}rojektion (Kollokation durch diskrete Projektion)\\
 
 
 \end{abbreviations}
@@ -248,7 +249,8 @@ Ein großes Dankeschön geht an Verena Volkmer für ihr konstruktives Korrekturl
 $t$ & Zeit & Einheitslose nicht-negative reelle Variable\\
 $x$ & Ort & Einheitslose (mehrdimensionale) reelle Ortsvariable\\
 $\dt{u}$ & Ableitung nach t & Für differenzierbares $u\colon\R\to \R$\\ 
-$\Laplace$ & Laplace& Laplace Operator im Ort $\Laplace u(x_1,x_2)=\frac{\text{d}^2}{\text{d}x^2_1}u(x_1,x_2)+\frac{\text{2}^2}{\text{d}x^2_d}u(x_1,x_2)$ \\
+$\Laplace$ & Laplace& Laplace Operator im Ort\\
+& & $\Laplace u(x_1,x_2)=\frac{\text{d}^2}{\text{d}x^2_1}u(x_1,x_2)+\frac{\text{2}^2}{\text{d}x^2_d}u(x_1,x_2)$ \\
 $\Torus$ & eindimensionaler Torus & $\Torus=\R/(2\pi\Z)$\\
 $\tau$ & Zeitschrittweite & $0<\tau<1$\\
 $d$ & räumliche Dimension & $d\in\N$\\
@@ -270,6 +272,7 @@ $\mathcal{O}$ & Landau-Symbol & Asymptotischer Aufwand/Verhalten\\
 % Include the chapters of the thesis as separate files from the Chapters folder
 % Uncomment the lines as you write the chapters
 
+\include{Chapters/Chapter0}
 \include{Chapters/Chapter1}
 \include{Chapters/Chapter2} 
 \include{Chapters/Chapter3}

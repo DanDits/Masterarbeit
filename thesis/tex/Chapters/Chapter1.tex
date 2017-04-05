@@ -1,29 +1,28 @@
 % Chapter 1
 
-\chapter{Einführung}
-In diesem Kapitel werden wir die zu untersuchende Klein-Gordon-Gleichung (KGG) vorstellen und uns mit den zugehörigen häufig verwendeten Parametern vertraut machen. Anhand dieser Differentialgleichung wollen wir in späteren Kapiteln Methoden der \emph{uncertainty quantification} miteinander vergleichen. Die Grundidee ist dabei, dass die vorkommenden Parameter oder die Anfangswerte stochastische Größen sind. So kann man beispielsweise natürliche Schwankungen beim Messen der Parameter in der Gleichung durch normalverteilte Zufallsvariablen modellieren. Wir erhalten eine stochastische Variante der KGG, welche eine zufallsabhängige Lösung besitzt. Das Ziel dieser Arbeit ist ein Vergleich der Güte und des Aufwands verschiedener Ansätze zum Erhalt gewisser statistischer Kenngrößen der zufallsabhängigen Lösung.\\
-Als wichtiges Fundament für viele Algorithmen gewinnen wir zunächst einen numerischen Lösungsansatz für die KGG aus der Idee des Operatorsplittings. Anschließend beschreibt dieses Kapitel noch relevante Ergebnisse aus der polynomialen Approximationstheorie und bietet einen ersten Einblick in die Beziehung von orthogonalen Polynomen und stochastischen Verteilungen.
+\chapter{Grundlagen}
 \label{Chapter1}
+In diesem Kapitel werden viele wichtige Grundlagen vorgestellt, die in der ganzen Arbeit an verschiedenen Stellen benötigt werden. Zuerst werden wir im Detail die deterministische Klein-Gordon-Gleichung mit zugehöriger Existenztheorie präsentieren. Um eine numerischen numerischen Lösungsansatz für die KGG zu erhalten, wird anschließend das Operatorsplitting erläutert und auf die KGG angewandt. Schlussendlich erklären wir die Modellierung der stochastischen Klein-Gordon-Gleichung und bieten eine kurze Wiederholung von benötigten Begriffen aus der Stochastik und Statistik.
 
 \section{Die Klein-Gordon-Gleichung}
 Die für diese Arbeit grundlegende Gleichung ist die lineare Klein-Gordon-Gleichung in der Form
 \begin{align}
 \label{kgg}
-\dtt{u}(t,x)&=\alpha \Laplace_x u(t,x) - \beta(x)u(t,x), \: t>0, \, x\in \Torus^d\\
+\dtt{u}(t,x)&=\alpha \Laplace u(t,x) - \beta(x)u(t,x), \: t>0, \, x\in \Torus^d\\
 u(0,x)&=u_0(x), \: x\in \Torus^d\\
 \dt{u}(0,x)&=v_0(x), \: x\in \Torus^d
 \end{align}
-Im Folgenden werden wir auf den, hier zur Betonung verwendeten, Index $x$ des Laplace Operators $\Laplace=\Laplace_x=\frac{\text{d}^2}{\text{d}x^2_1}+\dots+\frac{\text{d}^2}{\text{d}x^2_d}$ verzichten.\\
-Bevor wir Abhängigkeiten von einer Zufallsvariablen hinzufügen, ist es hilfreich, die Gleichung für deterministische Parameter besser zu verstehen. Diese Mühe ist nicht vergebens, da einige numerische Verfahren zur Bestimmung der Lösung der zufallsabhängigen Gleichung stark auf einem robusten und schnellen Löser der deterministischen Gleichung basieren. Dazu seien als Stichworte Monte-Carlo-Verfahren und Collocations-Verfahren genannt, die wir im späteren Verlauf genauer betrachten werden.
+Dabei ist $\Laplace$ der Laplace Operator im Ort $x$, definiert als
+\[\Laplace=\frac{\text{d}^2}{\text{d}x^2_1}+\dots+\frac{\text{d}^2}{\text{d}x^2_d}.\]\\
+Bevor wir Abhängigkeiten von einer Zufallsvariablen hinzufügen, ist es hilfreich, die Gleichung für deterministische Parameter besser zu verstehen. Diese Mühe ist nicht vergebens, da einige numerische Verfahren zur Bestimmung der Lösung der zufallsabhängigen Gleichung stark auf einem robusten und schnellen Löser der deterministischen Gleichung basieren. Dazu seien als Stichworte Monte-Carlo-Verfahren und Kollokationsverfahren genannt, die wir im späteren Verlauf genauer betrachten werden.
 \subsection{Physikalische Definitionen}
 Die KGG ist eine relativistische Feldgleichung, welche die Kinematik von spin-freien Teilchen, wie dem Pion, beschreibt. Auch das 2012 entdeckte Higgs-Boson ist ein spin-freies Teilchen, es ist jedoch noch unklar, ob es wirklich das von dem Standardmodell der Teilchenphysik vorhergesagte Teilchen ist und sich vom Standardmodell beschreiben lässt \autocite{cern2016}.\\
 Dabei ist
 \begin{itemize}
-\item $\Torus=\R/(2\pi\Z)$ der skalierte eindimensionale Torus. Wir werden ab sofort die vereinfachte Darstellung $\Torus^d=(-\pi,\pi)^d$ mit periodischen Randbedingungen verwenden. Diese Skalierung des Torus ermöglicht das direkte Verwenden der schnellen Fourier-Transformation ohne weitere Skalierung, ist jedoch keine Beschränkung der Allgemeinheit. 
-\item die periodische Randbedingung eine vereinfachte Beschreibung des Verhaltens der Lösung ohne Einflüsse von Rändern. Solche Einflüsse, wie sie beispielsweise bei Dirichlet- oder Neumann-Randwerten auftreten, werden vernachlässigt und die Lösung als auf einem großen Träger lebend betrachtet.
+\item $\Torus=\R/(2\pi\Z)$ der skalierte eindimensionale Torus. Wir werden ab sofort die vereinfachte Darstellung $\Torus^d=(-\pi,\pi)^d$ mit periodischen Randbedingungen verwenden. Diese Skalierung des Torus ermöglicht das direkte Verwenden der schnellen Fourier-Transformation. Eine beliebige andere Skalierung des Torus ist jedoch ohne Beschränkung der Allgemeinheit möglich.
 \item $\absolute{u(t,x)}^2$ physikalisch als Ladungsdichte des Teilchens zum Zeitpunkt $t$ und Ort $x$ interpretierbar \autocite{kleingordon2016}. 
 \item $\alpha>0$ das Quadrat der Wellengeschwindigkeit.
-\item $\beta(x)>0, \forall x\in \Torus^d,$ in der physikalischen Interpretation das Quadrat aus dem Produkt von quadratischer Wellengeschwindigkeit, Masse und inversem planckschem Wirkungsquantum. Die Abhängigkeit des Potentialteils der KGG vom Ort $x$ ist dabei eine Verallgemeinerung der klassischen Gleichung.
+\item $\beta(x)>0, \forall x\in \Torus^d,$ in der physikalischen Interpretation das Quadrat aus dem Produkt von quadratischer Wellengeschwindigkeit, Masse und inversem \sloppy{planckschem} Wirkungsquantum. Die Abhängigkeit des Potentialteils der KGG vom Ort $x$ ist dabei eine Verallgemeinerung der klassischen Gleichung.
 \item die Differentialgleichung im Gegensatz zur physikalischen Darstellung reellwertig. Insbesondere fordern wir, dass $u$, $u_0$ und $v_0$ reellwertig und die Anfangswerte $u_0$ und $v_0$ periodisch in $(-\pi,\pi)^d$ sind.
 \end{itemize}
 
@@ -31,19 +30,19 @@ Dabei ist
 Um den analytischen Rahmen für die Existenz und Eindeutigkeit von Lösungen der KGG zu schaffen werden wir die Halbgruppentheorie verwenden. Die verwendete Theorie ist übernommen aus \autocite{HundSchnau} und \autocite{EngelNagel}, dort finden sich auch weitere Details und Beweise der verwendeten Theoreme.
 \begin{mathdef}
 Sei der Raum der beliebig häufig differenzierbaren periodischen Funktionen definiert als
-\[C_\text{per}^\infty (\Torus^d)\coloneqq \lbrace v\colon \Torus^d\to\R \mid v \text{ beliebig häufig stetig differenzierbar und periodisch in }[-\pi,\pi]\rbrace\]
-Definieren wir zu $v\in C^\infty(\Torus^d)$ und $k\in\N_0$ die Sobolev-Norm $\norm{v}_{k,2}$ durch
+\[C_\text{per}^\infty (\Torus^d)\coloneqq \lbrace v\colon \Torus^d\to\R \mid v \text{ beliebig häufig stetig differenzierbar und periodisch in }[-\pi,\pi]^d\rbrace\]
+Definieren wir zu $v\in C^\infty((-\pi,\pi)^d)$ und $k\in\N_0$ die Sobolev-Norm $\norm{v}_{k,2}$ durch
 \[\norm{v}_{k,2}^2\coloneqq \sum_{|m|\le k}\norm{\dxp{v}{m}}_{L^2((-\pi,\pi)^d)}^2,\quad \text{Multiindex }\, |m|=m_1+\dots + m_d\]
 so erhalten wir bei Verwendung der schwachen Ableitung und mit Vervollständigung die Sobolev-Räume $H^k((-\pi,\pi)^d)$.\\
-Wir definieren einen vollständigen Unterraum --und somit einen Banachraum-- des Sobolev-Raums $H^k((-\pi,\pi)^d)$ durch
-\[H_\text{per}^k(\Torus^d)\coloneqq \text{Abschluss von } C_\text{per}^\infty(\Torus^d) \text{ bezüglich der Norm von } H^k((-\pi,\pi)^d)\]
+Wir definieren einen abgeschlossenen Unterraum --und somit einen Banachraum-- des Sobolev-Raums $H^k((-\pi,\pi)^d)$ durch
+\[H_\text{per}^k(\Torus^d)\coloneqq \text{Abschluss von } C_\text{per}^\infty(\Torus^d)\left(\subset C^\infty((-\pi,\pi)^d)\right) \text{ bezüglich der Norm von } H^k((-\pi,\pi)^d)\]
 \end{mathdef}
 Zunächst definieren wir die benötigte Halbgruppe $S(\cdot)$ und ihren Generator $A$.
 \begin{mathdef}
 Zu einem Banachraum $R$ heißt die Abbildung $S(\cdot)\colon \R_+\to L(R)$, die einer Zeit $t$ einen beschränken linearen Operator zuordnet, eine Operatorhalbgruppe, wenn
 \[S(0)=I,\quad S(t+s)=S(t)S(s)\quad \forall t,s\ge 0\]
 $S(\cdot)$ heißt $C_0$-Halbgruppe bzw. stark stetig, wenn zusätzlich gilt
-\[\forall r\in R\colon S_\text{Orbit}(\cdot)\colon \R_+\to R,\: t\mapsto S(t)r \text{ ist stetig}\]
+\[\forall r\in R\colon S_r(\cdot)\colon \R_+\to R,\: t\mapsto S(t)r \text{ ist stetig}\]
 Den Generator $A$ von $S(\cdot)$ erhält man, indem der Definitionsbereich definiert wird als
 \[D(A)\coloneqq \lbrace r\in R\mid \text{ der Grenzwert } \lim\limits_{t\to0+}\frac{1}{t}(S(t)r-r)\text { existiert in }R\rbrace\]
 und man anschließend für $r\in D(A)$ definiert
@@ -63,10 +62,11 @@ v(0)&=r
 \end{maththeorem}
 Formulieren wir unsere KGG als ein Cauchy-Problem obiger Gestalt, so ist also nur noch zu zeigen, dass der Generator eine $C_0$-Halbgruppe generiert.\\
 Den Generator $C=A+B$ der KGG teilen wir auf und erhalten zuerst den Teilgenerator $A$
-\[A=\begin{pmatrix}0 & \kappa I\\ \alpha\Laplace & 0\end{pmatrix},\quad \kappa \in [0,1],\alpha>0\]
+\[A=\begin{pmatrix}0 & \kappa I\\ \alpha\Laplace & 0\end{pmatrix},\quad \kappa \in (0,1],\alpha>0\]
 Wir definieren den Hilbertraum $R=H^1_\text{per}(\Torus^d)\times H^0_\text{per}(\Torus^d)$ mit zugehörigem leicht abgewandelten Skalarprodukt 
 \[\langle \begin{pmatrix}v_1\\v_2\end{pmatrix}, \begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle =\int_{[-\pi,\pi]^d}\alpha \nabla v_1\nabla w_1+\kappa v_2w_2dx\] 
-Es ist $D(A)=H^2_\text{per}(\Torus^d)\times H^1_\text{per}(\Torus^d)\subset R$ dicht in $R$, da bereits $C_\text{per}^\infty\times C_\text{per}^\infty$ dicht in $R$ ist.\\
+\todo[inline]{Problem: Die zugehörige Norm ist nicht äquivalent zur Standardnorm des HRs, da Poincare mit periodischen RB Poincare nicht gilt.}
+Es ist $D(A)=H^2_\text{per}(\Torus^d)\times H^1_\text{per}(\Torus^d)\subset R$ dicht in $R$, da bereits $C_\text{per}^\infty\times C_\text{per}^\infty\subset D(A)$ bezüglicher schwächerer Norm dicht in $R$ ist.\\
 Stones Theorem besagt, dass $A$ genau dann eine $C_0$-Halbgruppe von unitären Operatoren generiert, wenn $A$ schiefadjungiert bezüglich des Skalarprodukt des Hilbertraums ist. Wir rechnen nach:
 \begin{align*}
 \langle A\begin{pmatrix}v_1\\v_2\end{pmatrix}, \begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle
@@ -85,6 +85,7 @@ $C=A+B$ mit $D(C)\coloneqq D(A)$ ebenfalls Generator einer stark stetigen Halbgr
 Wir verwenden daher den Banachraum $R_B=H_\text{per}^0\times H_\text{per}^0\supset R=H_\text{per}^1\times H_\text{per}^0$ mit der Norm 
 \[\norm{\begin{pmatrix}v_1\\v_2\end{pmatrix}}_B^2=\int_{[-\pi,\pi]^d}v_1^2+v_2^2dx\le 
 \norm{\begin{pmatrix}v_1\\v_2\end{pmatrix}}^2_{H_\text{per}^1\times H_\text{per}^0}\]
+\todo[inline]{Wieder ist die Norm nicht äquivalent zu der aus $R$, aber $B$ ist kein Operator von $R\to R$ mit unserer Wahl von $R$.}
 Dann gilt
 \begin{align*}
 \norm{B\begin{pmatrix}v_1\\v_2\end{pmatrix}}^2_B&=\int_{[-\pi,\pi]^d}(1-\kappa)^2v_2^2+(\beta(x))^2v_1^2dx\\
@@ -93,24 +94,23 @@ Dann gilt
 Insgesamt ist somit der Generator 
 \[C=\begin{pmatrix}0 & I\\ \alpha\Laplace - \beta(x) & 0\end{pmatrix}\]
 der Klein-Gordon-Gleichung Generator einer $C_0$-Halbgruppe und das zugehörige Cauchy-Problem besitzt eine eindeutige Lösung in $D(A)$. Dies impliziert auch eine eindeutige Lösung der KGG in $H_\text{per}^2(\Torus^d)$.
-\todo[inline]{Passt das mit der Norm für $B$? Können BRe auch einfach reell sein?}
 \subsection{Exakte Lösungen}
 Für spezielle Konfigurationen der Parameter und Anfangswerte können wir exakte Lösungen angeben. Diese sind hilfreich, um die Korrektheit von Implementierungen schnell und zuverlässig testen zu können. Außerdem werden so schnell die Grenzen und eventuelle Schwächen der Verfahren für gut gestellte Probleme deutlich.\\[0.5cm]
 Mithilfe des Separationsansatzes $u(t,x)=g(x)f(t)$ erhalten wir aus (\ref{kgg}) die Darstellung
 \begin{equation*}
-(\alpha\Laplace g(x)-\beta(x)g(x))f(t) = g(x)f''(t)
+(\alpha\Laplace g(x)-\beta(x)g(x))f(t) = g(x)f''(t).
 \end{equation*}
 Diese können wir trennen und bekommen die zwei Differentialgleichungen
 \begin{align*}
 \alpha\Laplace g(x)-\beta(x)g(x)&=\lambda g(x), \: \lambda\in\R\\
-\mu f(t)&=f''(t), \: \mu\in \R
+\mu f(t)&=f''(t), \: \mu\in \R.
 \end{align*}
 Für $\beta(x) \equiv \beta>0$ ergibt sich das Eigenwertproblem $-\Laplace g(x)=-\frac{\beta + \lambda}{\alpha}g(x)$ mit periodischen Randbedingungen und eine lineare gewöhnliche Differentialgleichung.\\
 Schlussendlich gewinnen wir daraus Lösungen für die ursprüngliche KGG. Die Anfangswerte $u_0$ und $v_0$ der KGG werden dann entsprechend passend gewählt.\\[1cm]
 Beispiele für exakte Lösungen ($d=1$) sind
 \begin{align*}
-u(t,x)&=\sin(\lambda x)(c_1 \sin(\mu t) + c_2 \cos(\mu t)), \quad \mu^2=\beta+\alpha \lambda^2\\ 
-u(t,x)&=(c_1 \sin(\lambda x) + c_2 \cos(\lambda x))\sin(\mu t), \quad \mu^2=\beta+\alpha \lambda^2\\
+u(t,x)&=\sin(\lambda x)(c_1 \sin(\mu t) + c_2 \cos(\mu t)), \quad \mu^2=\beta+\alpha \lambda^2,\quad \beta(x)\equiv \text{const}\\ 
+u(t,x)&=(c_1 \sin(\lambda x) + c_2 \cos(\lambda x))\sin(\mu t), \quad \mu^2=\beta+\alpha \lambda^2,\quad \beta(x)\equiv \text{const}\\
 u(t,x)&=\exp(-\cos(x))\sin(\mu t), \quad \beta(x)=\mu^2+\cos(x)+\sin^2(x), \, \mu \in \R
 \end{align*}
 wobei $\lambda\in \pi\Z$ um die Periodizität zu gewährleisten und $c_1, c_2 \in \R$ frei wählbare Skalierungsfaktoren sind.\\
@@ -146,9 +146,9 @@ Angenommen, wir stehen vor dem Problem die Differentialgleichung
 \dt{u}(t)=(L+R)u(t), \, t>0, \quad u(0)=u_0
 \end{equation}
 lösen zu wollen. Dabei ist im einfachsten Fall $u$ eine vektorwertige Funktion und $L$ bzw. $R$ zwei Matrizen.\\
-Sind beispielsweise $L$ eine untere und $R$ eine obere Dreiecksmatrix, so sind die Gleichungen 
+Ist beispielsweise $L=Q\Lambda Q^T$ eine einfach zu diagonalisierende Matrix und $R$ eine Diagonalmatrix, so sind die entkoppelten Gleichungen 
 \begin{align*}
-\dt{v}(t)&=Lv(t), \quad v(0)=v_0\\
+\dt{(Q^Tv)}(t)&=\Lambda Q^Tv(t), \quad v(0)=v_0\\
 \dt{w}(t)&=Rw(t), \quad w(0)=w_0
 \end{align*}
 einfacher zu lösen als die Gleichung (\ref{gencompdgl}). Das Ziel des Operatorsplittings ist es, aus den Lösungen $v$ und $w$ eine Approximation an $u$ zu gewinnen.\\
@@ -162,22 +162,22 @@ zu splitten. Dabei wird der Operator $\alpha\Laplace$ in $L$ einfließen und $-\
 \subsection{Lie-Trotter-Splitting}
 \label{seclietrotter}
 Wir beginnen mit einer rigorosen Einführung in Splittingverfahren. Als zentrales Ergebnis werden wir dabei das Strang-Splitting erhalten, welches einen Fehler $\mathcal{O}(\deltat^2)$ in Abhängigkeit von der Zeitschrittweite $\deltat$ besitzt.\\
-Die folgende Einführung ist angelehnt an \autocite{patrickdiplom}, welche wiederum aus \autocite[Kapitel II.3 bis II.5]{HairerLubichWanner} übernommen wurde.
+Die folgende Einführung ist angelehnt an \autocite[Kapitel II.3 bis II.5]{HairerLubichWanner}.
 \begin{mathdef}[Fluss einer Differentialgleichung]
 Der Fluss $\varphi_t$ einer reversiblen Differentialgleichung
 \begin{equation}
 \label{orddgl}
 \dt{y}=f(y),\quad y(0)\:\text{ gegeben}
 \end{equation}
-mit $f\colon \R^d\to\R^d$ ist die injektive Abbildung, die einem gegebenen $y_0$ die exakte Lösung $y(t)$ zum Zeitpunkt $t$ zuordnet, wobei $y(0)=y_0$. Also gilt
+mit $f\colon \R^d\to\R^d$ ist die injektive Abbildung, die einem gegebenen $y_0$ die exakte Lösung $y(t)$ zum Zeitpunkt $t$ mit Anfangsbedingung $y(0)=y_0$ zuordnet. Also gilt
 \begin{equation*}
-\varphi_t(y_0)=y(t)\enspace und\enspace y(0)=y_0
+\varphi_t(y_0)=y(t)\enspace und\enspace y(0)=y_0.
 \end{equation*}
 \end{mathdef}
 
 Um Splittingverfahren von möglichst höher Ordnung zu bekommen ist es wichtig, die einzelnen Teilverfahren bestmöglich zu kombinieren. Hierbei spielt das adjungierte Verfahren eine wichtige Rolle, da es dabei hilft, symmetrisierte Verfahren mit gerader Ordnung zu gewinnen.
 \begin{mathdef}[Adjungiertes Verfahren]
-Ist $\Phi_{\deltat}\colon\R^d\to\R^d$ ein Einschrittverfahren so definieren wir das adjungierte Verfahren $\Phi_{\deltat}^*$ als das Inverse des Einschrittverfahrens mit negativer Schrittweite $\deltat$, also \[\Phi_{\deltat}^*\coloneqq\Phi_{-\deltat}^{-1}\]
+Ist $\Phi_{\deltat}\colon\R^d\to\R^d$ ein Einschrittverfahren so definieren wir das adjungierte Verfahren $\Phi_{\deltat}^*$ als das Inverse des Einschrittverfahrens mit negativer Schrittweite $\deltat$, also \[\Phi_{\deltat}^*\coloneqq\Phi_{-\deltat}^{-1}.\]
 Das bedeutet, dass $y_1=\Phi_{\deltat}^*(y_0)$ implizit durch $\Phi_{-\deltat}(y_1)=y_0$ definiert wird.\\
 Ist $\Phi_{\deltat}^*=\Phi_{\deltat}$ so nennen wir das Verfahren symmetrisch.
 \end{mathdef}
@@ -186,11 +186,11 @@ Beispielsweise sind das explizite Euler-Verfahren $\Phi_{\deltat}^E$ und das imp
 Ohne Beweis sei bemerkt, dass $(\Phi_{\deltat}^*)^*=\Phi_{\deltat}$ und 
 \begin{equation}
 \label{adjlemma}
-(\Phi_{\deltat}\circ \Psi_{\deltat})^*=\Psi_{\deltat}^* \circ \Phi_{\deltat}^*
+(\Phi_{\deltat}\circ \Psi_{\deltat})^*=\Psi_{\deltat}^* \circ \Phi_{\deltat}^*.
 \end{equation}
 
 \begin{mathdef}[Konsistenzordnung]
-Wir sagen, dass eine numerische Methode zum Lösen von (\ref{orddgl}) (konsistent) von Ordnung $p$ ist, wenn der lokale Fehler für hinreichend glattes $y$
+Eine numerische Methode zum Lösen von (\ref{orddgl}) ist (konsistent) von Ordnung $p$, wenn der lokale Fehler für hinreichend glattes $y$
 \[\Phi_{\deltat}(y(t))=\varphi_{\deltat}(y(t))+\mathcal{O}(\deltat^{p+1})\] erfüllt.
 \end{mathdef}
 \begin{maththeorem}[Ordnung des adjungierten Verfahrens, vgl. 
@@ -202,7 +202,7 @@ erfüllt. Dann ist das adjungierte Verfahren $\Phi_{\deltat}^*$ ebenfalls von Or
 \[\Phi_{\deltat}^*(y_0)=\varphi_{\deltat}(y_0)+(-1)^{p}C(y_0)\deltat^{p+1}+\mathcal{O}(\deltat^{p+2})\]
 Ist insbesondere $\Phi_{\deltat}$ symmetrisch, so ist wegen $C(y_0)=(-1)^pC(y_0)$ die Ordnung $p$ gerade.
 \end{maththeorem}
-Nun zerlegen wir die ursprüngliche Gleichung (\ref{orddgl}) in zwei Teile
+Nun zerlegen wir die ursprüngliche Gleichung (\ref{orddgl}) in zwei Teile:
 \[\dt{y}=f(y)=A(y)+B(y) \]
 Das Aufteilen ist hierbei nicht eindeutig! Eine Möglichkeit im zweidimensionalen wäre zum Beispiel: $A=\text{P}_{(1,0)^T}f,\,B=\text{P}_{(0,1)^T}f$, wobei $\text{P}_v$ die Projektion auf $\text{span}(v)$ darstellt. Wie in unserem Fall der KGG ist die bereits vorhandene natürliche Aufteilung der Summe die Methode der Wahl.\\
 Sind nun $\varphi_{\deltat}^A$ und $\varphi_{\deltat}^B$ die exakten Flüsse der Systeme
@@ -235,7 +235,7 @@ Die Taylorreihe von $\varphi_{\deltat}$ lässt sich wegen
 \[\varphi_{\deltat}(y_0)=y(\deltat)=y(0)+\deltat \underbrace{y^\prime(0)}_{=f(y_0)}
 +\frac{\deltat^2}{2}\underbrace{y^{\prime\prime}(0)}_{=f^\prime(y_0)y^\prime(0)=f^\prime(y_0)f(y_0)}+\mathcal{O}(\deltat^3)\] darstellen als 
 \[\varphi_{\deltat}(y_0)=y_0+\deltat f(y_0)+\frac{\deltat^2}{2}f^\prime(y_0)f(y_0)+\mathcal{O}(\deltat^3)\]
-Diese vergleichen wir nun mit der Taylorreihe des Splittings
+Diese vergleichen wir nun mit der Taylorreihe des Splittings:
 \begin{align*}
 \left(\varphi_{\deltat}^B \circ \varphi_{\deltat}^A\right)(y_0)&=
 \varphi_{\deltat}^B\left(y_0+\deltat f^A(y_0)+\frac{\deltat^2}{2}f^{\prime A}(y_0)f^A(y_0)+\mathcal{O}(\deltat^3)\right)\\
@@ -245,7 +245,7 @@ Diese vergleichen wir nun mit der Taylorreihe des Splittings
 &=y_0+\deltat f(y_0)+\frac{\deltat^2}{2}f^\prime(y_0)f(y_0)\\
 &\quad+\frac{\deltat^2}{2}\left(f^{\prime B}(y_0)f^A(y_0)-f^{\prime A}(y_0)f^B(y_0)\right)+\mathcal{O}(\deltat^3)
 \end{align*}
-so bekommen wir für hinreichend glatte Funktionen $f^A$, $f^{\prime A}$, $f^B$ und $f^{\prime B}$ den Fehler \[\varphi_{\deltat}(y_0)-\left(\varphi_{\deltat}^B \circ \varphi_{\deltat}^A\right)(y_0)=\mathcal{O}(\deltat^2)\] und die Ordnung $p=1$. Mit Satz \ref{adjfloworder} ist das adjungierte Verfahren ebenfalls von Ordnung $p=1$.
+So erhalten wir für hinreichend glatte Funktionen $f^A$, $f^{\prime A}$, $f^B$ und $f^{\prime B}$ den Fehler \[\varphi_{\deltat}(y_0)-\left(\varphi_{\deltat}^B \circ \varphi_{\deltat}^A\right)(y_0)=\mathcal{O}(\deltat^2)\] und die Ordnung $p=1$. Mit Satz \ref{adjfloworder} ist das adjungierte Verfahren ebenfalls von Ordnung $p=1$.
 \end{proof}
 
 \subsection{Strang-Splitting}
@@ -260,7 +260,7 @@ von Ordnung $p+1$, wenn
 \sum_{j=1}^sa_j^{p+1}+(-1)^pb_j^{p+1}&=0
 \end{align*}
 \end{maththeorem}
-Um das Lie-Trotter-Splitting zur Ordnung 2 zu erweitern motiviert der Satz die Wahl $\alpha_1=\beta_1=\onehalf$. Wir wollen nun ein Verfahren $\Phi_{\deltat}^S$ mit Ordnung $p=2$ gewinnen. Idealerweise benötigt das neue Verfahren eine ähnliche Berechnungszeit wie das Lie-Trotter-Splitting. Daher definieren wir
+Um das Lie-Trotter-Splitting zur Ordnung 2 zu erweitern motiviert der Satz die Wahl $\alpha_1=\beta_1=\onehalf$. Wir wollen nun ein Verfahren $\Phi_{\deltat}^S$ mit Ordnung $p=2$ gewinnen. Daher definieren wir
 \[\Phi_{\deltat}^S=\Phi_{\deltathalf}^*\circ\Phi_{\deltathalf}=\left(\Phi_{\deltat}^S\right)^*\]
 Wir erkennen sofort, dass es sich hierbei um ein symmetrisches Verfahren handelt. Als Komposition von Verfahren mit Ordnung 1 (siehe Satz \ref{lieorder1}) ist es ebenfalls mindestens von Ordnung 1. Als zusätzlich symmetrisches Verfahren gilt mit Satz \ref{adjfloworder}, dass das Verfahren mindestens von Ordnung 2 ist.\\
 Dieses sogenannte \emph{Strang-Splitting} lässt sich unter Verwendung der aufgeteilten Flüsse (\ref{liesplittings}) auch darstellen als 
@@ -275,7 +275,7 @@ Dieses sogenannte \emph{Strang-Splitting} lässt sich unter Verwendung der aufge
 &=\varphi_{\deltathalf}^A\circ\varphi_{\deltat}^B\circ\varphi_{\deltathalf}^A
 \end{align}
 \end{minipage}
-Für einen Schritt ist also nur der anderthalbfache Aufwand nötig wie beim Lie-Trotter-Splitting, aber man gewinnt bereits eine Ordnung dazu. Die Laufzeit kann sogar noch verbessert werden:\\
+Für einen Schritt des Verfahrens ist wegen der Zusammenfassung der zwei inneren Teilschritte $\varphi_{\deltathalf}^B$ ist im Vergleich zum Lie-Trotter-Splitting also nur der anderthalbfache Aufwand nötig, aber man gewinnt bereits eine Ordnung dazu. Die Laufzeit kann sogar noch verbessert werden:\\
 Gegeben sei ein Anfangswert $y_0$ für das System (\ref{orddgl}). Ist man an einer Approximation $y_T$ der Lösung $y(T)$ zu einem Zeitpunkt $T=n\deltat>0$ interessiert, so gilt unter Verwendung des Strang-Splittingverfahrens
 \begin{align*}
 y_T&=\underbrace{\Phi_{\deltat}^S\circ\dots\circ\Phi_{\deltat}^S}_{n\text{ mal}}(y_0)\\
@@ -302,10 +302,18 @@ Am Beispiel von $\varphi_{\deltat}^A$ und $p=1$:\\
 Man verwendet die Darstellung $\varphi_{\deltat}^A(y_0)=y_0+\deltat f^A(y_0)+\mathcal{O}(\deltat^2)$ und ersetzt $\varphi_{\deltat}^A$ durch $\Phi_{\deltat}^A$. Die Vorgehensweise in den Beweisen benötigt dann minimale Anpassungen.\\
 Man beachte hierbei, dass nun $\Phi_{\deltat}^A$ im Gegensatz zu $\varphi_{\deltat}^A$ nicht mehr symmetrisch ist. Die Argumentation über die Ordnung von symmetrischen Verfahren kann daher nicht direkt verwendet werden, um $p=2$ für das Strang-Splittings zu begründen. Außerdem kann dies die Möglichkeit, das Strang-Splitting durch Kombination der Halbschritte zu beschleunigen, zunichte machen.
 \end{proof}
+\todo[inline]{Noch etwas anderes.In Ihrer Arbeit zeigen Sie ja, dass Lie-Trotter bzw.
+Strang die klassische Ordnung 1 bzw. 2 hat. "Klassische Ordnung"
+bedeutet aber, dass das Resultat für ODEs mit hinreichend glatter Lösung
+gilt. Bei PDEs ist die Sache anders, denn Differentialoperatoren sind
+unbeschränkte Operatoren. Ich denke aber, dass man auch für PDEs eine
+Fehlerabschätzung ähnlich zu Theorem 2.1 im angehängten Paper "Error
+bounds for exponential operator splittings" zeigen kann. Auch dafür
+braucht man aber ein bisschen Halbgruppentheorie.}
 
 \subsection{Numerischer Löser der Klein-Gordon-Gleichung}
 \label{chapter:solver_kgg}
-Dieser Abschnitt bildet das Fundament, auf dem viele numerischen Lösungsverfahren basieren werden. Um ein Operatorsplitting auf die KGG anwenden zu können muss diese zuerst in eine Gleichung mit Zeitableitung erster Ordnung in der Form von (\ref{orddgl}) umgeschrieben werden. Formal:
+Dieser Abschnitt bildet das Fundament, auf dem viele numerischen Lösungsverfahren basieren werden. Inhalt und Notation basieren zu Teilen auf \autocite{patrickdiplom}. Um ein Operatorsplitting auf die KGG anwenden zu können muss diese zuerst in eine Gleichung mit Zeitableitung erster Ordnung in der Form von (\ref{orddgl}) umgeschrieben werden. Formal:
 \begin{align}
 \dtt{u}(t,x)&=\alpha \Laplace u(t,x) - \beta(x)u(t,x)\nonumber\\
 \iff
@@ -539,162 +547,144 @@ Zuletzt sei aber erwähnt, dass die Wahl $w=1$ aus Sicht des minimalen Fehlers s
 \label{fig:splitting_dependence_on_weight}
 \end{figure}
 \end{mathbsp}
-\section{Polynome und Verteilungen}
-Die Theorie des general Polynomial-Chaos ist die Grundlage für später vorgestellte Verfahren zum Lösen von der stochastischen Klein-Gordon-Gleichung. Im Mittelpunkt dieser Theorie stehen orthogonale Polynombasen. Die Verflechtung mit der Stochastik geschieht dann auf natürliche Weise durch die passende Wahl des zugrunde liegenden Skalarproduktes.
-\subsection{Orthogonale Polynome}
-Wir beginnen mit grundlegender Notation und Namensgebung um das zentrale Werkzeug der Polynomapproximation festzulegen. Später werden diese Polynome verwendet, um die Zufallsabhängigkeit der auftretenden Funktionen darzustellen, indem das Orthogonalitätsmaß der Dichtefunktion entspricht.
 
-\begin{mathdef}
-Ein allgemeines Polynom $Q$ vom Grad $n$ lässt sich darstellen als
-\[Q_n(x)=q_nx^n+q_{n-1}^{n-1}+\dots+q_1x+q_0,\quad q_n\ne 0\]
-Ein System $\left\lbrace Q_n(x),\: n\in\mathcal{N}\right\rbrace$ von Polynomen mit $\mathcal{N}=\N_0=\N\cup\lbrace 0\rbrace$ oder $\mathcal{N}=\lbrace 0,1,\dots,N-1,N\rbrace$ heißt Orthogonalsystem, wenn bezüglich eines reellen positiven Maßes $\alpha$ die Orthogonalitätsbedingung
- \[\langle Q_n(x),Q_m(x)\rangle =\int_I Q_n(x)Q_m(x)d\alpha(x)=\gamma_n\delta_{mn},\quad m,n\in\mathcal{N}\]
- erfüllt ist. Dabei ist $\delta_{mn}$ das Kronecker-Delta, $I$ der nicht notwendigerweise endliche Träger des Maßes $\alpha$ und $\gamma_n>0$ die Normalisierungskonstanten. Es gilt 
- \[\gamma_n=\int_I Q_n^2(x)d\alpha(x),\quad n\in\mathcal{N}\] und O.B.d.A. werden wir in folgenden Kapiteln stets von $\gamma_n=1$ ausgehen. In diesem Fall nennt man das System ein Orthonormalsystem.
-\end{mathdef}
-Das zukünftig von uns verwendete Skalarprodukt wird dabei in der folgenden Definition konkretisiert.
-\begin{mathdef}
-Sei $w\colon I\to\R_{>0}$ ein Gewicht, dann definieren wir den gewichteten $L^2$ Raum als
-\begin{equation*}
-L_w^2(I)\coloneqq \left\lbrace v\colon I\to\R | \int_Iv^2(x)w(x)dx<\infty\right\rbrace
-\end{equation*}
-mit dem inneren Produkt 
-\[\langle u,v\rangle_{L_w^2(I)}=\int_I u(x)v(x)w(x)dx,\quad u,v\in L_w^2(I)\]
-und zugehöriger Norm
-\[\norm{u}_{L_w^2(I)}=\left(\int_I u^2(x)w(x)dx\right)^{\onehalf}\]
+\section{Stochastische Modellierung}
+In diesem Abschnitt werden wir erläutern, wie man stochastische Einflüsse auf die KGG darstellen kann. Die Modellierung, die hier gezeigt wird ist dabei viel allgemeiner gehalten, als wir sie später verwenden werden. Dies entspricht dem praktischen Vorgehen in den Anwendungen und motiviert die Verwendung von stochastischer Modellierung bei Differentialgleichungen. In unserem Fall werden wir uns auf Zufallsvektoren mit bekannten Komponentenverteilungen beschränken.
+\subsection{Grundbegriffe}
+Wir geben keine Einführung in die klassische Wahrscheinlichkeitstheorie, werden aber die relevanten Begriffe und Definitionen an dieser Stelle kurz wiederholen. Es sei angemerkt, dass neben den vorgestellten stetigen Verteilungen auch diskrete Verteilungen wie die Poisson-Verteilung existieren und sich durch dieselbe Theorie beschreiben lassen. Um die Notation zu vereinfachen, werden wir jedoch ausschließlich stetige Verteilungen betrachten.
+
+\begin{mathdef}[Wahrscheinlichkeitsraum]
+Ein Wahrscheinlichkeitsraum $(\Omega,\mathcal{F},P)$ ist ein Tripel bestehend aus 
+\begin{itemize}
+\item der abzählbaren nichtleeren Ergebnismenge $\Omega$
+\item der $\sigma$-Algebra der Ereignisse $\mathcal{F}$ über der Grundmenge $\Omega$
+\item dem Wahrscheinlichkeitsmaß $P\colon\mathcal{F}\to [0,1]$
+\end{itemize}
 \end{mathdef}
 
-Das Hermite Chaos ist ein motivierendes Beispiel dafür, dass gewisse orthogonale Polynombasen auf natürlicher Weise mit stochastischen Verteilungen verbunden sind.
-\begin{mathbsp}[Hermite Chaos]
-\label{bsp:hermitechaos}
-Ist $I=(-\infty,\infty)$, $w(x)=\frac{1}{\sqrt{2\pi}}e^{-\frac{x^2}{2}}$ die Dichtefunktion der Gauss-Verteilung und verwenden wir diese als Dichte des Maßes $\alpha$, so sind die Hermite-Polynome
-\[H_0(x)\equiv 1,\quad H_1(x)=x,\quad H_2(x)=x^2-1,\quad H_n(x)=xH_{n-1}(x)-(n-1)H_{n-2}(x)\]
-ein Orthogonalsystem bezüglich $\langle\cdot,\cdot\rangle_{L_w^2(I)}$ mit Normalisierungskonstanten $\gamma_n=n!$.\\
-Der Erwartungswert der Gauss-Verteilung
-\[\E_w[Z]= \int_{-\infty}^\infty Z(x)w(x)dx\] erfüllt also die entscheidende Beziehung des Polynomial-Chaos
-\[\langle H_n,H_m\rangle_{L_w^2(I)} =\E_w \left[H_nH_m\right]=\gamma_n\delta_{nm}\]
-Man beachte, dass diese Definition der Hermite-Polynome leicht von der in der Literatur üblichen abweicht. Dies ist der Tatsache geschuldet, dass dort die entsprechende Gewichtsfunktion einen zusätzlichen Faktor $\sqrt{2}$ besitzt. Sie stellt somit keine Dichte einer Wahrscheinlichkeitsverteilung dar und ist für unsere Zwecke unpraktisch und wird nicht verwendet. 
+\begin{mathdef}[Verteilungsfunktion]
+Die Verteilungsfunktion $F_Y$ der Zufallsvariablen $Y\colon\Omega\to\R$ ist definiert durch
+\[F_Y(y)\coloneqq P(Y\le y)=P(\left\lbrace \omega\in\Omega |\: Y(\omega)\le y\right\rbrace),\quad y\in\R\]
+\end{mathdef}
+\begin{mathdef}[Dichte einer Verteilung]
+Existiert zu der Verteilungsfunktion $F_Y$ der Zufallsvariablen $Y\colon\R\to\R$ eine Funktion $\rho_Y\colon\R\to\R_{\ge 0}$ mit
+\[F_Y(y)=\int_{-\infty}^y\rho_Y(z)dz,\quad y\in\R\]
+so nennen wir diese die Dichte von $F_Y$.\\
+Für stetige Zufallsvariablen folgt die Existenz aus dem Satz von Radon-Nikodým.
+\end{mathdef}
+\begin{mathdef}[Stochastische Unabhängigkeit]
+Ist $(\Omega,\mathcal{F},P)$ ein Wahrscheinlichkeitsraum und $Y_1, Y_2\colon \Omega\to\R$ zwei reelle Zufallsvariablen, so nennt man $Y_1$ und $Y_2$ (stochastisch) unabhängig genau dann wenn
+\[P(Y_1\in B_1,Y_2\in B_2)=P(Y_1\in B_1)P(Y_2\in B_2)\]
+für alle $B_1,B_2\in \mathcal{B}(\R)$, der Borelschen $\sigma$-Algebra über $\R$.
+\end{mathdef}
+\begin{mathbsp}
+Ist $\mathcal{N}(\mu, \sigma^2)$ die Normalverteilung mit Parametern $\mu\in\R$ und $\sigma^2>0$ so gilt für ihre Dichtefunktion
+\[\rho_Y(y)=\frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(y-\mu)^2}{2\sigma^2}},\quad y\in\R\]
+Ist $\mathcal{U}(a,b)$ die Gleichverteilung auf $(a,b)$ so gilt für ihre Dichtefunktion
+\[\rho_Y(y)=\begin{cases}\frac{1}{b-a},\quad &y\in (a,b)\\ 0, \quad &\text{sonst} \end{cases}\]
 \end{mathbsp}
-Wir werden in dieser Arbeit auf Polynombasen, die diskreten Verteilungen entsprechen, verzichten. Es sei jedoch bemerkt, dass dies keine Einschränkung der Methode ist, sondern lediglich die Notation vereinfacht. Konkret werden wir uns mit Laguerre-, Jacobi-, Hermite- und Legendre-Polynomen beschäftigen, wobei letztere ein Spezialfall der Jacobipolynome darstellen. Details und Eigenschaften sind im Anhang \ref{AppendixA} zu finden.\\[0.3cm]
-Eine wichtige Eigenschaft von Orthogonalsystemen von Polynomen ist eine besondere Art der rekursiven Darstellung, wie wir sie bereits bei den Hermite-Polynomen gesehen haben.
-\begin{maththeorem}[Drei-Term-Rekursion]
-\label{threetermexist}
-Ein Orthogonalsystem $\left\lbrace Q_n(x),\: n\in\N_0\right\rbrace$ von Polynomen erfüllt eine Drei-Term-Rekursion
-\begin{eqnarray}
-Q_n(x)=(a_nx+b_n)Q_{n-1}(x)-c_nQ_{n-2}(x),\quad n\in\N\\
-Q_{-1}(x)\equiv 0, Q_0(x)\equiv 1\nonumber
-\end{eqnarray}
-wobei $a_n=\frac{k_n}{k_{n-1}}\neq 0$, $b_n\in\R$ und $c_n=\frac{a_n}{a_{n-1}}\cdot \frac{\gamma_n}{\gamma_{n-1}}$.
-Dabei ist $k_n\neq 0$ der führende Faktor und $\gamma_n>0$ der Normalisierungsfaktor des Polynoms $Q_n$ . 
+Folgende Definitionen werden die später hauptsächlich untersuchten Eigenschaften von zufallsabhängigen Größen darstellen.
+\begin{mathdef}[Erwartungswert und Varianz]
+Ist $Y\colon\R\to\R$ eine reelle Zufallsvariable mit Dichte $\rho_Y$ so definieren wir den Erwartungswert von $Y$ als
+\[\mu_Y=\E[Y]=\int_{-\infty}^\infty y\rho_Y(y)dy\]
+und die Varianz von $Y$ als 
+\[\sigma_Y^2=\text{var}(Y)=\int_{-\infty}^\infty (y-\mu_Y)^2\rho_Y(y)dy=\E[Y^2]-\E[Y]^2\]
+\end{mathdef}
+Ohne Beweis präsentieren wir die Inversionsmethode. Diese ist nützlich um aus Zufallsvariablen einer bestimmten Verteilung Zufallsvariablen einer anderen Verteilung zu gewinnen. In der Numerik ist dies ist essentiell für die Generation von Pseudozufallszahlen von beliebigen Verteilungen. Die Methode ist aber auch wichtig für die "`stochastische Normierung"' von verschiedenen Zufallsvariablen zu einem gemeinsamen Wahrscheinlichkeitsraum, auf dem dann Erwartungswerte berechnet werden können.
+\begin{maththeorem}[Inversionsmethode]
+\label{thinversionsmethode}
+Ist $Y$ eine reelle Zufallsvariable mit Verteilungsfunktion $F_Y$, so definieren wir deren Quantilfunktion als
+\[F_Y^{-1}(p)\coloneqq \inf\lbrace y\in\R |\: F_Y(y)\ge p\rbrace,\quad p\in\R\]
+Dann gilt
+\begin{itemize}
+\item $z\le F_Y(y)\iff F_Y^{-1}(z)\le y$\\
+\item Falls $Z$ gleichverteilt in $(0,1)$ ist, dann hat $F_Y^{-1}(Z)$ die Verteilungsfunktion $F_Y$. 
+\end{itemize}
 \end{maththeorem}
-\begin{proof}
-Es gilt $\text{deg}(Q_n)=n,\forall n\in\N_0$. Für $a_n=\frac{k_n}{k_{n-1}}$ ist $Q_n(x)-a_nxQ_{n-1}(x)$ ein Polynom vom Grad $\le n-1$. Dieses lässt sich also schreiben als
-\[Q_n(x)-a_nxQ_{n-1}(x)=\sum_{m=0}^{n-1}r_mQ_m(x)\]
-Für $k\le n-1$ folgt also aus der Orthogonalität bezüglich des Skalarproduktes $\langle\cdot,\cdot\rangle$
-\begin{equation*}
-\langle Q_n(x)-a_nxQ_{n-1}(x),Q_k(x)\rangle=\sum_{m=0}^{n-1}r_m\langle Q_m(x),Q_k(x)\rangle=r_k\langle Q_k(x),Q_k(x)\rangle=r_k\gamma_k
-\end{equation*}
-und durch Verwenden von $\langle Q_n(x),Q_k(x)\rangle = 0$ und Umstellen
-\[ -a_n\langle Q_{n-1}(x),xQ_k(x)\rangle=r_k\gamma_k\]
-Somit folgt für $k<n-2$ wegen $\text{deg}(xQ_k(x))<n-1$ dass $r_k=0$. Damit erfüllen die Polynome eine Drei-Term-Rekursion
-\[Q_n(x)-a_nxQ_{n-1}(x)=r_{n-1}Q_{n-1}(x)+r_{n-2}Q_{n-2}(x)\]
-Nun definieren wir $b_n=r_{n-1}$, $c_n=-r_{n-2}$ und berechnen schlussendlich
-\[r_{n-2}\gamma_{n-2}=\langle -a_nxQ_{n-1}(x),Q_{n-2}(x)\rangle =-a_n\langle Q_{n-1}(x),xQ_{n-2}(x)\rangle=-a_n\frac{k_{n-2}}{k_{n-1}}\gamma_{n-1}\]
-\end{proof}
-Diese und noch viele weitere Eigenschaften der verschiedenen Orthogonalsysteme von Polynomen finden sich in \autocite{weborthopoly} und in vielen weiteren Werken über Polynome. Beispielsweise lässt sich auch die Umkehrung zeigen (unter milden Anforderungen an die Koeffizienten): Zu jeder durch eine Drei-Term-Rekursion definierte Menge an Polynomen existiert ein Maß $\alpha$, bezüglich dessen die Polynome ein Orthogonalsystem bilden (Satz von Favard).\\[0.3cm]
-Die auftretenden Integrale in den Skalarprodukten werden wir später mit Gauss-Quadraturformeln approximieren. Unter anderem dafür werden wir später die Nullstellen der Polynome als Stützstellen benötigen. Basierend auf den Koeffizienten der Drei-Term-Rekursion entwickelten Golub und Welsch in \autocite{GolubWelsch} einen effizienten stabilen Algorithmus, der für die Berechnung der Nullstellen mit der Berechnung der Eigenwerte einer symmetrischen Tridiagonalmatrix auskommt.
+Der auch \emph{Gesetz der großen Zahlen} genannte Zentrale Grenzwertsatz bildet die Grundlage für das erste Verfahren zur Berechnung von Erwartungswert und Varianz.
+\begin{maththeorem}[Zentraler Grenzwertsatz]
+\label{thzentralgrenzwert}
+Seien $Y_1,Y_2,\dots,Y_n$ unabhängige und identisch verteilte Zufallsvariablen mit $\E[Y_i]=\mu$ und $\text{var}(Y_i)=\sigma^2<\infty$ Der Mittelwert sei definiert als
+\[\overline{Y}\coloneqq \frac{1}{n}\sum_{i=1}^nY_i\]
+und skaliert durch
+\[Z_n=\sqrt{n}\left(\frac{\overline{Y}-\mu}{\sigma}\right)\]
+Dann konvergiert für $n\to\infty$ die Verteilungsfunktion von $Z_n$ zu einer $\mathcal{N}(0,1)$ verteilten Verteilungsfunktion.
+\end{maththeorem}
+\begin{mathdef}[Zufallsvektoren]
+Wir nennen $Y=(Y_1,\dots,Y_n)$ einen $n$-dimensionalen Zufallsvektor (häufig auch einfach $n$-dimensionale Zufallsvariable), wenn die Komponenten $Y_1,\dots,Y_n\colon\Omega\to\R$ eindimensionale reelle Zufallsvariablen sind. Sind die Komponenten $Y_i$ stochastisch unabhängig und besitzt jede Komponente $Y_i$ eine Dichte $\rho_{Y_i}$, so gilt die wichtige Darstellung der gemeinsamen Dichtefunktion $\rho_Y$
+\[\rho_Y=\prod_{i=1}^n \rho_{Y_i}\]
+und die Verteilungsfunktion lässt sich darstellen als
+\[F_Y(y_1,\dots,y_n)=\int_{-\infty}^{y_1}\dots\int_{-\infty}^{y_n}\rho_Y(z_1,\dots,z_n)dy_1\dots dy_n\]
+\end{mathdef}
+Weitere wichtige Begriffe, die aber in dieser Arbeit nicht in den Vordergrund rücken werden, seien stichwortartig genannt:
+\begin{itemize}
+\item Konvergenz $P$ fast sicher, Konvergenz in Wahrscheinlichkeit, Konvergenz in Verteilung
+\item Bedingte Wahrscheinlichkeit, bedingte Erwartung
+\item Unkorreliertheit vs. Unabhängigkeit
+\item Momente höherer Ordnung
+\end{itemize}
 
-\begin{maththeorem}[Golub Welsch Algorithmus]
-\label{golubwelschalg}
-Ist $\left\lbrace Q_i(x),\: i=0,\dots,n\right\rbrace$ ein Orthogonalsystem von Polynomen welches die Drei-Term-Rekursion
-\begin{eqnarray}
-\label{threetermgolub}
-Q_i(x)=(a_ix+b_i)Q_{i-1}(x)-c_iQ_{i-2}(x),\quad i=1,\dots , n\\
-Q_{-1}(x)\equiv 0, Q_0(x)\equiv 1\nonumber
-\end{eqnarray}
-erfüllt für $a_i>0,c_i>0$, so gilt:
+\subsection{Endliche Parametrisierung}
+\label{secfiniteparam}
+Dieser Abschnitt beschäftigt sich mit der Frage, wie man, ausgehend von einem potentiell unendlich-dimensionalen Wahrscheinlichkeitsraum, eine endliche Charakterisierung desselben durch einen $n$-dimensionalen Zufallsvektor mit unabhängigen Komponenten erhalten kann. Die Bedingung der Unabhängigkeit ist dabei theoretisch zwar wenig einschränkend, aber eine sehr wichtige Grundlage für viele praktische numerische Verfahren.\\
+Diese Frage tritt beispielsweise auf, wenn die Zufallsabhängigkeit im Modell nicht explizit über die Parameter einfließt, sondern ein zeitabhängiger stochastischer Prozess ist. Möglich wäre auch, dass die Zufallsabhängigkeit in endlich oder abzählbar vielen Modellparametern steckt, die einzelnen Parameter jedoch nicht stochastisch unabhängig sind.\\
+Wir werden später stets davon ausgehen, dass bereits eine endliche Parametrisierung durch unabhängige Zufallsvariablen mit bekannter Verteilung vorliegt. Der Vollständigkeit aber seien hier kurz Methoden genannt, um das Parametrisierungsproblem zu lösen. Man beachte jedoch, dass einige der Methoden numerisch nicht umsetzbar oder ad-hoc-Lösungen sind, die spezielle Annahmen benötigen. Dieser Abschnitt wurde aus \autocite[Kapitel 4.1+4.2]{dongbinxiu2010} übernommen, wo auch Visualisierungen und kleine Beispiele zu finden sind.
+
+\subsubsection{Unabhängigkeit von endlich vielen Parametern}
+Wenn die Zufallsabhängigkeit des Modells bereits durch endlich viele Modellparameter vorliegt, ist die Parameterisierung auf natürliche Art gegeben. Wichtig ist dann, die unabhängigen Parameter zu identifizieren bzw. die Abhängigkeit zu konkretisieren.\\
+Für normalverteilte Parameter ist dies auch auf einfache Weise möglich:
+\begin{maththeorem}
+\label{thgaussunabhg}
+Sei $Y=(Y_1,\dots,Y_n)$ ein $\mathcal{N}(0,C)$ verteilter Zufallsvektor mit Kovarianzmatrix $C\in\R^{n\times n}$. Sei $Z\sim\mathcal{N}(0,I_n)$, wobei $I_n$ die n-dimensionale Einheitsmatrix ist, ein unkorrelierter Zufallsvektor. Für die Gaussverteilung ist Unkorreliertheit äquivalent zu Unabhängigkeit und die Komponenten von $Z$ sind somit unabhängig. Da $C$ reell und symmetrisch ist, existiert die Cholesky-Zerlegung $C=AA^T$ und es gilt
+\[Y=AZ\sim\mathcal{N}(0,AA^T)=\mathcal{N}(0,C)\]
+besitzt die gegebene Verteilung. Wir können folglich $Y$ durch stochastisch unabhängige Parameter $Z_1,\dots,Z_n$ darstellen.
+\end{maththeorem}
+Sind die Parameter nicht normalverteilt, so wird das Problem deutlich schwieriger und bis jetzt gibt es keine zufriedenstellende numerische Transformation, die entsprechendes zu Satz \ref{thgaussunabhg} leistet. Eine theoretische Möglichkeit bietet sich jedoch über die Rosenblatt-Transformation, welche auf den in der Praxis selten bekannten bedingten Wahrscheinlichkeiten basiert.
+
+\subsubsection{Parametrisierung von Zufallsprozessen}
+Häufig sind die Zufallsabhängigkeiten des Modells nur durch Beobachtungen oder Messungen von Zufallsvariablen möglich. Wir schreiben diese als stochastischen Prozess $(Y_t,t\in T)$, wobei $T$ der Indexraum ist und $Y_t$ die beobachteten Zufallsvariablen. Wir suchen dann eine Transformation $R$, welche die Darstellung $Y_t=R(Z)$ mit Zufallsvektor $Z=(Z_1,\dots,Z_n)$ und unabhängigen Komponenten $Z_i$ erlaubt. Da $T$ potentiell ein unendlich-dimensionaler Raum ist, kann diese Transformation nicht exakt sein und wir suchen nun eine in einem gewissen Sinne bestmögliche Approximation.\\
+Die am häufigsten verwendete Technik ist dabei die Karhunen-Loeve-Darstellung.
+\begin{mathdef}[Karhunen-Loeve-Darstellung]
+Sei $\mu_Y(t)$ der Erwartungswert des Prozesses $Y_t$ am Punkt $t$ und sei $C(t,s)=\text{cov}(Y_t,Y_s)$ die Kovarianzfunktion. Dann ist die Karhunen-Loeve-Darstellung definiert als
+\[Y_t(\omega)=\mu_Y(t)+\sum_{i=1}^\infty \sqrt{\lambda_i}\Psi_i(t)Z_i(\omega)\] wobei $\Psi_i$ die orthogonalen Eigenfunktionen und $\lambda_i$ die zugehörigen Eigenwerte des Eigenwertproblems
+\[\int_T C(t,s)\Psi_i(s)ds=\lambda_i\Psi_i(t),\quad t\in T\]
+sind. Die paarweise unkorrelierten Zufallsvariablen $Z_i(\omega)$ erfüllen
+\[\E[Z_i]=0,\quad \E[Z_iZ_j]=\delta_{ij}\]
+und sind definiert durch
+\[Z_i(\omega)=\frac{1}{\sqrt{\lambda_i}}\int_T (Y_t(\omega)-\mu_Y(t))\Psi_i(t)dt\]
+Um eine endliche Approximation zu erhalten wird die Reihe bei einem gewissen Index $n\in\N$ abgebrochen.
+\end{mathdef}
+Wiederrum erhält man daraus für normalverteilte Prozesse eine endliche Menge von unabhängigen Zufallsvariablen. Für nicht-normalverteilte Prozesse wird häufig dennoch die Karhunen-Loeve-Darstellung verwendet und zusätzlich angenommen, dass die $Z_i$ unabhängig sind. Diese Vorgehensweise ist nicht sehr zufriedenstellend und ein offenes Forschungsproblem.
+
+\subsection{Formulierung der stochastischen Klein-Gordon-Gleichung}
+In Analogie zur Klein-Gordon-Gleichung (\ref{kgg}) definieren wir für einen Wahrscheinlichkeitsraum $(\Omega,\mathcal{F},P)$ und $Y\colon\Omega\to\R^N$ die stochastische Klein-Gordon-Gleichung (sKGG) für $y=Y(\omega)$ durch
+\begin{align}
+\label{skgg}
+\dtt{u}(t,x,y)&=\alpha(y) \Laplace u(t,x,y) - \beta(x,\omega)u(t,x,y), \: t>0, \, x\in \Torus^d\\
+u(0,x,y)&=u_0(x,y), \: x\in \Torus^d\\
+\dt{u}(0,x,y)&=v_0(x,y), \: x\in \Torus^d
+\end{align}
+Die Lösung \[u(t,x,y)\colon [0,T]\times\Torus^d\times \R^N\to\R\] ist folglich eine zufallsabhängige Größe.\\
+Dabei ist die grundlegende Annahme, dass (\ref{skgg}) $P$-fast-sicher wohl gestellt ist, d.h. die Menge an Punkten $\omega$, für welche die partielle Differentialgleichung mit fixem $y=Y(\omega)$ keine eindeutige Lösung besitzt, ist eine Nullmenge bezüglich des Wahrscheinlichkeitmaßes $P$.\\
+Wie bereits in Kapitel \ref{secfiniteparam} diskutiert, werden wir stets annehmen, dass die Komponenten $Y_i$ von $Y$ stochastisch unabhängige Zufallsvariablen mit bekannter Verteilung sind.
+\begin{mathbsp}
+\label{bsp:trial1}
+Sei $Y=(Y_1)$ eine eindimensionale und in $(2,3)$ gleichverteilte Zufallsvariable. Dann gilt für $t>0$, $d\in\N$, $x=(x_1,\dots$, $x_d)\in\Torus^d$, $\hat{x}\coloneqq \sum_{i=1}^d x_i$ und $y=Y(\omega)$
 \begin{align*}
-Q_n(x_j)=0\: \equivalent \: &x_j\text{ ist Eigenwert von }J=\begin{pmatrix}
-\alpha_1 & \beta_1 &  &  &  \\ 
-\beta_1 & \alpha_2 & \beta_2 & & \text{\huge0} \\ 
- & \beta_2 & \ddots & \ddots &  \\ 
- &  & \ddots & & \beta_{n-1} \\
-\text{\huge0} &  &  & \beta_{n-1} & \alpha_n
-\end{pmatrix},\quad j=1,\dots,n\\
-&\text{ mit } \alpha_i=-\frac{b_i}{a_i},\quad \beta_i=\sqrt{\frac{c_{i+1}}{a_ia_{i+1}}},\quad i=1,\dots,n
+u(t,x,y)&=2\cos(ty)\sin(\hat{x})\\
+u_0(x,y)&=2\sin(\hat{x})\\
+v_0(x,y)&\equiv 0
 \end{align*}
-Die Eigenwerte der symmetrischen Tridiagonalmatrix sind reell und lassen sich mit spezialisierten Algorithmen effizient berechnen. Insbesondere sind alle Nullstellen des Polynoms $Q_n$ reell.
-\end{maththeorem}
-\begin{proof}
-Zuerst schreiben wir die Rekursionen (\ref{threetermgolub}) für $i=1,\dots,n$ in Matrixform und teilen zeilenweise durch $a_i$ und sortieren den Term $xQ_{i-1}$ auf die linke Seite
-\begin{equation*}
-x\cdot
-\underbrace{\begin{pmatrix}Q_0(x)\\ Q_1(x) \\ \vdots \\ \\ \vdots \\ Q_{n-1}(x)\end{pmatrix}}_{=Q(x)}
-=\underbrace{\begin{pmatrix}
--\frac{b_1}{a_1} & \frac{1}{a_1} &  &  &  \\ 
-\frac{c_2}{a_2} & -\frac{b_2}{a_2} & \frac{1}{a_2} & & \text{\huge0} \\ 
- & \frac{c_3}{a_3} & \ddots & \ddots &  \\ 
- &  & \ddots & & \frac{1}{a_{n-1}} \\
-\text{\huge0} &  &  & \frac{c_n}{a_n} & -\frac{b_n}{a_n}
-\end{pmatrix}}_{=T}
-\begin{pmatrix}Q_0(x)\\ Q_1(x) \\ \vdots \\ \\ \vdots \\ Q_{n-1}(x)\end{pmatrix} 
-+\begin{pmatrix}0 \\ 0 \\ \vdots \\ \vdots \\ 0 \\ \frac{Q_{n}(x)}{a_n}\end{pmatrix} 
-\end{equation*}
-In kompakter Form lässt sich dies darstellen als
-\[xQ(x)=TQ(x)+\frac{1}{a_n}Q_n(x)e_n\]
-wobei $e_n=(0,\dots,0,1)^T$ der n-te Einheitsvektor ist. Hieran erkennt man sofort \[Q_n(x_j)=0\equivalent x_j\text{ ist Eigenwert von }T\]
-Weiterhin erhalten wir aus Satz \ref{threetermexist}, dass $\frac{c_i}{a_i}=\frac{1}{a_{i-1}}\frac{\gamma_i}{\gamma_{i-1}}$ und somit wäre $T=J$ bereits symmetrisch, wenn die $Q_i$ eine Orthonormalbasis bildeten.\\
-Andernfalls führen wir eine Äquivalenztransformation durch mit der Diagonalmatrix $D=\text{diag}\left((d_1,\dots,d_n)^T\right)$, so dass $J=DTD^{-1}$. Koeffizientenvergleich ergibt die Bedingung $d_{i+1}=d_i\sqrt{\frac{a_{i+1}}{c_{i+1}a_i}}$. Mit einer möglichen Wahl $d_1=1$ des freien Parameters $d_1$ erhalten wir somit die gewünschte symmetrische Matrix.
-\end{proof}
-Wir bemerken zusätzlich ohne Beweis, dass das Polynom $Q_n$ für $n\ge 1$ insgesamt $n$ verschiedene reelle Nullstellen besitzt. Dies ist eine fundamentale Aussage über Orthogonalpolynome und lässt sich induktiv einsehen unter Ausnutzung von $n$ Vorzeichenwechseln, die durch die Orthogonalität vorhanden sein müssen.
+löst die stochastische KGG (\ref{skgg}) für $\alpha(y)=\frac{y}{d}$ und $\beta(x,y)=y^2-y$ (vergleiche \nameref{trial:1} im Anhang).\\
+Für den Erwartungswert und Varianz von $u$ gelten
+\begin{align*}
+\E[u(t,x,Y)]&=\int_2^3u(t,x,y)dy=\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\\
+\text{var}(u(t,x,Y))&=\frac{1}{t}\sin^2(\hat{x})\left(2t + \sin(6t) - \sin(4t)\right)- \left(\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\right)^2
+\end{align*}
+Um einen potentiellen Denkfehler zu vermeiden, weisen wir an dieser Stelle explizit darauf hin, dass 
+\[\E[u(t,x,Y)]=\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\quad \neq \quad 2\sin(\hat{x})\cos(\frac{5}{2}t)=u(t,x,\E[Y])\]
+Dies erkennt man beispielsweise am Zeitpunkt $t=\frac{\pi}{2}$, wo gilt
+\[\E[u(t,x,Y)]=-\sin(\hat{x})\pi \neq -\sin(\hat{x})\sqrt{2}=u(t,x,\E[Y])\]
+Der Erwartungswert ist linear, die Abhängigkeiten von $y$ sind es aber nicht. Diese erste fehlgeschlagene Idee, den Erwartungswert durch das Lösen eines deterministischen Systems zu erhalten, ist jedoch nicht vollends vergebens. Wir werden am Beispiel der Monte-Carlo-Methode sehen, dass wir dazu allerdings weit mehr als ein deterministisches System lösen müssen.
+\end{mathbsp}
 
-\subsection{Polynomiale Approximationstheorie}
-\label{sec:poly_approx}
-Es gibt sehr viele Ergebnisse zur Approximation von Funktionen $f\colon \R\to\R$ durch Polynome $p\in\Poly_n$. Um ein Gefühl für die Mächtigkeit und auch für die Grenzen von polynomialer Approximation zu bekommen, werden an dieser Stelle einige zentrale Sätze genannt. Auf Beweise werden wir größtenteils verzichten, jedoch basierend auf \autocite{Trefethen} eine Diskussion der Interpretation dieser Ergebnisse aus dem numerischen Blickwinkel der Interpolation und Quadratur geben.
-\begin{maththeorem}[Weierstrass]
-Ist $I$ ein beschränktes Intervall und $f\in C^0(\bar{I})$ stetig, dann gibt es für jedes $\epsilon >0$ ein $n\in\N$ und $p\in\Poly_n$, so dass
-\[|f(x)-p(x)|<\epsilon,\quad \forall x\in\bar{I}\]
-\end{maththeorem}
-Folglich gilt für die \emph{gleichmäßige Bestapproximation} $\phi_n$, welche zu $f\in C^0(\bar{I})$ eine eindeutige Lösung $\phi_n(f)\in\Poly_n$ mit minimalem Abstand bezüglich der Maximumsnorm ergibt, die Aussage
-\[\lim\limits_{n\to\infty}\norm{f-\phi_n(f)}_\infty=0\] 
-Dieses Ergebnis sieht sehr vielversprechend aus. Eine erste Idee zur Berechnung von $\phi_n(f)$ ist die Interpolation. Jedoch wurde von Faber in \autocite{faber14} gezeigt, dass es kein Interpolationsschema gibt, das für alle stetigen Funktionen auf diese Weise konvergiert. Doch dieser vermeintliche Rückschlag ist in der Praxis selten von Bedeutung. Problematisch sind nur Interpolationsschemata, die auf gleichverteilten Knotenpunkten basieren und dann unter dem Runge-Phänomen leiden, welches bei Funktionen wie $f(x)=\frac{1}{1+x^2}$ an den Rändern für eine schlechte Approximationsgüte sorgt. Erfüllt $f$ jedoch minimale Glattheitsanforderungen (wie bereits Lipschitzstetigkeit) und verwendet man \chebyspace Interpolationspunkte, so ist die Approximationsgüte bereits bereits für kleines $n$ gesichert.\\
-Man beachte, dass der Name "`Bestapproximation"' sich strikt auf die verwendete Norm bezieht. Punktweise Aussagen lassen sich somit im Allgemeinen nicht treffen. 
-\begin{mathbsp}
-Als Beispiel vergleichen wir die Bestapproximation bezüglich der Maximumsnorm und die \chebyspace Interpolation vom Grad $N=100$ von der Funktion $f(x)=|x-\frac{1}{4}|$ in $[-1,1]$. Wie wir an Abbildung \ref{polyapproxcomp} erkennen, ist der maximale Fehler der Bestapproximation zwar geringer, aber tritt an $N+2$ Punkten auf, wohingegen der Fehler der \chebyspace Approximation zu den Rändern hin stark abnimmt. Dies soll verdeutlichen, dass die Bestapproximation nicht immer in jedem Sinne die "`beste"' Approximation darstellt.
-\begin{figure}[ht]
- \center
- \includegraphics[width=\linewidth]{Figures/polynomial_approx_comparison.png}
- \caption{Visualisierung der Fehler verschiedener Approximationen, angelehnt an \autocite{Trefethen}. Hierbei wurde die Bestapproximation mithilfe des \emph{Remez} Algorithmus aus dem Chebfun Projekt (http://www.chebfun.org/) berechnet. Der Fehler der \chebyspace Approximation nimmt zu den Rändern hin stark ab.}
- \label{polyapproxcomp}
-\end{figure}
-\end{mathbsp}
-Im Folgenden lösen wir uns von dem beschränkten Intervall $I$ und lassen auch $I=\R$ oder $I=[0,\infty)$ zu. Der Begriff der Bestapproximation lässt sich auch auf den Raum $L_w^2(I)$ erweitern. Dazu verwenden wir eine orthogonale Projektion auf eine orthogonale Polynombasis und erhalten eine einfache Darstellung des Bestapproximationsoperators.
-\begin{maththeorem}
-Ist $N\in\N_0$ und $\lbrace Q_k(x)\rbrace_{k=0}^N\subset \Poly_N$ ein Orthogonalsystem bezüglich des positiven Gewichtes $w(\cdot)$, also 
-\[\langle Q_m(x),Q_n(x)\rangle_{L_w^2(I)}=\norm{Q_m}^2_{L_w^2(I)}\delta_{m,n},\quad, 0\le m,n\le N\]
-so gilt für den Projektionsoperator $P_N\colon L_w^2(I)\to \Poly_N$ definiert durch 
-\[P_Nf\coloneqq \sum_{k=0}^N\hat{f}_kQ_k(x),\quad \hat{f}_k\coloneqq \frac{1}{\norm{Q_k}_{L_w^2(I)}^2}\langle f,Q_k\rangle_{L_w^2(I)},\qquad f\in L^2_w(I),\]
-die Bestapproximationsaussage
-\[\norm{f-P_Nf}_{L_w^2(I)}=\inf\limits_{\psi\in\Poly_N}\norm{f-\psi}_{L_w^2(I)}\]
-\end{maththeorem}
-Dies entspricht der Fourier-Entwicklung im Hilbertraum. Entsprechend nennt man die Koeffizienten $\hat{f}_k$ die (verallgemeinerten) Fourier-Koeffizienten. Die Projektion ist eine Orthogonalprojektion in dem Sinne, dass der Fehler $f-P_Nf$ senkrecht zum Polynomraum $\Poly_N$ ist.\\
-Wie schon bei der Bestapproximation bzgl. der Maximumsnorm erhält man auch für die verallgemeinerte Bestapproximation eine Konvergenzaussage. Für unbeschränktes $I$ sind die Beweise sehr aufwändig und beispielsweise in \autocite{CouHil53} zu finden. 
-\begin{maththeorem}
-Für jedes $f\in L_w^2(I)$ gilt
-\[\lim\limits_{N\to\infty}\norm{f-P_Nf}_{L_w^2(I)}=0\]
-\end{maththeorem}
-Die Konvergenzordnung ist hierbei abhängig von der Regularität von $f$ und der Art der für die Projektion verwendeten Orthogonalpolynome. Man nennt diese Art der Konvergenz in der Literatur auch \emph{spektrale Konvergenz}, da die Konvergenzrate abhängig von der Glattheit der Funktion ist. Man muss also aufpassen eine hohe Approximationsordnung $N$ nicht mit einer hohen Approximationsgenauigkeit zu verwechseln.\\
-Für das Beispiel der Legendre-Polynome, also mit konstanter Gewichtsfunktion $w$, zeigt Xiu in \autocite[Theorem 3.6]{dongbinxiu2010} folgendes Ergebnis.
-\begin{maththeorem}
-\label{spectralconvth}
-Für jedes $f\in H_w^p[-1,1]\coloneqq \left\lbrace v\colon I\to\R | \frac{d^mv}{dx^m}\in L_w^2(I),0\le m\le p\right\rbrace$ mit $p\ge 0, w\equiv 1$ gibt es eine Konstante $C$ unabhängig von $N$, so dass
-\[\norm{f-P_Nf}_{L_w^2[-1,1]}\le CN^{-p}\norm{f}_{H_w^p[-1,1]}\]
-\end{maththeorem}
-\begin{mathbsp}
-Als Veranschaulichung von Satz \ref{spectralconvth} approximieren wir verschiedene Funktionen $f\colon [-1,1]\to\R$ durch die orthogonale Projektion $P_Nf$ für steigendes $N\in\N$. In Abbildung \ref{figurespectralconverg} sind dafür die Fehler der Approximationen dargestellt. Dabei sind die $f$ unterschiedlich glatt und man erkennt unterschiedliche Konvergenzordnungen. Insbesondere erahnt man für die analytische Funktion $f(x)=\sin(\pi x)$ exponentielle Konvergenz in $N$. Da der General-Purpose Integrator, der für die Berechnung der Fourierkoeffizienten verwendet wurde für zu hohe Polynomgrade versagt, bricht die Darstellung an der entsprechenden Stelle ab.
-\begin{figure}[h]
-\includegraphics[width=\textwidth]{Figures/spectral_convergence_legendre.png}
-\caption{Spektrale Konvergenz der Bestapproximation von Funktionen verschiedener Glattheit mithilfe von Legendre-Polynomen und Gewichtsfunktion $w\equiv \onehalf$ auf $[-1,1]$.}
-\label{figurespectralconverg}
-\end{figure}
-\end{mathbsp}
