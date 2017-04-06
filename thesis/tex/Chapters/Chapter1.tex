@@ -554,7 +554,7 @@ Zuletzt sei aber erwähnt, dass die Wahl $w=1$ aus Sicht des minimalen Fehlers s
 \end{mathbsp}
 
 \section{Stochastische Modellierung}
-In diesem Abschnitt werden wir erläutern, wie man stochastische Einflüsse auf die KGG darstellen kann. Die Modellierung, die hier gezeigt wird ist dabei viel allgemeiner gehalten, als wir sie später verwenden werden. Dies entspricht dem praktischen Vorgehen in den Anwendungen und motiviert die Verwendung von stochastischer Modellierung bei Differentialgleichungen. In unserem Fall werden wir uns auf Zufallsvektoren mit bekannten Komponentenverteilungen beschränken.
+In diesem Abschnitt werden wir erläutern, wie man stochastische Einflüsse, insbesondere zufällige Koeffizienten $\alpha$ und $\beta$, auf die KGG darstellen kann. Die Modellierung, die hier gezeigt wird ist dabei viel allgemeiner gehalten, als wir sie später verwenden werden. Dies entspricht dem praktischen Vorgehen in den Anwendungen und motiviert die Verwendung von stochastischer Modellierung bei Differentialgleichungen. In unserem Fall werden wir uns auf Zufallsvektoren mit bekannten Komponentenverteilungen beschränken.
 \subsection{Grundbegriffe}
 Wir geben keine Einführung in die klassische Wahrscheinlichkeitstheorie, werden aber die relevanten Begriffe und Definitionen an dieser Stelle kurz wiederholen. Es sei angemerkt, dass neben den vorgestellten stetigen Verteilungen auch diskrete Verteilungen wie die Poisson-Verteilung existieren und sich durch dieselbe Theorie beschreiben lassen. Um die Notation zu vereinfachen, werden wir jedoch ausschließlich stetige Verteilungen betrachten.
 
@@ -584,9 +584,9 @@ für alle $B_1,B_2\in \mathcal{B}(\R)$, der Borelschen $\sigma$-Algebra über $\
 \end{mathdef}
 \begin{mathbsp}
 Ist $\mathcal{N}(\mu, \sigma^2)$ die Normalverteilung mit Parametern $\mu\in\R$ und $\sigma^2>0$ so gilt für ihre Dichtefunktion
-\[\rho_Y(y)=\frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(y-\mu)^2}{2\sigma^2}},\quad y\in\R\]
+\[\rho_Y(y)=\frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(y-\mu)^2}{2\sigma^2}},\quad y\in\R\,.\]
 Ist $\mathcal{U}(a,b)$ die Gleichverteilung auf $(a,b)$ so gilt für ihre Dichtefunktion
-\[\rho_Y(y)=\begin{cases}\frac{1}{b-a},\quad &y\in (a,b)\\ 0, \quad &\text{sonst} \end{cases}\]
+\[\rho_Y(y)=\begin{cases}\frac{1}{b-a},\quad &y\in (a,b)\\ 0, \quad &\text{sonst}\,. \end{cases}\]
 \end{mathbsp}
 Folgende Definitionen werden die später hauptsächlich untersuchten Eigenschaften von zufallsabhängigen Größen darstellen.
 \begin{mathdef}[Erwartungswert und Varianz]
@@ -595,7 +595,7 @@ Ist $Y\colon\R\to\R$ eine reelle Zufallsvariable mit Dichte $\rho_Y$ so definier
 und die Varianz von $Y$ als 
 \[\sigma_Y^2=\text{var}(Y)=\int_{-\infty}^\infty (y-\mu_Y)^2\rho_Y(y)dy=\E[Y^2]-\E[Y]^2\]
 \end{mathdef}
-Ohne Beweis präsentieren wir die Inversionsmethode. Diese ist nützlich um aus Zufallsvariablen einer bestimmten Verteilung Zufallsvariablen einer anderen Verteilung zu gewinnen. In der Numerik ist dies ist essentiell für die Generation von Pseudozufallszahlen von beliebigen Verteilungen. Die Methode ist aber auch wichtig für die "`stochastische Normierung"' von verschiedenen Zufallsvariablen zu einem gemeinsamen Wahrscheinlichkeitsraum, auf dem dann Erwartungswerte berechnet werden können.
+Ohne Beweis präsentieren wir die Inversionsmethode. Diese ist nützlich um aus Zufallsvariablen einer bestimmten Verteilung Zufallsvariablen einer anderen Verteilung zu gewinnen. In der Numerik ist dies ist essentiell für die Erzeugung von Pseudozufallszahlen von beliebigen Verteilungen. Die Methode ist aber auch wichtig für die "`stochastische Normierung"' von verschiedenen Zufallsvariablen zu einem gemeinsamen Wahrscheinlichkeitsraum, auf dem dann Erwartungswerte berechnet werden können.
 \begin{maththeorem}[Inversionsmethode]
 \label{thinversionsmethode}
 Ist $Y$ eine reelle Zufallsvariable mit Verteilungsfunktion $F_Y$, so definieren wir deren Quantilfunktion als
@@ -621,33 +621,26 @@ Wir nennen $Y=(Y_1,\dots,Y_n)$ einen $n$-dimensionalen Zufallsvektor (häufig au
 und die Verteilungsfunktion lässt sich darstellen als
 \[F_Y(y_1,\dots,y_n)=\int_{-\infty}^{y_1}\dots\int_{-\infty}^{y_n}\rho_Y(z_1,\dots,z_n)dy_1\dots dy_n\]
 \end{mathdef}
-Weitere wichtige Begriffe, die aber in dieser Arbeit nicht in den Vordergrund rücken werden, seien stichwortartig genannt:
-\begin{itemize}
-\item Konvergenz $P$ fast sicher, Konvergenz in Wahrscheinlichkeit, Konvergenz in Verteilung
-\item Bedingte Wahrscheinlichkeit, bedingte Erwartung
-\item Unkorreliertheit vs. Unabhängigkeit
-\item Momente höherer Ordnung
-\end{itemize}
 
 \subsection{Endliche Parametrisierung}
 \label{secfiniteparam}
-Dieser Abschnitt beschäftigt sich mit der Frage, wie man, ausgehend von einem potentiell unendlich-dimensionalen Wahrscheinlichkeitsraum, eine endliche Charakterisierung desselben durch einen $n$-dimensionalen Zufallsvektor mit unabhängigen Komponenten erhalten kann. Die Bedingung der Unabhängigkeit ist dabei theoretisch zwar wenig einschränkend, aber eine sehr wichtige Grundlage für viele praktische numerische Verfahren.\\
-Diese Frage tritt beispielsweise auf, wenn die Zufallsabhängigkeit im Modell nicht explizit über die Parameter einfließt, sondern ein zeitabhängiger stochastischer Prozess ist. Möglich wäre auch, dass die Zufallsabhängigkeit in endlich oder abzählbar vielen Modellparametern steckt, die einzelnen Parameter jedoch nicht stochastisch unabhängig sind.\\
-Wir werden später stets davon ausgehen, dass bereits eine endliche Parametrisierung durch unabhängige Zufallsvariablen mit bekannter Verteilung vorliegt. Der Vollständigkeit aber seien hier kurz Methoden genannt, um das Parametrisierungsproblem zu lösen. Man beachte jedoch, dass einige der Methoden numerisch nicht umsetzbar oder ad-hoc-Lösungen sind, die spezielle Annahmen benötigen. Dieser Abschnitt wurde aus \autocite[Kapitel 4.1+4.2]{dongbinxiu2010} übernommen, wo auch Visualisierungen und kleine Beispiele zu finden sind.
+Dieser Abschnitt beschäftigt sich mit der Frage, wie man, ausgehend von einem potentiell unendlich-dimensionalen Wahrscheinlichkeitsraum, eine endliche Approximation desselben erhalten kann. Diese Approximation soll in der Form von $n$ stochastisch unabhängigen Zufallsvariablen vorliegen, welche zu einem $n$-dimensionalen Zufallsvektor zusammen gefasst werden. Die Bedingung der Unabhängigkeit ist dabei theoretisch zwar wenig einschränkend, aber eine sehr wichtige Grundlage für viele praktische numerische Verfahren.\\
+Im Fall unserer stochastischer Klein-Gordon-Gleichung steckt die Zufallsabhängigkeit direkt in den Modellparametern $\alpha$ und $\beta$ und in den Anfangswerten. Auch wenn die Zufallsabhängigkeit wie in diesem Fall direkt im Modell gegeben ist, muss für numerische Lösungsverfahren eine Charakterisierung derselben durch endlich viele unabhängige Zufallsvariablen mit bekannter Verteilung sicher gestellt werden.\\
+Wir werden später stets davon ausgehen, dass bereits eine endliche Parametrisierung durch unabhängige Zufallsvariablen mit bekannter Verteilung vorliegt. Der Vollständigkeit halber seien hier kurz Methoden genannt, um das Parametrisierungsproblem zu lösen. Man beachte jedoch, dass einige der Methoden numerisch nicht umsetzbar oder ad-hoc-Lösungen sind, die spezielle Annahmen benötigen. Dieser Abschnitt wurde aus \autocite[Kapitel 4.1+4.2]{dongbinxiu2010} übernommen, wo auch Visualisierungen und kleine Beispiele zu finden sind.
 
 \subsubsection{Unabhängigkeit von endlich vielen Parametern}
 Wenn die Zufallsabhängigkeit des Modells bereits durch endlich viele Modellparameter vorliegt, ist die Parameterisierung auf natürliche Art gegeben. Wichtig ist dann, die unabhängigen Parameter zu identifizieren bzw. die Abhängigkeit zu konkretisieren.\\
 Für normalverteilte Parameter ist dies auch auf einfache Weise möglich:
 \begin{maththeorem}
 \label{thgaussunabhg}
-Sei $Y=(Y_1,\dots,Y_n)$ ein $\mathcal{N}(0,C)$ verteilter Zufallsvektor mit Kovarianzmatrix $C\in\R^{n\times n}$. Sei $Z\sim\mathcal{N}(0,I_n)$, wobei $I_n$ die n-dimensionale Einheitsmatrix ist, ein unkorrelierter Zufallsvektor. Für die Gaussverteilung ist Unkorreliertheit äquivalent zu Unabhängigkeit und die Komponenten von $Z$ sind somit unabhängig. Da $C$ reell und symmetrisch ist, existiert die Cholesky-Zerlegung $C=AA^T$ und es gilt
-\[Y=AZ\sim\mathcal{N}(0,AA^T)=\mathcal{N}(0,C)\]
-besitzt die gegebene Verteilung. Wir können folglich $Y$ durch stochastisch unabhängige Parameter $Z_1,\dots,Z_n$ darstellen.
+Sei $Z\sim\mathcal{N}(0,I_n)$, wobei $I_n$ die n-dimensionale Einheitsmatrix ist, ein unkorrelierter Zufallsvektor. Für die Gaussverteilung ist Unkorreliertheit äquivalent zu Unabhängigkeit und die Komponenten von $Z$ sind somit unabhängig. Sei $A\in\R^{n\times n}$ eine reguläre untere Dreiecksmatrix. Dann gilt:
+\[Y\coloneqq AZ\sim\mathcal{N}(0,AA^T)\]
+Da die Kovarianzmatrix $C\in\R^{n\times n}$ eines $\mathcal{N}(0,C)$ verteilten Zufallsvektors $Y$ symmetrisch und positiv definit ist, existiert die Cholesky-Zerlegung $C=AA^T$ mit einer regulären unteren Dreicksmatrix $A$. Folglich kann $Y$ durch stochastisch unabhängige Parameter $Z_1,\dots,Z_n$ dargestellt werden.
 \end{maththeorem}
 Sind die Parameter nicht normalverteilt, so wird das Problem deutlich schwieriger und bis jetzt gibt es keine zufriedenstellende numerische Transformation, die entsprechendes zu Satz \ref{thgaussunabhg} leistet. Eine theoretische Möglichkeit bietet sich jedoch über die Rosenblatt-Transformation, welche auf den in der Praxis selten bekannten bedingten Wahrscheinlichkeiten basiert.
 
 \subsubsection{Parametrisierung von Zufallsprozessen}
-Häufig sind die Zufallsabhängigkeiten des Modells nur durch Beobachtungen oder Messungen von Zufallsvariablen möglich. Wir schreiben diese als stochastischen Prozess $(Y_t,t\in T)$, wobei $T$ der Indexraum ist und $Y_t$ die beobachteten Zufallsvariablen. Wir suchen dann eine Transformation $R$, welche die Darstellung $Y_t=R(Z)$ mit Zufallsvektor $Z=(Z_1,\dots,Z_n)$ und unabhängigen Komponenten $Z_i$ erlaubt. Da $T$ potentiell ein unendlich-dimensionaler Raum ist, kann diese Transformation nicht exakt sein und wir suchen nun eine in einem gewissen Sinne bestmögliche Approximation.\\
+Häufig sind die Zufallsabhängigkeiten des Modells nur durch Beobachtungen oder Messungen von Zufallsvariablen möglich. Wir schreiben diese als stochastischen Prozess $(Y_t,t\in T)$, wobei $T$ die Indexmenge ist und $Y_t$ die beobachteten Zufallsvariablen. Wir suchen dann eine Transformation $R$, welche die Darstellung $Y_t=R(Z)$ mit Zufallsvektor $Z=(Z_1,\dots,Z_n)$ und unabhängigen Komponenten $Z_i$ erlaubt. Da $T$ potentiell ein unendlich-dimensionaler Raum ist, kann diese Transformation nicht exakt sein und wir suchen nun eine in einem gewissen Sinne bestmögliche Approximation.\\
 Die am häufigsten verwendete Technik ist dabei die Karhunen-Loeve-Darstellung.
 \begin{mathdef}[Karhunen-Loeve-Darstellung]
 Sei $\mu_Y(t)$ der Erwartungswert des Prozesses $Y_t$ am Punkt $t$ und sei $C(t,s)=\text{cov}(Y_t,Y_s)$ die Kovarianzfunktion. Dann ist die Karhunen-Loeve-Darstellung definiert als
@@ -657,7 +650,7 @@ sind. Die paarweise unkorrelierten Zufallsvariablen $Z_i(\omega)$ erfüllen
 \[\E[Z_i]=0,\quad \E[Z_iZ_j]=\delta_{ij}\]
 und sind definiert durch
 \[Z_i(\omega)=\frac{1}{\sqrt{\lambda_i}}\int_T (Y_t(\omega)-\mu_Y(t))\Psi_i(t)dt\]
-Um eine endliche Approximation zu erhalten wird die Reihe bei einem gewissen Index $n\in\N$ abgebrochen.
+Um eine Approximation zu erhalten wird die Reihe bei einem gewissen Index $n\in\N$ abgebrochen.
 \end{mathdef}
 Wiederrum erhält man daraus für normalverteilte Prozesse eine endliche Menge von unabhängigen Zufallsvariablen. Für nicht-normalverteilte Prozesse wird häufig dennoch die Karhunen-Loeve-Darstellung verwendet und zusätzlich angenommen, dass die $Z_i$ unabhängig sind. Diese Vorgehensweise ist nicht sehr zufriedenstellend und ein offenes Forschungsproblem.
 
@@ -674,14 +667,12 @@ Dabei ist die grundlegende Annahme, dass (\ref{skgg}) $P$-fast-sicher wohl geste
 Wie bereits in Kapitel \ref{secfiniteparam} diskutiert, werden wir stets annehmen, dass die Komponenten $Y_i$ von $Y$ stochastisch unabhängige Zufallsvariablen mit bekannter Verteilung sind.
 \begin{mathbsp}
 \label{bsp:trial1}
-Sei $Y=(Y_1)$ eine eindimensionale und in $(2,3)$ gleichverteilte Zufallsvariable. Dann gilt für $t>0$, $d\in\N$, $x=(x_1,\dots$, $x_d)\in\Torus^d$, $\hat{x}\coloneqq \sum_{i=1}^d x_i$ und $y=Y(\omega)$
-\begin{align*}
-u(t,x,y)&=2\cos(ty)\sin(\hat{x})\\
-u_0(x,y)&=2\sin(\hat{x})\\
-v_0(x,y)&\equiv 0
-\end{align*}
-löst die stochastische KGG (\ref{skgg}) für $\alpha(y)=\frac{y}{d}$ und $\beta(x,y)=y^2-y$ (vergleiche \nameref{trial:1} im Anhang).\\
-Für den Erwartungswert und Varianz von $u$ gelten
+Sei $Y=(Y_1)$ eine eindimensionale und in $(2,3)$ gleichverteilte Zufallsvariable. Dann gilt für $t>0$, $d\in\N$, $x=(x_1,\dots$, $x_d)\in\Torus^d$, $\hat{x}\coloneqq \sum_{i=1}^d x_i$, $y=Y(\omega)$ und Anfangswerten $u_0(x,y)=2\sin(\hat{x})$, $v_0(x,y)\equiv 0$:
+\begin{equation*}
+u(t,x,y)=2\cos(ty)\sin(\hat{x})
+\end{equation*}
+löst die stochastische KGG (\ref{skgg}) für $\alpha(y)=\frac{y}{d}$ und $\beta(x,y)=y^2-y$. Diese Parameter und Anfangswerte entsprechen der \nameref{trial:1} im Anhang, dort finden sich auch weitere untersuchte Konfigurationen auf die in Zukunft verwiesen wird. Die Vorgehensweise zum Erhalt von Referenzlösungen bzw. Referenzapproximationen wird dort ausführlich erläutert.\\
+Für den Erwartungswert und die Varianz von $u$ gelten
 \begin{align*}
 \E[u(t,x,Y)]&=\int_2^3u(t,x,y)dy=\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\\
 \text{var}(u(t,x,Y))&=\frac{1}{t}\sin^2(\hat{x})\left(2t + \sin(6t) - \sin(4t)\right)- \left(\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\right)^2
