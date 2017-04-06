@@ -1,8 +1,8 @@
 % Chapter 3
 
-\chapter{General Polynomial-Chaos}
+\chapter{General Polynomial Chaos}
 \label{Chapter3}
-Die hier aufgezeigte Einführung in das general Polynomial-Chaos (gPC) ist angelehnt an Xiu in \autocite{dongbinxiu2010}. Zuerst wiederholen wir grundsätzliche Begriffe aus der polynomialen Approximationstheorie und diskutieren auftretende Probleme. Anschließend erläutern wir die Anwendung auf spezielle Orthogonalbasen, die in enger Verbindung zu stochastischen Verteilungen stehen und die Grundlage für die gPC Approximation bilden. Schlussendlich wird dieser Ansatz dann auf mehrdimensionale Zufallsräume erweitert und die Extraktion von Statistiken aus dieser Polynomapproximation erläutert.
+Diese Einführung in das general Polynomial Chaos (gPC) ist angelehnt an Xiu in \autocite{dongbinxiu2010}. Zuerst wiederholen wir grundsätzliche Begriffe aus der polynomialen Approximationstheorie und diskutieren auftretende Probleme. Anschließend erläutern wir die Anwendung auf spezielle Orthogonalbasen, die in enger Verbindung zu stochastischen Verteilungen stehen und die Grundlage für die gPC Approximation bilden. Schlussendlich wird dieser Ansatz dann auf mehrdimensionale Zufallsräume erweitert und die Extraktion von Statistiken aus dieser Polynomapproximation erläutert.
 \section{Polynome und Verteilungen}
 Die Theorie des general Polynomial-Chaos ist die Grundlage für später vorgestellte Verfahren zum Lösen der stochastischen Klein-Gordon-Gleichung. Im Mittelpunkt dieser Methode stehen orthogonale Polynombasen. Die Verflechtung mit der Stochastik geschieht dann auf natürliche Weise durch die passende Wahl des zugrunde liegenden Skalarproduktes.
 \subsection{Orthogonale Polynome}
@@ -35,7 +35,7 @@ Ist $\mathcal{I}=(-\infty,\infty)$, $w(x)=\frac{1}{\sqrt{2\pi}}e^{-\frac{x^2}{2}
 \[H_0(x)\equiv 1,\quad H_1(x)=x,\quad H_2(x)=x^2-1,\quad H_n(x)=xH_{n-1}(x)-(n-1)H_{n-2}(x)\]
 ein Orthogonalsystem bezüglich $\langle\cdot,\cdot\rangle_{L_w^2(\mathcal{I})}$ mit Normalisierungskonstanten $\gamma_n=n!$.\\
 Der Erwartungswert der Gauss-Verteilung
-\[\E_w[Z]= \int_{-\infty}^\infty Z(x)w(x)dx\] erfüllt also die entscheidende Beziehung des Polynomial-Chaos
+\[\E_w[Z]= \int_{-\infty}^\infty Z(x)w(x)dx\] erfüllt also die entscheidende Beziehung des Polynomial Chaos
 \[\langle H_n,H_m\rangle_{L_w^2(\mathcal{I})} =\E_w \left[H_nH_m\right]=\gamma_n\delta_{nm}\]
 Man beachte, dass diese Definition der Hermite-Polynome leicht von der in der Literatur üblichen abweicht. Dies ist der Tatsache geschuldet, dass dort die entsprechende Gewichtsfunktion einen zusätzlichen Faktor $\sqrt{2}$ besitzt. Sie stellt somit keine Dichte einer Wahrscheinlichkeitsverteilung dar und ist für unsere Zwecke unpraktisch und wird nicht verwendet. 
 \end{mathbsp}
@@ -167,7 +167,7 @@ Als Veranschaulichung von Satz \ref{spectralconvth} approximieren wir verschiede
 Anhand des Beispiels \ref{bsp:hermitechaos} des Hermite-Chaos haben wir bereits gesehen, dass für gewisse Orthonormalbasen von Polynomen $\lbrace H_i\rbrace$ und Zufallsvariablen $Y$ mit passenden stochastischen Verteilungen die Beziehung
 \[\langle H_i(x),H_j(x)\rangle_{L_w^2(S)} =\E_Y \left[H_i(Y)H_j(Y)\right]=\delta_{ij}\]
 erfüllt wird. Ein feiner Unterschied ist dabei, dass die Polynome einmal mit reellem Argument und einmal mit der Zufallsvariable $Y$ als Argument aufgefasst werden.
-\begin{mathdef}[General Polynomial-Chaos Basis]
+\begin{mathdef}[General Polynomial Chaos Basis]
 \label{def:gpc}
 Sei $Y$ eine reelle Zufallsvariable mit Verteilungsfunktion $F_Y(y)=P(Y\le y)$ und endlichen Momenten
 \[\E\left[|Y|^{2\ell}\right]=\int |y|^{2\ell}dF_Y(y)<\infty,\quad \ell\in \N_0\]
@@ -176,15 +176,15 @@ Existieren Polynome $\Phi_i\in\Poly_i$, insbesondere $\Phi_0\equiv const$, welch
 \label{eqn:gpc_basicortho}
 \E\left[\Phi_i(Y)\Phi_j(Y)\right]=\delta_{ij},\quad i,j\in\N_0
 \end{equation}
-erfüllen, so nennt man diese \emph{general Polynomial-Chaos Basis-Funktionen}.\\
-Ist $Y$ stetig, so existiert eine Dichtefunktion $\rho>0$, so dass $dF_Y(y)=\rho(y)dy$ auf $\mathcal{I}$. In diesem Fall lässt sich die Bedingung (\ref{eqn:gpc_basicortho}) schreiben als
+erfüllen, so nennt man diese \emph{general Polynomial Chaos Basis-Funktionen}.\\
+Ist $Y$ stetig, so existiert eine Dichtefunktion $\rho>0$, so dass $dF_Y(y)=\rho(y)dy$ auf $\mathcal{\mathcal{J}}$. In diesem Fall lässt sich die Bedingung (\ref{eqn:gpc_basicortho}) schreiben als
 \begin{equation}
 \label{eqn:gpc_ortho}
-\E\left[\Phi_i(Y)\Phi_j(Y)\right]=\int_\mathcal{I} \Phi_i(y)\Phi_j(y)\rho(y)dy=\delta_{ij},\quad i,j\in\N_0
+\E\left[\Phi_i(Y)\Phi_j(Y)\right]=\int_\mathcal{\mathcal{J}} \Phi_i(y)\Phi_j(y)\rho(y)dy=\delta_{ij},\quad i,j\in\N_0
 \end{equation}
 \end{mathdef}
 \begin{mathbem}
-Betrachten wir die Orthogonalitätsbedingung (\ref{eqn:gpc_ortho}), so wird klar, dass diese direkt der Orthogonalität des Raumes $L_\rho^2(\mathcal{I})$ entspricht. Die Polynome erfüllen somit nach Satz \ref{threetermexist} eine Drei-Term-Rekursion und bilden eine Orthonormalbasis bezüglich $L_\rho^2(\mathcal{I})$.\\
+Betrachten wir die Orthogonalitätsbedingung (\ref{eqn:gpc_ortho}), so wird klar, dass die Polynome $\Phi_i$ orthogonal bezüglich des Skalarprodukts $\langle \cdot,\cdot\rangle_{L_\rho^2(\mathcal{J})}$ sind, welches zum Raum $L_\rho^2(\mathcal{J})$ gehört. Die Polynome erfüllen somit nach Satz \ref{threetermexist} eine Drei-Term-Rekursion und bilden eine Orthonormalbasis bezüglich $L_\rho^2(\mathcal{\mathcal{J}})$.\\
 Man beachte, dass die hier vorgenommene Normierung der Basis keine Beschränkung der Allgemeinheit darstellt. Gilt als Bedingung nur
 \[\langle H_i,H_j\rangle_{L_w^2(S)} =\E_Y \left[H_i(Y)H_j(Y)\right]=\gamma_i\delta_{ij},\quad i,j\in\N_0,\gamma_i>0\]
 so müssen die Polynome $H_i$ lediglich durch die Normalisierungskonstanten $\sqrt{\gamma_i}=\sqrt{\E\left[\Phi_i^2(Y)\right]}$ geteilt werden.\\
@@ -211,21 +211,26 @@ Diskret & Poisson & Charlier & $\lbrace 0,1,2,\dots\rbrace$ \\
 \end{table}
 
 Das Ziel ist nun, mithilfe einer gPC-Orthonormalbasis eine Funktion $f(Y)$ einer Zufallsvariablen $Y$ zu approximieren. Wir wollen nun einen Einblick dazu bekommen, was an dieser Stelle mit "`approximieren"' gemeint ist.
-\begin{mathdef}[Starke gPC-Konvergenz]
-Sei $f(Y)$ eine Funktion einer Zufallsvariablen $Y$ mit Dichte $\rho_Y$ und Träger $\mathcal{I}_Y$. Eine general Polynomial-Chaos Approximation $f_M(Y)\in\Poly_M(Y)$ konvergiert in einem starken Sinne gegen $f(Y)$, wenn \[\norm{f(Y)-f_M(Y)}_{L_{\rho_Y}^2(\mathcal{I}_Y)}\to 0\text{ für }{M\to\infty}\]
+\begin{mathdef}[General Polynomial Chaos Approximation]
+Sei $f(Y)$ eine Funktion einer Zufallsvariablen $Y$ mit Dichte $\rho_Y$ und Träger $\mathcal{J}_Y$. Sind $\Phi_i$ für $i=0,\dots,M$ die general Polynomial Chaos Basis-Funktionen zu $Y$, so nennen wir $f_M(Y)\in\Poly_M(Y)$ mit
+\[f_M(Y)\coloneqq \sum_{m=0}^M\hat{f}_m\Phi_m(Y),\quad \hat{f}_m=\E[f(Y)\Phi_m(Y)]\]
+die general Polynomial Chaos Approximation von $f(Y)$.
 \end{mathdef}
-Die starke gPC-Konvergenz entspricht also direkt der in Kapitel \ref{sec:poly_approx} vorgestellten spektralen Konvergenz, entsprechend ist die Konvergenzordnung abhängig von der Glattheit der Funktion $f$. Ohne Beweis folgt aus der starken gPC-Konvergenz auch die Konvergenz in Wahrscheinlichkeit und schlussendlich die Konvergenz in Verteilung.
+\begin{mathdef}[Starke gPC-Konvergenz]
+Sei $f(Y)$ eine Funktion einer Zufallsvariablen $Y$ mit Dichte $\rho_Y$ und Träger $\mathcal{J}_Y$. Eine general Polynomial Chaos Approximation $f_M(Y)\in\Poly_M(Y)$ konvergiert in einem starken Sinne gegen $f(Y)$, wenn \[\norm{f(Y)-f_M(Y)}_{L_{\rho_Y}^2(\mathcal{J}_Y)}\to 0\text{ für }{M\to\infty}\]
+\end{mathdef}
+Die starke gPC-Konvergenz entspricht also direkt der in Kapitel \ref{sec:poly_approx} vorgestellten spektralen Konvergenz, entsprechend ist die Konvergenzordnung abhängig von der Glattheit der Funktion $f$. Aus der starken gPC-Konvergenz folgt auch die Konvergenz in Wahrscheinlichkeit und schlussendlich die Konvergenz in Verteilung. Für Beweise sei auf einführende Literatur aus der Wahrscheinlichkeitstheorie verwiesen.
 \begin{mathbem}
 Ist die Funktion $f$ oder ihre Abhängigkeit von der Zufallsvariablen $Y$ nicht konkret bekannt, sondern liegt diese beispielsweise nur als Verteilungsfunktion vor, so ist es dennoch möglich eine gPC-Approximation in einem schwachen Sinne zu erhalten. Für Details sei auf \autocite[Kapitel 5.1.2]{dongbinxiu2010} verwiesen.\\
 Ein illustratives Beispiel ist in Abbildung \ref{fig:gpcweakconv} gegeben. Dort verwenden wir die Bestapproximation bezüglich $L_\rho^2(-\infty,\infty)$, wobei $\rho$ die Dichtefunktion der Normalverteilung ist, die Orthonormalbasis aus den Hermite-Polynomen $H_m$ besteht und $Y$ eine normalverteilte Zufallsvariable ist. Es ist
 \[f_M(Y)=\sum_{m=0}^M\hat{f}_mH_m(Y), \quad \hat{f}_m=\E[f(Y)H_m(Y)]\]
 die Bestapproximation an die Funktion $f(Y)$ in $\Poly_M(Y)$. Wir nehmen an, dass wir nur die Verteilung von $Z=f(Y)$ kennen und $Z\sim\text{Beta}(0.2,3.)$ in $[-1,1]$.\\
-Dann tritt bei der Berechnung von $\E[ZH_m(Y)]$ eine Schwierigkeit auf: Es ist in dieser Form nicht möglich den Erwartungswert zu berechnen, da die Zufallsvariablen $Z$ und $H_m(Y)$ zu verschiedenen Wahrscheinlichkeitsräumen gehören. Hierzu ist es nun hilfreich, mithilfe der Inversionsmethode die beiden Verteilungen auf einen gemeinsamen Wahrscheinlichkeitsraum $\mathcal{U}(0,1)$ zu "`normieren"'. Dann gilt
+Dann tritt bei der Berechnung von $\E[ZH_m(Y)]$ eine Schwierigkeit auf: Es ist in dieser Form nicht möglich den Erwartungswert zu berechnen, da die Zufallsvariablen $Z$ und $H_m(Y)$ zu verschiedenen Verteilungen gehören. Hierzu ist es nun hilfreich, mithilfe der Inversionsmethode die beiden Verteilungen auf eine gemeinsame Verteilung $\mathcal{U}(0,1)$ zu "`normieren"'. Dann gilt
 \[\hat{f}_m=\E_U\left[F_Z^{-1}(U)H_m(F_Y^{-1}(U))\right]=\int_0^1F_Z^{-1}(u)H_m(F_Y^{-1}(u))du\]
 und $f_M(Y)$ konvergiert in Verteilung gegen $f(Y)$ für $M\to\infty$.
 \begin{figure}[!htb]
 \includegraphics[width=\textwidth]{Figures/gpc_weak_convergence.png}
-\caption{Schwache Konvergenz von Hermite gPC-Approximation zu einer $\text{Beta}(0.2,3.)$ verteilten Zufallsvariablen. Dargestellt sind Approximationen an die Dichtefunktionen, welche über Histogramme von 50 gleich großen Intervallen angenähert werden.}
+\caption{Schwache Konvergenz von Hermite gPC-Approximation zu einer $Beta(0.2,3)$ verteilten Zufallsvariablen. Dargestellt sind Approximationen an die Dichtefunktionen, welche über Histogramme von 50 gleich großen Intervallen angenähert werden.}
 \label{fig:gpcweakconv}
 \end{figure}
 \end{mathbem}
@@ -239,7 +244,7 @@ Sei $P\in\N_0$ der fest gewählte maximale Polynomgrad. Sei weiter $Y=(Y_1,\dots
 
 \begin{mathbem}
 Der von den multivariate gPC-Funktionen aufgespannte Raum $\Poly_P^N$ ist der Raum aller Polynome vom Grad höchstens $P$ in $N$ Variablen
-\[\Poly_P^N(Y)\coloneqq \left\lbrace p\colon \mathcal{I}_Y\to \R \mid p(Y)=\sum_{|m|\le P}c_m\Phi_m(Y)\right\rbrace\]
+\[\Poly_P^N(Y)\coloneqq \left\lbrace p\colon \mathcal{J}_Y\to \R \mid p(Y)=\sum_{|m|\le P}c_m\Phi_m(Y)\right\rbrace\]
 Die Dimension des Raumes ist $\dim\Poly_P^N=\binom{P+N}{P}=\frac{(P+N)!}{P!N!}$.
 \end{mathbem}
 \begin{proof}
@@ -258,10 +263,10 @@ Im Folgenden wird es sowohl für die theoretische Notation, als auch die konkret
 \begin{equation}
 \label{eqn:gpc_ortho_mv}
 \begin{split}
-&\E\left[\Phi_i(Y)\Phi_j(Y)\right]=\int_{\mathcal{I}_Y} \Phi_i(y)\Phi_j(y)\rho(y)dy\\
-&=\int_{\mathcal{I}_{Y_1}}\dots\int_{\mathcal{I}_{Y_N}}\Phi_{i_1}(y_1)\dots\Phi_{i_N}(y_N)\Phi_{j_1}(y_1)\dots\Phi_{j_N}(y_N)\\
+&\E\left[\Phi_i(Y)\Phi_j(Y)\right]=\int_{\mathcal{J}_Y} \Phi_i(y)\Phi_j(y)\rho(y)dy\\
+&=\int_{\mathcal{J}_{Y_1}}\dots\int_{\mathcal{J}_{Y_N}}\Phi_{i_1}(y_1)\dots\Phi_{i_N}(y_N)\Phi_{j_1}(y_1)\dots\Phi_{j_N}(y_N)\\
 &\qquad\quad\cdot\rho_{Y_1}(y_1)\dots\rho_{Y_N}(y_N)dy_N\dots dy_1\\
-&=\int_{\mathcal{I}_{Y_1}}\Phi_{i_1}(y_1)\Phi_{j_1}(y_1)\rho_{Y_1}(y_1)dy_1\dots\int_{\mathcal{I}_{Y_N}}\Phi_{i_N}(y_N)\Phi_{j_N}(y_N)\rho_{Y_N}(y_N)dy_N\\
+&=\int_{\mathcal{J}_{Y_1}}\Phi_{i_1}(y_1)\Phi_{j_1}(y_1)\rho_{Y_1}(y_1)dy_1\dots\int_{\mathcal{J}_{Y_N}}\Phi_{i_N}(y_N)\Phi_{j_N}(y_N)\rho_{Y_N}(y_N)dy_N\\
 &=\delta_{i_1j_1}\dots \delta_{i_Nj_N}=\delta_{ij}
 \end{split}
 \end{equation}
@@ -275,7 +280,7 @@ Für $N=3$ sind für $|m|=0,\dots,2$ die ersten Multi-Indices gegeben durch
 &(2,0,0)<(1,1,0)<(1,0,1)<(0,2,0)<(0,1,1)<(0,0,2)\\
 \end{align*}
 \begin{mathbem}
-Die Wahl der beschränkten Summe $|m|\le P$ für $m\in\N_0^N$ ist eine Einschränkung an den Polynomraum, den wir für die Approximation verwenden wollen. Häufig ist für theoretische Überlegungen der volle Tensorproduktraum mit $m_i\le P$ für alle $i=1,\dots,N$ der Raum der Wahl, da sich dann Ergebnisse aus dem eindimensionalen direkter auf den mehrdimensionalen Fall übertragen lassen. Die Dimension des vollen Tensorproduktraumes beträgt jedoch $(P+1)^N$, was bereits für kleine Dimensionen $N$ eine große Anzahl an Basispolynomen bedeuten würde und folglich einen hohen Rechenzeitaufwand (vgl. Tabelle \ref{table:poly_space_dim}).
+Das Abschneidekriterium $|m|=m_1+\dots m_N\le P$ für $m\in\N_0^N$ ist eine Einschränkung an den Polynomraum, den wir für die Approximation verwenden wollen. Häufig ist für theoretische Überlegungen der volle Tensorproduktraum mit $m_i\le P$ für alle $i=1,\dots,N$ der Raum der Wahl, da sich dann Ergebnisse aus dem eindimensionalen direkter auf den mehrdimensionalen Fall übertragen lassen. Die Dimension des vollen Tensorproduktraumes beträgt jedoch $(P+1)^N$, was bereits für kleine Dimensionen $N$ eine große Anzahl an Basispolynomen bedeuten würde und folglich einen hohen Rechenzeitaufwand (vgl. Tabelle \ref{table:poly_space_dim}).
 \begin{table}
 \centering
 \begin{tabular}{c|cc}
@@ -308,7 +313,7 @@ In Abbildung \ref{fig:bestapproxcoeffs2d} ist der Betrag der Koeffizienten $|\ha
 \end{mathbsp}
 
 \section{Extraktion von Statistiken}
-Gegeben sei die multivariate gPC-Approximation mit Summenschranke $P$ zu einer Funktion $f(Y)$ und einem Zufallsvektor $Y$ der Dimension $N$, also
+Gegeben sei die multivariate gPC-Approximation mit Summenschranke $P$ zu einer Funktion $f(Y)$ und einem Zufallsvektor $Y$ der Größe $N$, also
 \[f(Y)\approx f_M(Y)=\sum_{|m|\le P}\hat{f}_m\Phi_m(Y)\in\Poly_P^N,\quad m\in\N_0^N\]
 Unter Ausnutzung der Orthogonalitätsbedingung (\ref{eqn:gpc_ortho_mv}) der Polynombasen lassen sich gewisse Statistiken der gPC-Approximation auf sehr einfache Art und Weise berechnen. Schlussendlich ist dies eine der größten Motivationen dafür, die Orthogonalbasis passend zur gegebenen Verteilung zu wählen.\\
 Es ist $\gamma_{(0,\dots,0)}=1$, da für das nicht normalisierte Polynom $\Psi_0\equiv 1$ und eine Wahrscheinlichkeitsverteilung $F_Y$ gilt $\gamma_0=\E[\Psi_0^2(Y)]=\int 1\cdot 1dF_Y(y)=1$. Folglich gilt $\Phi_{(0,\dots,0)}(Y)= \frac{\Psi_0(Y)}{\sqrt{\gamma_0}}\equiv 1$ und für den Erwartungswert $\mu_f$
@@ -329,7 +334,9 @@ Die Varianz lässt sich dann berechnen als
 \end{align*}
 Die Standardabweichung ist folglich gegeben durch
 \[\sigma_f=\sqrt{\text{var}(f(Y))}\approx\sqrt{\sum_{0<|m|\le P}\hat{f}_m^2}\]
-Ist man an einer Approximation der Dichtefunktion von $f(Y)$ interessiert, so lässt sich diese mittels eines Histogramms und Samplings der Funktion $f_N(Y)=\sum_{|m|\le P}\hat{f}_m\Phi_m(Y)$ näherungsweise darstellen.\\[0.2cm]
+Ist man an einer Approximation der Dichtefunktion von $f(Y)$ interessiert, so lässt sich diese mittels eines Histogramms und Samplings der Funktion 
+\[f_N(Y)=\sum_{|m|\le P}\hat{f}_m\Phi_m(Y)\]
+näherungsweise darstellen.\\[0.2cm]
 Für höhere Momente gilt
 \begin{align*}
 \E[f^\ell(Y)]\approx \sum_{|m^{(1)}|,\dots,|m^{(\ell)}|\le P} \hat{f}_{m^{(1)}}\dots\hat{f}_{m^{(\ell)}}\underbrace{\E[\Phi_{m^{(1)}}(Y)\dots\Phi_{m^{(\ell)}}(Y)]}_{=\mathcal{T}_{m^{(1)},\dots m^{(\ell)}}}
