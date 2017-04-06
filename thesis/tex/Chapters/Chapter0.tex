@@ -3,9 +3,9 @@
 \chapter{Einleitung}
 Im Zentrum dieser Arbeit steht die stochastische Klein-Gordon-Gleichung (sKGG)
 \begin{align*}
-\dtt{u}(t,x,y)&=\alpha(y) \Laplace u(t,x,y) - \beta(x,\omega)u(t,x,y), \: t>0, \, x\in \Torus^d\\
+\partialdtt{u}(t,x,y)&=\alpha(y) \Laplace u(t,x,y) - \beta(x,\omega)u(t,x,y), \: t>0, \, x\in \Torus^d\\
 u(0,x,y)&=u_0(x,y), \: x\in \Torus^d\\
-\dt{u}(0,x,y)&=v_0(x,y), \: x\in \Torus^d.
+\partialdt{u}(0,x,y)&=v_0(x,y), \: x\in \Torus^d.
 \end{align*}
 Diese ist eine Verallgemeinerung der klassischen Klein-Gordon-Gleichung mit periodischen Randbedingungen. Die Parameter $\alpha$ und $\beta$, die Anfangswerte $u_0$ und $v_0$, und somit auch die Lösung $u$, erhalten eine zusätzliche Abhängigkeit von einem Vektor $y\in\R^N$. Dieser Vektor $y$ stellt eine Realisierung einer $N$-dimensionalen Zufallsvariable dar und wir gewinnen die Möglichkeit, Unsicherheit für die Wahl der Modellparameter direkt in die partielle Differentialgleichung zu integrieren. Somit können als einfaches Beispiel physikalische Messfehler durch eine Normalverteilung modelliert werden.\\[0.2cm]
 Da die Lösung der sKGG eine stochastische Größe ist, versucht man mit der \emph{uncertainty quantification} gewisse stochastische Kenngrößen der Lösung zu erhalten. Wir werden uns dabei auf den Erwartungswert und die Varianz beschränken, die Berechnung höherer Momente oder von Verteilungsfunktionen ist jedoch ebenfalls ohne größeren Mehraufwand möglich.\\In dieser Arbeit werden wir anhand von konkreten Implementierungen verschiedene Ansätze und Verfahren miteinander vergleichen. Das Ziel dieser Arbeit ist ein Vergleich der Güte und des Aufwands verschiedener Ansätze zur Berechnung gewisser statistischer Kenngrößer der zufallsabhängigen Lösung. Die vorhandenen Pseudocodes orientieren sich am Syntax von \emph{Python}, so definiert beispielsweise die Einrücktiefe einen zusammenhängenden Codeblock.\\

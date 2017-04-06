@@ -8,9 +8,9 @@ Die beiden Ansätze \emph{Interpolation} und \emph{diskrete Projektion} (auch \e
 \section*{Kollokation für die stochastische KGG}
 Die stochastische KGG (\ref{skgg}) für $d$ räumliche Dimensionen, $N$ stochastische Dimensionen und $y\in\R^N$ war definiert durch
 \begin{align*}
-\dtt{u}(t,x,y)&=\alpha(y) \Laplace_x u(t,x,y) - \beta(x,\omega)u(t,x,y), \: t>0, \, x\in \Torus^d\\
+\partialdtt{u}(t,x,y)&=\alpha(y) \Laplace_x u(t,x,y) - \beta(x,\omega)u(t,x,y), \: t>0, \, x\in \Torus^d\\
 u(0,x,y)&=u_0(x,y), \: x\in \Torus^d\\
-\dt{u}(0,x,y)&=v_0(x,y), \: x\in \Torus^d
+\partialdt{u}(0,x,y)&=v_0(x,y), \: x\in \Torus^d
 \end{align*}
 Im klassischen Sinne bedeutet Kollokation, dass eine Approximation für eine diskrete Knotenmenge $\Theta_Y=\lbrace y_i\in\R^N\mid i=1,\dots,S\rbrace$ exakt ist. Auf die stochastische KGG übertragen, muss also für $y=y_i\in\Theta_Y$ die Lösung $u(t,x,y_i)$ für $x\in\Torus^d$ und $t>0$ vorliegen und die Approximation $w$ erfüllt $w(t,x,y_i)=u(t,x,y_i)$ für $i=1,\dots,S$. Da wir die exakte Lösung $u(t,x,y_i)$ nicht kennen, sondern für einen Zeitpunkt $T>0$ und eine Knotenmenge $\lbrace x_j\in\Torus^d\mid j=1,\dots,H\rbrace$ nur mithilfe des Strang-Splittings approximieren können, gilt für festes $x_j$ die Kollokationsbedingung lediglich approximativ:
 \[w(T,x_j,y_i)=u(T,x_j,y_i)\approx \tilde{u}(T,x_j,y_i),\quad i=1,\dots,S\]

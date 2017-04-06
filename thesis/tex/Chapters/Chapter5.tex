@@ -2,12 +2,12 @@
 
 \chapter{Stochastische Galerkin-Methode}
 \label{Chapter5}
-Die stochastische Klein-Gordon-Gleichung war für eine $N$-dimensionale Zufallsvariable $Y$ und $y\in\R^N$ definiert durch
+Die stochastische Klein-Gordon-Gleichung wurde für eine $N$-dimensionale Zufallsvariable $Y$ und $y\in\R^N$ definiert durch
 \begin{align}
 \label{eqn:galerkin_skgg}
-\dtt{u}(t,x,y)&=\alpha(y) \Laplace u(t,x,y) - \beta(x,\omega)u(t,x,y), \: t>0, \, x\in \Torus^d\\
+\partialdtt{u}(t,x,y)&=\alpha(y) \Laplace u(t,x,y) - \beta(x,\omega)u(t,x,y), \: t>0, \, x\in \Torus^d\\
 u(0,x,y)&=g(x,y), \: x\in \Torus^d\nonumber\\
-\dt{u}(0,x,y)&=h(x,y), \: x\in \Torus^d\nonumber
+\partialdt{u}(0,x,y)&=h(x,y), \: x\in \Torus^d\nonumber
 \end{align}
 Seien $\Phi_m(Y)$ die zu $Y$ gehörenden gPC Basisfunktionen. Diese erfüllen die Orthogonalitätsbedingung 
 \[\E[\Phi_i(Y)\Phi_j(Y)]=\delta_{ij}\] 
@@ -25,39 +25,39 @@ Die Forderung an $v_M$ ist dann, dass das Residuum der sKGG (\ref{eqn:galerkin_s
 Konkret lautet die Orthogonalitätsbedingung an das Residuum für $t>0$ und $x\in\Torus^d$
 \begin{equation}
 \label{eqn:galerkinOrtho}
-\E\left[\left(\dtt{v_M}(t,x,Y)-\alpha(Y)\Laplace v_M(t,x,Y)+\beta(x,Y)v_M(t,x,Y)\right)\Phi_k\right]=0
+\E\left[\left(\partialdtt{v_M}(t,x,Y)-\alpha(Y)\Laplace v_M(t,x,Y)+\beta(x,Y)v_M(t,x,Y)\right)\Phi_k\right]=0
 \end{equation} 
 für alle $k=0,\dots,M$.\\
 Wir wollen jetzt aus der Orthogonalitätsbedingung (\ref{eqn:galerkinOrtho}) eine Gleichung für die Koeffizienten $\hat{v}_m$ gewinnen. Dazu setzen wir die Definition von $v_M$ in die Gleichung ein und erhalten
 \begin{align*}
-\sum_{m=0}^M\dtt{\hat{v}}_m(t,x)\underbrace{\E[\Phi_m(Y)\Phi_k(Y)]}_{=\delta_{mk}}&=\E\left[\alpha(Y)\sum_{m=0}^M\Laplace \hat{v}_m(t,x)\Phi_m(Y)\Phi_k(Y)\right]\\
+\sum_{m=0}^M\partialdtt{\hat{v}}_m(t,x)\underbrace{\E[\Phi_m(Y)\Phi_k(Y)]}_{=\delta_{mk}}&=\E\left[\alpha(Y)\sum_{m=0}^M\Laplace \hat{v}_m(t,x)\Phi_m(Y)\Phi_k(Y)\right]\\
 &\quad -\E\left[\beta(x,Y)\sum_{m=0}^M\hat{v}_m(t,x)\Phi_m(Y)\Phi_k(Y)\right]\\
-\equivalent \qquad \dtt{\hat{v}}_k(t,x)&=\sum_{m=0}^M\Laplace \hat{v}_m(t,x)\underbrace{\E[\alpha(Y)\Phi_m(Y)\Phi_k(Y)]}_{=a_{mk}}\\
+\equivalent \qquad \partialdtt{\hat{v}}_k(t,x)&=\sum_{m=0}^M\Laplace \hat{v}_m(t,x)\underbrace{\E[\alpha(Y)\Phi_m(Y)\Phi_k(Y)]}_{=a_{mk}}\\
 &\quad -\sum_{m=0}^M\hat{v}_m(t,x)\underbrace{\E[\beta(x,Y)\Phi_m(Y)\Phi_k(Y)]}_{=b_{mk}(x)}\\
-\equivalent \qquad \dtt{\hat{v}}_k(t,x)&=a_k\Laplace \hat{v}(t,x)-b_k(x)\hat{v}(t,x)\\
+\equivalent \qquad \partialdtt{\hat{v}}_k(t,x)&=a_k\Laplace \hat{v}(t,x)-b_k(x)\hat{v}(t,x)\\
 \intertext{mit $ a_k=(a_{0k},\dots,a_{Mk}),\quad b_k(x)=(b_{0k}(x),\dots,b_{Mk}(x)),\quad \hat{v}(t,x)=(\hat{v}_0(t,x),\dots,\hat{v}_M(t,x))^T$}\\
-\equivalent \qquad \dtt{\hat{v}}(t,x)&=A\Laplace \hat{v}(t,x)-B(x)\hat{v}(t,x)
+\equivalent \qquad \partialdtt{\hat{v}}(t,x)&=A\Laplace \hat{v}(t,x)-B(x)\hat{v}(t,x)
 \end{align*}
 Die Matrizen $A$ und $B(x)$ werden durch die Zeilenvektoren $a_k$ und $b_k(x)$ gebildet und sind symmetrisch. Die benötigten Koeffizienten der Approximation $v_M$ sind gekoppelt und als Lösung folgender partieller Differentialgleichung zu erhalten
 \begin{equation}
 \label{eqn:galerkin_dgl}
 \begin{split}
-\dtt{\hat{v}}(t,x)&=A\Laplace \hat{v}(t,x)-B(x)\hat{v}(t,x)\\
+\partialdtt{\hat{v}}(t,x)&=A\Laplace \hat{v}(t,x)-B(x)\hat{v}(t,x)\\
 \hat{v}(0,x)&=\hat{g}(x)\\
-\dt{\hat{v}}(0,x)&=\hat{h}(x)\\
+\partialdt{\hat{v}}(0,x)&=\hat{h}(x)\\
 \end{split}
 \end{equation}
-Dabei gilt für die Anfangswerte $\hat{v}(0,x)$ und $\dt{\hat{v}}(0,x)$ wegen 
+Dabei gilt für die Anfangswerte $\hat{v}(0,x)$ und $\partialdt{\hat{v}}(0,x)$ wegen 
 \[v_M(0,x,Y)=\sum_{m=0}^M\hat{v}_m(0,x)\Phi_m(Y)\]
 und
 \begin{align*}
 g(x,y)&\approx v_M(0,x,y)\\
-h(x,y)&\approx \dt{v}_M(0,x,y)
+h(x,y)&\approx \partialdt{v}_M(0,x,y)
 \end{align*}
 die Darstellung mithilfe der Koeffizienten der Bestapproximation von $g$ und $h$
 \begin{align*}
 \hat{v}_m(0,x)=\hat{g}_m=\E[g(x,Y)\Phi_m(Y)]\\
-\dt{\hat{v}}_m(0,x)=\hat{h}_m=\E[h(x,Y)\Phi_m(Y)]
+\partialdt{\hat{v}}_m(0,x)=\hat{h}_m=\E[h(x,Y)\Phi_m(Y)]
 \end{align*}
 \section{Splitting für den Galerkin-Ansatz}
 Die partielle Differentialgleichung (\ref{eqn:galerkin_dgl}) ist ein System mit Zeitableitung zweiter Ordnung und vektorwertig mit Größe $M+1$. Um eine numerische Lösung des Systems zu erhalten, bietet sich wieder ein Splitting-Ansatz an. Zuerst wollen wir das System aber so weit wie möglich entkoppeln.
@@ -90,34 +90,34 @@ und schreiben das System (\ref{eqn:galerkin_dgl}) in der Form
 \begin{equation}
 \label{eqn:galerkin_dgl_transformed}
 \begin{split}
-\dtt{w}(t,x)&=D_1\Laplace w(t,x)-S_1^TB(x)S_1w(t,x)\\
+\partialdtt{w}(t,x)&=D_1\Laplace w(t,x)-S_1^TB(x)S_1w(t,x)\\
 w(0,x)&=S_1^T\hat{g}(x)\\
-\dt{w}(0,x)&=S_1^T\hat{h}(x)\\
+\partialdt{w}(0,x)&=S_1^T\hat{h}(x)\\
 \end{split}
 \end{equation}
-Schreiben wir es anschließend formal um in ein System mit Zeitableitung erster Ordnung, so gilt für $\tilde{w}\coloneqq \dt w$ und ein Gewicht $\kappa\in[0,1]$
-\[\dt\begin{pmatrix}w\\ \tilde{w}\end{pmatrix}(t,x)=\left[\begin{pmatrix}0 & \kappa I_{M+1}\\ D_1\Laplace& 0\end{pmatrix}+\begin{pmatrix}0&(1-\kappa)I_{M+1}\\-S_1^TB(x)S_1 & 0\end{pmatrix}\right]
+Schreiben wir es anschließend formal um in ein System mit Zeitableitung erster Ordnung, so gilt für $\tilde{w}\coloneqq \partialdt w$ und ein Gewicht $\kappa\in[0,1]$
+\[\partialdt\begin{pmatrix}w\\ \tilde{w}\end{pmatrix}(t,x)=\left[\begin{pmatrix}0 & \kappa I_{M+1}\\ D_1\Laplace& 0\end{pmatrix}+\begin{pmatrix}0&(1-\kappa)I_{M+1}\\-S_1^TB(x)S_1 & 0\end{pmatrix}\right]
 \begin{pmatrix}w\\\tilde{w}\end{pmatrix}(t,x)\]
 Das Splitting besteht dann aus den zwei Gleichungen
 \begin{equation}
 \label{eqn:galerkin_split1}
-\dt\begin{pmatrix}w_1\\ \tilde{w}_1\end{pmatrix}(t,x)=\begin{pmatrix}0 & \kappa I_{M+1}\\ D_1\Laplace& 0\end{pmatrix}\begin{pmatrix}w_1\\\tilde{w}_1\end{pmatrix}(t,x)
+\partialdt\begin{pmatrix}w_1\\ \tilde{w}_1\end{pmatrix}(t,x)=\begin{pmatrix}0 & \kappa I_{M+1}\\ D_1\Laplace& 0\end{pmatrix}\begin{pmatrix}w_1\\\tilde{w}_1\end{pmatrix}(t,x)
 \end{equation}
 und
 \begin{equation}
 \label{eqn:galerkin_split2}
-\dt\begin{pmatrix}w_2\\ \tilde{w}_2\end{pmatrix}(t,x)=\begin{pmatrix}0&(1-\kappa)I_{M+1}\\-S_1^TB(x)S_1 & 0\end{pmatrix}\begin{pmatrix}w_2\\\tilde{w}_2\end{pmatrix}(t,x)
+\partialdt\begin{pmatrix}w_2\\ \tilde{w}_2\end{pmatrix}(t,x)=\begin{pmatrix}0&(1-\kappa)I_{M+1}\\-S_1^TB(x)S_1 & 0\end{pmatrix}\begin{pmatrix}w_2\\\tilde{w}_2\end{pmatrix}(t,x)
 \end{equation}
 Diese sind wie schon in Kapitel \ref{chapter:solver_kgg} mithilfe der Matrixexponentialfunktion lösbar. Beachte, dass die Gleichung (\ref{eqn:galerkin_split1}) nach Umsortierung in $2\times 2$ Systeme entkoppelt ist, da $D_1$ diagonal ist. Die Matrixexponentialfunktion der entkoppelten $2\times 2$ Systeme ist in Algorithmus \ref{alg:kgg_solver} als \emph{First\_Part\_Solver} in einfacher Darstellung direkt gegeben. Der erste Teil des Splittings besteht somit aus dem Lösen von $M+1$ unabhängigen "'Wellengleichungen"' (Name passend für $\kappa=1$). Die Eigenwerte $d_i$ von $A$ sind die Quadrate der Wellengeschwindigkeiten. Abschätzungen für diese, insbesondere Positivität, erhalten wir mithilfe von Satz \ref{th:galerkin_posdef} unter entsprechenden Voraussetzungen an $\alpha(y)$.
 
 \subsection{Entkopplung des zweiten Teils}
 Analog zum ersten Teil können wir für jedes fixe $x\in\Torus^d$ die symmetrische Matrix $S_1^TB(x)S_1\in\R^{M+1\times M+1}$ zerlegen in $S_1^TB(x)S_1=S_2(x)D_2(x)S_2^T(x)$ mit $S_2(x)$ orthonormal und $D_2(x)$ diagonal.\\
 Definiere
-\[z(t,x)\coloneqq S_2^T(x) w_2(t,x), \quad \tilde{z}(t,x)=\dt{z}(t,x)\]
+\[z(t,x)\coloneqq S_2^T(x) w_2(t,x), \quad \tilde{z}(t,x)=\partialdt{z}(t,x)\]
 Dann ist (\ref{eqn:galerkin_split2}) äquivalent zum System
 \begin{equation}
 \label{eqn:galerkin_split2_decoup}
-\dt\begin{pmatrix}z\\ \tilde{z}\end{pmatrix}(t,x)=\begin{pmatrix}0&(1-\kappa)I_{M+1}\\-D_2(x) & 0\end{pmatrix}\begin{pmatrix}z\\\tilde{z}\end{pmatrix}(t,x)
+\partialdt\begin{pmatrix}z\\ \tilde{z}\end{pmatrix}(t,x)=\begin{pmatrix}0&(1-\kappa)I_{M+1}\\-D_2(x) & 0\end{pmatrix}\begin{pmatrix}z\\\tilde{z}\end{pmatrix}(t,x)
 \end{equation}
 Das System (\ref{eqn:galerkin_split2_decoup}) ist nach Umsortierung in $2\times 2$ Blöcke entkoppelt. Die Matrixexponentialfunktion dieser Blöcke können wir mit der Funktion \emph{Second\_Part\_Solver} aus Algorithmus \ref{alg:kgg_solver} effizient lösen. Der große Vorteil hierbei ist, dass die Berechnung der Matrixexponentialfunktion der $2M+2\times 2M+2$ Matrix aus (\ref{eqn:galerkin_split2}) für jedes $x$ im Gitter entfällt. Der Trade-off ist, dass in jedem Splittingschritt die Transformation und Rücktransformation mit $S_2(x)$ durchgeführt werden muss. Dieser zusätzliche Aufwand fällt jedoch im Gegensatz zur teuren Matrixexponentialfunktion, welche die Blockstruktur der Matrix nicht berücksichtigt, nicht stark ins Gewicht.
 \subsection{Algorithmus}
@@ -231,17 +231,17 @@ Sei
 \[e_m(t,x)\coloneqq \hat{u}_m(t,x)-\hat{v}_m(t,x),\quad m=0,\dots,M\]
 Verwenden wir den Galerkin-Ansatz (\ref{eqn:galerkinOrtho}) für die Reihendarstellung von $u$ anstelle von $v_M$, so erhalten wir analog zum Ergebnis für $v_M$ die Gleichungen
 \begin{equation}
-\dtt{\hat{u}}_k(t,x)=\sum_{m=0}^\infty \Laplace \hat{u}_m(t,x)a_{mk}-\sum_{m=0}^\infty \hat{u}_m(t,x)b_{mk}(x),\quad k=0,\dots,M
+\partialdtt{\hat{u}}_k(t,x)=\sum_{m=0}^\infty \Laplace \hat{u}_m(t,x)a_{mk}-\sum_{m=0}^\infty \hat{u}_m(t,x)b_{mk}(x),\quad k=0,\dots,M
 \end{equation}
 Subtrahieren wir davon die Gleichungen
 \begin{equation}
-\dtt{\hat{v}}_k(t,x)=\sum_{m=0}^M\Laplace \hat{v}_m(t,x)a_{mk}-\sum_{m=0}^M\hat{v}_m(t,x)b_{mk}(x),\quad k=0,\dots,M
+\partialdtt{\hat{v}}_k(t,x)=\sum_{m=0}^M\Laplace \hat{v}_m(t,x)a_{mk}-\sum_{m=0}^M\hat{v}_m(t,x)b_{mk}(x),\quad k=0,\dots,M
 \end{equation}
 so erhalten wir für $k=0,\dots,M$
 \begin{equation}
 \label{eqn:error_eq_1}
 \begin{split}
-\dtt{e_k}(t,x)&=\sum_{m=0}^M\Laplace e_m(t,x)a_{mk}-\sum_{m=0}^M e_m(t,x)b_{mk}(x)\\
+\partialdtt{e_k}(t,x)&=\sum_{m=0}^M\Laplace e_m(t,x)a_{mk}-\sum_{m=0}^M e_m(t,x)b_{mk}(x)\\
 &\quad +\sum_{m=M+1}^\infty \Laplace \hat{u}_m(t,x)a_{mk}-\hat{u}_m(t,x)b_{mk}(x)
 \end{split}
 \end{equation}
@@ -254,7 +254,7 @@ Dabei ist $S_1D_1S_1^T=A$ und $r$ der Restterm der Gleichung mit
 \[r_{i}(t,x)=\sum_{k=0}^Ms_{ki}\sum_{m=M+1}^\infty \Laplace \hat{u}_m(t,x)a_{mk}-\hat{u}_m(t,x)b_{mk}(x)\]
 Wir multiplizieren Gleichung (\ref{eqn:error_eq2}) nun von links mit $f^T$ und integrieren über $x$
 \begin{align*}
-\int_{-\pi}^\pi f^T(t,x)\dtt{f}(t,x)dx&=\sum_{i=0}^M d_i\int_{-\pi}^\pi f_i(t,x)\Laplace f_i(t,x)dx\\
+\int_{-\pi}^\pi f^T(t,x)\partialdtt{f}(t,x)dx&=\sum_{i=0}^M d_i\int_{-\pi}^\pi f_i(t,x)\Laplace f_i(t,x)dx\\
 &\quad -\int_{-\pi}^\pi f^T(t,x)S_1^TB(x)S_1f(t,x)dx+\int_{-\pi}^\pi f^T(t,x)r(t,x)dx
 \end{align*}
 Ist $\alpha(y)>c>0$, so ist nach Satz \ref{th:galerkin_posdef} auch $d_i>c$. Weiterhin gilt aufgrund der periodischen Randbedingung mit dem Satz von Green
@@ -263,7 +263,7 @@ Ist für $x\in\Torus^d$ beliebig $\beta(x,y)>c>0$, so ist $B(x)$ positiv definit
 \[-\int_{-\pi}^\pi f^T(t,x)S_1^TB(x)S_1f(t,x)dx\le 0\]
 Daher ergibt sich die Abschätzung
 \begin{equation}
-\int_{-\pi}^\pi f^T(t,x)\dtt{f}(t,x)dx\le \int_{-\pi}^\pi f^T(t,x)r(t,x)\,dx\le \norm{f}_2\norm{r}_2 
+\int_{-\pi}^\pi f^T(t,x)\partialdtt{f}(t,x)dx\le \int_{-\pi}^\pi f^T(t,x)r(t,x)\,dx\le \norm{f}_2\norm{r}_2 
 \end{equation}
 \todo[inline]{Problem3: Ich finde keine gute Möglichkeit daraus eine Abschätzung für $\norm{f}_2$ zu erhalten. Mithilfe dieser hätte ich dann auch eine Abschätzung für $\norm{e}_2$ und somit für den Satz. Evtl. mit einer anderen Norm als der verwendeten $\norm{g}_2^2\coloneqq \int_{-\pi}^\pi g^2(x)dx$ um die Ableitung nach der Zeit zweiter Ordnung besser in den Griff zu bekommen?}
 \end{proof}

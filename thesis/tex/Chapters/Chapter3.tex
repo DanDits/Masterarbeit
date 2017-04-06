@@ -4,39 +4,39 @@
 \label{Chapter3}
 Die hier aufgezeigte Einführung in das general Polynomial-Chaos (gPC) ist angelehnt an Xiu in \autocite{dongbinxiu2010}. Zuerst wiederholen wir grundsätzliche Begriffe aus der polynomialen Approximationstheorie und diskutieren auftretende Probleme. Anschließend erläutern wir die Anwendung auf spezielle Orthogonalbasen, die in enger Verbindung zu stochastischen Verteilungen stehen und die Grundlage für die gPC Approximation bilden. Schlussendlich wird dieser Ansatz dann auf mehrdimensionale Zufallsräume erweitert und die Extraktion von Statistiken aus dieser Polynomapproximation erläutert.
 \section{Polynome und Verteilungen}
-Die Theorie des general Polynomial-Chaos ist die Grundlage für später vorgestellte Verfahren zum Lösen von der stochastischen Klein-Gordon-Gleichung. Im Mittelpunkt dieser Theorie stehen orthogonale Polynombasen. Die Verflechtung mit der Stochastik geschieht dann auf natürliche Weise durch die passende Wahl des zugrunde liegenden Skalarproduktes.
+Die Theorie des general Polynomial-Chaos ist die Grundlage für später vorgestellte Verfahren zum Lösen der stochastischen Klein-Gordon-Gleichung. Im Mittelpunkt dieser Methode stehen orthogonale Polynombasen. Die Verflechtung mit der Stochastik geschieht dann auf natürliche Weise durch die passende Wahl des zugrunde liegenden Skalarproduktes.
 \subsection{Orthogonale Polynome}
 Wir beginnen mit grundlegender Notation und Namensgebung um das zentrale Werkzeug der Polynomapproximation festzulegen. Später werden diese Polynome verwendet, um die Zufallsabhängigkeit der auftretenden Funktionen darzustellen, indem das Orthogonalitätsmaß der Dichtefunktion entspricht.
 
 \begin{mathdef}
-Ein allgemeines Polynom $Q$ vom Grad $n$ lässt sich darstellen als
+Ein Polynom $Q$ vom Grad $n$ lässt sich darstellen als
 \[Q_n(x)=q_nx^n+q_{n-1}^{n-1}+\dots+q_1x+q_0,\quad q_n\ne 0\]
 Ein System $\left\lbrace Q_n(x),\: n\in\mathcal{N}\right\rbrace$ von Polynomen mit $\mathcal{N}=\N_0=\N\cup\lbrace 0\rbrace$ oder $\mathcal{N}=\lbrace 0,1,\dots,N-1,N\rbrace$ heißt Orthogonalsystem, wenn bezüglich eines reellen positiven Maßes $\alpha$ die Orthogonalitätsbedingung
  \[\langle Q_n(x),Q_m(x)\rangle =\int_I Q_n(x)Q_m(x)d\alpha(x)=\gamma_n\delta_{mn},\quad m,n\in\mathcal{N}\]
- erfüllt ist. Dabei ist $\delta_{mn}$ das Kronecker-Delta, $I$ der nicht notwendigerweise endliche Träger des Maßes $\alpha$ und $\gamma_n>0$ die Normalisierungskonstanten. Es gilt 
- \[\gamma_n=\int_I Q_n^2(x)d\alpha(x),\quad n\in\mathcal{N}\] und O.B.d.A. werden wir in folgenden Kapiteln stets von $\gamma_n=1$ ausgehen. In diesem Fall nennt man das System ein Orthonormalsystem.
+ erfüllt ist. Dabei ist $\delta_{mn}$ das Kronecker-Delta, $\mathcal{I}$ der nicht notwendigerweise endliche Träger des Maßes $\alpha$ und $\gamma_n>0$ sind die Normalisierungskonstanten. Es gilt 
+ \[\gamma_n=\int_\mathcal{I} Q_n^2(x)d\alpha(x),\quad n\in\mathcal{N}\] und O.B.d.A. werden wir in folgenden Kapiteln stets von $\gamma_n=1$ ausgehen. In diesem Fall nennt man das System ein Orthonormalsystem.
 \end{mathdef}
 Das zukünftig von uns verwendete Skalarprodukt wird dabei in der folgenden Definition konkretisiert.
 \begin{mathdef}
-Sei $w\colon I\to\R_{>0}$ ein Gewicht, dann definieren wir den gewichteten $L^2$ Raum als
+Sei $w\colon \mathcal{I}\to\R_{>0}$ ein Gewicht, dann definieren wir den gewichteten $L^2$ Raum als
 \begin{equation*}
-L_w^2(I)\coloneqq \left\lbrace v\colon I\to\R | \int_Iv^2(x)w(x)dx<\infty\right\rbrace
+L_w^2(\mathcal{I})\coloneqq \left\lbrace v\colon \mathcal{I}\to\R | \int_\mathcal{I}v^2(x)w(x)dx<\infty\right\rbrace
 \end{equation*}
 mit dem inneren Produkt 
-\[\langle u,v\rangle_{L_w^2(I)}=\int_I u(x)v(x)w(x)dx,\quad u,v\in L_w^2(I)\]
+\[\langle u,v\rangle_{L_w^2(\mathcal{I})}=\int_\mathcal{I} u(x)v(x)w(x)dx,\quad u,v\in L_w^2(\mathcal{I})\]
 und zugehöriger Norm
-\[\norm{u}_{L_w^2(I)}=\left(\int_I u^2(x)w(x)dx\right)^{\onehalf}\]
+\[\norm{u}_{L_w^2(\mathcal{I})}=\left(\int_\mathcal{I} u^2(x)w(x)dx\right)^{\onehalf}\]
 \end{mathdef}
 
 Das Hermite Chaos ist ein motivierendes Beispiel dafür, dass gewisse orthogonale Polynombasen auf natürlicher Weise mit stochastischen Verteilungen verbunden sind.
 \begin{mathbsp}[Hermite Chaos]
 \label{bsp:hermitechaos}
-Ist $I=(-\infty,\infty)$, $w(x)=\frac{1}{\sqrt{2\pi}}e^{-\frac{x^2}{2}}$ die Dichtefunktion der Gauss-Verteilung und verwenden wir diese als Dichte des Maßes $\alpha$, so sind die Hermite-Polynome
+Ist $\mathcal{I}=(-\infty,\infty)$, $w(x)=\frac{1}{\sqrt{2\pi}}e^{-\frac{x^2}{2}}$ die Dichtefunktion der Gauss-Verteilung und verwenden wir diese als Dichte des Maßes $\alpha$, so sind die Hermite-Polynome
 \[H_0(x)\equiv 1,\quad H_1(x)=x,\quad H_2(x)=x^2-1,\quad H_n(x)=xH_{n-1}(x)-(n-1)H_{n-2}(x)\]
-ein Orthogonalsystem bezüglich $\langle\cdot,\cdot\rangle_{L_w^2(I)}$ mit Normalisierungskonstanten $\gamma_n=n!$.\\
+ein Orthogonalsystem bezüglich $\langle\cdot,\cdot\rangle_{L_w^2(\mathcal{I})}$ mit Normalisierungskonstanten $\gamma_n=n!$.\\
 Der Erwartungswert der Gauss-Verteilung
 \[\E_w[Z]= \int_{-\infty}^\infty Z(x)w(x)dx\] erfüllt also die entscheidende Beziehung des Polynomial-Chaos
-\[\langle H_n,H_m\rangle_{L_w^2(I)} =\E_w \left[H_nH_m\right]=\gamma_n\delta_{nm}\]
+\[\langle H_n,H_m\rangle_{L_w^2(\mathcal{I})} =\E_w \left[H_nH_m\right]=\gamma_n\delta_{nm}\]
 Man beachte, dass diese Definition der Hermite-Polynome leicht von der in der Literatur üblichen abweicht. Dies ist der Tatsache geschuldet, dass dort die entsprechende Gewichtsfunktion einen zusätzlichen Faktor $\sqrt{2}$ besitzt. Sie stellt somit keine Dichte einer Wahrscheinlichkeitsverteilung dar und ist für unsere Zwecke unpraktisch und wird nicht verwendet. 
 \end{mathbsp}
 Wir werden in dieser Arbeit auf Polynombasen, die diskreten Verteilungen entsprechen, verzichten. Es sei jedoch bemerkt, dass dies keine Einschränkung der Methode ist, sondern lediglich die Notation vereinfacht. Konkret werden wir uns mit Laguerre-, Jacobi-, Hermite- und Legendre-Polynomen beschäftigen, wobei letztere ein Spezialfall der Jacobipolynome darstellen. Details und Eigenschaften sind im Anhang \ref{AppendixA} zu finden.\\[0.3cm]
@@ -68,7 +68,7 @@ Nun definieren wir $b_n=r_{n-1}$, $c_n=-r_{n-2}$ und berechnen schlussendlich
 Diese und noch viele weitere Eigenschaften der verschiedenen Orthogonalsysteme von Polynomen finden sich in \autocite{weborthopoly} und in vielen weiteren Werken über Polynome. Beispielsweise lässt sich auch die Umkehrung zeigen (unter milden Anforderungen an die Koeffizienten): Zu jeder durch eine Drei-Term-Rekursion definierte Menge an Polynomen existiert ein Maß $\alpha$, bezüglich dessen die Polynome ein Orthogonalsystem bilden (Satz von Favard).\\[0.3cm]
 Die auftretenden Integrale in den Skalarprodukten werden wir später mit Gauss-Quadraturformeln approximieren. Unter anderem dafür werden wir später die Nullstellen der Polynome als Stützstellen benötigen. Basierend auf den Koeffizienten der Drei-Term-Rekursion entwickelten Golub und Welsch in \autocite{GolubWelsch} einen effizienten stabilen Algorithmus, der für die Berechnung der Nullstellen mit der Berechnung der Eigenwerte einer symmetrischen Tridiagonalmatrix auskommt.
 
-\begin{maththeorem}[Golub Welsch Algorithmus]
+\begin{maththeorem}[Golub-Welsch-Algorithmus]
 \label{golubwelschalg}
 Ist $\left\lbrace Q_i(x),\: i=0,\dots,n\right\rbrace$ ein Orthogonalsystem von Polynomen welches die Drei-Term-Rekursion
 \begin{eqnarray}
@@ -116,42 +116,42 @@ Wir bemerken zusätzlich ohne Beweis, dass das Polynom $Q_n$ für $n\ge 1$ insge
 \label{sec:poly_approx}
 Es gibt sehr viele Ergebnisse zur Approximation von Funktionen $f\colon \R\to\R$ durch Polynome $p\in\Poly_n$. Um ein Gefühl für die Mächtigkeit und auch für die Grenzen von polynomialer Approximation zu bekommen, werden an dieser Stelle einige zentrale Sätze genannt. Auf Beweise werden wir größtenteils verzichten, jedoch basierend auf \autocite{Trefethen} eine Diskussion der Interpretation dieser Ergebnisse aus dem numerischen Blickwinkel der Interpolation und Quadratur geben.
 \begin{maththeorem}[Weierstrass]
-Ist $I$ ein beschränktes Intervall und $f\in C^0(\bar{I})$ stetig, dann gibt es für jedes $\epsilon >0$ ein $n\in\N$ und $p\in\Poly_n$, so dass
-\[|f(x)-p(x)|<\epsilon,\quad \forall x\in\bar{I}\]
+Ist $\mathcal{I}$ ein beschränktes Intervall und $f\in C^0(\bar{\mathcal{I}})$ stetig, dann gibt es für jedes $\epsilon >0$ ein $n\in\N$ und $p\in\Poly_n$, so dass
+\[|f(x)-p(x)|<\epsilon,\quad \forall x\in\bar{\mathcal{I}}\]
 \end{maththeorem}
-Folglich gilt für die \emph{gleichmäßige Bestapproximation} $\phi_n$, welche zu $f\in C^0(\bar{I})$ eine eindeutige Lösung $\phi_n(f)\in\Poly_n$ mit minimalem Abstand bezüglich der Maximumsnorm ergibt, die Aussage
+Folglich gilt für die \emph{gleichmäßige Bestapproximation} $\phi_n$, welche zu $f\in C^0(\bar{\mathcal{I}})$ eine eindeutige Lösung $\phi_n(f)\in\Poly_n$ mit minimalem Abstand bezüglich der Maximumsnorm ergibt, die Aussage
 \[\lim\limits_{n\to\infty}\norm{f-\phi_n(f)}_\infty=0\] 
 Dieses Ergebnis sieht sehr vielversprechend aus. Eine erste Idee zur Berechnung von $\phi_n(f)$ ist die Interpolation. Jedoch wurde von Faber in \autocite{faber14} gezeigt, dass es kein Interpolationsschema gibt, das für alle stetigen Funktionen auf diese Weise konvergiert. Doch dieser vermeintliche Rückschlag ist in der Praxis selten von Bedeutung. Problematisch sind nur Interpolationsschemata, die auf gleichverteilten Knotenpunkten basieren und dann unter dem Runge-Phänomen leiden, welches bei Funktionen wie $f(x)=\frac{1}{1+x^2}$ an den Rändern für eine schlechte Approximationsgüte sorgt. Erfüllt $f$ jedoch minimale Glattheitsanforderungen (wie bereits Lipschitzstetigkeit) und verwendet man \chebyspace Interpolationspunkte, so ist die Approximationsgüte bereits bereits für kleines $n$ gesichert.\\
 Man beachte, dass der Name "`Bestapproximation"' sich strikt auf die verwendete Norm bezieht. Punktweise Aussagen lassen sich somit im Allgemeinen nicht treffen. 
 \begin{mathbsp}
-Als Beispiel vergleichen wir die Bestapproximation bezüglich der Maximumsnorm und die \chebyspace Interpolation vom Grad $N=100$ von der Funktion $f(x)=|x-\frac{1}{4}|$ in $[-1,1]$. Wie wir an Abbildung \ref{polyapproxcomp} erkennen, ist der maximale Fehler der Bestapproximation zwar geringer, aber tritt an $N+2$ Punkten auf, wohingegen der Fehler der \chebyspace Approximation zu den Rändern hin stark abnimmt. Dies soll verdeutlichen, dass die Bestapproximation nicht immer in jedem Sinne die "`beste"' Approximation darstellt.
+Als Beispiel vergleichen wir die Bestapproximation bezüglich der Maximumsnorm und die \chebyspace Interpolation vom Grad $N=100$ der Funktion $f(x)=|x-\frac{1}{4}|$ in $[-1,1]$. Wie wir an Abbildung \ref{polyapproxcomp} erkennen, ist der maximale Fehler der Bestapproximation zwar geringer, aber tritt an $N+2$ Punkten auf, wohingegen der Fehler der \chebyspace Approximation zu den Rändern hin stark abnimmt. Dies soll verdeutlichen, dass die Bestapproximation nicht immer in jedem Sinne die "`beste"' Approximation darstellt.
 \begin{figure}[ht]
  \center
  \includegraphics[width=\linewidth]{Figures/polynomial_approx_comparison.png}
- \caption{Visualisierung der Fehler verschiedener Approximationen, angelehnt an \autocite{Trefethen}. Hierbei wurde die Bestapproximation mithilfe des \emph{Remez} Algorithmus aus dem Chebfun Projekt (http://www.chebfun.org/) berechnet. Der Fehler der \chebyspace Approximation nimmt zu den Rändern hin stark ab.}
+ \caption{Visualisierung der Fehler verschiedener Approximationen, angelehnt an \autocite{Trefethen}. Hierbei wurde die Bestapproximation mithilfe des Algorithmus \emph{Remez} aus dem Projekt Chebfun (http://www.chebfun.org) berechnet. Der Fehler der \chebyspace Approximation nimmt zu den Rändern hin stark ab.}
  \label{polyapproxcomp}
 \end{figure}
 \end{mathbsp}
-Im Folgenden lösen wir uns von dem beschränkten Intervall $I$ und lassen auch $I=\R$ oder $I=[0,\infty)$ zu. Der Begriff der Bestapproximation lässt sich auch auf den Raum $L_w^2(I)$ erweitern. Dazu verwenden wir eine orthogonale Projektion auf eine orthogonale Polynombasis und erhalten eine einfache Darstellung des Bestapproximationsoperators.
+Im Folgenden lösen wir uns von dem beschränkten Intervall $\mathcal{I}$ und lassen auch $\mathcal{I}=\R$ oder $\mathcal{I}=[0,\infty)$ zu. Der Begriff der Bestapproximation lässt sich auch auf den Raum $L_w^2(\mathcal{I})$ erweitern. Dazu verwenden wir eine orthogonale Projektion auf eine orthogonale Polynombasis und erhalten eine einfache Darstellung des Bestapproximationsoperators.
 \begin{maththeorem}
 Ist $N\in\N_0$ und $\lbrace Q_k(x)\rbrace_{k=0}^N\subset \Poly_N$ ein Orthogonalsystem bezüglich des positiven Gewichtes $w(\cdot)$, also 
-\[\langle Q_m(x),Q_n(x)\rangle_{L_w^2(I)}=\norm{Q_m}^2_{L_w^2(I)}\delta_{m,n},\quad, 0\le m,n\le N\]
-so gilt für den Projektionsoperator $P_N\colon L_w^2(I)\to \Poly_N$ definiert durch 
-\[P_Nf\coloneqq \sum_{k=0}^N\hat{f}_kQ_k(x),\quad \hat{f}_k\coloneqq \frac{1}{\norm{Q_k}_{L_w^2(I)}^2}\langle f,Q_k\rangle_{L_w^2(I)},\qquad f\in L^2_w(I),\]
+\[\langle Q_m(x),Q_n(x)\rangle_{L_w^2(\mathcal{I})}=\norm{Q_m}^2_{L_w^2(\mathcal{I})}\delta_{m,n},\quad, 0\le m,n\le N\]
+so gilt für den Projektionsoperator $P_N\colon L_w^2(\mathcal{I})\to \Poly_N$ definiert durch 
+\[P_Nf\coloneqq \sum_{k=0}^N\hat{f}_kQ_k(x),\quad \hat{f}_k\coloneqq \frac{1}{\norm{Q_k}_{L_w^2(\mathcal{I})}^2}\langle f,Q_k\rangle_{L_w^2(\mathcal{I})},\qquad f\in L^2_w(\mathcal{I}),\]
 die Bestapproximationsaussage
-\[\norm{f-P_Nf}_{L_w^2(I)}=\inf\limits_{\psi\in\Poly_N}\norm{f-\psi}_{L_w^2(I)}\]
+\[\norm{f-P_Nf}_{L_w^2(\mathcal{I})}=\inf\limits_{\psi\in\Poly_N}\norm{f-\psi}_{L_w^2(\mathcal{I})}\]
 \end{maththeorem}
 Dies entspricht der Fourier-Entwicklung im Hilbertraum. Entsprechend nennt man die Koeffizienten $\hat{f}_k$ die (verallgemeinerten) Fourier-Koeffizienten. Die Projektion ist eine Orthogonalprojektion in dem Sinne, dass der Fehler $f-P_Nf$ senkrecht zum Polynomraum $\Poly_N$ ist.\\
-Wie schon bei der Bestapproximation bzgl. der Maximumsnorm erhält man auch für die verallgemeinerte Bestapproximation eine Konvergenzaussage. Für unbeschränktes $I$ sind die Beweise sehr aufwändig und beispielsweise in \autocite{CouHil53} zu finden. 
+Wie schon bei der Bestapproximation bzgl. der Maximumsnorm erhält man auch für die verallgemeinerte Bestapproximation eine Konvergenzaussage. Für unbeschränktes $\mathcal{I}$ sind die Beweise sehr aufwändig und beispielsweise in \autocite{CouHil53} zu finden. 
 \begin{maththeorem}
-Für jedes $f\in L_w^2(I)$ gilt
-\[\lim\limits_{N\to\infty}\norm{f-P_Nf}_{L_w^2(I)}=0\]
+Für jedes $f\in L_w^2(\mathcal{I})$ gilt
+\[\lim\limits_{N\to\infty}\norm{f-P_Nf}_{L_w^2(\mathcal{I})}=0\]
 \end{maththeorem}
 Die Konvergenzordnung ist hierbei abhängig von der Regularität von $f$ und der Art der für die Projektion verwendeten Orthogonalpolynome. Man nennt diese Art der Konvergenz in der Literatur auch \emph{spektrale Konvergenz}, da die Konvergenzrate abhängig von der Glattheit der Funktion ist. Man muss also aufpassen eine hohe Approximationsordnung $N$ nicht mit einer hohen Approximationsgenauigkeit zu verwechseln.\\
 Für das Beispiel der Legendre-Polynome, also mit konstanter Gewichtsfunktion $w$, zeigt Xiu in \autocite[Theorem 3.6]{dongbinxiu2010} folgendes Ergebnis.
 \begin{maththeorem}
 \label{spectralconvth}
-Für jedes $f\in H_w^p[-1,1]\coloneqq \left\lbrace v\colon I\to\R | \frac{d^mv}{dx^m}\in L_w^2(I),0\le m\le p\right\rbrace$ mit $p\ge 0, w\equiv 1$ gibt es eine Konstante $C$ unabhängig von $N$, so dass
+Für jedes $f\in H_w^p[-1,1]\coloneqq \left\lbrace v\colon \mathcal{I}\to\R | \frac{d^mv}{dx^m}\in L_w^2(\mathcal{I}),0\le m\le p\right\rbrace$ mit $p\ge 0, w\equiv 1$ gibt es eine Konstante $C$ unabhängig von $N$, so dass
 \[\norm{f-P_Nf}_{L_w^2[-1,1]}\le CN^{-p}\norm{f}_{H_w^p[-1,1]}\]
 \end{maththeorem}
 \begin{mathbsp}
@@ -177,14 +177,14 @@ Existieren Polynome $\Phi_i\in\Poly_i$, insbesondere $\Phi_0\equiv const$, welch
 \E\left[\Phi_i(Y)\Phi_j(Y)\right]=\delta_{ij},\quad i,j\in\N_0
 \end{equation}
 erfüllen, so nennt man diese \emph{general Polynomial-Chaos Basis-Funktionen}.\\
-Ist $Y$ stetig, so existiert eine Dichtefunktion $\rho>0$, so dass $dF_Y(y)=\rho(y)dy$ auf $I$. In diesem Fall lässt sich die Bedingung (\ref{eqn:gpc_basicortho}) schreiben als
+Ist $Y$ stetig, so existiert eine Dichtefunktion $\rho>0$, so dass $dF_Y(y)=\rho(y)dy$ auf $\mathcal{I}$. In diesem Fall lässt sich die Bedingung (\ref{eqn:gpc_basicortho}) schreiben als
 \begin{equation}
 \label{eqn:gpc_ortho}
-\E\left[\Phi_i(Y)\Phi_j(Y)\right]=\int_I \Phi_i(y)\Phi_j(y)\rho(y)dy=\delta_{ij},\quad i,j\in\N_0
+\E\left[\Phi_i(Y)\Phi_j(Y)\right]=\int_\mathcal{I} \Phi_i(y)\Phi_j(y)\rho(y)dy=\delta_{ij},\quad i,j\in\N_0
 \end{equation}
 \end{mathdef}
 \begin{mathbem}
-Betrachten wir die Orthogonalitätsbedingung (\ref{eqn:gpc_ortho}), so wird klar, dass diese direkt der Orthogonalität des Raumes $L_\rho^2(I)$ entspricht. Die Polynome erfüllen somit nach Satz \ref{threetermexist} eine Drei-Term-Rekursion und bilden eine Orthonormalbasis bezüglich $L_\rho^2(I)$.\\
+Betrachten wir die Orthogonalitätsbedingung (\ref{eqn:gpc_ortho}), so wird klar, dass diese direkt der Orthogonalität des Raumes $L_\rho^2(\mathcal{I})$ entspricht. Die Polynome erfüllen somit nach Satz \ref{threetermexist} eine Drei-Term-Rekursion und bilden eine Orthonormalbasis bezüglich $L_\rho^2(\mathcal{I})$.\\
 Man beachte, dass die hier vorgenommene Normierung der Basis keine Beschränkung der Allgemeinheit darstellt. Gilt als Bedingung nur
 \[\langle H_i,H_j\rangle_{L_w^2(S)} =\E_Y \left[H_i(Y)H_j(Y)\right]=\gamma_i\delta_{ij},\quad i,j\in\N_0,\gamma_i>0\]
 so müssen die Polynome $H_i$ lediglich durch die Normalisierungskonstanten $\sqrt{\gamma_i}=\sqrt{\E\left[\Phi_i^2(Y)\right]}$ geteilt werden.\\
@@ -212,7 +212,7 @@ Diskret & Poisson & Charlier & $\lbrace 0,1,2,\dots\rbrace$ \\
 
 Das Ziel ist nun, mithilfe einer gPC-Orthonormalbasis eine Funktion $f(Y)$ einer Zufallsvariablen $Y$ zu approximieren. Wir wollen nun einen Einblick dazu bekommen, was an dieser Stelle mit "`approximieren"' gemeint ist.
 \begin{mathdef}[Starke gPC-Konvergenz]
-Sei $f(Y)$ eine Funktion einer Zufallsvariablen $Y$ mit Dichte $\rho_Y$ und Träger $I_Y$. Eine general Polynomial-Chaos Approximation $f_M(Y)\in\Poly_M(Y)$ konvergiert in einem starken Sinne gegen $f(Y)$, wenn \[\norm{f(Y)-f_M(Y)}_{L_{\rho_Y}^2(I_Y)}\to 0\text{ für }{M\to\infty}\]
+Sei $f(Y)$ eine Funktion einer Zufallsvariablen $Y$ mit Dichte $\rho_Y$ und Träger $\mathcal{I}_Y$. Eine general Polynomial-Chaos Approximation $f_M(Y)\in\Poly_M(Y)$ konvergiert in einem starken Sinne gegen $f(Y)$, wenn \[\norm{f(Y)-f_M(Y)}_{L_{\rho_Y}^2(\mathcal{I}_Y)}\to 0\text{ für }{M\to\infty}\]
 \end{mathdef}
 Die starke gPC-Konvergenz entspricht also direkt der in Kapitel \ref{sec:poly_approx} vorgestellten spektralen Konvergenz, entsprechend ist die Konvergenzordnung abhängig von der Glattheit der Funktion $f$. Ohne Beweis folgt aus der starken gPC-Konvergenz auch die Konvergenz in Wahrscheinlichkeit und schlussendlich die Konvergenz in Verteilung.
 \begin{mathbem}
@@ -239,7 +239,7 @@ Sei $P\in\N_0$ der fest gewählte maximale Polynomgrad. Sei weiter $Y=(Y_1,\dots
 
 \begin{mathbem}
 Der von den multivariate gPC-Funktionen aufgespannte Raum $\Poly_P^N$ ist der Raum aller Polynome vom Grad höchstens $P$ in $N$ Variablen
-\[\Poly_P^N(Y)\coloneqq \left\lbrace p\colon I_Y\to \R \mid p(Y)=\sum_{|m|\le P}c_m\Phi_m(Y)\right\rbrace\]
+\[\Poly_P^N(Y)\coloneqq \left\lbrace p\colon \mathcal{I}_Y\to \R \mid p(Y)=\sum_{|m|\le P}c_m\Phi_m(Y)\right\rbrace\]
 Die Dimension des Raumes ist $\dim\Poly_P^N=\binom{P+N}{P}=\frac{(P+N)!}{P!N!}$.
 \end{mathbem}
 \begin{proof}
@@ -258,10 +258,10 @@ Im Folgenden wird es sowohl für die theoretische Notation, als auch die konkret
 \begin{equation}
 \label{eqn:gpc_ortho_mv}
 \begin{split}
-&\E\left[\Phi_i(Y)\Phi_j(Y)\right]=\int_{I_Y} \Phi_i(y)\Phi_j(y)\rho(y)dy\\
-&=\int_{I_{Y_1}}\dots\int_{I_{Y_N}}\Phi_{i_1}(y_1)\dots\Phi_{i_N}(y_N)\Phi_{j_1}(y_1)\dots\Phi_{j_N}(y_N)\\
+&\E\left[\Phi_i(Y)\Phi_j(Y)\right]=\int_{\mathcal{I}_Y} \Phi_i(y)\Phi_j(y)\rho(y)dy\\
+&=\int_{\mathcal{I}_{Y_1}}\dots\int_{\mathcal{I}_{Y_N}}\Phi_{i_1}(y_1)\dots\Phi_{i_N}(y_N)\Phi_{j_1}(y_1)\dots\Phi_{j_N}(y_N)\\
 &\qquad\quad\cdot\rho_{Y_1}(y_1)\dots\rho_{Y_N}(y_N)dy_N\dots dy_1\\
-&=\int_{I_{Y_1}}\Phi_{i_1}(y_1)\Phi_{j_1}(y_1)\rho_{Y_1}(y_1)dy_1\dots\int_{I_{Y_N}}\Phi_{i_N}(y_N)\Phi_{j_N}(y_N)\rho_{Y_N}(y_N)dy_N\\
+&=\int_{\mathcal{I}_{Y_1}}\Phi_{i_1}(y_1)\Phi_{j_1}(y_1)\rho_{Y_1}(y_1)dy_1\dots\int_{\mathcal{I}_{Y_N}}\Phi_{i_N}(y_N)\Phi_{j_N}(y_N)\rho_{Y_N}(y_N)dy_N\\
 &=\delta_{i_1j_1}\dots \delta_{i_Nj_N}=\delta_{ij}
 \end{split}
 \end{equation}

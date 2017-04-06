@@ -54,6 +54,6 @@ plt.title("Fehler der spektralen Ableitung der Ordnung {} von {}".format(deriv, 
 plt.plot(Ns, errors, "-o")
 plt.xscale('log')
 plt.yscale('log')
-plt.xlabel('Anzahl Fourier Punkte', fontsize=font)
+plt.xlabel('Anzahl Fourier-Koeffizienten', fontsize=font)
 plt.ylabel('Relativer Fehler in diskreter L2-Norm', fontsize=font)
 plt.show()
