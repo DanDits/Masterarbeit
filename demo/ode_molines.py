@@ -12,11 +12,11 @@ from util.trial import Trial
 show_errors = True
 plot_references = True  # when not animating, plot in same figure
 do_animate = True
-grid_n = 256  # amount of grid points per dimension
+grid_n = 128  # amount of grid points per dimension
 dimension = 1  # plotting only supported for one or two dimensional
 domain = list(repeat([-pi, pi], dimension))  # intervals with periodic boundary conditions, so a ring in 1d, torus in 2d
 anim_pause = 100  # in ms
-show_times = np.arange(0, 100, anim_pause / 1000)  # times to evaluate solution for and plot it
+show_times = np.arange(0.1, 100, anim_pause / 1000)  # times to evaluate solution for and plot it
 # show_times = [0, 1, 2, 3]
 
 

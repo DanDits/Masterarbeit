@@ -2,7 +2,7 @@
 
 \chapter{Stochastische Galerkin-Methode}
 \label{Chapter5}
-Die stochastische Klein-Gordon-Gleichung wurde für eine $N$-dimensionale Zufallsvariable $Y$ und $y\in\R^N$ definiert durch
+Die stochastische Klein-Gordon-Gleichung ist für eine $N$-dimensionale Zufallsvariable $Y$ und $y\in\R^N$ definiert durch
 \begin{align}
 \label{eqn:galerkin_skgg}
 \partialdtt{u}(t,x,y)&=\alpha(y) \Laplace u(t,x,y) - \beta(x,\omega)u(t,x,y), \: t>0, \, x\in \Torus^d\\
@@ -54,13 +54,15 @@ und
 g(x,y)&\approx v_M(0,x,y)\\
 h(x,y)&\approx \partialdt{v}_M(0,x,y)
 \end{align*}
-die Darstellung mithilfe der Koeffizienten der Bestapproximation von $g$ und $h$
+die Darstellung mithilfe der Koeffizienten der Bestapproximation von $g$ und $h$:
 \begin{align*}
 \hat{v}_m(0,x)=\hat{g}_m=\E[g(x,Y)\Phi_m(Y)]\\
 \partialdt{\hat{v}}_m(0,x)=\hat{h}_m=\E[h(x,Y)\Phi_m(Y)]
 \end{align*}
+Ist insbesondere $g$ nicht zufallsabhängig, so ist $\hat{g}_m=0$ für alle $m>0$.
 \section{Splitting für den Galerkin-Ansatz}
-Die partielle Differentialgleichung (\ref{eqn:galerkin_dgl}) ist ein System mit Zeitableitung zweiter Ordnung und vektorwertig mit Größe $M+1$. Um eine numerische Lösung des Systems zu erhalten, bietet sich wieder ein Splitting-Ansatz an. Zuerst wollen wir das System aber so weit wie möglich entkoppeln.
+Die partielle Differentialgleichung (\ref{eqn:galerkin_dgl}) ist vektorwertig mit Größe $M+1$. Durch die vollbesetzen Matrizen $A$ und $B(x)$ sind die Komponenten stark gekoppelt. Schreibt man die Gleichung naiv in eine Gleichung mit Zeitableitung erster Ordnung um und verwendet die Matrixexponentialfunktion direkt, so wird der benötigte Rechenaufwand schnell zu groß. Daher ist es das Ziel, die Gleichung geschickt in ein äquivalentes entkoppeltes System zu transformieren, welches sich auch durch Parallelisierung der innersten Schleifen beschleunigen lässt.\\
+Um die Teile mit $A$ und mit $B(x)$ getrennt entkoppeln zu können, ist es sehr hilfreich einen Splitting-Ansatz zu verwenden. Die Entkopplung basiert auf der Diagonalisierung der Matrizen. Um notwendige Voraussetzungen an deren Eigenwerte erfüllen zu können, benötigen wir Voraussetzungen an $\alpha$ und $\beta(x)$. Dieser Zusammenhang wird im folgenden Satz erläutert.
 \begin{maththeorem}
 \label{th:galerkin_posdef}
 Ist $\alpha(y)>c$ für ein $c>0$, so ist die Matrix $A$ aus dem Galerkin-Ansatz positiv definit und besitzt nur positive Eigenwerte $\lambda>c$.\\
@@ -108,9 +110,10 @@ und
 \label{eqn:galerkin_split2}
 \partialdt\begin{pmatrix}w_2\\ \tilde{w}_2\end{pmatrix}(t,x)=\begin{pmatrix}0&(1-\kappa)I_{M+1}\\-S_1^TB(x)S_1 & 0\end{pmatrix}\begin{pmatrix}w_2\\\tilde{w}_2\end{pmatrix}(t,x)
 \end{equation}
-Diese sind wie schon in Kapitel \ref{chapter:solver_kgg} mithilfe der Matrixexponentialfunktion lösbar. Beachte, dass die Gleichung (\ref{eqn:galerkin_split1}) nach Umsortierung in $2\times 2$ Systeme entkoppelt ist, da $D_1$ diagonal ist. Die Matrixexponentialfunktion der entkoppelten $2\times 2$ Systeme ist in Algorithmus \ref{alg:kgg_solver} als \emph{First\_Part\_Solver} in einfacher Darstellung direkt gegeben. Der erste Teil des Splittings besteht somit aus dem Lösen von $M+1$ unabhängigen "'Wellengleichungen"' (Name passend für $\kappa=1$). Die Eigenwerte $d_i$ von $A$ sind die Quadrate der Wellengeschwindigkeiten. Abschätzungen für diese, insbesondere Positivität, erhalten wir mithilfe von Satz \ref{th:galerkin_posdef} unter entsprechenden Voraussetzungen an $\alpha(y)$.
+Diese sind wie schon in Kapitel \ref{chapter:solver_kgg} mithilfe der Matrixexponentialfunktion lösbar. Beachte, dass die Gleichung (\ref{eqn:galerkin_split1}) nach Umsortierung in $2\times 2$ Systeme entkoppelt ist, da $D_1$ diagonal ist. Die Matrixexponentialfunktion der entkoppelten $2\times 2$ Systeme ist in Algorithmus \ref{alg:kgg_solver} als \emph{First\_Part\_Solver} in einfacher Darstellung direkt gegeben. Der erste Teil des Splittings besteht somit aus dem Lösen von $M+1$ unabhängigen "'Wellengleichungen"' (Name passend für $\kappa=1$). Die Eigenwerte $d_i$ von $A$ sind die Quadrate der Wellengeschwindigkeiten. Abschätzungen für diese, insbesondere Positivität, erhalten wir mithilfe von Satz \ref{th:galerkin_posdef} unter entsprechenden Voraussetzungen an $\alpha(y)$. Beachte, dass die Eigenwerte lediglich einmal zu Beginn berechnet werden müssen. Die $M+1$ Systeme der Größe $2\times 2$ im innersten Teil des Algorithmus können somit vollständig parallel gelöst werden.
 
 \subsection{Entkopplung des zweiten Teils}
+\subsubsection*{Entkopplung für $\kappa \neq 1$}
 Analog zum ersten Teil können wir für jedes fixe $x\in\Torus^d$ die symmetrische Matrix $S_1^TB(x)S_1\in\R^{M+1\times M+1}$ zerlegen in $S_1^TB(x)S_1=S_2(x)D_2(x)S_2^T(x)$ mit $S_2(x)$ orthonormal und $D_2(x)$ diagonal.\\
 Definiere
 \[z(t,x)\coloneqq S_2^T(x) w_2(t,x), \quad \tilde{z}(t,x)=\partialdt{z}(t,x)\]
@@ -119,7 +122,16 @@ Dann ist (\ref{eqn:galerkin_split2}) äquivalent zum System
 \label{eqn:galerkin_split2_decoup}
 \partialdt\begin{pmatrix}z\\ \tilde{z}\end{pmatrix}(t,x)=\begin{pmatrix}0&(1-\kappa)I_{M+1}\\-D_2(x) & 0\end{pmatrix}\begin{pmatrix}z\\\tilde{z}\end{pmatrix}(t,x)
 \end{equation}
-Das System (\ref{eqn:galerkin_split2_decoup}) ist nach Umsortierung in $2\times 2$ Blöcke entkoppelt. Die Matrixexponentialfunktion dieser Blöcke können wir mit der Funktion \emph{Second\_Part\_Solver} aus Algorithmus \ref{alg:kgg_solver} effizient lösen. Der große Vorteil hierbei ist, dass die Berechnung der Matrixexponentialfunktion der $2M+2\times 2M+2$ Matrix aus (\ref{eqn:galerkin_split2}) für jedes $x$ im Gitter entfällt. Der Trade-off ist, dass in jedem Splittingschritt die Transformation und Rücktransformation mit $S_2(x)$ durchgeführt werden muss. Dieser zusätzliche Aufwand fällt jedoch im Gegensatz zur teuren Matrixexponentialfunktion, welche die Blockstruktur der Matrix nicht berücksichtigt, nicht stark ins Gewicht.
+Das System (\ref{eqn:galerkin_split2_decoup}) ist nach Umsortierung in $2\times 2$ Blöcke entkoppelt. Die Matrixexponentialfunktion dieser Blöcke können wir mit der Funktion \emph{Second\_Part\_Solver} aus Algorithmus \ref{alg:kgg_solver} effizient lösen. Der große Vorteil hierbei ist, dass die Berechnung der Matrixexponentialfunktion der $(2M+2)\times (2M+2)$ Matrix aus (\ref{eqn:galerkin_split2}) für jedes $x$ im Gitter entfällt. Der Trade-off ist, dass in jedem Splittingschritt die Transformation und Rücktransformation mit $S_2(x)$ durchgeführt werden muss. Dieser zusätzliche Aufwand fällt jedoch im Gegensatz zur teuren Matrixexponentialfunktion, welche die Blockstruktur der Matrix nicht berücksichtigt, nicht stark ins Gewicht.
+\subsubsection*{Entkopplung für $\kappa =1$}
+Ist $\kappa=1$, so können wir (\ref{eqn:galerkin_split2}) auch explizit lösen:
+\begin{align*}
+\begin{pmatrix}w_2\\\tilde{w}_2\end{pmatrix}(t,x)&=\exp\left(t\begin{pmatrix}0 & 0\\ -S_1^TB(x)S_1 & 0\end{pmatrix}\right)\begin{pmatrix}w_2\\\tilde{w}_2\end{pmatrix}(0,x)\\
+&=\begin{pmatrix}I & 0\\ -tS_1^TB(x)S_1 & I\end{pmatrix}\begin{pmatrix}w_2\\\tilde{w}_2\end{pmatrix}(0,x)\\
+&=\begin{pmatrix}w_2(0,x)\\\tilde{w}_2(0,x)-t\left(S_1^TB(x)S_1\right)w_2(0,x)\end{pmatrix}
+\end{align*}
+In diesem Fall benötigen wir also nur noch eine Matrix-Vektor-Multiplikation. Im allgemeinen Fall haben wir zwei solche Operationen benötigt, eine für die Transformation und eine für die Rücktransformation. Zusätzlich entfällt das Lösen der $M+1$ Systeme der Größe $2\times 2$. Die Kosten für diesen Geschwindigkeitsgewinn sind, dass die erste Komponente $w_2$ in diesem Splittingschritt nicht upgedatet wird und dass die Zeitintegration explizit ist.
+\newpage
 \subsection{Algorithmus}
 In Algorithmus \ref{alg:galerkin} ist die Vorgehensweise für den Galerkin-Ansatz zum Lösen der stochastischen KGG skizziert. Als Basis dienen dabei die Kernfunktionen des allgemeinen KGG Lösers aus Algorithmus \ref{alg:kgg_solver}, welche in einem schnellen Strang-Splitting eingebettet sind.
 \begin{algorithm}[ht]
@@ -130,8 +142,8 @@ In Algorithmus \ref{alg:galerkin} ist die Vorgehensweise für den Galerkin-Ansat
             	\State $\Phi_m\gets$ $m$-te orthonormale gPC-Basis-Funktion zu $Y$, $\quad m=0,\dots,M$
               \State $A_{mk}\gets \E[\alpha(Y)\Phi_m(Y)\Phi_k(Y)],\quad m,k=0,\dots,M$
               \State $A=S_1D_1S_1^T, \quad S_1$ orthonormal, $D_1$ diagonal
-              \State $x_H\gets$ Ortsdiskretisierung der Größe $H$
-              \For{$x\in x_H$}
+              \State $x_H\gets$ Ortsdiskretisierung mit insgesamt $H$ Gitterpunkten
+              \For{jedes $x$ im Gitter $x_H$}
               	\State $B_{mk}(x)\gets \E[\beta(x,Y)\Phi_m(Y)\Phi_k(Y)],\quad m,k=0,\dots,M$
               	\State $S_1^TB(x)S_1=S_2(x)D_2(x)S_2^T(x)$, $S_2(x)$ orthonormal, $D_2(x)$ diagonal
               \EndFor
@@ -171,8 +183,8 @@ In Algorithmus \ref{alg:galerkin} ist die Vorgehensweise für den Galerkin-Ansat
 \end{algorithm}
 \subsubsection*{Berechnung der Erwartungswerte}
 Die auftretenden Erwartungswerte zur Berechnung von $A$, $B(x)$, $g$ und $h$ können numerisch mithilfe von Quadraturformeln gelöst werden können. Mögliche Varianten wurden --insbesondere auch für mehrdimensionale Quadratur-- in Kapitel \ref{sec:discrete_proj} vorgestellt.\\
-Sind $\alpha$, $\beta$ und die Anfangswerte glatte Funktionen, so bietet sich die Verwendung der Gauss-Quadratur an. Diese besitzt eine hohe polynomiale Exaktheit und berücksichtigt die Wahrscheinlichkeitsdichten implizit. Da die benötigten Stützstellen und ihre Anzahl feststehen, ist der Zeitaufwand dieser Quadratur im Vorhinein bekannt und vergleichsweise gering.\\[0.2cm]
-Sind die Funktionen nicht glatt und besitzen beispielsweise Unstetigkeitsstellen, so bietet sich die Verwendung eines general-purpose Integrators an. Beachte, dass dieser die Wahrscheinlichkeitsdichten von $Y$ explizit auswerten muss. Diese Integratoren werden von verschiedenen Bibliotheken zur Verfügung gestellt und versuchen unter anderem Intervalle anhand der Unstetigkeitsstellen zu unterteilen. Dafür werden deutlich mehr Funktionsauswertungen benötigt und der Zeitaufwand lässt sich bei solchen Black-Box-Algorithmen nicht im Vorhinein bestimmen. Im Gegensatz zur Kollokation mithilfe von diskreter Projektion, wo eine Funktionsauswertung das Lösen einer Instanz der KGG entsprach, ist es hier jedoch möglich, die zu integrierende Funktion schnell und für beliebige $y\in\R^N$ auszuwerten.\\[0.2cm]
+Sind $\alpha$, $\beta$ und die Anfangswerte glatte Funktionen, so bietet sich die Verwendung der Gauss-Quadratur an. Diese besitzt eine hohe polynomiale Exaktheit und berücksichtigt die Wahrscheinlichkeitsdichten implizit. Da die benötigten Stützstellen und ihre Anzahl feststehen, ist der Zeitaufwand dieser Quadratur a priori bekannt und vergleichsweise gering.\\[0.2cm]
+Sind die Funktionen nicht glatt und besitzen beispielsweise Unstetigkeitsstellen, so bietet sich die Verwendung eines general-purpose Integrators an. Beachte, dass dieser die Wahrscheinlichkeitsdichten von $Y$ explizit auswerten muss. Diese Integratoren werden von verschiedenen Bibliotheken zur Verfügung gestellt und versuchen unter anderem Intervalle anhand der Unstetigkeitsstellen zu unterteilen. Dafür werden deutlich mehr Funktionsauswertungen benötigt und der Zeitaufwand lässt sich bei solchen Black-Box-Algorithmen nicht a priori bestimmen. Im Gegensatz zur Kollokation mithilfe von diskreter Projektion, wo eine Funktionsauswertung das Lösen einer Instanz der KGG entsprach, ist es hier jedoch möglich, die zu integrierende Funktion schnell und für beliebige $y\in\R^N$ auszuwerten.\\[0.2cm]
 Weiterhin sei bemerkt, dass die Berechnungen der Erwartungswerte einmalig am Anfang passieren und unabhängig von der Stoppzeit $T$ sind. Variiert man die Polynomgrenze $P$, so kann man bereits berechnete Koeffizienten entsprechend wiederverwenden.
 \section{Numerische Ergebnisse}
 \subsection{Einfluss der Zeitschrittweite $\tau$}

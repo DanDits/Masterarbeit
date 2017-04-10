@@ -9,12 +9,12 @@ from stochastic_equations.galerkin.galerkin import galerkin_approximation
 # trial1: with delta time = 0.000001 it loses accuracy,
 # this loss seems independent of quadrature count and is the same for poly degree 2,3,4; does not depend on wave_weight
 domain = [(-np.pi, np.pi)]
-trial = st.trial_7_t2
+trial = st.trial_3
 grid_size = trial.get_parameter("grid_size", 128)
 start_time = 0.
 stop_time = trial.get_parameter("stop_time", 1.)
-delta_times = [0.1, 0.01, 0.001, 0.0001]
-max_poly_degrees = [1, 5, 10, 20, 40]
+delta_times = [0.1, 0.01, 0.001, 0.0001, 0.00001]
+max_poly_degrees = [1, 5, 15]
 wave_weight = 1.
 
 # trial7: >=10 if degree <=6, >=15 if degree <= 10,  if degree <= 15
@@ -47,10 +47,10 @@ for max_poly_degree, quadrature_param in zip(max_poly_degrees, quadrature_params
     for delta_time in delta_times:
         print("Curr dt", delta_time, "of all", delta_times)
         steps = int(stop_time / delta_time)
-        xs, xs_mesh, exp, var, quadrature_nodes_count = galerkin_approximation(trial, max_poly_degree, domain,
+        xs, xs_mesh, exp, var, quadrature_nodes_count = next(galerkin_approximation(trial, max_poly_degree, domain,
                                                                                grid_size, start_time, steps,
                                                                                delta_time, wave_weight,
-                                                                               quadrature_method, quadrature_param)
+                                                                               quadrature_method, quadrature_param))
         if trial_exp is None:
             trial_exp = trial.obtain_evaluated_expectancy(xs, xs_mesh, stop_time)
         if trial_var is None:
@@ -70,6 +70,7 @@ for max_poly_degree, quadrature_param in zip(max_poly_degrees, quadrature_params
     print("Plotting done.")
 
 
+plt.plot(1. / np.array(delta_times), np.array(delta_times) ** 2, label="Referenz $\\tau^{2}$}")
 plt.title("Galerkin-Approximation, T={}, $\\kappa={}$, {} mit {} Punkten"
           .format(stop_time, wave_weight, quadrature_method, quadrature_nodes_count))
 plt.ylim((1E-13, 1.))
