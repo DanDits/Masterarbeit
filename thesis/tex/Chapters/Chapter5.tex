@@ -29,15 +29,15 @@ Konkret lautet die Orthogonalitätsbedingung an das Residuum für $t>0$ und $x\i
 \end{equation} 
 für alle $k=0,\dots,M$.\\
 Wir wollen jetzt aus der Orthogonalitätsbedingung (\ref{eqn:galerkinOrtho}) eine Gleichung für die Koeffizienten $\hat{v}_m$ gewinnen. Dazu setzen wir die Definition von $v_M$ in die Gleichung ein und erhalten
-\begin{align*}
-\sum_{m=0}^M\partialdtt{\hat{v}}_m(t,x)\underbrace{\E[\Phi_m(Y)\Phi_k(Y)]}_{=\delta_{mk}}&=\E\left[\alpha(Y)\sum_{m=0}^M\Laplace \hat{v}_m(t,x)\Phi_m(Y)\Phi_k(Y)\right]\\
-&\quad -\E\left[\beta(x,Y)\sum_{m=0}^M\hat{v}_m(t,x)\Phi_m(Y)\Phi_k(Y)\right]\\
-\equivalent \qquad \partialdtt{\hat{v}}_k(t,x)&=\sum_{m=0}^M\Laplace \hat{v}_m(t,x)\underbrace{\E[\alpha(Y)\Phi_m(Y)\Phi_k(Y)]}_{=a_{mk}}\\
-&\quad -\sum_{m=0}^M\hat{v}_m(t,x)\underbrace{\E[\beta(x,Y)\Phi_m(Y)\Phi_k(Y)]}_{=b_{mk}(x)}\\
-\equivalent \qquad \partialdtt{\hat{v}}_k(t,x)&=a_k\Laplace \hat{v}(t,x)-b_k(x)\hat{v}(t,x)\\
-\intertext{mit $ a_k=(a_{0k},\dots,a_{Mk}),\quad b_k(x)=(b_{0k}(x),\dots,b_{Mk}(x)),\quad \hat{v}(t,x)=(\hat{v}_0(t,x),\dots,\hat{v}_M(t,x))^T$}\\
-\equivalent \qquad \partialdtt{\hat{v}}(t,x)&=A\Laplace \hat{v}(t,x)-B(x)\hat{v}(t,x)
-\end{align*}
+\begin{align}
+\sum_{m=0}^M\partialdtt{\hat{v}}_m(t,x)\underbrace{\E[\Phi_m(Y)\Phi_k(Y)]}_{=\delta_{mk}}&=\E\left[\alpha(Y)\sum_{m=0}^M\Laplace \hat{v}_m(t,x)\Phi_m(Y)\Phi_k(Y)\right]\nonumber\\
+&\quad -\E\left[\beta(x,Y)\sum_{m=0}^M\hat{v}_m(t,x)\Phi_m(Y)\Phi_k(Y)\right]\nonumber\\
+\equivalent \qquad \partialdtt{\hat{v}}_k(t,x)&=\sum_{m=0}^M\Laplace \hat{v}_m(t,x)\underbrace{\E[\alpha(Y)\Phi_m(Y)\Phi_k(Y)]}_{=a_{mk}}\nonumber\\
+&\quad -\sum_{m=0}^M\hat{v}_m(t,x)\underbrace{\E[\beta(x,Y)\Phi_m(Y)\Phi_k(Y)]}_{=b_{mk}(x)}\nonumber\\
+\equivalent \qquad \partialdtt{\hat{v}}_k(t,x)&=a_k\Laplace \hat{v}(t,x)-b_k(x)\hat{v}(t,x)\label{eqn:galerkin_def_medium}\\
+\intertext{mit $ a_k=(a_{0k},\dots,a_{Mk}),\quad b_k(x)=(b_{0k}(x),\dots,b_{Mk}(x)),\quad \hat{v}(t,x)=(\hat{v}_0(t,x),\dots,\hat{v}_M(t,x))^T$}\nonumber\\
+\equivalent \qquad \partialdtt{\hat{v}}(t,x)&=A\Laplace \hat{v}(t,x)-B(x)\hat{v}(t,x)\nonumber
+\end{align}
 Die Matrizen $A$ und $B(x)$ werden durch die Zeilenvektoren $a_k$ und $b_k(x)$ gebildet und sind symmetrisch. Die benötigten Koeffizienten der Approximation $v_M$ sind gekoppelt und als Lösung folgender partieller Differentialgleichung zu erhalten
 \begin{equation}
 \label{eqn:galerkin_dgl}
@@ -114,7 +114,7 @@ Diese sind wie schon in Kapitel \ref{chapter:solver_kgg} mithilfe der Matrixexpo
 
 \subsection{Entkopplung des zweiten Teils}
 \subsubsection*{Entkopplung für $\kappa \neq 1$}
-Analog zum ersten Teil können wir für jedes fixe $x\in\Torus^d$ die symmetrische Matrix $S_1^TB(x)S_1\in\R^{M+1\times M+1}$ zerlegen in $S_1^TB(x)S_1=S_2(x)D_2(x)S_2^T(x)$ mit $S_2(x)$ orthonormal und $D_2(x)$ diagonal.\\
+Analog zum ersten Teil können wir für jedes fixe $x\in\Torus^d$ die symmetrische Matrix $S_1^TB(x)S_1\in\R^{M+1\times M+1}$ zerlegen in $S_1^TB(x)S_1=S_2(x)D_2(x)S_2^T(x)$ mit einer orthonormalen Matrix $S_2(x)$ und einer Diagonalmatrix $D_2(x)$.\\
 Definiere
 \[z(t,x)\coloneqq S_2^T(x) w_2(t,x), \quad \tilde{z}(t,x)=\partialdt{z}(t,x)\]
 Dann ist (\ref{eqn:galerkin_split2}) äquivalent zum System
@@ -248,7 +248,7 @@ Zusammen mit der Summe bis unendlich würde dies einen weiteren Term $\sum_{m=M+
 \begin{proof}[Beweisideen]
 Sei 
 \[e_m(t,x)\coloneqq \hat{u}_m(t,x)-\hat{v}_m(t,x),\quad m=0,\dots,M\]
-Verwenden wir den Galerkin-Ansatz (\ref{eqn:galerkinOrtho}) für die Reihendarstellung von $u$ anstelle von $v_M$, so erhalten wir analog zum Ergebnis für $v_M$ die Gleichungen
+Verwenden wir den Galerkin-Ansatz (\ref{eqn:galerkinOrtho}) für die Reihendarstellung von $u$ anstelle von $v_M$, so erhalten wir analog zum Ergebnis für $v_M$ aus Gleichung (\ref{eqn:galerkin_def_medium}) die Gleichungen
 \begin{equation}
 \partialdtt{\hat{u}}_k(t,x)=\sum_{m=0}^\infty \Laplace \hat{u}_m(t,x)a_{mk}-\sum_{m=0}^\infty \hat{u}_m(t,x)b_{mk}(x),\quad k=0,\dots,M
 \end{equation}
