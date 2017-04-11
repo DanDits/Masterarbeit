@@ -13,15 +13,19 @@ trial = st.trial_3
 grid_size = trial.get_parameter("grid_size", 128)
 start_time = 0.
 stop_time = trial.get_parameter("stop_time", 1.)
-delta_times = [0.1, 0.01, 0.001, 0.0001, 0.00001]
-max_poly_degrees = [1, 5, 15]
+delta_times = [0.1, 0.01, 0.001, 0.0001]
+max_poly_degrees = [1, 5, 7, 10, 15]
 wave_weight = 1.
+show_var = False
 
 # trial7: >=10 if degree <=6, >=15 if degree <= 10,  if degree <= 15
 if len(trial.variable_distributions) == 1:
     # needs to be by one bigger than max(max_poly_degrees) in 1D
     quadrature_method = "full_tensor"
     quadrature_params = [[n + 1] * len(trial.variable_distributions) for n in max_poly_degrees]
+
+    quadrature_method = "general_purpose"
+    quadrature_params = [None] * len(max_poly_degrees)
 else:
     quadrature_method = "sparse"
     quadrature_params = max_poly_degrees
@@ -57,7 +61,7 @@ for max_poly_degree, quadrature_param in zip(max_poly_degrees, quadrature_params
             trial_var = trial.obtain_evaluated_variance(xs, xs_mesh, stop_time)
         error_exp = error_l2_relative(exp, trial_exp)
         errors_exp.append(error_exp)
-        if var is not None:
+        if show_var and var is not None:
             error_var = error_l2_relative(var, trial_var)
             errors_var.append(error_var)
         print("Degree={}, dt={}, error_exp={}, error_var={}".format(max_poly_degree, delta_time, error_exp, error_var))
@@ -70,7 +74,7 @@ for max_poly_degree, quadrature_param in zip(max_poly_degrees, quadrature_params
     print("Plotting done.")
 
 
-plt.plot(1. / np.array(delta_times), np.array(delta_times) ** 2, label="Referenz $\\tau^{2}$}")
+plt.plot(1. / np.array(delta_times), np.array(delta_times) ** 2, ".", color="black", label="Referenz $\\tau^{2}$")
 plt.title("Galerkin-Approximation, T={}, $\\kappa={}$, {} mit {} Punkten"
           .format(stop_time, wave_weight, quadrature_method, quadrature_nodes_count))
 plt.ylim((1E-13, 1.))

@@ -188,7 +188,14 @@ Sind die Funktionen nicht glatt und besitzen beispielsweise Unstetigkeitsstellen
 Weiterhin sei bemerkt, dass die Berechnungen der Erwartungswerte einmalig am Anfang passieren und unabhängig von der Stoppzeit $T$ sind. Variiert man die Polynomgrenze $P$, so kann man bereits berechnete Koeffizienten entsprechend wiederverwenden.
 \section{Numerische Ergebnisse}
 \subsection{Einfluss der Zeitschrittweite $\tau$}
-Anhand der vierdimensionalen \nameref{trial:8} beobachten wir für verschiedene Werte von $P$ mit $M=\binom{4+P}{P}$ Polynomen den Einfluss der Zeitschrittweite $\tau$ auf die Approximationsgenauigkeit. Dieser Einfluss ist in Abbildung \ref{fig:galerkin_bydt_trial8} durch den Fehler des Erwartungswerts und der Varianz dargestellt. Wir erkennen, dass für $P\le 5$ die Wahl $\tau=10^{-3}$ ausreichend ist für eine bestmögliche Approximation. Der Fehler konvergiert quadratisch bezüglich des Parameters $\tau$, der bestmögliche Fehler ist aber durch den Parameter $P$ eingeschränkt und die Konvergenz endet vorzeitig.\\
+Für die eindimensionale \nameref{trial:3} erkennen wir in Abbildung \ref{fig:galerkin_dt_convergence}, dass der Fehler bezüglich der Zeitschrittweite $\tau$ des Splittings quadratisch abnimmt, bis die bestmögliche Approximation für den jeweiligen Polynomgrad $P$ erreicht wurde.
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\textwidth]{Figures/galerkin_trial3_splitting_convergence.png}
+\caption{Fehler der Galerkin-Approximation von \nameref{trial:3} anhand von der für das Strang-Splitting verwendeten Zeitschrittweite $\tau$.}
+\label{fig:galerkin_dt_convergence}
+\end{figure}
+Anhand der vierdimensionalen \nameref{trial:8} beobachten wir für verschiedene Werte von $P$ mit $M=\binom{4+P}{P}$ Polynomen den Einfluss der Zeitschrittweite $\tau$ auf die Approximationsgenauigkeit. Dieser Einfluss ist in Abbildung \ref{fig:galerkin_bydt_trial8} durch den Fehler des Erwartungswerts und der Varianz dargestellt. Wir erkennen, dass für $P\le 5$ die Wahl $\tau=10^{-3}$ ausreichend ist für eine bestmögliche Approximation.\\
 Für $P=5$ ist $M=126$ und es steckt bereits ein großer Aufwand darin, die Matrizen $B(x)$ der Größe $126\times 126$ für jeden der 128 Knotenpunkte $x\in\Torus$ zu berechnen, da jeweils eine dünne Gitter Quadratur mit 9065 Punkten verwendet werden muss.
 \begin{figure}
 \centering
@@ -210,7 +217,7 @@ Wie bereits bei der Kollokation betrachten wir wieder die \nameref{trial:discont
   \label{fig:galerkin_bydegree_trialdiscontsimple}
 \end{figure}
 \newline
-Eine ähnliche Beobachtung machen wir auch für die \nameref{trial:disconttriple} mit 2 Unstetigkeitsstellen in $\alpha$ und stetigem $\beta$ in Abbildung \ref{fig:galerkin_bydegree_trialtriple}. Im Gegensatz zur Kollokation die einfache Möglichkeit einen monoton fallenden Fehler zu erhalten ohne große Laufzeitprobleme.
+Eine ähnliche Beobachtung machen wir in Abbildung \ref{fig:galerkin_bydegree_trialtriple} auch für die \nameref{trial:disconttriple}. Der Parameter $\alpha$ besitzt in diesem Fall zwei Unstetigkeitsstellen, der Parameter $\beta$ ist stetig bezüglich $y$. Im Gegensatz zur Kollokation, wo die Lösung $u$ der KGG mithilfe von Polynomen approximiert wird und wir viele Lösungen der KGG zu festen Punkten $y$ benötigen, erfordert das Vorgehen beim Galerkin-Ansatz lediglich viele Auswertungen der Funktionen $\alpha$ und $\beta$ um die Matrizen $A$ und $B(x)$ zu berechnen. Somit haben wir eine einfache und schnelle Möglichkeit einen monoton fallenden Fehler zu erhalten und sind nicht darauf angewiesen, eine Quadraturformel zu finden, welche imstande ist eine Funktion der Lösung gut zu integrieren.
  \begin{figure}[!htb]
 \minipage{0.5\textwidth}
   \includegraphics[width=\linewidth]{Figures/galerkin_bydegree_trialdisconttriple_gauss.png}
