@@ -30,12 +30,14 @@ Dabei ist
 Um den analytischen Rahmen für die Existenz und Eindeutigkeit von Lösungen der KGG zu schaffen werden wir die Halbgruppentheorie verwenden. Die verwendete Theorie ist übernommen aus \autocite{HundSchnau} und \autocite{EngelNagel}, dort finden sich auch weitere Details und Beweise der verwendeten Theoreme.
 \begin{mathdef}
 Sei der Raum der beliebig häufig differenzierbaren periodischen Funktionen definiert als
-\[C_\text{per}^\infty (\Torus^d)\coloneqq \lbrace v\colon \Torus^d\to\R \mid v \text{ beliebig häufig stetig differenzierbar und periodisch in }[-\pi,\pi]^d\rbrace\]
+\[C^\infty (\Torus^d)\coloneqq \lbrace v\colon \Torus^d\to\R \mid v \text{ beliebig häufig stetig differenzierbar und periodisch in }[-\pi,\pi]^d\rbrace\]
 Definieren wir zu $v\in C^\infty((-\pi,\pi)^d)$ und $k\in\N_0$ die Sobolev-Norm $\norm{v}_{k,2}$ durch
 \[\norm{v}_{k,2}^2\coloneqq \sum_{|m|\le k}\norm{\dxp{v}{m}}_{L^2((-\pi,\pi)^d)}^2,\quad \text{Multiindex }\, |m|=m_1+\dots + m_d\]
 so erhalten wir bei Verwendung der schwachen Ableitung und mit Vervollständigung die Sobolev-Räume $H^k((-\pi,\pi)^d)$.\\
 Wir definieren einen abgeschlossenen Unterraum --und somit einen Banachraum-- des Sobolev-Raums $H^k((-\pi,\pi)^d)$ durch
-\[H_\text{per}^k(\Torus^d)\coloneqq \text{Abschluss von } C_\text{per}^\infty(\Torus^d)\left(\subset C^\infty((-\pi,\pi)^d)\right) \text{ bezüglich der Norm von } H^k((-\pi,\pi)^d)\]
+\begin{align*}H^k(\Torus^d)\coloneqq &\text{ Abschluss von } C^\infty(\Torus^d)\left(\subset C^\infty((-\pi,\pi)^d)\right)\\
+&\text{ bezüglich der Norm von } H^k((-\pi,\pi)^d)
+\end{align*}
 \end{mathdef}
 Zunächst definieren wir die benötigte Halbgruppe $S(\cdot)$ und ihren Generator $A$.
 \begin{mathdef}
@@ -49,7 +51,7 @@ und man anschließend für $r\in D(A)$ definiert
 \[Ar\coloneqq \lim\limits_{t\to0+}\frac{1}{t}(S(t)r-r)\]
 \end{mathdef}
 Im folgenden Theorem wird die Verwendung der Halbgruppentheorie zum Erhalten von eindeutigen Lösungen der KGG klar. Inspiriert ist diese Betrachtungsweise durch den endlich dimensionalen Fall, wo $S(t)r=e^{At}r$ explizit über die Matrixexponentialfunktion gegeben ist.
-\begin{maththeorem}[{\autocite[Proposition 2.8]{HundSchnau}}]
+\begin{maththeorem}[Vergleiche {\autocite[Proposition 2.8]{HundSchnau}}]
 Ist $A$ Generator der $C_0$-Halbgruppe $S(\cdot)$ und $r\in D(A)$, dann ist für alle $t\ge 0\colon \,S(t)r\in D(A)$ und
 \[v\colon \R_+\to R,\quad t\mapsto S(t)r\]
 die eindeutige Lösung des Cauchy-Problems
@@ -61,13 +63,17 @@ v(0)&=r
 \end{equation}
 \end{maththeorem}
 Formulieren wir unsere KGG als ein Cauchy-Problem obiger Gestalt, so ist also nur noch zu zeigen, dass der Generator eine $C_0$-Halbgruppe generiert.\\
-Den Generator $C=A+B$ der KGG teilen wir auf und erhalten zuerst den Teilgenerator $A$
-\[A=\begin{pmatrix}0 & \kappa I\\ \alpha\Laplace & 0\end{pmatrix},\quad \kappa \in (0,1],\alpha>0\]
-Wir definieren den Hilbertraum $R=H^1_\text{per}(\Torus^d)\times H^0_\text{per}(\Torus^d)$ mit zugehörigem leicht abgewandelten Skalarprodukt 
-\[\langle \begin{pmatrix}v_1\\v_2\end{pmatrix}, \begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle =\int_{[-\pi,\pi]^d}\alpha \nabla v_1\nabla w_1+\kappa v_2w_2dx\] 
-\todo[inline]{Problem: Die zugehörige Norm ist nicht äquivalent zur Standardnorm des HRs, da Poincare mit periodischen RB Poincare nicht gilt.}
-Es ist $D(A)=H^2_\text{per}(\Torus^d)\times H^1_\text{per}(\Torus^d)\subset R$ dicht in $R$, da bereits $C_\text{per}^\infty\times C_\text{per}^\infty\subset D(A)$ bezüglicher schwächerer Norm dicht in $R$ ist.\\
-Stones Theorem besagt, dass $A$ genau dann eine $C_0$-Halbgruppe von unitären Operatoren generiert, wenn $A$ schiefadjungiert bezüglich des Skalarprodukt des Hilbertraums ist. Wir rechnen nach:
+Den Generator $C$ der KGG mit $\alpha>0$ und $\beta\in L^\infty(\Torus^d)$ schreiben wir als Summe von zwei Operatoren:
+\[\underbrace{\begin{pmatrix}0 & I\\ \alpha\Laplace -\beta(x) & 0\end{pmatrix}}_{=C}
+=\underbrace{\begin{pmatrix}0 & I\\ \alpha\Laplace-I & 0\end{pmatrix}}_{=A}
++\underbrace{\begin{pmatrix}0 & 0\\ -\beta(x)+I & 0\end{pmatrix}}_{=B}\]
+Wir werden zuerst zeigen, dass $A$ eine $C_0$-Halbgruppe generiert und verwenden anschließend, dass die Summe mit einer beschränkten Störung $B$ diese Eigenschaft nicht zunichte macht.\\[0.2cm]
+Wir definieren den Hilbertraum $R=H^1(\Torus^d)\times H^0(\Torus^d)$ mit zugehörigem leicht abgewandelten Skalarprodukt 
+\[\langle \begin{pmatrix}v_1\\v_2\end{pmatrix}, \begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle =\int_{[-\pi,\pi]^d}\alpha \nabla v_1\nabla w_1+ v_2w_2dx\]
+Da $\alpha>0$ ist die durch dieses Skalarprodukt induzierte Norm äquivalent zur Standardnorm des Hilbertraums (welche $\alpha=1$ entspricht). Konvergenz bezüglich beider Normen ist dementsprechend äquivalent und der Raum mit dem definierten Skalarprodukt ist ebenfalls ein Hilbertraum.\\
+Es ist $D(A)=H^2(\Torus^d)\times H^1(\Torus^d)\subset R$ dicht in $R$, da bereits $C^\infty(\Torus^d)\times C^\infty(\Torus^d)\subset D(A)$ dicht in $R$ ist.\\
+Stones Theorem besagt, dass $A$ genau dann eine $C_0$-Halbgruppe von unitären Operatoren generiert, wenn $A$ schiefadjungiert bezüglich des Skalarprodukt des Hilbertraums ist. Wir rechnen für $(v_1,v_2)^T, (w_1,w_2)^T\in D(A)$ die Antisymmetrie des Operators $A$ nach:
+\todo[inline]{Anpassen an neuen Operator A. Zeige shiefadjungiert, dafür sigma(iA) reell und iA selbstadjungiert (siehe Quelle S.44). Kappa=1 überall}
 \begin{align*}
 \langle A\begin{pmatrix}v_1\\v_2\end{pmatrix}, \begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle
 &=\langle \begin{pmatrix}\kappa v_2\\\alpha \Laplace v_1\end{pmatrix}, \begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle\\
@@ -82,9 +88,9 @@ Dazu verwenden wir das Theorem über beschränkte Störungen eines stark stetige
 Ist $A$ Generator einer stark stetigen Halbgruppe $S(\cdot)$ mit Definitionsbereich $D(A)$ auf einem Banachraum $R$ und $B\colon R\to R$ ein beschränkter linearer Operator, so ist
 $C=A+B$ mit $D(C)\coloneqq D(A)$ ebenfalls Generator einer stark stetigen Halbgruppe.
 \end{maththeorem}
-Wir verwenden daher den Banachraum $R_B=H_\text{per}^0\times H_\text{per}^0\supset R=H_\text{per}^1\times H_\text{per}^0$ mit der Norm 
+Wir verwenden daher den Banachraum $R_B=H^0\times H^0\supset R=H^1\times H^0$ mit der Norm 
 \[\norm{\begin{pmatrix}v_1\\v_2\end{pmatrix}}_B^2=\int_{[-\pi,\pi]^d}v_1^2+v_2^2dx\le 
-\norm{\begin{pmatrix}v_1\\v_2\end{pmatrix}}^2_{H_\text{per}^1\times H_\text{per}^0}\]
+\norm{\begin{pmatrix}v_1\\v_2\end{pmatrix}}^2_{H^1\times H^0}\]
 \todo[inline]{Wieder ist die Norm nicht äquivalent zu der aus $R$, aber $B$ ist kein Operator von $R\to R$ mit unserer Wahl von $R$.}
 Dann gilt
 \begin{align*}
@@ -93,7 +99,7 @@ Dann gilt
 \end{align*}
 Insgesamt ist somit der Generator 
 \[C=\begin{pmatrix}0 & I\\ \alpha\Laplace - \beta(x) & 0\end{pmatrix}\]
-der Klein-Gordon-Gleichung Generator einer $C_0$-Halbgruppe und das zugehörige Cauchy-Problem besitzt eine eindeutige Lösung in $D(A)$. Dies impliziert auch eine eindeutige Lösung der KGG in $H_\text{per}^2(\Torus^d)$.
+der Klein-Gordon-Gleichung Generator einer $C_0$-Halbgruppe und das zugehörige Cauchy-Problem besitzt eine eindeutige Lösung in $D(A)$. Dies impliziert auch eine eindeutige Lösung der KGG in $H^2(\Torus^d)$.
 \subsection{Exakte Lösungen}
 Für spezielle Konfigurationen der Parameter und Anfangswerte können wir exakte Lösungen angeben. Diese sind hilfreich, um die Korrektheit von Implementierungen schnell und zuverlässig testen zu können. Außerdem werden so schnell die Grenzen und eventuelle Schwächen der Verfahren für gut gestellte Probleme deutlich.\\[0.5cm]
 Mithilfe des Separationsansatzes $u(t,x)=g(x)f(t)$ erhalten wir aus (\ref{kgg}) die Darstellung
