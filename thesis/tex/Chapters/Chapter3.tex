@@ -28,15 +28,15 @@ und zugehöriger Norm
 \[\norm{u}_{L_w^2(\mathcal{I})}=\left(\int_\mathcal{I} u^2(x)w(x)dx\right)^{\onehalf}\]
 \end{mathdef}
 
-Das Hermite Chaos ist ein motivierendes Beispiel dafür, dass gewisse orthogonale Polynombasen auf natürlicher Weise mit stochastischen Verteilungen verbunden sind.
+Das Hermite-Chaos ist ein motivierendes Beispiel dafür, dass gewisse orthogonale Polynombasen auf natürlicher Weise mit stochastischen Verteilungen verbunden sind.
 \begin{mathbsp}[Hermite Chaos]
 \label{bsp:hermitechaos}
 Ist $\mathcal{I}=(-\infty,\infty)$, $w(x)=\frac{1}{\sqrt{2\pi}}e^{-\frac{x^2}{2}}$ die Dichtefunktion der Gauss-Verteilung und verwenden wir diese als Dichte des Maßes $\alpha$, so sind die Hermite-Polynome
 \[H_0(x)\equiv 1,\quad H_1(x)=x,\quad H_2(x)=x^2-1,\quad H_n(x)=xH_{n-1}(x)-(n-1)H_{n-2}(x)\]
-ein Orthogonalsystem bezüglich $\langle\cdot,\cdot\rangle_{L_w^2(\mathcal{I})}$ mit Normalisierungskonstanten $\gamma_n=n!$.\\
+ein Orthogonalsystem bezüglich $\langle\cdot,\cdot\rangle_{L_w^2(\mathcal{J})}$ mit Normalisierungskonstanten $\gamma_n=n!$.\\
 Der Erwartungswert der Gauss-Verteilung
 \[\E_w[Z]= \int_{-\infty}^\infty Z(x)w(x)dx\] erfüllt also die entscheidende Beziehung des Polynomial Chaos
-\[\langle H_n,H_m\rangle_{L_w^2(\mathcal{I})} =\E_w \left[H_nH_m\right]=\gamma_n\delta_{nm}\]
+\[\langle H_n,H_m\rangle_{L_w^2(\mathcal{J})} =\E_w \left[H_nH_m\right]=\gamma_n\delta_{nm}\]
 Man beachte, dass diese Definition der Hermite-Polynome leicht von der in der Literatur üblichen abweicht. Dies ist der Tatsache geschuldet, dass dort die entsprechende Gewichtsfunktion einen zusätzlichen Faktor $\sqrt{2}$ besitzt. Sie stellt somit keine Dichte einer Wahrscheinlichkeitsverteilung dar und ist für unsere Zwecke unpraktisch und wird nicht verwendet. 
 \end{mathbsp}
 Wir werden in dieser Arbeit auf Polynombasen, die diskreten Verteilungen entsprechen, verzichten. Es sei jedoch bemerkt, dass dies keine Einschränkung der Methode ist, sondern lediglich die Notation vereinfacht. Konkret werden wir uns mit Laguerre-, Jacobi-, Hermite- und Legendre-Polynomen beschäftigen, wobei letztere ein Spezialfall der Jacobipolynome darstellen. Details und Eigenschaften sind im Anhang \ref{AppendixA} zu finden.\\[0.3cm]
@@ -116,11 +116,11 @@ Wir bemerken zusätzlich ohne Beweis, dass das Polynom $Q_n$ für $n\ge 1$ insge
 \label{sec:poly_approx}
 Es gibt sehr viele Ergebnisse zur Approximation von Funktionen $f\colon \R\to\R$ durch Polynome $p\in\Poly_n$. Um ein Gefühl für die Mächtigkeit und auch für die Grenzen von polynomialer Approximation zu bekommen, werden an dieser Stelle einige zentrale Sätze genannt. Auf Beweise werden wir größtenteils verzichten, jedoch basierend auf \autocite{Trefethen} eine Diskussion der Interpretation dieser Ergebnisse aus dem numerischen Blickwinkel der Interpolation und Quadratur geben.
 \begin{maththeorem}[Weierstrass]
-Ist $\mathcal{I}$ ein beschränktes Intervall und $f\in C^0(\bar{\mathcal{I}})$ stetig, dann gibt es für jedes $\epsilon >0$ ein $n\in\N$ und $p\in\Poly_n$, so dass
-\[|f(x)-p(x)|<\epsilon,\quad \forall x\in\bar{\mathcal{I}}\]
+Ist $\mathcal{J}$ ein beschränktes Intervall und $f\in C^0(\bar{\mathcal{J}})$ stetig, dann gibt es für jedes $\epsilon >0$ ein $n\in\N$ und $p\in\Poly_n$, so dass
+\[|f(x)-p(x)|<\epsilon,\quad \forall x\in\bar{\mathcal{J}}\]
 \end{maththeorem}
-Folglich gilt für die \emph{gleichmäßige Bestapproximation} $\phi_n$, welche zu $f\in C^0(\bar{\mathcal{I}})$ eine eindeutige Lösung $\phi_n(f)\in\Poly_n$ mit minimalem Abstand bezüglich der Maximumsnorm ergibt, die Aussage
-\[\lim\limits_{n\to\infty}\norm{f-\phi_n(f)}_\infty=0\] 
+Folglich gilt für die \emph{gleichmäßige Bestapproximation} $\phi_n$, welche zu $f\in C^0(\bar{\mathcal{J}})$ eine eindeutige Lösung $\phi_n(f)\in\Poly_n$ mit minimalem Abstand bezüglich der Maximumsnorm ergibt, die Aussage
+\[\lim\limits_{n\to\infty}\norm{f-\phi_n(f)}_\infty=0.\] 
 Dieses Ergebnis sieht sehr vielversprechend aus. Eine erste Idee zur Berechnung von $\phi_n(f)$ ist die Interpolation. Jedoch wurde von Faber in \autocite{faber14} gezeigt, dass es kein Interpolationsschema gibt, das für alle stetigen Funktionen auf diese Weise konvergiert. Doch dieser vermeintliche Rückschlag ist in der Praxis selten von Bedeutung. Problematisch sind nur Interpolationsschemata, die auf gleichverteilten Knotenpunkten basieren und dann unter dem Runge-Phänomen leiden, welches bei Funktionen wie $f(x)=\frac{1}{1+x^2}$ an den Rändern für eine schlechte Approximationsgüte sorgt. Erfüllt $f$ jedoch minimale Glattheitsanforderungen (wie bereits Lipschitzstetigkeit) und verwendet man \chebyspace Interpolationspunkte, so ist die Approximationsgüte bereits bereits für kleines $n$ gesichert.\\
 Man beachte, dass der Name "`Bestapproximation"' sich strikt auf die verwendete Norm bezieht. Punktweise Aussagen lassen sich somit im Allgemeinen nicht treffen. 
 \begin{mathbsp}
@@ -132,26 +132,26 @@ Als Beispiel vergleichen wir die Bestapproximation bezüglich der Maximumsnorm u
  \label{polyapproxcomp}
 \end{figure}
 \end{mathbsp}
-Im Folgenden lösen wir uns von dem beschränkten Intervall $\mathcal{I}$ und lassen auch $\mathcal{I}=\R$ oder $\mathcal{I}=[0,\infty)$ zu. Der Begriff der Bestapproximation lässt sich auch auf den Raum $L_w^2(\mathcal{I})$ erweitern. Dazu verwenden wir eine orthogonale Projektion auf eine orthogonale Polynombasis und erhalten eine einfache Darstellung des Bestapproximationsoperators.
+Im Folgenden lösen wir uns von dem beschränkten Intervall $\mathcal{J}$ und lassen auch $\mathcal{J}=\R$ oder $\mathcal{J}=[0,\infty)$ zu. Der Begriff der Bestapproximation lässt sich auch auf den Raum $L_w^2(\mathcal{J})$ erweitern. Dazu verwenden wir eine orthogonale Projektion auf eine orthogonale Polynombasis und erhalten eine einfache Darstellung des Bestapproximationsoperators.
 \begin{maththeorem}
 Ist $N\in\N_0$ und $\lbrace Q_k(x)\rbrace_{k=0}^N\subset \Poly_N$ ein Orthogonalsystem bezüglich des positiven Gewichtes $w(\cdot)$, also 
-\[\langle Q_m(x),Q_n(x)\rangle_{L_w^2(\mathcal{I})}=\norm{Q_m}^2_{L_w^2(\mathcal{I})}\delta_{m,n},\quad, 0\le m,n\le N\]
-so gilt für den Projektionsoperator $P_N\colon L_w^2(\mathcal{I})\to \Poly_N$ definiert durch 
-\[P_Nf\coloneqq \sum_{k=0}^N\hat{f}_kQ_k(x),\quad \hat{f}_k\coloneqq \frac{1}{\norm{Q_k}_{L_w^2(\mathcal{I})}^2}\langle f,Q_k\rangle_{L_w^2(\mathcal{I})},\qquad f\in L^2_w(\mathcal{I}),\]
+\[\langle Q_m(x),Q_n(x)\rangle_{L_w^2(\mathcal{J})}=\norm{Q_m}^2_{L_w^2(\mathcal{J})}\delta_{m,n},\quad, 0\le m,n\le N\]
+so gilt für den Projektionsoperator $P_N\colon L_w^2(\mathcal{J})\to \Poly_N$ definiert durch 
+\[P_Nf\coloneqq \sum_{k=0}^N\hat{f}_kQ_k(x),\quad \hat{f}_k\coloneqq \frac{1}{\norm{Q_k}_{L_w^2(\mathcal{J})}^2}\langle f,Q_k\rangle_{L_w^2(\mathcal{J})},\qquad f\in L^2_w(\mathcal{J}),\]
 die Bestapproximationsaussage
-\[\norm{f-P_Nf}_{L_w^2(\mathcal{I})}=\inf\limits_{\psi\in\Poly_N}\norm{f-\psi}_{L_w^2(\mathcal{I})}\]
+\[\norm{f-P_Nf}_{L_w^2(\mathcal{J})}=\inf\limits_{\psi\in\Poly_N}\norm{f-\psi}_{L_w^2(\mathcal{J})}\]
 \end{maththeorem}
 Dies entspricht der Fourier-Entwicklung im Hilbertraum. Entsprechend nennt man die Koeffizienten $\hat{f}_k$ die (verallgemeinerten) Fourier-Koeffizienten. Die Projektion ist eine Orthogonalprojektion in dem Sinne, dass der Fehler $f-P_Nf$ senkrecht zum Polynomraum $\Poly_N$ ist.\\
-Wie schon bei der Bestapproximation bzgl. der Maximumsnorm erhält man auch für die verallgemeinerte Bestapproximation eine Konvergenzaussage. Für unbeschränktes $\mathcal{I}$ sind die Beweise sehr aufwändig und beispielsweise in \autocite{CouHil53} zu finden. 
+Wie schon bei der Bestapproximation bzgl. der Maximumsnorm erhält man auch für die verallgemeinerte Bestapproximation eine Konvergenzaussage. Für unbeschränktes $\mathcal{J}$ sind die Beweise sehr aufwändig und beispielsweise in \autocite{CouHil53} zu finden. 
 \begin{maththeorem}
-Für jedes $f\in L_w^2(\mathcal{I})$ gilt
-\[\lim\limits_{N\to\infty}\norm{f-P_Nf}_{L_w^2(\mathcal{I})}=0\]
+Für jedes $f\in L_w^2(\mathcal{J})$ gilt
+\[\lim\limits_{N\to\infty}\norm{f-P_Nf}_{L_w^2(\mathcal{J})}=0\]
 \end{maththeorem}
 Die Konvergenzordnung ist hierbei abhängig von der Regularität von $f$ und der Art der für die Projektion verwendeten Orthogonalpolynome. Man nennt diese Art der Konvergenz in der Literatur auch \emph{spektrale Konvergenz}, da die Konvergenzrate abhängig von der Glattheit der Funktion ist. Man muss also aufpassen eine hohe Approximationsordnung $N$ nicht mit einer hohen Approximationsgenauigkeit zu verwechseln.\\
 Für das Beispiel der Legendre-Polynome, also mit konstanter Gewichtsfunktion $w$, zeigt Xiu in \autocite[Theorem 3.6]{dongbinxiu2010} folgendes Ergebnis.
 \begin{maththeorem}
 \label{spectralconvth}
-Für jedes $f\in H_w^p[-1,1]\coloneqq \left\lbrace v\colon \mathcal{I}\to\R | \frac{d^mv}{dx^m}\in L_w^2(\mathcal{I}),0\le m\le p\right\rbrace$ mit $p\ge 0, w\equiv 1$ gibt es eine Konstante $C$ unabhängig von $N$, so dass
+Für jedes $f\in H_w^p[-1,1]\coloneqq \left\lbrace v\colon \mathcal{J}\to\R | \frac{d^mv}{dx^m}\in L_w^2(\mathcal{J}),0\le m\le p\right\rbrace$ mit $p\ge 0, w\equiv 1$ gibt es eine Konstante $C$ unabhängig von $N$, so dass
 \[\norm{f-P_Nf}_{L_w^2[-1,1]}\le CN^{-p}\norm{f}_{H_w^p[-1,1]}\]
 \end{maththeorem}
 \begin{mathbsp}

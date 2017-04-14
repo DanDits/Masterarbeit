@@ -67,8 +67,8 @@ Den Generator $C$ der KGG mit $\alpha>0$ und $\beta\in L^\infty(\Torus^d)$ schre
 \[\underbrace{\begin{pmatrix}0 & I\\ \alpha\Laplace -\beta(x) & 0\end{pmatrix}}_{=C}
 =\underbrace{\begin{pmatrix}0 & I\\ \alpha\Laplace-I & 0\end{pmatrix}}_{=A}
 +\underbrace{\begin{pmatrix}0 & 0\\ -\beta(x)+I & 0\end{pmatrix}}_{=B}\]
-Wir werden zuerst zeigen, dass $A$ eine $C_0$-Halbgruppe generiert und verwenden anschließend, dass die Summe mit einer beschränkten Störung $B$ diese Eigenschaft nicht zunichte macht.\\[0.2cm]
-Wir definieren den Hilbertraum $R=H^1(\Torus^d)\times H^0(\Torus^d)$ mit zugehörigem leicht abgewandelten Skalarprodukt 
+Wir werden zuerst zeigen, dass $A$ eine $C_0$-Halbgruppe generiert und verwenden anschließend, dass die Summe mit einer beschränkten Störung $B$ diese Eigenschaft erhält.\\[0.2cm]
+Wir definieren den komplexen Hilbertraum $R=H^1(\Torus^d)\times H^0(\Torus^d)$ mit zugehörigem leicht abgewandelten Skalarprodukt 
 \[\langle \begin{pmatrix}v_1\\v_2\end{pmatrix}, \begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle =\int_{[-\pi,\pi]^d}\alpha \nabla v_1\nabla \overline{w_1}+v_1\overline{w_1}+ v_2\overline{w_2}dx\]
 Da $\alpha>0$ ist die durch dieses Skalarprodukt induzierte Norm äquivalent zur Standardnorm des Hilbertraums (welche $\alpha=1$ entspricht). Konvergenz bezüglich beider Normen ist dementsprechend äquivalent und der Raum mit dem definierten Skalarprodukt ist ebenfalls ein Hilbertraum.\\
 Es ist $D(A)=H^2(\Torus^d)\times H^1(\Torus^d)\subset R$ dicht in $R$, da bereits $C^\infty(\Torus^d)\times C^\infty(\Torus^d)\subset D(A)$ dicht in $R$ ist.\\
@@ -81,14 +81,17 @@ Stones Theorem besagt, dass $A$ genau dann eine $C_0$-Halbgruppe von unitären O
 &=-\int_{[-\pi,\pi]^d}\alpha v_2\Laplace \overline{w_1}-v_2\overline{w_1}+ \alpha \nabla v_1\nabla \overline{w_2} + v_1\overline{w_2}dx\\
 &=-\langle \begin{pmatrix} v_1\\ v_2\end{pmatrix}, \begin{pmatrix} w_2\\\alpha \Laplace w_1-w_1\end{pmatrix}\rangle=-\langle \begin{pmatrix}v_1\\v_2\end{pmatrix}, A\begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle
 \end{align*}
-Wäre $A$ beschränkt, so folgt daraus sofort die Schiefadjungiertheit $A=-A^*$ von $A$. Da in unserem Fall $A$ unbeschränkt ist, müssen wir zusätzlich die Bedingung $D(A)=D(A^*)$ erfüllen. Dazu benutzen wir die Tatsache, dass $A$ schiefadjungiert äquivalent ist zu $iA$ selbstadjungiert. Nach \autocite[Bemerkung 5.6f]{HundSchnau} müssen wir für die Selbstadjungiertheit von $iA$ folgende Bedingungen erfüllen:\\
+Wäre $A$ beschränkt, so folgt daraus sofort die Schiefadjungiertheit $A=-A^*$ von $A$. Da in unserem Fall $A$ unbeschränkt ist, müssen wir zusätzlich die Bedingung $D(A)=D(A^*)$ erfüllen.\\
+Wir benutzen die Eigenschaft:
+\[A \text{ schiefadjungiert } \equivalent iA \text{ selbstadjungiert}\]
+Nach \autocite[Bemerkung 5.6f]{HundSchnau} müssen wir für die Selbstadjungiertheit von $iA$ folgende Bedingungen erfüllen:
 \begin{itemize}
 \item $iA$ symmetrisch
 \item $iA$ abgeschlossen, d.h. für $\lbrace u_n \rbrace \in D(A)$ mit $u_n\to u\in R$ und $Au_n\to y\in R$ für $n\to\infty$ gilt: $u\in D(A)$ und $Au=y$.
 \item $\sigma(iA)\subset \R$
 \end{itemize}
 Die Symmetrie von $iA$ ist äquivalent zur bereits gezeigten Antisymmetrie von $A$.\\
-Die Abgeschlossenheit von $A$ ist äquivalent zur Abgeschlossenheit von $A$. Sei dazu
+Die Abgeschlossenheit von $iA$ ist äquivalent zur Abgeschlossenheit von $A$. Sei dazu
 \begin{align*}
 u_n=\begin{pmatrix}u_{1,n}\\u_{2,n}\end{pmatrix}\to\begin{pmatrix}u_1\\u_2\end{pmatrix}\in H^1(\Torus^d)\times L^2(\Torus^d)\\
 A\begin{pmatrix}u_{1,n}\\u_{2,n}\end{pmatrix}=\begin{pmatrix}u_{2,n}\\\alpha\Laplace u_{1,n}-u_{1,n}\end{pmatrix}\to\begin{pmatrix}y_1\\y_2\end{pmatrix}\in H^1(\Torus^d)\times L^2(\Torus^d)
@@ -99,7 +102,7 @@ Somit gilt $u_n\in D(A)$ und wegen
 \begin{align*}
 \norm{Au-y}&\le \norm{Au-Au_n}+\norm{Au_n-y}\\
 &=\norm{\begin{pmatrix}u_2-u_{2,n}\\\Laplace(u_1-u_{1,n})-(u_1-u_{1,n})\end{pmatrix}}+\norm{Au_n-y}\\
-&\le \norm{u_2-u_{2,n}}_{H^1}+\norm{\Laplace(u_1-u_{1,n})}_{L^2}+\norm{u_1-u_{1,n}}+\norm{Au_n-y}\to 0 (n\to\infty)
+&\le \norm{u_2-u_{2,n}}_{H^1}+\norm{\Laplace(u_1-u_{1,n})}_{L^2}+\norm{u_1-u_{1,n}}_{L^2}+\norm{Au_n-y}\xrightarrow{n \to \infty }0
 \end{align*}
 ist $Au=y$ und $A$ somit abgeschlossen.\\
 Für die Bedingung $\sigma(iA)\subset \R$ sei $\lambda \in\Complex\setminus\R$. Zu zeigen ist $\lambda \in\rho(iA)$, der Resolventenmenge von $iA$. Sei dazu
@@ -663,7 +666,7 @@ und die Verteilungsfunktion lässt sich darstellen als
 
 \subsection{Endliche Parametrisierung}
 \label{secfiniteparam}
-Dieser Abschnitt beschäftigt sich mit der Frage, wie man, ausgehend von einem potentiell unendlich-dimensionalen Wahrscheinlichkeitsraum, eine endliche Approximation desselben erhalten kann. Diese Approximation soll in der Form von $n$ stochastisch unabhängigen Zufallsvariablen vorliegen, welche zu einem $n$-dimensionalen Zufallsvektor zusammen gefasst werden. Die Bedingung der Unabhängigkeit ist dabei theoretisch zwar wenig einschränkend, aber eine sehr wichtige Grundlage für viele praktische numerische Verfahren.\\
+Dieser Abschnitt beschäftigt sich mit der Frage, wie man, ausgehend von einem potentiell unendlich-dimensionalen Wahrscheinlichkeitsraum, eine endliche Approximation desselben erhalten kann. Diese Approximation soll in der Form von $n$ stochastisch unabhängigen Zufallsvariablen vorliegen, welche zu einem $n$"=dimensionalen Zufallsvektor zusammen gefasst werden. Die Bedingung der Unabhängigkeit ist dabei theoretisch zwar wenig einschränkend, aber eine sehr wichtige Grundlage für viele praktische numerische Verfahren.\\
 Im Fall unserer stochastischer Klein-Gordon-Gleichung steckt die Zufallsabhängigkeit direkt in den Modellparametern $\alpha$ und $\beta$ und in den Anfangswerten. Auch wenn die Zufallsabhängigkeit wie in diesem Fall direkt im Modell gegeben ist, muss für numerische Lösungsverfahren eine Charakterisierung derselben durch endlich viele unabhängige Zufallsvariablen mit bekannter Verteilung sicher gestellt werden.\\
 Wir werden später stets davon ausgehen, dass bereits eine endliche Parametrisierung durch unabhängige Zufallsvariablen mit bekannter Verteilung vorliegt. Der Vollständigkeit halber seien hier kurz Methoden genannt, um das Parametrisierungsproblem zu lösen. Man beachte jedoch, dass einige der Methoden numerisch nicht umsetzbar oder ad-hoc-Lösungen sind, die spezielle Annahmen benötigen. Dieser Abschnitt wurde aus \autocite[Kapitel 4.1+4.2]{dongbinxiu2010} übernommen, wo auch Visualisierungen und kleine Beispiele zu finden sind.
 
@@ -706,7 +709,7 @@ Dabei ist die grundlegende Annahme, dass (\ref{skgg}) $P$-fast-sicher wohl geste
 Wie bereits in Kapitel \ref{secfiniteparam} diskutiert, werden wir stets annehmen, dass die Komponenten $Y_i$ von $Y$ stochastisch unabhängige Zufallsvariablen mit bekannter Verteilung sind.
 \begin{mathbsp}
 \label{bsp:trial1}
-Sei $Y=(Y_1)$ eine eindimensionale und in $(2,3)$ gleichverteilte Zufallsvariable. Dann gilt für $t>0$, $d\in\N$, $x=(x_1,\dots$, $x_d)\in\Torus^d$, $\hat{x}\coloneqq \sum_{i=1}^d x_i$, $y=Y(\omega)$ und Anfangswerten $u_0(x,y)=2\sin(\hat{x})$, $v_0(x,y)\equiv 0$:
+Sei $Y=(Y_1)$ eine eindimensionale und in $(2,3)$ gleichverteilte Zufallsvariable. Dann gilt für $t>0$, $d\in\N$, $x=(x_1,\dots$, $x_d)\in\Torus^d$, $\hat{x}\coloneqq \sum_{i=1}^d x_i$, $y=Y(\omega)$ und Anfangswerten $u_0(x,y)=2\sin(\hat{x})$, $v_0(x,y)\equiv 0:$
 \begin{equation*}
 u(t,x,y)=2\cos(ty)\sin(\hat{x})
 \end{equation*}
