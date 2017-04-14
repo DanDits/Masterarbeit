@@ -3,7 +3,7 @@
 \chapter{Stochastische Kollokation}
 \label{Chapter4}
 Wie bereits die Monte-Carlo-Methode basieren auch stochastische Kollokationsverfahren auf \emph{sampling}, d.h. der wiederholten Auswertung von vielen Zufallsexperimenten. Bei der Monte-Carlo-Methode werden die Punkte der gegebenen Verteilung entsprechend unabhängig und zufällig gewählt. Die Konvergenz ist in einem stochastischen Sinne durch das Gesetz der großen Zahlen gegeben.\\
-Dies ist ein großer Unterschied zu den hier vorgestellten stochastischen Kollokationsverfahren. Für diese werden die Kollokationspunkte nicht zufällig, sondern so gewählt, dass mithilfe von ihnen eine Polynominterpolation oder Quadratur möglich ist. Konvergenz ist dann abhängig davon, wie gut sich die approximierte stochastische Größe durch Polynome von Zufallsvariablen approximieren lässt.\\
+Dies ist ein großer Unterschied zu den hier vorgestellten stochastischen Kollokationsverfahren. Für diese werden die Kollokationspunkte nicht zufällig, sondern so gewählt, dass mithilfe von ihnen eine Polynominterpolation oder Quadratur möglich ist. Konvergenz ist dann abhängig davon, wie gut sich die stochastische Größe durch Polynome von Zufallsvariablen approximieren lässt.\\
 Die beiden Ansätze \emph{Interpolation} und \emph{diskrete Projektion} (auch \emph{pseudospektraler Ansatz} genannt) werden für die stochastische KGG im Folgenden detailliert vorgestellt und miteinander verglichen.
 \section*{Kollokation für die stochastische KGG}
 Die stochastische KGG (\ref{skgg}) für $d$ räumliche Dimensionen, $N$ stochastische Dimensionen und $y\in\R^N$ ist definiert durch
@@ -12,12 +12,12 @@ Die stochastische KGG (\ref{skgg}) für $d$ räumliche Dimensionen, $N$ stochast
 u(0,x,y)&=u_0(x,y), \: x\in \Torus^d\\
 \partialdt{u}(0,x,y)&=v_0(x,y), \: x\in \Torus^d
 \end{align*}
-Im klassischen Sinne bedeutet Kollokation, dass eine Approximation für eine diskrete Knotenmenge $\Theta_Y=\lbrace y_i\in\R^N\mid i=1,\dots,S\rbrace$ exakt ist. Auf die stochastische KGG übertragen, muss also für $y=y_i\in\Theta_Y$ die Lösung $u(t,x,y_i)$ für $x\in\Torus^d$ und $t>0$ vorliegen und die Approximation $w$ erfüllt $w(t,x,y_i)=u(t,x,y_i)$ für $i=1,\dots,S$. Da wir die exakte Lösung $u(t,x,y_i)$ nicht kennen, sondern für einen Zeitpunkt $T>0$ und eine Knotenmenge $\lbrace x_j\in\Torus^d\mid j=1,\dots,H\rbrace$ nur eine Approximation $\tilde{u}$ berechnen können (z.B. mithilfe des Strang-Splittings), gilt für festes $x_j$ die Kollokationsbedingung lediglich approximativ:
+Im klassischen Sinne bedeutet Kollokation, dass eine Approximation für eine diskrete Knotenmenge $\Theta_Y=\lbrace y_i\in\R^N\mid i=1,\dots,S\rbrace$ exakt ist. Auf die stochastische KGG übertragen muss also für $y=y_i\in\Theta_Y$ die Lösung $u(t,x,y_i)$ für $x\in\Torus^d$ und $t>0$ vorliegen und die Approximation $w$ erfüllt $w(t,x,y_i)=u(t,x,y_i)$ für $i=1,\dots,S$. Da wir die exakte Lösung $u(t,x,y_i)$ nicht kennen, sondern für einen Zeitpunkt $T>0$ und eine Knotenmenge $\lbrace x_j\in\Torus^d\mid j=1,\dots,H\rbrace$ nur eine Approximation $\tilde{u}$ berechnen können (z.B. mithilfe des Strang-Splittings), gilt für festes $x_j$ die Kollokationsbedingung lediglich approximativ:
 \[w(T,x_j,y_i)=u(T,x_j,y_i)\approx \tilde{u}(T,x_j,y_i),\quad i=1,\dots,S\]
 Wir wählen daher $\tau$ so klein, dass dieser Fehler im Vergleich zum eigentlichen Kollokationsfehler vernachlässigbar gering ist. Zur Vereinfachung der Notation nehmen wir im Folgenden an, die Lösung $u(T,x_j,y_i)$ liege exakt vor.
 
 \section{Interpolation}
-Sei $Y$ ein $N$-dimensionaler Zufallsvektor mit stochastisch unabhängigen Komponenten und $\Theta_Y\subset \mathcal{J}_Y$ eine $S$ elementige Knotenmenge. Seien weiter $\lbrace \Phi_m \mid |m|\le P \rbrace$ die gPC Basisfunktionen zu $Y$ und im Folgenden mit $m=0,\dots,M=\binom{N+P}{P}-1$ durchnummeriert. Eine Diskussion zur Nummerierung findet man im vorherigen Kapitel.\\
+Sei $Y$ ein $N$-dimensionaler Zufallsvektor mit stochastisch unabhängigen Komponenten und $\Theta_Y\subset \mathcal{J}_Y$ eine $S$-elementige Knotenmenge. Seien weiter $\lbrace \Phi_m \mid |m|\le P \rbrace$ die gPC Basisfunktionen zu $Y$ und im Folgenden mit $m=0,\dots,M=\binom{N+P}{P}-1$ durchnummeriert. Eine Diskussion zur Nummerierung findet man im vorherigen Kapitel.\\
 Dann wählen wir als Interpolationspolynom die Funktion
 \begin{equation}
 \label{eqn:coll_interpol_basic}
@@ -60,7 +60,7 @@ Dabei ist $\mathcal{Q}_Sf\in\Poly_S$ das Interpolationspolynom von $f$ mit $\mat
 
 Da die Funktion gegeben ist, hat man keinen Einfluss auf die Ableitung $f^{(S)}$. Wegen
 \[\norm{f(y)-\mathcal{Q}_{S}f}\le \frac{\norm{f^{(S)}}_\infty}{S!}\underbrace{\norm{\prod_{i=1}^{S}(y-y_i)}}_{=\norm{w(y)}}\]
-ist es somit das Ziel, den Term $\norm{w(y)}$ abhängig von der Norm zu minimieren.
+ist somit das Ziel, den Term $\norm{w(y)}$ abhängig von der Norm zu minimieren.
 \begin{mathbem}[\chebyspace Interpolation]
 \label{bem:cheby}
 Die Nullstellen $y_i=\cos\left(\pi\frac{2i-1}{2S+2}\right)$, für $i=1,\dots,S+1$, der \chebyspace Polynome $T_{S+1}(y)=\cos((S+1)\arccos(y))$ minimieren den Ausdruck $\norm{w(y)}_\infty$ auf $[-1,1]$ und bieten auf $[-1,1]$ optimale Interpolationsgüte. Es gilt 
@@ -86,7 +86,7 @@ Es ist $A_{ij}=\Phi_j(y_i)$. Da wir uns im eindimensionalen Fall befinden ($N$=1
 &\stackrel{\text{deg}(\Phi_j\Phi_\ell)\le 2M}{=}\sum_{\ell=0}^M\hat{w}_\ell\sum_{j=0}^M\Phi_j(y_i)\underbrace{\int_\mathcal{J}\Phi_j(y)\Phi_\ell(y)w(y)dy}_{=\delta_{j\ell}}\\
 &=\sum_{\ell=0}^M\hat{w}_\ell\Phi_\ell(y_i)=f(y_i)=\hat{f}_i
 \end{align*}
-Also gilt $A\widetilde{w}=\hat{f}=A\hat{w}$ und da $A$ regulär ist somit $\widetilde{w}=\hat{w}$.
+Also gilt $A\widetilde{w}=\hat{f}=A\hat{w}$. Da $A$ eine reguläre Matrix ist folgt schlussendlich $\widetilde{w}=\hat{w}$.
 \end{proof}
 \begin{mathbem}
 Wir wollen nun dem technischen Satz \ref{th:interpol_and_proj} Leben einhauchen und seine Relevanz verdeutlichen.
@@ -98,7 +98,7 @@ Wir sehen, dass sich im Eindimensionalen bei bekannter Quadraturformel die Inter
 \item
 Die Darstellung $\hat{w}_i=\sum_{j=0}^M\Phi_i(y_j)a_jf(y_j)$ kann als Approximation an die Koeffizienten $\int_\mathcal{J} \Phi_i(y)f(y)w(y)dy$ der Bestapproximation $P_Mf$ in $L_w^2(\mathcal{J})$ aufgefasst werden. Mithilfe der Dreiecksungleichung lässt sich dann der Fehler der Interpolation beschreiben durch
 \begin{align*}
-&\norm{\mathcal{Q}_Mf-f}_{L_w^2}\le \underbrace{\norm{P_Mf-f}_{L_w^2}}_{\text{Fehler der Bestapproximation}}+\underbrace{\norm{\mathcal{Q}_Mf-P_Mf}_{L_w^2}}_{\text{Aliasing Fehler}}\\
+&\norm{\mathcal{Q}_Mf-f}_{L_w^2}\le \underbrace{\norm{P_Mf-f}_{L_w^2}}_{\text{Fehler der Bestapproximation}}+\underbrace{\norm{\mathcal{Q}_Mf-P_Mf}_{L_w^2}}_{\text{Aliasing-Fehler}}\\
 &=\norm{\mathcal{Q}_Mf-P_Mf}_{L_w^2}+\norm{\sum_{m=0}^M\left(\sum_{j=0}^M\Phi_m(y_j)a_jf(y_j)\right)\Phi_m-\sum_{m=0}^M\left(\int_\mathcal{J}\Phi_m(y)f(y)w(y)dy\right)\Phi_m}_{L_w^2}\\
 &=\norm{\mathcal{Q}_Mf-P_Mf}_{L_w^2}+\norm{\sum_{m=0}^M\left(\sum_{j=0}^M\Phi_m(y_j)a_jf(y_j)-\int_\mathcal{J}\Phi_m(y)f(y)w(y)dy\right)\Phi_m}_{L_w^2}\\
 &\stackrel{\text{Parseval}}{=}\norm{\mathcal{Q}_Mf-P_Mf}_{L_w^2}+\sqrt{\sum_{m=0}^M\left(\sum_{j=0}^M\Phi_m(y_j)a_jf(y_j)-\int_\mathcal{J}\Phi_m(y)f(y)w(y)dy\right)^2}
@@ -125,15 +125,15 @@ In Abbildung \ref{fig:Kollokation_trial1} ist die Approximationsgüte der Interp
 \end{figure}
 \end{mathbsp}
 \subsubsection*{Mehrdimensionale Interpolation durch volles Tensorprodukt}
-Eine mögliche Wahl für $N>1$ die Menge der Interpolationspunkte $\Theta_Y^N$ zu einem gegebenem Zufallsvektor $Y$ der Dimension $N$ zu wählen, ist gegeben durch das volle Tensorprodukt
+Eine Möglichkeit, für $N>1$ die Menge der Interpolationspunkte $\Theta_Y^N$ zu einem gegebenem Zufallsvektor $Y$ der Dimension $N$ zu wählen, ist gegeben durch das volle Tensorprodukt
 \[\Theta_Y^N=\Theta_{Y_1}\otimes \dots \otimes \Theta_{Y_N},\quad \Theta_{Y_i}\subset \mathcal{J}_{Y_i}\]
-Dann gilt für die Anzahl der Interpolationspunkte $S=S_1 \dots S_N$. Ist die Anzahl an Basispolynomen $M+1$ fest, so ist es schwierig die Bedingung $S=M+1$ exakt zu erfüllen. Wir fordern daher, dass $S_1=\dots=S_N$ und $S\ge M+1$ minimal gewählt wird. Dieser Ansatz wird in Abbildungen durch \textit{full\_tensor} gekennzeichnet.
+Dann gilt für die Anzahl der Interpolationspunkte $S=S_1 \dots S_N$. Ist die Anzahl an Basispolynomen $M+1$ fest, dann ist es schwierig, die Bedingung $S=M+1$ exakt zu erfüllen. Wir fordern daher, dass $S_1=\dots=S_N$ und $S\ge M+1$ minimal gewählt wird. Dieser Ansatz wird in Abbildungen durch \textit{full\_tensor} gekennzeichnet.
 \subsubsection*{Mehrdimensionale Interpolation durch pseudo-dünne Gitter}
 Eine weitere Idee für die mehrdimensionale Interpolation, welche die Gleichung $M+1=\binom{N+P}{P}$ exakt erfüllt, ist mit $S_1=\dots=S_N$ die Wahl
 \[\Theta_Y^N=\lbrace (y_{m_1},\dots,y_{m_N})\in \Theta_{Y_1}\otimes \dots \otimes \Theta_{Y_N} \mid |m|\le P,m\in\N_0^N \rbrace \]
-Es wird somit jedem Multi-Index $m\in\N_0^N$ genau ein mehrdimensionaler Interpolationspunkt $y$ zugewiesen und es gilt $M+1=S$. Die Matrix im Interpolationsansatz ist dadurch quadratisch und besitzt für kleine $P$ eine geringere Kondition als die Matrix aus dem vollen Tensorprodukt Ansatz.\\[0.1cm]
-Die Wahl der Nummerierung der eindimensionalen Interpolationspunkte ist entscheidend. Für Legendre- oder Hermite-Polynome bietet sich eine betragsmäßig aufsteigende Sortierung der Punkte an, da diese symmetrisch um $0$ verteilt sind. Für Jacobi- und Laguerre-Polynome beobachten wir in Abbildung \ref{fig:poly_roots} keine Symmetrie. Dennoch gilt die Eigenschaft von Orthogonalpolynomen, dass die Nullstellen eines Polynoms höheren Grades zwischen den Nullstellen des vorherigen Polynoms zu finden sind. Wir sortieren die Nullstellen auf- oder absteigend, um eine möglichst repräsentative Auswahl der Punkte des vollen Tensorprodukts zu bekommen. Die Idee ist dadurch motiviert, dass so die Struktur der Entwicklung der Nullstellen einer Polynombasis berücksichtigt wird, auch wenn diese keine eindeutige Schachtelung aufweisen.\\
-Dieser Ansatz wird in Abbildungen durch \textit{pseudo\_sparse} gekennzeichnet. Er ist eine Heuristik, um den Einfluss der Überbestimmtheit des zu lösenden Systems besser zu verstehen und sollte nicht als robuste Methode für mehrdimensionale Interpolation aufgefasst werden.\\
+Es wird somit jedem Multi-Index $m\in\N_0^N$ genau ein mehrdimensionaler Interpolationspunkt $y$ zugewiesen und es gilt $M+1=S$. Die Matrix im Interpolationsansatz ist dadurch quadratisch und besitzt für kleine $P$ eine geringere Kondition als die Matrix aus dem vollen Tensorproduktansatz.\\[0.1cm]
+Die Wahl der Nummerierung der eindimensionalen Interpolationspunkte ist entscheidend. Für Legendre- oder Hermite-Polynome bietet sich eine betragsmäßig aufsteigende Sortierung der Punkte an, da diese symmetrisch um $0$ verteilt sind. Für Jacobi- und Laguerre-Polynome beobachten wir in Abbildung \ref{fig:poly_roots} keine Symmetrie. Dennoch gilt die Eigenschaft von Orthogonalpolynomen, dass die Nullstellen eines Polynoms höheren Grades zwischen den Nullstellen des vorherigen Polynoms zu finden sind. Wir sortieren die Nullstellen auf- oder absteigend um eine möglichst repräsentative Auswahl der Punkte des vollen Tensorprodukts zu bekommen. Die Idee ist dadurch motiviert, dass so die Struktur der Entwicklung der Nullstellen einer Polynombasis berücksichtigt wird, auch wenn diese keine eindeutige Schachtelung aufweisen.\\
+Dieser Ansatz wird in Abbildungen durch \textit{pseudo\_sparse} gekennzeichnet. Er ist eine Heuristik um den Einfluss der Überbestimmtheit des zu lösenden Systems besser zu verstehen und sollte nicht als robuste Methode für mehrdimensionale Interpolation aufgefasst werden.\\
 \begin{figure}[!htb]
 \minipage{0.5\textwidth}
   \includegraphics[width=\linewidth]{Figures/roots_legendre.png}
@@ -159,7 +159,7 @@ Ein Beispiel sei für $N=2$ und $P=14$ gemacht, wo für Legendre- und Laguerre-P
 \label{fig:roots_two_dim}
 \end{figure}
 
-Wir werden später basierend auf Smolyaks Konstruktion einen effizienteren Dünngitteransatz kennen lernen, der nicht nur für Interpolation verwendbar ist, sondern sich auch auf generelle Operatoren übertragen lässt. Dieser basiert allerdings auf vollen Tensorprodukten von Operatoren und ist daher nur übertragbar, wenn wir volle Tensorprodukte von Polynombasen zulassen (d.h. ohne die zusätzliche Bedingung $|m|\le P$). Da dies einen erheblichen Rechenaufwand impliziert, werden wir keine Dünngitteransätze für die Interpolation verwenden.
+Wir werden später basierend auf Smolyaks Konstruktion einen effizienteren Dünngitteransatz kennenlernen, der nicht nur für Interpolation verwendbar ist, sondern sich auch auf generelle Operatoren übertragen lässt. Dieser basiert allerdings auf vollen Tensorprodukten von Operatoren und ist daher nur übertragbar, wenn wir volle Tensorprodukte von Polynombasen zulassen (d.h. ohne die zusätzliche Bedingung $|m|\le P$). Da dies einen erheblichen Rechenaufwand impliziert, werden wir keine Dünngitteransätze für die Interpolation verwenden.
 \subsection{Algorithmus}
 In Algorithmus \ref{alg:Kollokation_mi} ist das Kollokationsverfahren für den eindimensionalen Fall $d=1$ skizziert. Diese Variante der Kollokation durch Interpolation wird in der Literatur auch mit \emph{Matrix-Invertierung} (MI) bezeichnet. Die Matrix $A$ muss nicht explizit invertiert werden, trotzdem besteht der Kern des Verfahrens aus dem Lösen der linearen Gleichungssysteme bzw. linearen Ausgleichsprobleme.\\
 \begin{tabular}{c|c}
@@ -192,8 +192,8 @@ $S$ & Anzahl an Interpolationspunkten gemäß einer der möglichen Ansätze
     \end{algorithmic}
 \end{algorithm}
 \subsection{Vergleiche der Ansätze}
-Wir beschränken uns für $N=1$ auf die Nullstellen derjenigen Orthogonalpolynome, die gemäß des gPC zu der Verteilung von $Y$ gehören. Für das kompakte Interval $\mathcal{J}=[-1,1]$ wäre es ebenso möglich die \chebyspace Interpolationspunkte zu verwenden. Diese bieten aber nach unseren Beobachtungen keinen Vorteil.\\
-Für $N>1$ besteht die Möglichkeit das volle Tensorprodukt der jeweiligen eindimensionalen Interpolationspunkte zu den Komponenten von $Y$ zu wählen. Da dies jedoch im Allgemeinen mehr Punkte umfasst als die vorhandenen $M+1$ Polynome, ist das lineare Gleichungssystem überbestimmt und wir beobachten eine hohe Kondition der Matrix. Die Invertierbarkeit der Matrix für die mehrdimensionale Interpolation ist selbst im quadratischen Fall nicht garantiert. Dies sorgt insbesondere dafür, dass die Approximation der Varianz, welche jede Komponente des Lösungsvektors benötigt, bereits für $P>3$ instabil ist.\\
+Wir beschränken uns für $N=1$ auf die Nullstellen derjenigen Orthogonalpolynome, die gemäß des gPC zu der Verteilung von $Y$ gehören. Für das kompakte Intervall $\mathcal{J}=[-1,1]$ wäre es ebenso möglich, die \chebyspace Interpolationspunkte zu verwenden. Diese bieten aber nach unseren Beobachtungen keinen Vorteil.\\
+Für $N>1$ besteht die Möglichkeit, das volle Tensorprodukt der jeweiligen eindimensionalen Interpolationspunkte zu den Komponenten von $Y$ zu wählen. Da dies jedoch im Allgemeinen mehr Punkte umfasst als die vorhandenen $M+1$ Polynome, ist das lineare Gleichungssystem überbestimmt und wir beobachten eine hohe Kondition der Matrix. Die Invertierbarkeit der Matrix für die mehrdimensionale Interpolation ist selbst im quadratischen Fall nicht garantiert. Dies sorgt insbesondere dafür, dass die Approximation der Varianz, welche jede Komponente des Lösungsvektors benötigt, bereits für $P>3$ instabil ist.\\
 Anhand der \nameref{trial:8} aus dem Appendix mit $N=4$ vergleichen wir die beiden Ansätze in Abbildung \ref{fig:Kollokation_trial8}. 
 \begin{figure}[!htb]
 \centering
@@ -216,7 +216,7 @@ Ist nun $(y_i,a_i)_{i=0,\dots,Q}$ eine Quadraturformel für das Gewicht $\rho_Y$
 \[w_{M,Q}(T,x_j,Y)=\sum_{m=0}^M\hat{w}_m^{(j)}\Phi_m(Y)\] wobei für die Koeffizienten gilt
 \[\hat{w}_m^{(j)}=\sum_{i=0}^Qu(T,x_j,y_i)\Phi_m(y_i)a_i\approx \int_{\mathcal{J}_Y} u(T,x_j,y)\Phi_m(y)\rho_Y(y)dy\]
 \end{mathdef}
-Satz \ref{th:interpol_and_proj} zeigt, dass für $Q=M$ und eine Quadraturformel mit paarweise verschiedenen Quadraturpunkten und Exaktheitsgrad $2M$ die beiden Ansätze im Eindimensionalen äquivalent sind. Aus der Bemerkung nach Satz \ref{th:interpol_and_proj} folgt auch, dass sich der Fehler der diskreten Projektion mithilfe der Dreiecksungleichung durch den Fehler der Bestapproximation und einen Quadraturfehler, den Aliasing Fehler, abschätzen lässt.
+Satz \ref{th:interpol_and_proj} zeigt, dass für $Q=M$ und eine Quadraturformel mit paarweise verschiedenen Quadraturpunkten und Exaktheitsgrad $2M$ die beiden Ansätze im Eindimensionalen äquivalent sind. Aus der Bemerkung nach Satz \ref{th:interpol_and_proj} folgt auch, dass sich der Fehler der diskreten Projektion mithilfe der Dreiecksungleichung durch den Fehler der Bestapproximation und einen Quadraturfehler, den Aliasing-Fehler, abschätzen lässt.
 
 \subsection{Gauss-Quadratur im Eindimensionalen}
 Wir wollen nun eine möglichst exakte Quadraturformel konstruieren, welche auf natürliche Weise das jeweilige Gewicht $\rho$ des Integrals berücksichtigt.
@@ -251,14 +251,14 @@ Das Gewicht ist somit das Quadrat des ersten Eintrags des Eigenvektors, siehe \a
 \end{mathbem}
 \subsection{Mehrdimensionale Quadratur}
 \label{chapter:multivariatequad}
-Um den Ansatz der diskreten Projektion für einen mehrdimensionalen Zufallsvektor mit $N>1$ durchzuführen, benötigen wir eine mehrdimensionale Quadratur. Im Gegensatz zur mehrdimensionalen Interpolation liegt die Schwierigkeit nicht nur darin eine Menge von Kollokationspunkten zu finden, sondern auch die zugehörige Menge der Quadraturgewichte zu bestimmen.\\
+Um den Ansatz der diskreten Projektion für einen mehrdimensionalen Zufallsvektor mit $N>1$ durchzuführen, benötigen wir eine mehrdimensionale Quadratur. Im Gegensatz zur mehrdimensionalen Interpolation liegt die Schwierigkeit nicht nur darin, eine Menge von Kollokationspunkten zu finden, sondern auch die zugehörige Menge der Quadraturgewichte zu bestimmen.\\
 Die numerischen Möglichkeiten der mehrdimensionalen Integration (engl. \emph{cubature}) umfassen unter anderem adaptive Verfahren und Monte-Carlo-Methoden. Da diese auf einer großen Menge an Funktionsauswertungen basieren und in unserem Fall eine Funktionsauswertung das aufwändige Lösen einer Instanz der sKGG bedeutet, benötigen wir somit angepasste Integrationsverfahren.
 \subsubsection*{Tensorkonstruktion}
 Sei $Y$ ein Zufallsvektor und $L_{Y_i}$ ein eindimensionaler Quadraturoperator bezüglich des Gewichts $\rho_{Y_i}$, beispielsweise die Gauss-Quadratur. Dann erhalten wir mithilfe einer Tensorkonstruktion die mehrdimensionale Quadratur
 \[L_Y=L_{Y_1}\otimes\dots\otimes L_{Y_N}\]
 Für die Menge an Quadraturpunkten gilt wie schon bei der Interpolation
 \[\Theta_Y=\Theta_{Y_1}\otimes\dots\otimes \Theta_{Y_N}\]
-Die Anzahl der Quadraturpunkte $Q=Q_1\dots Q_N$ wächst daher wiederum sehr stark und dies macht den Ansatz bereits für geringe Dimensionen $N$ sehr rechenaufwändig. Andererseits sehen wir sofort, dass sich die polynomiale Exaktheit der Gauss-Quadraturen direkt auf den mehrdimensionalen Fall übertragen lässt. Die Quadratur $L_Y$ ist exakt für alle Polynome in
+Die Anzahl der Quadraturpunkte $Q=Q_1\dots Q_N$ wächst daher wiederum sehr stark. Dies macht den Ansatz bereits für geringe Dimensionen $N$ sehr rechenaufwändig. Andererseits sehen wir sofort, dass sich die polynomiale Exaktheit der Gauss-Quadraturen direkt auf den mehrdimensionalen Fall übertragen lässt. Die Quadratur $L_Y$ ist exakt für alle Polynome in
 \[\Poly_{2Q_1-1}(Y_1)\otimes\dots\otimes\Poly_{2Q_N-1}(Y_N)\]
 \subsubsection*{Smolyaks dünne Gitter}
 Basierend auf \autocite{ConradMarzouk} geben wir eine kurze Einführung in die Konstruktion von Smolyaks dünnen Gittern. Sei $L_{Y_i}^{Q_i}$ ein linearer Operator für die $i$-te Komponente von $Y$. Im Folgenden wird $L_{Y_i}^{Q_i}$ einen Quadraturoperator darstellen, die Konstruktion ist aber beispielsweise auch für Interpolationsoperatoren gültig.\\
@@ -292,7 +292,7 @@ Die Gestalt und Größe der Menge $\Theta_Y^\ell$ ist abhängig davon, wie die T
 \end{figure}
 Die Nullstellen der Legendre- und Hermite sind schwach geschachtelt (engl. \emph{weakly nested}), da für ungerade Polynomgrade die Zahl $0$ eine Nullstelle ist. Dies ist jedoch die einzige Wiederholung eines Knotenpunktes. Die Nullstellen der Laguerre- und Jacobi-Polynome besitzen im Allgemeinen keinerlei Schachtelung.\\
 Im Gegensatz zu Gittern, die beispielsweise auf Glenshaw-Curtis Knotenpunkten basieren und vollständig geschachtelt sind, bieten schwach geschachtelte Gitter somit wenig Zeitersparnis durch Wiederverwendung von Kollokationspunkten. Der Vorteil liegt hauptsächlich in der geschickten Approximation des vollen Tensorprodukts der exakten Operatoren.\\
-Eine Implementierung für vollständig geschachtelte, schwach geschachtelte und nicht geschachtelte dünne Gitter in Matlab und C++ ist durch die Sandia Sparse Bibliothek (siehe \autocite{Sandia}) gegeben. Die Schwierigkeit liegt dabei darin, für schwach geschachtelte Gitter die einzelnen wieder auftauchenden Knotenstellen korrekt zu identifizieren.
+Eine Implementierung für vollständig geschachtelte, schwach geschachtelte und nicht geschachtelte dünne Gitter in Matlab und C++ ist durch die Sandia-Sparse-Bibliothek (siehe \autocite{Sandia}) gegeben. Die Schwierigkeit liegt dabei darin, für schwach geschachtelte Gitter die einzelnen wieder auftauchenden Knotenstellen korrekt zu identifizieren.
 \begin{figure}[!htb]
 \includegraphics[width=\textwidth]{Figures/collocation_dp_trial8_nebeneinander.png}
 \caption{Konvergenz des Erwartungswert und der Varianz mit diskreter Projektion für \nameref{trial:8} mit $N=4$.}
@@ -315,7 +315,7 @@ ist eine häufig genutzte Quadraturformel mit vollständig geschachtelten Quadra
 Diese Quadratur ist für das kompakte Intervall $[-1,1]$ ausgelegt. Für die Legendre-Polynome und die Jacobi-Polynome mit $\alpha,\beta>0$ stimmt der Träger mit dem Träger der zugehörigen stochastischen Verteilung überein. Es gilt
 \[\\E[Y]=\int_{[-1,1]}f(y)\rho(y)dy\approx\sum_{i=0}^Qf(y_i)\rho(y_i)a_i\]
 Die Dichte $\rho$ wird hier explizit ausgewertet und ist nicht Teil der Quadraturformel, wie dies bei der Gauss-Quadratur der Fall war.\\
-Für Hermite-Polynome mit zugehörigem Träger $(-\infty,\infty)$ bzw. Laguerre-Polynome mit zugehörigem Träger $(0,\infty)$ ist daher eine Transformation des Integrals nötig. Da $[-1,1]$ kompakt ist existiert aber keine Bijektion zwischen den Mengen. Heuristische Ansätze wie das Ignorieren der Randpunkte und anschließender Verwendung des Transformationssatzes auf $(-1,1)$ liefert schlechte Approximationen.\\
+Für Hermite-Polynome mit zugehörigem Träger $(-\infty,\infty)$ bzw. Laguerre-Polynome mit zugehörigem Träger $(0,\infty)$ ist daher eine Transformation des Integrals nötig. Da $[-1,1]$ kompakt ist, existiert aber keine Bijektion zwischen den Mengen. Heuristische Ansätze wie das Ignorieren der Randpunkte und anschließender Verwendung des Transformationssatzes auf $(-1,1)$ liefert schlechte Approximationen.\\
 Unseren Beobachtungen nach bietet die Glenshaw-Curtis Quadratur keine Vorteile gegenüber der Gauss-Quadratur. Die polynomiale Exaktheit ist lediglich $n$ bei $n$ Quadraturpunkten und verwendet die Dichtefunktion der Verteilung nicht implizit. Die Dichte muss somit ebenfalls durch die Quadratur approximiert werden, was den nötigen Polynomgrad noch weiter erhöht. Schlussendlich erhöhen die Polynome $\Phi_m$, die bei der Approximation der Varianz unter dem Integral auftauchen, die benötigte polynomiale Exaktheit.
 \subsection{Algorithmus}
 Algorithmus \ref{alg:Kollokation_dp} skizziert die Berechnung der Approximation von Erwartungswert und Varianz mithilfe von Kollokation durch diskrete Projektion.
@@ -337,7 +337,7 @@ Algorithmus \ref{alg:Kollokation_dp} skizziert die Berechnung der Approximation 
     \end{algorithmic}
 \end{algorithm}
 \section{Vergleich der Ansätze Interpolation und diskrete Projektion}
-In diesem Abschnitt werden wir die beiden Ansätze für die Kollokation miteinander vergleichen. Dabei werden wir für die Interpolation die Gauss-Stützstellen verwenden und ebenso für die diskrete Projektion die Gauss-Quadratur. Wir betrachten Beispiele mit $N=1$ und $N=4$ und verwenden im mehrdimensionalen Fall den vollen Tensorproduktansatz. Für die mehrdimensionale Quadratur bei der diskreten Projektion vergleichen wir zusätzlich den vollen Tensorprodukt Ansatz mit der Dünngitterquadratur nach Smolyak.
+In diesem Abschnitt werden wir die beiden Ansätze für die Kollokation miteinander vergleichen. Dabei werden wir für die Interpolation die Gauss-Stützstellen verwenden und ebenso für die diskrete Projektion die Gauss-Quadratur. Wir betrachten Beispiele mit $N=1$ und $N=4$ und verwenden im mehrdimensionalen Fall den vollen Tensorproduktansatz. Für die mehrdimensionale Quadratur bei der diskreten Projektion vergleichen wir zusätzlich den vollen Tensorproduktansatz mit der Dünngitterquadratur nach Smolyak.
 \subsection*{Allgemeiner Vergleich}
 \begin{center}
 \begin{tabular}{p{0.47\linewidth}|p{0.47\linewidth}}
@@ -360,7 +360,7 @@ Volles Tensorprodukt macht LGS überbestimmt & Volles Tensorprodukt ohne Stabili
 \end{center}
 Die Überbestimmtheit des Systems bei der Interpolation mit vollem Tensorprodukt der Knoten ist bedingt durch unsere Wahl der Interpolationspolynome. Bei Verwendung des vollen Tensorprodukts der eindimensionalen Polynombasen ist diese Quelle der Instabilität auf Kosten der Rechenzeit beseitigt.\\
 Dass für die Berechnung des Erwartungswerts nur $P=0$ benötigt wird, macht die diskrete Projektion für manche Anwendungen sehr attraktiv. Die explizite Berechnung der Koeffizienten, die ohne Lösen eines LGS auskommt, verspricht mehr Stabilität und Geschwindigkeit.\\
-Die Beziehung der beiden freien Parameter $P$ für den eindimensionalen Polynomgrad und $Q$ für die Quadraturpunkte ist einerseits aus praktischer Sicht problematisch, da im Vorhinein unklar ist, welche Erhöhung eine Verbesserung der Approximation bietet. Andererseits ist der Einfluss der Parameter auf den Fehler durch die Aufteilung in den Fehler der Bestapproximation und den Aliasing Fehler aus theoretischer Sicht gut verstanden.
+Die Beziehung der beiden freien Parameter $P$ für den eindimensionalen Polynomgrad und $Q$ für die Quadraturpunkte ist einerseits aus praktischer Sicht problematisch, da im Vorhinein unklar ist, welche Erhöhung eine Verbesserung der Approximation bietet. Andererseits ist der Einfluss der Parameter auf den Fehler durch die Aufteilung in den Fehler der Bestapproximation und den Aliasing-Fehler aus theoretischer Sicht gut verstanden.
 \subsection*{Numerischer Vergleich}
 
 \subsubsection*{Eindimensionaler Fall anhand von \nameref{trial:7}}
@@ -398,5 +398,5 @@ Fügen wir in  eine weitere Unstetigkeitsstelle für $\alpha$ hinzu und entferne
 \caption{Konvergenz der Kollokation für \nameref{trial:disconttriple} mit $N=1$ anhand der Anzahl benötigter Kollokationspunkte.}
 \label{fig:Kollokation_comparison_trialdisconttriple}
 \end{figure}
-Für solche Probleme bieten sich adaptive Quadratur- und Interpolationsverfahren an, welche den Träger an bekannten oder unbekannten (Unstetigkeits)stellen aufteilen. Dafür ist es hilfreich die Theorie des gPC auf stückweise Polynome zu erweitern und entsprechende Quadraturverfahren zu verwenden.
+Für solche Probleme bieten sich adaptive Quadratur- und Interpolationsverfahren an, welche den Träger an bekannten oder unbekannten (Unstetigkeits-) Stellen aufteilen. Dafür ist es hilfreich, die Theorie des gPC auf stückweise Polynome zu erweitern und entsprechende Quadraturverfahren zu verwenden.
 

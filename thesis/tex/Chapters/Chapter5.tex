@@ -17,7 +17,7 @@ u_M(T,x,Y)&=\sum_{m=0}^M\hat{u}_m(T,x)\Phi_m(Y)\in\Poly_P^N,\quad  M+1=\binom{N+
 \hat{u}_m(T,x)&=\E[u(T,x,Y)\Phi_m(Y)]
 \end{align*}
 Ist $\rho$ die Dichtefunktion von $Y$, so stimmt die gPC Projektion mit der Bestapproximation in $L_\rho^2$ überein. Diese Approximation ist im $L_\rho^2$ Sinne optimal, allerdings benötigen wir zur Berechnung der Koeffizienten $\hat{u}_m$ die unbekannte exakte Lösung $u(T,x,Y)$.\\
-Der stochastische Galerkin Ansatz ist eine Erweiterung des klassischen Galerkin Ansatzes. Sei dazu eine weitere Approximation $v_M\in\Poly_P^N$ gegeben durch
+Der stochastische Galerkinansatz ist eine Erweiterung des klassischen Galerkinansatzes. Sei dazu eine weitere Approximation $v_M\in\Poly_P^N$ gegeben durch
 \begin{equation}
 v_M(t,x,Y)=\sum_{m=0}^M\hat{v}_m(t,x)\Phi_m(Y)
 \end{equation}
@@ -110,7 +110,7 @@ und
 \label{eqn:galerkin_split2}
 \partialdt\begin{pmatrix}w_2\\ \tilde{w}_2\end{pmatrix}(t,x)=\begin{pmatrix}0&(1-\kappa)I_{M+1}\\-S_1^TB(x)S_1 & 0\end{pmatrix}\begin{pmatrix}w_2\\\tilde{w}_2\end{pmatrix}(t,x)
 \end{equation}
-Diese sind wie schon in Kapitel \ref{chapter:solver_kgg} mithilfe der Matrixexponentialfunktion lösbar. Beachte, dass die Gleichung (\ref{eqn:galerkin_split1}) nach Umsortierung in $2\times 2$ Systeme entkoppelt ist, da $D_1$ diagonal ist. Die Matrixexponentialfunktion der entkoppelten $2\times 2$ Systeme ist in Algorithmus \ref{alg:kgg_solver} als \emph{First\_Part\_Solver} in einfacher Darstellung direkt gegeben. Der erste Teil des Splittings besteht somit aus dem Lösen von $M+1$ unabhängigen "'Wellengleichungen"' (Name passend für $\kappa=1$). Die Eigenwerte $d_i$ von $A$ sind die Quadrate der Wellengeschwindigkeiten. Abschätzungen für diese, insbesondere Positivität, erhalten wir mithilfe von Satz \ref{th:galerkin_posdef} unter entsprechenden Voraussetzungen an $\alpha(y)$. Beachte, dass die Eigenwerte lediglich einmal zu Beginn berechnet werden müssen. Die $M+1$ Systeme der Größe $2\times 2$ im innersten Teil des Algorithmus können somit vollständig parallel gelöst werden.
+Diese sind wie schon in Kapitel \ref{chapter:solver_kgg} mithilfe der Matrixexponentialfunktion lösbar. Hier gilt zu beachten, dass die Gleichung (\ref{eqn:galerkin_split1}) nach Umsortierung in $2\times 2$ Systeme entkoppelt ist, da $D_1$ diagonal ist. Die Matrixexponentialfunktion der entkoppelten $2\times 2$ Systeme ist in Algorithmus \ref{alg:kgg_solver} als \emph{First\_Part\_Solver} in einfacher Darstellung direkt gegeben. Der erste Teil des Splittings besteht somit aus dem Lösen von $M+1$ unabhängigen "'Wellengleichungen"' (Name passend für $\kappa=1$). Die Eigenwerte $d_i$ von $A$ sind die Quadrate der Wellengeschwindigkeiten. Abschätzungen für diese, insbesondere Positivität, erhalten wir mithilfe von Satz \ref{th:galerkin_posdef} unter entsprechenden Voraussetzungen an $\alpha(y)$. Beachte, dass die Eigenwerte lediglich einmal zu Beginn berechnet werden müssen. Die $M+1$ Systeme der Größe $2\times 2$ im innersten Teil des Algorithmus können somit vollständig parallel gelöst werden.
 
 \subsection{Entkopplung des zweiten Teils}
 \subsubsection*{Entkopplung für $\kappa \neq 1$}
