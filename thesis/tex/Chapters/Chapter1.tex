@@ -65,49 +65,51 @@ v(0)&=r
 Formulieren wir unsere KGG als ein Cauchy-Problem obiger Gestalt, so ist also nur noch zu zeigen, dass der Generator eine $C_0$-Halbgruppe generiert.\\
 Den Generator $C$ der KGG mit $\alpha>0$ und $\beta\in L^\infty(\Torus^d)$ schreiben wir als Summe von zwei Operatoren:
 \[\underbrace{\begin{pmatrix}0 & I\\ \alpha\Laplace -\beta(x) & 0\end{pmatrix}}_{=C}
-=\underbrace{\begin{pmatrix}0 & I\\ \alpha\Laplace-I & 0\end{pmatrix}}_{=A}
-+\underbrace{\begin{pmatrix}0 & 0\\ -\beta(x)+I & 0\end{pmatrix}}_{=B}\]
-Wir werden zuerst zeigen, dass $A$ eine $C_0$-Halbgruppe generiert und verwenden anschließend, dass die Summe mit einer beschränkten Störung $B$ diese Eigenschaft erhält.\\[0.2cm]
+=\underbrace{\begin{pmatrix}0 & I\\ \alpha\Laplace-I & 0\end{pmatrix}}_{=\widetilde{A}}
++\underbrace{\begin{pmatrix}0 & 0\\ -\beta(x)+I & 0\end{pmatrix}}_{=\widetilde{B}}\]
+Wir werden zuerst zeigen, dass $\widetilde{A}$ eine $C_0$-Halbgruppe generiert und verwenden anschließend, dass die Summe mit einer beschränkten Störung $\widetilde{B}$ diese Eigenschaft erhält.\\[0.2cm]
 Wir definieren den komplexen Hilbertraum $R=H^1(\Torus^d)\times H^0(\Torus^d)$ mit zugehörigem leicht abgewandelten Skalarprodukt 
 \[\langle \begin{pmatrix}v_1\\v_2\end{pmatrix}, \begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle =\int_{[-\pi,\pi]^d}\alpha \nabla v_1\nabla \overline{w_1}+v_1\overline{w_1}+ v_2\overline{w_2}dx\]
-Da $\alpha>0$ ist die durch dieses Skalarprodukt induzierte Norm äquivalent zur Standardnorm des Hilbertraums (welche $\alpha=1$ entspricht). Konvergenz bezüglich beider Normen ist dementsprechend äquivalent und der Raum mit dem definierten Skalarprodukt ist ebenfalls ein Hilbertraum.\\
-Es ist $D(A)=H^2(\Torus^d)\times H^1(\Torus^d)\subset R$ dicht in $R$, da bereits $C^\infty(\Torus^d)\times C^\infty(\Torus^d)\subset D(A)$ dicht in $R$ ist.\\
-Stones Theorem besagt, dass $A$ genau dann eine $C_0$-Halbgruppe von unitären Operatoren generiert, wenn $A$ schiefadjungiert bezüglich des Skalarprodukt des Hilbertraums ist. Wir rechnen für $(v_1,v_2)^T, (w_1,w_2)^T\in D(A)$ die Antisymmetrie des Operators $A$ nach:
+Da $\alpha>0$ ist die durch dieses Skalarprodukt induzierte Norm äquivalent zur Standardnorm des Hilbertraums (welche $\alpha=1$ entspricht). Konvergenz bezüglich beider Normen ist dementsprechend äquivalent und der Raum $R$ mit dem definierten Skalarprodukt ist ebenfalls ein Hilbertraum.\\
+Die zur $R$ gehörende Norm ist
+\[\norm{\begin{pmatrix}v_1\\v_2\end{pmatrix}}^2=\underbrace{\alpha \sum_{i=1}^d\norm{\partial_{x_i} v_1}^2_{L^2}+\norm{v_1}_{L^2}^2}_{\eqqcolon\norm{v_1}_{H^1_\alpha}}+\norm{v_2}_{L^2}.\]
+Es ist $D(\widetilde{A})=H^2(\Torus^d)\times H^1(\Torus^d)\subset R$ dicht in $R$, da bereits $C^\infty(\Torus^d)\times C^\infty(\Torus^d)\subset D(\widetilde{A})$ dicht in $R$ ist.\\
+Stones Theorem besagt, dass $\widetilde{A}$ genau dann eine $C_0$-Halbgruppe von unitären Operatoren generiert, wenn $\widetilde{A}$ schiefadjungiert bezüglich des Skalarprodukt des Hilbertraums ist. Wir rechnen für $(v_1,v_2)^T, (w_1,w_2)^T\in D(\widetilde{A})$ die Antisymmetrie des Operators $\widetilde{A}$ nach:
 \begin{align*}
-\langle A\begin{pmatrix}v_1\\v_2\end{pmatrix}, \begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle
+\langle \widetilde{A}\begin{pmatrix}v_1\\v_2\end{pmatrix}, \begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle
 &=\langle \begin{pmatrix} v_2\\\alpha \Laplace v_1-v_1\end{pmatrix}, \begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle\\
 &=\int_{[-\pi,\pi]^d} \alpha \nabla v_2\nabla \overline{w_1} +v_2\overline{w_1}+ \alpha \Laplace v_1 \overline{w_2} - v_1\overline{w_2}dx\\
 &\text{ (da $v_1,v_2,w_1,w_2$ periodisch gilt weiter mit Green):}\\
 &=-\int_{[-\pi,\pi]^d}\alpha v_2\Laplace \overline{w_1}-v_2\overline{w_1}+ \alpha \nabla v_1\nabla \overline{w_2} + v_1\overline{w_2}dx\\
-&=-\langle \begin{pmatrix} v_1\\ v_2\end{pmatrix}, \begin{pmatrix} w_2\\\alpha \Laplace w_1-w_1\end{pmatrix}\rangle=-\langle \begin{pmatrix}v_1\\v_2\end{pmatrix}, A\begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle
+&=-\langle \begin{pmatrix} v_1\\ v_2\end{pmatrix}, \begin{pmatrix} w_2\\\alpha \Laplace w_1-w_1\end{pmatrix}\rangle=-\langle \begin{pmatrix}v_1\\v_2\end{pmatrix}, \widetilde{A}\begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle
 \end{align*}
-Wäre $A$ beschränkt, so folgt daraus sofort die Schiefadjungiertheit $A=-A^*$ von $A$. Da in unserem Fall $A$ unbeschränkt ist, müssen wir zusätzlich die Bedingung $D(A)=D(A^*)$ erfüllen.\\
+Wäre $\widetilde{A}$ beschränkt, so folgt daraus sofort die Schiefadjungiertheit $\widetilde{A}=-\widetilde{A}^*$ von $\widetilde{A}$. Da in unserem Fall $\widetilde{A}$ unbeschränkt ist, müssen wir zusätzlich die Bedingung $D(\widetilde{A})=D(\widetilde{A}^*)$ erfüllen.\\
 Wir benutzen die Eigenschaft:
-\[A \text{ schiefadjungiert } \equivalent iA \text{ selbstadjungiert}\]
-Nach \autocite[Bemerkung 5.6f]{HundSchnau} müssen wir für die Selbstadjungiertheit von $iA$ folgende Bedingungen erfüllen:
+\[\widetilde{A} \text{ schiefadjungiert } \equivalent i\widetilde{A} \text{ selbstadjungiert}\]
+Nach \autocite[Bemerkung 5.6f]{HundSchnau} müssen wir für die Selbstadjungiertheit von $i\widetilde{A}$ folgende Bedingungen erfüllen:
 \begin{itemize}
-\item $iA$ symmetrisch
-\item $iA$ abgeschlossen, d.h. für $\lbrace u_n \rbrace \in D(A)$ mit $u_n\to u\in R$ und $Au_n\to y\in R$ für $n\to\infty$ gilt: $u\in D(A)$ und $Au=y$.
-\item $\sigma(iA)\subset \R$
+\item $i\widetilde{A}$ symmetrisch
+\item $i\widetilde{A}$ abgeschlossen, d.h. für $\lbrace u_n \rbrace \in D(\widetilde{A})$ mit $u_n\to u\in R$ und $\widetilde{A}u_n\to y\in R$ für $n\to\infty$ gilt: $u\in D(\widetilde{A})$ und $\widetilde{A}u=y$.
+\item $\sigma(i\widetilde{A})\subset \R$
 \end{itemize}
-Die Symmetrie von $iA$ ist äquivalent zur bereits gezeigten Antisymmetrie von $A$.\\
-Die Abgeschlossenheit von $iA$ ist äquivalent zur Abgeschlossenheit von $A$. Sei dazu
+Die Symmetrie von $i\widetilde{A}$ ist äquivalent zur bereits gezeigten Antisymmetrie von $\widetilde{A}$.\\
+Die Abgeschlossenheit von $i\widetilde{A}$ ist äquivalent zur Abgeschlossenheit von $\widetilde{A}$. Sei dazu
 \begin{align*}
 u_n=\begin{pmatrix}u_{1,n}\\u_{2,n}\end{pmatrix}\to\begin{pmatrix}u_1\\u_2\end{pmatrix}\in H^1(\Torus^d)\times L^2(\Torus^d)\\
-A\begin{pmatrix}u_{1,n}\\u_{2,n}\end{pmatrix}=\begin{pmatrix}u_{2,n}\\\alpha\Laplace u_{1,n}-u_{1,n}\end{pmatrix}\to\begin{pmatrix}y_1\\y_2\end{pmatrix}\in H^1(\Torus^d)\times L^2(\Torus^d)
+\widetilde{A}\begin{pmatrix}u_{1,n}\\u_{2,n}\end{pmatrix}=\begin{pmatrix}u_{2,n}\\\alpha\Laplace u_{1,n}-u_{1,n}\end{pmatrix}\to\begin{pmatrix}y_1\\y_2\end{pmatrix}\in H^1(\Torus^d)\times L^2(\Torus^d)
 \end{align*} 
 Somit gilt $u_{2,n}\to u_2$ in $L^2(\Torus^d)$ und $u_{2,n}\to y_1$ in $H^1(\Torus^d)$ woraus sofort $u_2=y_1\in H^1(\Torus^d)$ folgt.\\
 Entsprechend gilt $u_{1,n}\to u_1$ in $H^1(\Torus^d)$. Es ist in diesem Fall noch einzusehen, dass die zweiten Ableitungen nach $x$ existieren und in $L^2(\Torus^d)$ sind. Dies ist erfüllt wegen $\alpha \Laplace u_{1,n}-u_{1,n}\to y_2$ in $L^2(\Torus^d)$.\\
-Somit gilt $u_n\in D(A)$ und wegen 
+Somit gilt $u_n\in D(\widetilde{A})$ und wegen 
 \begin{align*}
-\norm{Au-y}&\le \norm{Au-Au_n}+\norm{Au_n-y}\\
-&=\norm{\begin{pmatrix}u_2-u_{2,n}\\\Laplace(u_1-u_{1,n})-(u_1-u_{1,n})\end{pmatrix}}+\norm{Au_n-y}\\
-&\le \norm{u_2-u_{2,n}}_{H^1}+\norm{\Laplace(u_1-u_{1,n})}_{L^2}+\norm{u_1-u_{1,n}}_{L^2}+\norm{Au_n-y}\xrightarrow{n \to \infty }0
+\norm{\widetilde{A}u-y}&\le \norm{\widetilde{A}u-\widetilde{A}u_n}+\norm{\widetilde{A}u_n-y}\\
+&=\norm{\begin{pmatrix}u_2-u_{2,n}\\\Laplace(u_1-u_{1,n})-(u_1-u_{1,n})\end{pmatrix}}+\norm{\widetilde{A}u_n-y}\\
+&\le \norm{u_2-u_{2,n}}_{H^1}+\norm{\Laplace(u_1-u_{1,n})}_{L^2}+\norm{u_1-u_{1,n}}_{L^2}+\norm{\widetilde{A}u_n-y}\xrightarrow{n \to \infty }0
 \end{align*}
-ist $Au=y$ und $A$ somit abgeschlossen.\\
-Für die Bedingung $\sigma(iA)\subset \R$ sei $\lambda \in\Complex\setminus\R$. Zu zeigen ist $\lambda \in\rho(iA)$, der Resolventenmenge von $iA$. Sei dazu
+ist $\widetilde{A}u=y$ und $\widetilde{A}$ somit abgeschlossen.\\
+Für die Bedingung $\sigma(i\widetilde{A})\subset \R$ sei $\lambda \in\Complex\setminus\R$. Zu zeigen ist $\lambda \in\rho(i\widetilde{A})$, der Resolventenmenge von $i\widetilde{A}$. Sei dazu
 \[f=\begin{pmatrix}f_1\\f_2\end{pmatrix}\in H^1(\Torus^d)\times L^2(\Torus^d)\]
-und ein $u\in D(A)$ gesucht welches $(iA-\lambda I)u=f$ erfüllt.\\
+und ein $u\in D(\widetilde{A})$ gesucht welches $(i\widetilde{A}-\lambda I)u=f$ erfüllt.\\
 Nachrechnen ergibt:
 \begin{align*}
 iu_2-\lambda u_1=f_1 &\implies u_2=(f_1+\lambda u_1)(-i)\\
@@ -118,24 +120,53 @@ Aus dem Ansatz $u_1(x)=\sum_{k\in\Z}\fourier{u}_ke^{ikx}$ (beispielhaft für $d=
 \[\sum_{k\in\Z}\fourier{u}_k(\alpha (ik)^2-1+\lambda^2)e^{ikx}=\sum_{k\in\Z}\fourier{g}_ke^{ikx}\]
 Und somit ist $\fourier{u}_k=\frac{\fourier{g}_k}{-\alpha k^2-1+\lambda^2}$ eine gültige Wahl für die Fourier-Koeffizienten, da 
 \[-\alpha k^2-1+\lambda^2=0\equivalent \lambda =\pm \sqrt{k^2+1}\in\R.\]
-Die Gleichung $(iA-\lambda I)u=f$ besitzt somit eine Lösung $u\in D(A)$ und daher gilt $\lambda \in \rho(iA)$ und schlussendlich $\sigma(iA)\subset \R$.\\
-Insgesamt ist nun $iA$ selbstadjungiert, daher ist $A$ schiefadjungiert und nach Stone erzeugt $(A,D(A))$ eine unitäre Halbgruppe.\\[0.3cm] 
-Um den vollen Generator $C$ der KGG zu erhalten benötigen wir noch den zweiten Teiloperator $B$ definiert durch
-\[B=\begin{pmatrix}0 & 0\\-\beta(x)+I & 0\end{pmatrix}\]
+Die Gleichung $(i\widetilde{A}-\lambda I)u=f$ besitzt somit eine Lösung $u\in D(\widetilde{A})$ und daher gilt $\lambda \in \rho(i\widetilde{A})$ und schlussendlich $\sigma(i\widetilde{A})\subset \R$.\\
+Insgesamt ist nun $i\widetilde{A}$ selbstadjungiert, daher ist $\widetilde{A}$ schiefadjungiert und nach Stone erzeugt $(\widetilde{A},D(\widetilde{A}))$ eine unitäre Halbgruppe.\\[0.3cm] 
+Um den vollen Generator $C$ der KGG zu erhalten benötigen wir noch den zweiten Teiloperator $\widetilde{B}$ definiert durch
+\[\widetilde{B}=\begin{pmatrix}0 & 0\\-\beta(x)+I & 0\end{pmatrix}\]
 Dazu verwenden wir das Theorem über beschränkte Störungen eines stark stetigen Generators.
 \begin{maththeorem}[{\autocite[Theorem 1.3, Kapitel III]{EngelNagel}}]
+\label{th:engelnagelbounded}
 Ist $A$ Generator einer stark stetigen Halbgruppe $S(\cdot)$ mit Definitionsbereich $D(A)$ auf einem Banachraum $R$ und $B\colon R\to R$ ein beschränkter linearer Operator, so ist
-$C=A+B$ mit $D(C)\coloneqq D(A)$ ebenfalls Generator einer stark stetigen Halbgruppe.
-\end{maththeorem}
+$C=A+B$ mit $D(C)\coloneqq D(A)$ ebenfalls Generator einer stark stetigen Halbgruppe $\widetilde{S}(\cdot)$.\\
+Gibt es ein $M\ge 1$ und $w\in\R$ mit
+\[\norm{S(t)}\le Me^{wt},\quad \text{ für alle } t\ge 0,\]
+so gilt
+\[\norm{\widetilde{S}(t)}\le Me^{(w+M\norm{B})t},\quad \text{ für alle } t\ge 0.\]
+\end{maththeorem}Die Beschränktheit von $\widetilde{B}$ ist direkt gezeigt:\\
 Es gilt für $\beta\in L^2(\Torus^d)\cap L^\infty(\Torus^d)$
 \begin{align*}
-\norm{B\begin{pmatrix}v_1\\v_2\end{pmatrix}}^2&=\norm{\begin{pmatrix}0\\v_1-\beta(x)v_1\end{pmatrix}}^2\\
+\norm{\widetilde{B}\begin{pmatrix}v_1\\v_2\end{pmatrix}}^2&=\norm{\begin{pmatrix}0\\v_1-\beta(x)v_1\end{pmatrix}}^2\\
 &\le c\norm{v_1}_{L^2}^2, \quad c=(\norm{\beta}_{\infty}+1)^2\\
 &\le c\norm{\begin{pmatrix}v_1\\v_2\end{pmatrix}}^2
 \end{align*}
 Insgesamt ist somit der Generator 
 \[C=\begin{pmatrix}0 & I\\ \alpha\Laplace - \beta(x) & 0\end{pmatrix}\]
-der Klein-Gordon-Gleichung Generator einer $C_0$-Halbgruppe und das zugehörige Cauchy-Problem besitzt eine eindeutige Lösung in $D(A)$. Dies impliziert auch eine eindeutige Lösung der KGG in $H^2(\Torus^d)$.
+der Klein-Gordon-Gleichung Generator einer $C_0$-Halbgruppe und das zugehörige Cauchy-Problem besitzt eine eindeutige Lösung in $D(\widetilde{A})$. Dies impliziert auch eine eindeutige Lösung der KGG in $H^2(\Torus^d)$.
+\subsubsection*{Abschätzungen für die generierten Halbgruppen}
+Da $\widetilde{A}$ eine unitäre Halbgruppe generiert und der Operator 
+\[\widetilde{I}=\begin{pmatrix}0&0\\I&0\end{pmatrix}\]
+beschränkt mit $\norm{\widetilde{I}}=1$ ist, gilt nach Satz \ref{th:engelnagelbounded} für die von $\widetilde{A}+\widetilde{I}$ erzeugte Halbgruppe
+\begin{equation}
+\label{eqn:normgroupofa}
+\norm{\exp\left(t(\widetilde{A}+\widetilde{I})\right)}=\norm{\exp\left(t\begin{pmatrix}0 & I\\\alpha\Laplace & 0\end{pmatrix}\right)}\le e^t,\quad t\ge 0.
+\end{equation}
+Für die von $\widetilde{B}-\widetilde{I}$ erzeugte Halbgruppe gilt
+\begin{equation}
+\label{eqn:normgroupofb}
+\norm{\exp\left(t(\widetilde{B}-\widetilde{I}\right)}=\norm{\exp\left(t\begin{pmatrix}0 & 0\\ -\beta & 0\end{pmatrix}\right)}=\norm{\begin{pmatrix}I & 0\\-t\beta & I\end{pmatrix}}\le 1+\norm{\beta}_\infty t.
+\end{equation}
+\begin{proof}[Beweis der Ungleichung (\ref{eqn:normgroupofb})]
+Sei $v=\begin{pmatrix}v_1\\v_2\end{pmatrix}\in H^1\times L^2$. Es gilt
+\begin{align*}
+\norm{\begin{pmatrix}I & 0\\-t\beta & I\end{pmatrix}\begin{pmatrix}v_1\\v_2\end{pmatrix}}^2
+&=\norm{\begin{pmatrix}v_1\\v_2-t\beta v_1\end{pmatrix}}^2=\norm{v_1}_{H^1_\alpha}^2+\norm{v_2-t\beta v_1}_{L^2}^2\\
+&\le \norm{v_1}_{H^1_\alpha}^2+\left(\norm{v_2}_{L^2}+t\underbrace{\norm{\beta v_1}_{L^2}}_{\le \norm{\beta}_\infty\norm{v_1}_{L^2}}\right)^2\\
+&\le \underbrace{\norm{v_1}_{H^1_\alpha}^2 + \norm{v_2}_{L^2}^2}_{=\norm{v}^2} + 2t\norm{\beta}_\infty \underbrace{\norm{v_1}_{L^2}\norm{v_2}_{L^2}}_{\le \onehalf \left(\norm{v_1}_{L^2}^2+\norm{v_2}_{L^2}^2\right)\le \norm{v}^2} + t^2\norm{\beta}_\infty^2\norm{v_1}_{L^2}^2\\
+&\le (1+t\norm{\beta}_\infty)^2\norm{v}^2
+\end{align*}
+\end{proof}
+Die Teilung des Generators $C$ der KGG wird nicht nur ein Werkzeug für die theoretische Existenztheorie bleiben, sondern die Grundlage für eine numerische Herangehensweise zur Berechnung von Approximationen der Lösung werden. Die gezeigten Abschätzungen bilden dabei die Basis für Konvergenzaussagen dieses \emph{Operatorsplittings}.
 \subsection{Exakte Lösungen}
 Für spezielle Konfigurationen der Parameter und Anfangswerte können wir exakte Lösungen angeben. Diese sind hilfreich, um die Korrektheit von Implementierungen schnell und zuverlässig testen zu können. Außerdem werden so schnell die Grenzen und eventuelle Schwächen der Verfahren für gut gestellte Probleme deutlich.\\[0.5cm]
 Mithilfe des Separationsansatzes $u(t,x)=g(x)f(t)$ erhalten wir aus (\ref{kgg}) die Darstellung
