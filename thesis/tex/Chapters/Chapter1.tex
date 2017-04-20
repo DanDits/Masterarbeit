@@ -27,6 +27,7 @@ Dabei ist
 \end{itemize}
 
 \subsection{Existenztheorie}
+\label{chapter:existencetheory}
 Um den analytischen Rahmen für die Existenz und Eindeutigkeit von Lösungen der KGG zu schaffen werden wir die Halbgruppentheorie verwenden. Die verwendete Theorie ist übernommen aus \autocite{HundSchnau} und \autocite{EngelNagel}, dort finden sich auch weitere Details und Beweise der verwendeten Theoreme.
 \begin{mathdef}
 Sei der Raum der beliebig häufig differenzierbaren periodischen Funktionen definiert als
@@ -375,15 +376,188 @@ Am Beispiel von $\varphi_{\deltat}^A$ und $p=1$:\\
 Man verwendet die Darstellung $\varphi_{\deltat}^A(y_0)=y_0+\deltat f^A(y_0)+\mathcal{O}(\deltat^2)$ und ersetzt $\varphi_{\deltat}^A$ durch $\Phi_{\deltat}^A$. Die Vorgehensweise in den Beweisen benötigt dann minimale Anpassungen.\\
 Man beachte hierbei, dass nun $\Phi_{\deltat}^A$ im Gegensatz zu $\varphi_{\deltat}^A$ nicht mehr symmetrisch ist. Die Argumentation über die Ordnung von symmetrischen Verfahren kann daher nicht direkt verwendet werden, um $p=2$ für das Strang-Splittings zu begründen. Außerdem kann dies die Möglichkeit, das Strang-Splitting durch Kombination der Halbschritte zu beschleunigen, zunichte machen.
 \end{proof}
-\todo[inline]{Noch etwas anderes.In Ihrer Arbeit zeigen Sie ja, dass Lie-Trotter bzw.
-Strang die klassische Ordnung 1 bzw. 2 hat. "Klassische Ordnung"
-bedeutet aber, dass das Resultat für ODEs mit hinreichend glatter Lösung
-gilt. Bei PDEs ist die Sache anders, denn Differentialoperatoren sind
-unbeschränkte Operatoren. Ich denke aber, dass man auch für PDEs eine
-Fehlerabschätzung ähnlich zu Theorem 2.1 im angehängten Paper "Error
-bounds for exponential operator splittings" zeigen kann. Auch dafür
-braucht man aber ein bisschen Halbgruppentheorie.}
-
+\subsection{Konvergenzordnung des Operatorsplittings}
+Die bisherigen Erläuterungen beziehen sich auf die klassische Ordnung der Splitting Varianten. Sie benötigen hinreichend glatte Lösungen, welche im Fall der KGG und dem unbeschränkten Operator 
+\[\begin{pmatrix}0 & I\\ \alpha\Laplace-\beta(x) & 0\end{pmatrix}\]
+nicht garantiert werden können. Basierend auf der Halbgruppentheorie, welche schon für die Existenztheorie in Kapitel \ref{chapter:existencetheory} verwendet wurde, werden wir hier ebenfalls Konvergenz zweiter Ordnung bezüglich der Zeitschrittweite $\tau$ beweisen können. Die Vorgehensweise ist angelehnt an den Beweis für Theorem 2.1b aus \autocite{jahnkelubich2000} (Jahnke und Lubich).
+\subsubsection*{Folgerungen aus Existenztheorie}
+Sei $R=H^1(\Torus^d)\times L^2(\Torus^d)$ mit zugehöriger Norm
+\[\norm{v}_R^2=\norm{v_1}_{H_1}^2+\norm{v_2}_{L^2}^2.\]
+Wir schreiben die KGG in der Form
+\[\partialdt{u}=\underbrace{\begin{pmatrix}0 & I\\ \alpha\Laplace & 0\end{pmatrix}}_{\eqqcolon A}u+\underbrace{\begin{pmatrix}0 & 0\\ -\beta & 0\end{pmatrix}}_{\eqqcolon B}u\]
+Dabei ist $D(A)\coloneqq H^2(\Torus^d)\times H^1(\Torus^d)$ der Definitionsbereich von $A$ und wir können für $\alpha>0$, $0<\beta\in L^\infty(\Torus^d)$ eine Lösung $u\in D(A)$ garantieren. Zu $v\in D(A)$ definieren wir die Graphennorm
+\[\norm{v}_{D(A)}^2=\norm{v}_R^2+\norm{Av}_R^2\]
+Der Operator $A$ erzeugt eine Halbgruppe $e^{tA}$ und erfüllt $\norm{e^{tA}}\le e^t$ (vgl. (\ref{eqn:normgroupofa})). Hierbei ist etwas Vorsicht geboten, da diese Norm zwar äquivalent zur hier verwendeten Norm ist, sich aber um einen Faktor $\alpha$ unterscheidet. Ist $\alpha\le 1$, so gilt ebenfalls $\norm{e^{tA}}_R\le e^t$, ist $\alpha>1$ gilt lediglich $\norm{e^{tA}}_R\le \alpha e^t$. Um diese Fallunterscheidung zu vermeiden definieren wir $\alpha_1\coloneqq \max(1,\alpha)$ und verwenden
+\[\norm{e^{tA}}_R\le \alpha_1 e^t, \quad t\ge 0.\]
+Für den Operator $B$ gilt analog zur Abschätzung (\ref{eqn:normgroupofb}) 
+\[\norm{e^{tB}}_R\le 1+\norm{\beta}_\infty t, \quad t\ge 0.\]
+\subsubsection*{Berechnung des lokalen Fehlers}
+Um für einen Zeitpunkt $t$ die exakte Lösung $e^{t(A+B)}u(0)$ der KGG mit der Approximation $e^{tA/2}e^{tB}e^{tA/2}u(0)$ des Splittings vergleichen zu können, verwenden wir eine Darstellung der \emph{Variation der Konstanten Formel} aus \autocite{carassco2007}.
+\begin{maththeorem}[Variation der Konstanten nach Alekseev]
+\label{th:varofconstantsalkeseev}
+Sei eine Differentialgleichung 
+\begin{equation}
+\label{eqn:varofconsts}
+y'(t)=f(t,y)+g(t,y),\quad y(0)=y_0
+\end{equation}
+gegeben. Sei $z(t,t_0,y_0)$ die Lösung der Differentialgleichung 
+\[z'(t)=f(t,z), \quad z(t_0)=y_0\]
+und
+\[\phi(t,s,\xi)\coloneqq\frac{\partial z}{\partial y_0}(t,s,\xi).\]
+Dann löst
+\[y(t,y_0)=z(t,0,y_0)+\int_0^t\phi(t,s,y(s))g(s,y(s))ds\]
+die Gleichung (\ref{eqn:varofconsts}).
+\end{maththeorem}
+In unserem Fall ist $f(t,y)=Ay(t)$, $g(t,y)=By(t)$ und es gilt daher
+\begin{align*}
+z(t,t_0,y_0)=e^{(t-t_0)A}y_0\\
+\phi(t,s,\xi)=e^{(t-s)A}
+\end{align*}
+und somit insgesamt
+\begin{equation}
+\label{eqn:kgg_voc_raw}
+e^{t(A+B)}u(0)=e^{tA}u(0)+\int_0^te^{(t-s)A}Be^{s(A+B)}u(0)ds.
+\end{equation}
+Zur Berechnung des lokalen Fehlers ausgehend von $u\coloneqq u(t_n)$ nach $u(t_n+\tau)$ schreiben wir unter doppelter Verwendung von (\ref{eqn:kgg_voc_raw}) die exakte Lösung als:
+\begin{equation}
+\begin{split}
+e^{\tau(A+B)}u&=e^{\tau A}u+\int_0^\tau e^{(\tau - s)A}Be^{s(A+B)}uds\\
+&=\underbrace{e^{\tau A}u}_{\eqqcolon E_0(\tau,u)}+\underbrace{\int_0^\tau e^{(\tau - s)A}Be^{sA}uds}_{\eqqcolon E_1(\tau,u)}
++\underbrace{\int_0^\tau e^{(\tau - s)A}B\int_0^s e^{(s-r)A}Be^{r(A+B)}udrds}_{\eqqcolon E_2(\tau, u)}
+\end{split}
+\end{equation}
+Entsprechend schreiben wir mithilfe der Reihenentwicklung von $e^{\tau B}$ die Splitting Approximation als:
+\begin{equation}
+\begin{split}
+e^{\tau A/2}e^{\tau B}e^{\tau A/2}u&=\underbrace{e^{\tau A}u}_{\eqqcolon S_0(\tau,u)}+\underbrace{e^{\tau A/2}\tau Be^{\tau A/2}u}_{\eqqcolon S_1(\tau,u)}+\underbrace{\frac{\tau^2}{2}e^{\tau A/2}B^2e^{\tau A/2}u}_{\eqqcolon S_2(\tau,u)}\\
+&\quad +\underbrace{e^{\tau A/2}\left(\sum_{k=3}^\infty \frac{(\tau B)^k}{k!}\right)(\tau B)e^{\tau A/2}u}_{\eqqcolon S_3(\tau,u)}
+\end{split}
+\end{equation}
+Wir vergleichen nun die Komponenten $E_i(\tau,u)$ der exakten Lösung mit den jeweiligen Komponenten $S_i(\tau,u)$ der Splitting Approximation und zeigen jeweils einen Fehler der Ordnung $\mathcal{O}\left(\tau^3\right)$.\\
+Es gilt $E_0-S_0\equiv 0$.\\
+Die dritte Komponente $S_3$ der Splitting Approximation ist bereits von Ordnung drei:
+\begin{align*}
+\norm{S_3(\tau,u)}_R&\le \alpha_1e^{\tau/2}\frac{\tau^3}{6}\norm{B}^3_R\alpha_1e^{\tau/2}\norm{u}_R+\mathcal{O}\left(\tau^4\right)\\
+&= \tau^3\frac{\alpha_1^2}{6}\norm{B}^3_Re^\tau\norm{u}_R+\mathcal{O}\left(\tau^4\right)
+\end{align*}
+Für den Vergleich der ersten Komponenten $E_1$ und $S_1$ definieren wir
+\[f(s)\coloneqq e^{(\tau - s)A}Be^{sA}u,\quad s\in[0,\tau].\]
+Es gilt für $f$ folgende Taylor Darstellung:
+\[f(s)=f(\tau/2)+(s-\tau/2)f'(\tau/2)+\int_{\tau/2}^s\int_{\tau/2}^rf''(q)dq\,dr\]
+Dabei gilt für die Ableitungen von $f$:
+\begin{align*}
+f'(s)&=e^{(\tau -s)A}\underbrace{(BA-AB)}_{\eqqcolon [B,A]}e^{sA}u\\
+f''(s)&=e^{(\tau -s)A}[[B,A],A]e^{sA}u
+\end{align*}
+Wir können nun die Komponenten vergleichen:
+\begin{align}
+E_1(\tau,u)-S_1(\tau,u)&=\int_0^\tau f(s)ds-\tau f(\tau/2)\nonumber\\
+&=\underbrace{\int_0^\tau f(\tau/2)ds}_{=\tau f(\tau/2)}+\underbrace{\int_0^\tau (s-\tau/2)f'(\tau/2)ds}_{=0}+\int_0^\tau\int_{\tau/2}^s\int_{\tau/2}^rf''(q)dq\,dr\,ds-\tau f(\tau/2)\nonumber\\
+&=\int_0^\tau\int_{\tau/2}^s\int_{\tau/2}^r f''(q)dq\,dr\,ds\nonumber\\
+&=\int_0^\tau\int_{\tau/2}^s\int_{\tau/2}^r e^{(\tau -q)A}[[B,A],A]e^{qA}udq\,dr\,ds\label{eqn:order_first_components}
+\end{align}
+Um den Fehler der ersten Komponenten $E_1$ und $S_1$ abschätzen zu können benötigen wir eine entsprechende Abschätzung für den Kommutator $[[B,A],A]$.
+\begin{mathlemma}[Kommutatorabschätzung]
+\label{lemma:commutator}
+Für alle $v\in D(A)$ gilt
+\[\norm{[[B,A],A]v}_R\le c\norm{v}_{D(A)}.\]
+\end{mathlemma}
+\begin{proof}
+Es ist $[[B,A],A]=[BA-AB,A]=BA^2-2ABA+A^2B$ und daher gilt für hinreichend glattes $\beta$ und eine Konstante $c>0$ für $v\in D(A)$:
+\begin{align*}
+\norm{[[B,A],A]v}_R^2&=\norm{\begin{pmatrix}2\beta v_2\\-(\beta\alpha\Laplace v_1+\alpha\Laplace(\beta v_1))\end{pmatrix}}_R^2\\
+&=\underbrace{4\norm{\beta v_2}_{H^1}^2}_{\le c^2\norm{v_2}_{H^1}^2}+\underbrace{\norm{\beta\alpha\Laplace v_1 + \alpha\Laplace(\beta v_1)}_{L^2}^2}_{\le c^2\norm{\alpha \Laplace v_1}_{L^2}^2+c^2\norm{v_1}_{H^1}^2}\\
+&\le c^2 \left(\norm{v}_R^2+\norm{Av}_R^2\right)=c^2\norm{v}_{D(A)}^2
+\end{align*}
+\end{proof}
+Für die Graphennorm gilt ebenfalls $\norm{e^{tA}}_{D(A)}\le \alpha_1e^t$:
+\begin{align*}
+\norm{e^{tA}v}_{D(A)}^2&=\norm{e^{tA}v}_R^2+\norm{Ae^{tA}v}_R^2\\
+&=\norm{e^{tA}v}_R^2+\norm{e^{tA}Av}_R^2\\
+&=\alpha_1^2e^{2t}\left(\norm{v}_R^2+\norm{Av}_R^2\right)=\alpha_1^2e^{2t}\norm{v}_{D(A)}^2
+\end{align*}
+Insgesamt folgt nun aus (\ref{eqn:order_first_components}) mit Lemma \ref{lemma:commutator} und der Abschätzung für die Graphennorm:
+\begin{align*}
+\norm{E_1(\tau,u)-S_1(\tau,u)}_R&=\norm{\int_0^\tau f(s)ds-\tau f(\tau/2)}_R\\
+&\le \int_0^\tau\int_{\tau/2}^s\int_{\tau/2}^r e^{\tau - q}c\alpha_1^2e^q\norm{u}_{D(A)}dq\,dr\,ds\\
+&=\tau^3c\alpha_1^2e^\tau\norm{u}_{D(A)}
+\end{align*}
+Zuletzt vergleichen wir die Komponenten $E_2$ und $S_2$. Wiederum definieren wir eine Hilfsfunktion $g$ durch
+\[g(s,r)\coloneqq e^{(\tau-s)A}Be^{(s-r)A}Be^{rA}u,\quad 0\le r\le s\le \tau\]
+Dann gilt:
+\begin{align*}
+&E_2(\tau,u)-S_2(\tau,u)=\int_0^\tau\int_0^se^{(\tau-s)A}Be^{(s-r)A}Be^{r(A+B)}udr\,ds-\frac{\tau^2}{2}e^{\tau A/2}B^2e^{\tau A/2}u\\
+&=\int_0^\tau\int_0^s g(s,r) + \underbrace{e^{(\tau-s)A}Be^{(s-r)A}B\left(e^{r(A+B)}-e^{rA}\right)u}_{\eqqcolon Z(r,s,u)}dr\,ds-\frac{\tau^2}{2}e^{\tau A/2}B^2e^{\tau A/2}u
+\end{align*}
+Der integrierte Summand $Z$ ist dabei bereits von Ordnung drei. Dies erhält man durch kurze Rechnung unter Verwendung von Satz \ref{th:varofconstantsalkeseev}:
+\begin{align*}
+&\norm{\int_0^\tau\int_0^s Z(r,s,u)dr\,ds}_R\\
+&\le \int_0^\tau\int_0^s \alpha_1^2e^{\tau-s}\norm{B}_Re^{s-r}\norm{B}_R\lVert\big(\underbrace{e^{r(A+B)}}_{=e^{rA}u+\int_0^r e^{(r-q)A}Be^{q(A+B)}udq}-e^{rA}\big)u\rVert_Rdr\,ds\\
+&\le \tau^2\alpha_1^2e^{\tau-r}\norm{B}_R^2\norm{\int_0^re^{(r-q)A}Be^{q(A+B)}udq}_R\\
+&\le \tau^3\alpha_1^3e^{\tau}\norm{B}_R^3\max_{s\in[0,\tau]}\norm{u(t_n+s)}_R
+\end{align*} 
+Somit gilt für die zweiten Komponenten
+\begin{align*}
+\norm{E_2(\tau,u)-S_2(\tau,u)}_R&\le \norm{\int_0^\tau\int_0^sg(s,r)dr\,ds-\frac{\tau^2}{2}g(\tau/2,\tau/2)}_R+c\tau^3e^\tau\\
+&=\norm{\int_0^\tau\int_0^s\left(g(s,r)-g(\tau/2,\tau/2)\right)dr\,ds}_R+c\tau^3e^\tau
+\end{align*}
+Um eine Abschätzung für $g(s,r)-g(\tau/2,\tau/2)$ zu erhalten definieren wir für $0\le r\le s\le\tau$ den Richtungsvektor $\nu\coloneqq (s,r)^T-\frac{\tau}{2}(1,1)^T$ und für $\xi\in[0,1]$ die Strecke $y$ durch $y(\xi)\coloneqq \frac{\tau}{2}(1,1)^T+\xi \nu$.\\
+Es gilt:
+\begin{align*}
+\norm{\nu}^2&=(s-\tau/2)^2+(r-\tau/2)^2=s^2-s\tau+\tau^2/4+r^2-r\tau+\tau^2/4\\
+&=\tau^2/2+r(r-\tau)+s(s-\tau)\le \tau^2/2
+\end{align*}
+Daher können wir wie folgt abschätzen:
+\begin{align*}
+&\max_{0\le r\le s\le \tau}\norm{g(s,r)-g(\tau/2,\tau/2)}_R=\max_{0\le r\le s\le \tau}\norm{g(y(1))-g(y(0))}_R\\
+&=\max_{0\le r\le s\le \tau}\norm{\int_0^1\frac{d}{d\xi}g(y(\xi))d\xi}_R=\max_{0\le r\le s\le \tau}\norm{\int_0^1\nabla g(y(\xi))^T\nu d\xi}_R\\
+&\le c\tau \max_{0\le r\le s\le \tau}\norm{\nabla g(s,r)^T\begin{pmatrix}1\\1\end{pmatrix}}_R
+\end{align*}
+Daraus folgt
+\begin{align*}
+\norm{E_2(\tau,u)-S_2(\tau,u)}_R
+&\le\norm{\int_0^\tau\int_0^s(g(s,r)-g(\tau/2,\tau/2))dr\,ds}_R+c\tau^3e^\tau\\
+&\le c\tau^3\max_{0\le r\le s\le \tau}\norm{\partial_sg(s,r)+\partial_rg(s,r)}_R+c\tau^3e^\tau
+\end{align*}
+Für die partiellen Ableitungen von $g$ gilt
+\begin{align*}
+\partial_sg(s,r)&=e^{(\tau-s)A}[B,A]e^{(s-r)A}Be^{rA}u\\
+\partial_rg(s,r)&=e^{(\tau-s)A}Be^{(s-r)A}[B,A]e^{rA}u.
+\end{align*}
+Da der Kommutator $[B,A]$ beschränkt ist mit
+\[\norm{[B,A]}_R=\norm{\begin{pmatrix}\beta & 0\\0 & -\beta\end{pmatrix}}_R\le \norm{\beta}_\infty\]
+folgt für die partiellen Ableitungen direkt:
+\begin{align*}
+\norm{\partial_sg(s,r)}_R&\le \alpha_1^3 e^{\tau-s}\norm{\beta}_\infty e^{s-r}\norm{B}_R e^r\norm{u}_R=\alpha_1^3e^\tau\norm{\beta}_\infty\norm{B}_R\norm{u}_R\\
+\norm{\partial_rg(s,r)}_R&\le ce^\tau \norm{u}_R
+\end{align*}
+Zusammengefasst haben wir nun für den lokalen Fehler folgende Abschätzung bewiesen:
+\begin{align*}
+&\norm{e^{\tau(A+B)}u-e^{\tau A/2}e^{\tau B}e^{\tau A/2}u}_R\\
+&\le\norm{E_0(\tau,u)-S_0(\tau,u)}_R
++\norm{E_1(\tau,u)-S_1(\tau,u)}_R
++\norm{E_2(\tau,u)-S_2(\tau,u)}_R
++\norm{S_3(\tau,u)}_R\\
+&\le c\tau^3e^\tau\norm{u}_{D(A)}+c\tau^3e^\tau\norm{u}_R+c\tau^3e^\tau\norm{u}_R+\mathcal{O}\left(\tau^4\right)\\
+&\le \tilde{c}\tau^3e^\tau \norm{u}_{D(A)}+\mathcal{O}\left(\tau^4\right),\quad \tilde{c}>0
+\end{align*}
+\subsubsection*{Berechnung des globalen Fehlers}
+Sei der Lösungsoperator $T$ der exakten Lösung der KGG definiert als
+\[T(t)\coloneqq e^{t(A+B)},\quad t\ge 0\]
+und der Splittingoperator $S$ des Strang-Splittings für die KGG als
+\[S(t)\coloneqq e^{tA/2}e^{tB}e^{tA/2},\quad t\ge 0.\]
+Dann können wir den globalen Fehler mithilfe einer Teleskopsumme schreiben als
+\begin{align*}
+u^n-u(t_n)&=S^n(\tau)u(0)-T^n(\tau)u(0)\\
+&=\sum_{j=0}^{n-1}S^{n-j-1}(\tau)\left(S(\tau)-T(\tau)\right)T^j(\tau)u(0).
+\end{align*}
+Daraus folgt unter der Verwendung der Abschätzung des lokalen Fehlers und wegen $\norm{v}^2=\norm{v_1}_{H_\alpha^1}^2+\norm{v_2}_{L^2}^2\le \alpha_1 \norm{v}_R^2$ schlussendlich die Konvergenz zweiter Ordnung für das Strang-Splitting:
+\begin{align*}
+\norm{u^n-u(t_n)}&\le \sum_{j=0}^{n-1}\norm{S^{n-j-1}(\tau)}\alpha_1\norm{(S(\tau)-T(\tau))u(t_j)}_R\\
+&\le \tilde{c}\alpha_1\tau^3ne^\tau\max_{j=0,\dots,n-1}\big((1+\norm{\beta}_\infty\underbrace{\tau}_{=\frac{t_n}{n}})e^\tau\big)^{n-j-1}\norm{u(t_j)}_{D(A)}\\
+&\le \tilde{c}\alpha_1\tau^2t_ne^{\norm{\beta}_\infty t_n}e^{t_n}\max_{j=0,\dots,n-1}\norm{u(t_j)}_{D(A)}
+=\mathcal{O}\left(\tau^2\right)
+\end{align*}
 \subsection{Numerischer Löser für die Klein-Gordon-Gleichung}
 \label{chapter:solver_kgg}
 Dieser Abschnitt bildet das Fundament, auf dem viele numerische Lösungsverfahren basieren werden. Inhalt und Notation basieren zu Teilen auf \autocite{patrickdiplom}. Um ein Operatorsplitting auf die KGG anwenden zu können muss diese zuerst in eine Gleichung mit Zeitableitung erster Ordnung in der Form von (\ref{orddgl}) umgeschrieben werden. Eine mögliche Darstellung ist
