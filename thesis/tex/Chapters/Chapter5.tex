@@ -197,7 +197,7 @@ Für die eindimensionale \nameref{trial:3} erkennen wir in Abbildung \ref{fig:ga
 \end{figure}
 Anhand der vierdimensionalen \nameref{trial:8} beobachten wir für verschiedene Werte von $P$ mit $M=\binom{4+P}{P}$ Polynomen den Einfluss der Zeitschrittweite $\tau$ auf die Approximationsgenauigkeit. Dieser Einfluss ist in Abbildung \ref{fig:galerkin_bydt_trial8} durch den Fehler des Erwartungswerts und der Varianz dargestellt. Wir erkennen, dass für $P\le 5$ die Wahl $\tau=10^{-3}$ ausreichend ist für eine bestmögliche Approximation.\\
 Für $P=5$ ist $M=126$ und es steckt bereits ein großer Aufwand darin, die Matrizen $B(x)$ der Größe $126\times 126$ für jeden der 128 Knotenpunkte $x\in\Torus$ zu berechnen, da jeweils eine dünne Gitter Quadratur mit 9065 Punkten verwendet werden muss.
-\begin{figure}
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\textwidth]{Figures/galerkin_trial8_sparse.png}
 \caption{Fehler der Galerkin-Approximation von \nameref{trial:8} anhand von der für das Strang-Splitting verwendeten Zeitschrittweite $\tau$.}
@@ -229,63 +229,6 @@ Eine ähnliche Beobachtung machen wir in Abbildung \ref{fig:galerkin_bydegree_tr
   \label{fig:galerkin_bydegree_trialtriple}
 \end{figure}
 \subsection{Einfluss der Stoppzeit}
-\begin{maththeorem}[Adaption von Theorem 2.2 aus \autocite{davidgottliebdongbinxiu2008}]
-\label{th:adapted22}
-Ziel: Abschätzung für 
-\begin{align*}
-\E\left[\norm{u-v_M}_2^2\right]&=\E\left[\int_{-\pi}^{\pi}\left(u(t,x,Y)-v_M(t,x,Y)\right)^2dx\right]\\
-&=\int_{-\pi}^\pi\norm{u(t,x,y)-v_M(t,x,y)}_{L_\rho^2}^2dx\\
-&\stackrel{\text{Parseval}}{=}\int_{-\pi}^\pi\sum_{m=0}^\infty |\langle u(t,x,y)-v_M(t,x,y),\Phi_m(y)\rangle_{L_\rho^2}|^2dx\\
-&=\int_{-\pi}^\pi\sum_{m=0}^\infty\left(\hat{u}_m(t,x)-\hat{v}_m(t,x)\right)^2dx,\quad \hat{v}_m=0 \text{ für } m>M\\
-&=\sum_{m=0}^\infty\norm{\hat{u}_m-\hat{v}_m}_2^2\\
-&\le \sum_{m=0}^M\norm{\hat{u}_m-\hat{v}_m}_2^2 + \sum_{m=M+1}^\infty \frac{K}{m^{2\ell}}
-\end{align*}
-\todo[inline]{Problem1: In Vorlage geht Summe nur bis $M$, nicht unendlich.}
-\todo[inline]{Problem2: In Vorlage gibt es Voraussetzung 
-\[\norm{\hat{u}_m}_2^2\le \norm{\hat{u}_m}_1^2=\int_{-\pi}^\pi\left(\hat{u}^2_m+\left(\dx{\hat{u}_m}\right)^2\right)dx\le \frac{K}{m^{2\ell}},\quad K,\ell>0, m \text{ groß}.\]
-Zusammen mit der Summe bis unendlich würde dies einen weiteren Term $\sum_{m=M+1}^\infty \frac{K}{m^{2\ell}}$ auf der rechten Seite der Gesamtabschätzung ergeben. Für $\ell\le\onehalf$ wäre diese Reihe nicht mal konvergent. Wie kommt es, dass dieser Term beim Autor nicht auftaucht?}
-\end{maththeorem}
-\begin{proof}[Beweisideen]
-Sei 
-\[e_m(t,x)\coloneqq \hat{u}_m(t,x)-\hat{v}_m(t,x),\quad m=0,\dots,M\]
-Verwenden wir den Galerkin-Ansatz (\ref{eqn:galerkinOrtho}) für die Reihendarstellung von $u$ anstelle von $v_M$, so erhalten wir analog zum Ergebnis für $v_M$ aus Gleichung (\ref{eqn:galerkin_def_medium}) die Gleichungen
-\begin{equation}
-\partialdtt{\hat{u}}_k(t,x)=\sum_{m=0}^\infty \Laplace \hat{u}_m(t,x)a_{mk}-\sum_{m=0}^\infty \hat{u}_m(t,x)b_{mk}(x),\quad k=0,\dots,M
-\end{equation}
-Subtrahieren wir davon die Gleichungen
-\begin{equation}
-\partialdtt{\hat{v}}_k(t,x)=\sum_{m=0}^M\Laplace \hat{v}_m(t,x)a_{mk}-\sum_{m=0}^M\hat{v}_m(t,x)b_{mk}(x),\quad k=0,\dots,M
-\end{equation}
-so erhalten wir für $k=0,\dots,M$
-\begin{equation}
-\label{eqn:error_eq_1}
-\begin{split}
-\partialdtt{e_k}(t,x)&=\sum_{m=0}^M\Laplace e_m(t,x)a_{mk}-\sum_{m=0}^M e_m(t,x)b_{mk}(x)\\
-&\quad +\sum_{m=M+1}^\infty \Laplace \hat{u}_m(t,x)a_{mk}-\hat{u}_m(t,x)b_{mk}(x)
-\end{split}
-\end{equation}
-Nun definieren wir $e\coloneqq (e_0,\dots,e_M)^T, f\coloneqq S_1^Te$ und schreiben Gleichung (\ref{eqn:error_eq_1}) kompakt als
-\begin{equation}
-\label{eqn:error_eq2}
-\dtt{f}=D_1\Laplace f-S_1^TB(x)S_1f+r
-\end{equation}
-Dabei ist $S_1D_1S_1^T=A$ und $r$ der Restterm der Gleichung mit
-\[r_{i}(t,x)=\sum_{k=0}^Ms_{ki}\sum_{m=M+1}^\infty \Laplace \hat{u}_m(t,x)a_{mk}-\hat{u}_m(t,x)b_{mk}(x)\]
-Wir multiplizieren Gleichung (\ref{eqn:error_eq2}) nun von links mit $f^T$ und integrieren über $x$
-\begin{align*}
-\int_{-\pi}^\pi f^T(t,x)\partialdtt{f}(t,x)dx&=\sum_{i=0}^M d_i\int_{-\pi}^\pi f_i(t,x)\Laplace f_i(t,x)dx\\
-&\quad -\int_{-\pi}^\pi f^T(t,x)S_1^TB(x)S_1f(t,x)dx+\int_{-\pi}^\pi f^T(t,x)r(t,x)dx
-\end{align*}
-Ist $\alpha(y)>c>0$, so ist nach Satz \ref{th:galerkin_posdef} auch $d_i>c$. Weiterhin gilt aufgrund der periodischen Randbedingung mit dem Satz von Green
-\[\int_{-\pi}^\pi f_i(t,x)\Laplace f_i(t,x)dx=-\int_{-\pi}^\pi \norm{\nabla f_i(t,x)}^2dx+\underbrace{\oint f_i(t,x)(\nabla f_i\cdot n)d\sigma}_{=0}\le 0\]
-Ist für $x\in\Torus^d$ beliebig $\beta(x,y)>c>0$, so ist $B(x)$ positiv definit und es gilt
-\[-\int_{-\pi}^\pi f^T(t,x)S_1^TB(x)S_1f(t,x)dx\le 0\]
-Daher ergibt sich die Abschätzung
-\begin{equation}
-\int_{-\pi}^\pi f^T(t,x)\partialdtt{f}(t,x)dx\le \int_{-\pi}^\pi f^T(t,x)r(t,x)\,dx\le \norm{f}_2\norm{r}_2 
-\end{equation}
-\todo[inline]{Problem3: Ich finde keine gute Möglichkeit daraus eine Abschätzung für $\norm{f}_2$ zu erhalten. Mithilfe dieser hätte ich dann auch eine Abschätzung für $\norm{e}_2$ und somit für den Satz. Evtl. mit einer anderen Norm als der verwendeten $\norm{g}_2^2\coloneqq \int_{-\pi}^\pi g^2(x)dx$ um die Ableitung nach der Zeit zweiter Ordnung besser in den Griff zu bekommen?}
-\end{proof}
 Zur Beobachtung, wie der maximale Polynomgrad $P$ und Stoppzeit $T$ zusammenhängen, betrachten wir die Konvergenz des Erwartungswerts und der Varianz von \nameref{trial:1}. In diesem eindimensionalen Problem gilt $M=P$ und wir können den exakten Erwartungswert und Varianz als Referenz zur Berechnung deren Approximationsfehler verwenden.\\
 In Abbildung \ref{fig:galerkin_bydegree_trial1} erkennen wir, dass für $T=1$ die Wahl $P\ge 5$ ausreicht für die bestmögliche Approximation des Erwartungswerts und der Varianz. Für $T=10$ benötigen wir hingegen $P\ge 14$. In diesem Fall erkennen wir auch eine exponentielle Konvergenz des Fehlers der Varianz bezüglich des Polynomgrads $P=M$.
 \begin{figure}[!htb]
@@ -300,7 +243,7 @@ In Abbildung \ref{fig:galerkin_bydegree_trial1} erkennen wir, dass für $T=1$ di
 \end{figure}
 \newline
 Anschließend beobachten wir in Abbildung \ref{fig:galerkin_bystoptime_trial1} das Verhalten für wachsende Stoppzeit $T$, ebenfalls anhand der einfachen \nameref{trial:1}. Die Parameter für die Quadratur sind dabei hoch genug gewählt um als relevante Fehlerquellen ausgeschlossen werden zu können. Die Wahl $P=25$ schließt, begründet durch die Beobachtungen aus Abbildung \ref{fig:galerkin_bydegree_trial1}, den Einfluss des Polynomgrads als Fehlerquelle für die Zeitspanne $T\le 10$ aus.\\
-Wir erkennen, dass im linken Fall der niedrige Polynomgrad mit $P=5$ dafür sorgt, dass die Approximationen ab $T=1$ zunehmend schlechter werden. Im rechten Fall mit $P=25$ ist keine Verschlechterung der Fehler im Erwartungswert und Varianz zu beobachten. Der Fourier-Fehler im Sinne von Satz \ref{th:adapted22} hingegen zeigt einen gewissen Aufwärtstrend bezüglich der Zeit $T$.
+Wir erkennen, dass im linken Fall der niedrige Polynomgrad mit $P=5$ dafür sorgt, dass die Approximationen ab $T=1$ zunehmend schlechter werden. Im rechten Fall mit $P=25$ ist keine Verschlechterung der Fehler im Erwartungswert und Varianz zu beobachten. Der Fourier-Fehler hingegen zeigt einen gewissen Aufwärtstrend bezüglich der Zeit $T$.
 \begin{figure}[!htb]
 \minipage{0.55\textwidth}
   \includegraphics[width=\linewidth]{Figures/galerkin_bystoptime_trial1_fixeddegree5.png}
@@ -312,11 +255,15 @@ Wir erkennen, dass im linken Fall der niedrige Polynomgrad mit $P=5$ dafür sorg
   \label{fig:galerkin_bystoptime_trial1}
 \end{figure}
 \newline
-In Abbildung \ref{fig:galerkin_bystoptime_trial3}, welche die Fehler der eindimensionalen \nameref{trial:3} mit $Y\sim\mathcal{U}(10,50)$, beobachten wir zusätzlich auch einen leichten Aufwärtstrend der Fehler des Erwartungswerts und der Varianz bezüglich der Zeit $T$.
+In Abbildung \ref{fig:galerkin_bystoptime_trial3}, welche die Fehler der eindimensionalen \nameref{trial:3} mit $Y\sim\mathcal{U}(10,50)$, beobachten wir zusätzlich auch einen leichten Aufwärtstrend der Fehler des Erwartungswerts und der Varianz bezüglich der Zeit $T$.\\
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=0.75\linewidth]{Figures/galerkin_bystoptime_trial3_fixeddegree25_big.png}
 \caption{Verschiedene Fehler von \nameref{trial:3} mit fixem Polynomgrad und hinreichend guter Quadraturformel.}
 \label{fig:galerkin_bystoptime_trial3}
 \end{figure}
-\todo[inline]{Problem4: Es ist nicht ganz klar, was eigentlich rauskommen soll. Durch fehlende Referenzlösungen für die Varianz an vielen verschiedenen Zeitpunkten ist es schwierig, beliebige Beispiele (insbesondere mehrdimensionale) zu beobachten.}
+Wünschenswert wäre eine allgemeine Abschätzung für den Fourier-Fehler des Galerkin-Ansatzes. Eine Adaption des Beweises von Theorem 2.2 aus \autocite{davidgottliebdongbinxiu2008}, wo für den entsprechenden Fourier-Fehler
+\[\sum_{m=0}^P\norm{\fourier{u}_m-\fourier{v}_m}^2\]
+einer hyperbolischen Differentialgleichung 
+\[\partial_t u(t,x,y)=c(y)\partial_x u(t,x,y),\quad x\in (-1,1),t>0\]
+ein lineares Wachstum bezüglich der Stoppzeit $T$ gezeigt wird, ist aufgrund der Zeitableitung zweiter Ordnung der KGG nicht ohne weiteres möglich.
