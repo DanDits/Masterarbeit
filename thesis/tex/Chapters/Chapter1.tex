@@ -2,7 +2,7 @@
 
 \chapter{Grundlagen}
 \label{Chapter1}
-In diesem Kapitel werden viele wichtige Grundlagen vorgestellt, die in der ganzen Arbeit an verschiedenen Stellen benötigt werden. Zuerst werden wir im Detail die deterministische Klein-Gordon-Gleichung mit zugehöriger Existenztheorie präsentieren. Um eine numerischen numerischen Lösungsansatz für die KGG zu erhalten, wird anschließend das Operatorsplitting erläutert und auf die KGG angewandt. Schlussendlich erklären wir die Modellierung der stochastischen Klein-Gordon-Gleichung und bieten eine kurze Wiederholung von benötigten Begriffen aus der Stochastik und Statistik.
+In diesem Kapitel werden viele wichtige Grundlagen vorgestellt, die in der ganzen Arbeit an verschiedenen Stellen benötigt werden. Zuerst werden wir im Detail die deterministische Klein-Gordon-Gleichung mit zugehöriger Existenztheorie präsentieren. Um einen numerischen Lösungsansatz für die KGG zu erhalten wird anschließend das Operatorsplitting erläutert und auf die KGG angewandt. Wir werden dazu für das Strang-Splitting Konvergenz zweiter Ordnung bezüglicher der Zeitschrittweite $\tau$ zeigen. Schlussendlich erklären wir die Modellierung der stochastischen Klein-Gordon-Gleichung und bieten eine kurze Wiederholung von benötigten Begriffen aus der Stochastik und Statistik.
 
 \section{Die Klein-Gordon-Gleichung}
 Die für diese Arbeit grundlegende Gleichung ist die lineare Klein-Gordon-Gleichung in der Form
@@ -10,11 +10,11 @@ Die für diese Arbeit grundlegende Gleichung ist die lineare Klein-Gordon-Gleich
 \label{kgg}
 \partialdtt{u}(t,x)&=\alpha \Laplace u(t,x) - \beta(x)u(t,x), \: t>0, \, x\in \Torus^d\\
 u(0,x)&=u_0(x), \: x\in \Torus^d\\
-\partialdt{u}(0,x)&=v_0(x), \: x\in \Torus^d
+\partialdt{u}(0,x)&=v_0(x), \: x\in \Torus^d.
 \end{align}
 Dabei ist $\Laplace$ der Laplace-Operator im Ort $x$, definiert als
-\[\Laplace=\frac{\text{d}^2}{\text{d}x^2_1}+\dots+\frac{\text{d}^2}{\text{d}x^2_d}.\]\\
-Bevor wir Abhängigkeiten von einer Zufallsvariablen hinzufügen, ist es hilfreich, die Gleichung für deterministische Parameter besser zu verstehen. Diese Mühe ist nicht vergebens, da einige numerische Verfahren zur Bestimmung der Lösung der zufallsabhängigen Gleichung stark auf einem robusten und schnellen Löser der deterministischen Gleichung basieren. Dazu seien als Stichworte Monte-Carlo-Verfahren und Kollokationsverfahren genannt, die wir im späteren Verlauf genauer betrachten werden.
+\[\Laplace=\partial^2_{x_1}+\dots+\partial^2_{x_d}.\]
+Bevor wir Abhängigkeiten von einer Zufallsvariablen hinzufügen, ist es hilfreich, die Gleichung für deterministische Parameter besser zu verstehen. Diese Mühe ist nicht vergebens, da einige numerische Verfahren zur Bestimmung der Lösung der zufallsabhängigen Gleichung stark auf einem robusten und schnellen Löser der deterministischen Gleichung basieren. Dazu seien als Stichworte Monte"=Carlo"=Verfahren und Kollokationsverfahren genannt, die wir im späteren Verlauf genauer betrachten werden.
 \subsection{Physikalische Definitionen}
 Die KGG ist eine relativistische Feldgleichung, welche die Kinematik von spin-freien Teilchen, wie dem Pion, beschreibt. Auch das 2012 entdeckte Higgs-Boson ist ein spin-freies Teilchen, es ist jedoch noch unklar, ob es wirklich das von dem Standardmodell der Teilchenphysik vorhergesagte Teilchen ist und sich vom Standardmodell beschreiben lässt \autocite{cern2016}.\\
 Dabei ist
@@ -31,27 +31,27 @@ Dabei ist
 Um den analytischen Rahmen für die Existenz und Eindeutigkeit von Lösungen der KGG zu schaffen werden wir die Halbgruppentheorie verwenden. Die verwendete Theorie ist übernommen aus \autocite{HundSchnau} und \autocite{EngelNagel}, dort finden sich auch weitere Details und Beweise der verwendeten Theoreme.
 \begin{mathdef}
 Sei der Raum der beliebig häufig differenzierbaren periodischen Funktionen definiert als
-\[C^\infty (\Torus^d)\coloneqq \lbrace v\colon \Torus^d\to\R \mid v \text{ beliebig häufig stetig differenzierbar und periodisch in }[-\pi,\pi]^d\rbrace\]
+\[C^\infty (\Torus^d)\coloneqq \lbrace v\colon \Torus^d\to\R \mid v \text{ beliebig häufig stetig differenzierbar und periodisch in }[-\pi,\pi]^d\rbrace.\]
 Definieren wir zu $v\in C^\infty((-\pi,\pi)^d)$ und $k\in\N_0$ die Sobolev-Norm $\norm{v}_{k,2}$ durch
-\[\norm{v}_{k,2}^2\coloneqq \sum_{|m|\le k}\norm{\dxp{v}{m}}_{L^2((-\pi,\pi)^d)}^2,\quad \text{Multiindex }\, |m|=m_1+\dots + m_d\]
+\[\norm{v}_{k,2}^2\coloneqq \sum_{|m|\le k}\norm{\dxp{v}{m}}_{L^2((-\pi,\pi)^d)}^2,\quad \text{mit }m\in\N_0^d,\, |m|=m_1+\dots + m_d,\]
 so erhalten wir bei Verwendung der schwachen Ableitung und mit Vervollständigung die Sobolev-Räume $H^k((-\pi,\pi)^d)$.\\
 Wir definieren einen abgeschlossenen Unterraum --und somit einen Banachraum-- des Sobolev-Raums $H^k((-\pi,\pi)^d)$ durch
 \begin{align*}H^k(\Torus^d)\coloneqq &\text{ Abschluss von } C^\infty(\Torus^d)\left(\subset C^\infty((-\pi,\pi)^d)\right)\\
-&\text{ bezüglich der Norm von } H^k((-\pi,\pi)^d)
+&\text{ bezüglich der Norm von } H^k((-\pi,\pi)^d).
 \end{align*}
 \end{mathdef}
 Zunächst definieren wir die benötigte Halbgruppe $S(\cdot)$ und ihren Generator $A$.
 \begin{mathdef}
 Zu einem Banachraum $R$ heißt die Abbildung $S(\cdot)\colon \R_+\to L(R)$, die einer Zeit $t$ einen beschränken linearen Operator zuordnet, eine Operatorhalbgruppe, wenn
-\[S(0)=I,\quad S(t+s)=S(t)S(s)\quad \forall t,s\ge 0\]
-$S(\cdot)$ heißt $C_0$-Halbgruppe bzw. stark stetig, wenn zusätzlich gilt
+\[S(0)=I,\quad S(t+s)=S(t)S(s)\quad \forall t,s\ge 0.\]
+$S(\cdot)$ heißt $C_0$-Halbgruppe bzw. stark stetig, wenn zusätzlich gilt:
 \[\forall r\in R\colon S_r(\cdot)\colon \R_+\to R,\: t\mapsto S(t)r \text{ ist stetig}\]
 Den Generator $A$ von $S(\cdot)$ erhält man, indem der Definitionsbereich definiert wird als
 \[D(A)\coloneqq \lbrace r\in R\mid \text{ der Grenzwert } \lim\limits_{t\to0+}\frac{1}{t}(S(t)r-r)\text { existiert in }R\rbrace\]
 und man anschließend für $r\in D(A)$ definiert
-\[Ar\coloneqq \lim\limits_{t\to0+}\frac{1}{t}(S(t)r-r)\]
+\[Ar\coloneqq \lim\limits_{t\to0+}\frac{1}{t}(S(t)r-r).\]
 \end{mathdef}
-Im folgenden Theorem wird die Verwendung der Halbgruppentheorie zum Erhalten von eindeutigen Lösungen der KGG klar. Inspiriert ist diese Betrachtungsweise durch den endlich dimensionalen Fall, wo $S(t)r=e^{At}r$ explizit über die Matrixexponentialfunktion gegeben ist.
+Im folgenden Theorem wird die Verwendung der Halbgruppentheorie zum Erhalten von eindeutigen Lösungen der KGG klar. Inspiriert ist diese Betrachtungsweise durch den endlich dimensionalen Fall, wo $S(t)r=e^{tA}r$ explizit über die Matrixexponentialfunktion gegeben ist. Häufig werden wir für die von $A$ generierte Halbgruppe $S(t)$ entsprechend ebenfalls die Notation $e^{tA}$ verwenden.
 \begin{maththeorem}[Vergleiche {\autocite[Proposition 2.8]{HundSchnau}}]
 Ist $A$ Generator der $C_0$-Halbgruppe $S(\cdot)$ und $r\in D(A)$, dann ist für alle $t\ge 0\colon \,S(t)r\in D(A)$ und
 \[v\colon \R_+\to R,\quad t\mapsto S(t)r\]
@@ -59,7 +59,7 @@ die eindeutige Lösung des Cauchy-Problems
 \begin{equation}
 \begin{split}
 v'(t)&=Av(t),\quad t\ge 0\\
-v(0)&=r
+v(0)&=r.
 \end{split}
 \end{equation}
 \end{maththeorem}
@@ -69,21 +69,21 @@ Den Generator $C$ der KGG mit $\alpha>0$ und $\beta\in L^\infty(\Torus^d)$ schre
 =\underbrace{\begin{pmatrix}0 & I\\ \alpha\Laplace-I & 0\end{pmatrix}}_{=\widetilde{A}}
 +\underbrace{\begin{pmatrix}0 & 0\\ -\beta(x)+I & 0\end{pmatrix}}_{=\widetilde{B}}\]
 Wir werden zuerst zeigen, dass $\widetilde{A}$ eine $C_0$-Halbgruppe generiert und verwenden anschließend, dass die Summe mit einer beschränkten Störung $\widetilde{B}$ diese Eigenschaft erhält.\\[0.2cm]
-Wir definieren den komplexen Hilbertraum $R=H^1(\Torus^d)\times H^0(\Torus^d)$ mit zugehörigem leicht abgewandelten Skalarprodukt 
+Wir definieren den komplexen Hilbertraum $R=H^1(\Torus^d)\times H^0(\Torus^d)$ mit zugehörigem leicht abgewandelten Skalarprodukt:
 \[\langle \begin{pmatrix}v_1\\v_2\end{pmatrix}, \begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle =\int_{[-\pi,\pi]^d}\alpha \nabla v_1\nabla \overline{w_1}+v_1\overline{w_1}+ v_2\overline{w_2}dx\]
 Da $\alpha>0$ ist die durch dieses Skalarprodukt induzierte Norm äquivalent zur Standardnorm des Hilbertraums (welche $\alpha=1$ entspricht). Konvergenz bezüglich beider Normen ist dementsprechend äquivalent und der Raum $R$ mit dem definierten Skalarprodukt ist ebenfalls ein Hilbertraum.\\
-Die zur $R$ gehörende Norm ist
-\[\norm{\begin{pmatrix}v_1\\v_2\end{pmatrix}}^2=\underbrace{\alpha \sum_{i=1}^d\norm{\partial_{x_i} v_1}^2_{L^2}+\norm{v_1}_{L^2}^2}_{\eqqcolon\norm{v_1}_{H^1_\alpha}}+\norm{v_2}_{L^2}.\]
+Die zu $R$ gehörende Norm ist
+\[\norm{\begin{pmatrix}v_1\\v_2\end{pmatrix}}^2=\underbrace{\alpha \sum_{i=1}^d\norm{\partial_{x_i} v_1}^2_{L^2}+\norm{v_1}_{L^2}^2}_{\eqqcolon\norm{v_1}^2_{H^1_\alpha}}+\norm{v_2}_{L^2}.\]
 Es ist $D(\widetilde{A})=H^2(\Torus^d)\times H^1(\Torus^d)\subset R$ dicht in $R$, da bereits $C^\infty(\Torus^d)\times C^\infty(\Torus^d)\subset D(\widetilde{A})$ dicht in $R$ ist.\\
-Stones Theorem besagt, dass $\widetilde{A}$ genau dann eine $C_0$-Halbgruppe von unitären Operatoren generiert, wenn $\widetilde{A}$ schiefadjungiert bezüglich des Skalarprodukt des Hilbertraums ist. Wir rechnen für $(v_1,v_2)^T, (w_1,w_2)^T\in D(\widetilde{A})$ die Antisymmetrie des Operators $\widetilde{A}$ nach:
+Stones Theorem besagt, dass $\widetilde{A}$ genau dann eine $C_0$-Halbgruppe von unitären Operatoren generiert, wenn $\widetilde{A}$ schiefadjungiert bezüglich des Skalarprodukts des Hilbertraums ist. Wir rechnen für $(v_1,v_2)^T, (w_1,w_2)^T\in D(\widetilde{A})$ die Antisymmetrie des Operators $\widetilde{A}$ nach:
 \begin{align*}
 \langle \widetilde{A}\begin{pmatrix}v_1\\v_2\end{pmatrix}, \begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle
 &=\langle \begin{pmatrix} v_2\\\alpha \Laplace v_1-v_1\end{pmatrix}, \begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle\\
 &=\int_{[-\pi,\pi]^d} \alpha \nabla v_2\nabla \overline{w_1} +v_2\overline{w_1}+ \alpha \Laplace v_1 \overline{w_2} - v_1\overline{w_2}dx\\
-&\text{ (da $v_1,v_2,w_1,w_2$ periodisch gilt weiter mit Green):}\\
-&=-\int_{[-\pi,\pi]^d}\alpha v_2\Laplace \overline{w_1}-v_2\overline{w_1}+ \alpha \nabla v_1\nabla \overline{w_2} + v_1\overline{w_2}dx\\
+&\stackrel{(*)}{=}-\int_{[-\pi,\pi]^d}\alpha v_2\Laplace \overline{w_1}-v_2\overline{w_1}+ \alpha \nabla v_1\nabla \overline{w_2} + v_1\overline{w_2}dx\\
 &=-\langle \begin{pmatrix} v_1\\ v_2\end{pmatrix}, \begin{pmatrix} w_2\\\alpha \Laplace w_1-w_1\end{pmatrix}\rangle=-\langle \begin{pmatrix}v_1\\v_2\end{pmatrix}, \widetilde{A}\begin{pmatrix}w_1\\w_2\end{pmatrix}\rangle
 \end{align*}
+Die Identität $(*)$ folgt mit Green, da $v_1,v_2,w_1,w_2$ periodisch sind.\\
 Wäre $\widetilde{A}$ beschränkt, so folgt daraus sofort die Schiefadjungiertheit $\widetilde{A}=-\widetilde{A}^*$ von $\widetilde{A}$. Da in unserem Fall $\widetilde{A}$ unbeschränkt ist, müssen wir zusätzlich die Bedingung $D(\widetilde{A})=D(\widetilde{A}^*)$ erfüllen.\\
 Wir benutzen die Eigenschaft:
 \[\widetilde{A} \text{ schiefadjungiert } \equivalent i\widetilde{A} \text{ selbstadjungiert}\]
@@ -94,14 +94,14 @@ Nach \autocite[Bemerkung 5.6f]{HundSchnau} müssen wir für die Selbstadjungiert
 \item $\sigma(i\widetilde{A})\subset \R$
 \end{itemize}
 Die Symmetrie von $i\widetilde{A}$ ist äquivalent zur bereits gezeigten Antisymmetrie von $\widetilde{A}$.\\
-Die Abgeschlossenheit von $i\widetilde{A}$ ist äquivalent zur Abgeschlossenheit von $\widetilde{A}$. Sei dazu
+Die Abgeschlossenheit von $i\widetilde{A}$ ist äquivalent zur Abgeschlossenheit von $\widetilde{A}$. Sei dazu $u_n\in D(\widetilde{A})$, $u_n\xrightarrow{n \to \infty }u\in R$ und $Au_n\xrightarrow{n \to \infty }y\in R$, also:
 \begin{align*}
 u_n=\begin{pmatrix}u_{1,n}\\u_{2,n}\end{pmatrix}\to\begin{pmatrix}u_1\\u_2\end{pmatrix}\in H^1(\Torus^d)\times L^2(\Torus^d)\\
-\widetilde{A}\begin{pmatrix}u_{1,n}\\u_{2,n}\end{pmatrix}=\begin{pmatrix}u_{2,n}\\\alpha\Laplace u_{1,n}-u_{1,n}\end{pmatrix}\to\begin{pmatrix}y_1\\y_2\end{pmatrix}\in H^1(\Torus^d)\times L^2(\Torus^d)
+\widetilde{A}\begin{pmatrix}u_{1,n}\\u_{2,n}\end{pmatrix}=\begin{pmatrix}u_{2,n}\\\alpha\Laplace u_{1,n}-u_{1,n}\end{pmatrix}\to\begin{pmatrix}y_1\\y_2\end{pmatrix}\in H^1(\Torus^d)\times L^2(\Torus^d).
 \end{align*} 
 Somit gilt $u_{2,n}\to u_2$ in $L^2(\Torus^d)$ und $u_{2,n}\to y_1$ in $H^1(\Torus^d)$ woraus sofort $u_2=y_1\in H^1(\Torus^d)$ folgt.\\
-Entsprechend gilt $u_{1,n}\to u_1$ in $H^1(\Torus^d)$. Es ist in diesem Fall noch einzusehen, dass die zweiten Ableitungen nach $x$ existieren und in $L^2(\Torus^d)$ sind. Dies ist erfüllt wegen $\alpha \Laplace u_{1,n}-u_{1,n}\to y_2$ in $L^2(\Torus^d)$.\\
-Somit gilt $u_n\in D(\widetilde{A})$ und wegen 
+Entsprechend gilt $u_{1,n}\to u_1$ in $H^1(\Torus^d)$. Um $u_1\in H^2(\Torus^d)$ zu erhalten und somit $u\in D(A)$, ist in diesem Fall noch einzusehen, dass die zweiten Ableitungen von $u_1$ nach $x$ existieren und in $L^2(\Torus^d)$ sind. Dies ist erfüllt wegen $\alpha \Laplace u_{1,n}-u_{1,n}\to y_2$ in $L^2(\Torus^d)$.\\
+Somit gilt $u\in D(\widetilde{A})$ und wegen 
 \begin{align*}
 \norm{\widetilde{A}u-y}&\le \norm{\widetilde{A}u-\widetilde{A}u_n}+\norm{\widetilde{A}u_n-y}\\
 &=\norm{\begin{pmatrix}u_2-u_{2,n}\\\Laplace(u_1-u_{1,n})-(u_1-u_{1,n})\end{pmatrix}}+\norm{\widetilde{A}u_n-y}\\
@@ -117,14 +117,14 @@ iu_2-\lambda u_1=f_1 &\implies u_2=(f_1+\lambda u_1)(-i)\\
 i\alpha \Laplace u_1-iu_1-\lambda u_2=f_2 &\implies i\alpha \Laplace u_1-iu_1+i\lambda f_1+i\lambda^2u_1=f_2\\
 &\quad \equivalent \alpha \Laplace u_1-u_1+\lambda^2u_1=-if_2-\lambda f_1\eqqcolon g
 \end{align*}
-Aus dem Ansatz $u_1(x)=\sum_{k\in\Z}\fourier{u}_ke^{ikx}$ (beispielhaft für $d=1$) folgt:
-\[\sum_{k\in\Z}\fourier{u}_k(\alpha (ik)^2-1+\lambda^2)e^{ikx}=\sum_{k\in\Z}\fourier{g}_ke^{ikx}\]
+Aus dem Ansatz $u_1(x)=\sum_{k\in\Z}\fourier{u}_ke^{ikx}$ (beispielhaft für $d=1$) folgt
+\[\sum_{k\in\Z}\fourier{u}_k(\alpha (ik)^2-1+\lambda^2)e^{ikx}=\sum_{k\in\Z}\fourier{g}_ke^{ikx}.\]
 Und somit ist $\fourier{u}_k=\frac{\fourier{g}_k}{-\alpha k^2-1+\lambda^2}$ eine gültige Wahl für die Fourier-Koeffizienten, da 
 \[-\alpha k^2-1+\lambda^2=0\equivalent \lambda =\pm \sqrt{k^2+1}\in\R.\]
 Die Gleichung $(i\widetilde{A}-\lambda I)u=f$ besitzt somit eine Lösung $u\in D(\widetilde{A})$ und daher gilt $\lambda \in \rho(i\widetilde{A})$ und schlussendlich $\sigma(i\widetilde{A})\subset \R$.\\
 Insgesamt ist nun $i\widetilde{A}$ selbstadjungiert, daher ist $\widetilde{A}$ schiefadjungiert und nach Stone erzeugt $(\widetilde{A},D(\widetilde{A}))$ eine unitäre Halbgruppe.\\[0.3cm] 
 Um den vollen Generator $C$ der KGG zu erhalten benötigen wir noch den zweiten Teiloperator $\widetilde{B}$ definiert durch
-\[\widetilde{B}=\begin{pmatrix}0 & 0\\-\beta(x)+I & 0\end{pmatrix}\]
+\[\widetilde{B}=\begin{pmatrix}0 & 0\\-\beta(x)+I & 0\end{pmatrix}.\]
 Dazu verwenden wir das Theorem über beschränkte Störungen eines stark stetigen Generators.
 \begin{maththeorem}[{\autocite[Theorem 1.3, Kapitel III]{EngelNagel}}]
 \label{th:engelnagelbounded}
@@ -139,9 +139,9 @@ Es gilt für $\beta\in L^2(\Torus^d)\cap L^\infty(\Torus^d)$
 \begin{align*}
 \norm{\widetilde{B}\begin{pmatrix}v_1\\v_2\end{pmatrix}}^2&=\norm{\begin{pmatrix}0\\v_1-\beta(x)v_1\end{pmatrix}}^2\\
 &\le c\norm{v_1}_{L^2}^2, \quad c=(\norm{\beta}_{\infty}+1)^2\\
-&\le c\norm{\begin{pmatrix}v_1\\v_2\end{pmatrix}}^2
+&\le c\norm{\begin{pmatrix}v_1\\v_2\end{pmatrix}}^2.
 \end{align*}
-Insgesamt ist somit der Generator 
+Insgesamt ist somit der definierende Operator 
 \[C=\begin{pmatrix}0 & I\\ \alpha\Laplace - \beta(x) & 0\end{pmatrix}\]
 der Klein-Gordon-Gleichung Generator einer $C_0$-Halbgruppe und das zugehörige Cauchy-Problem besitzt eine eindeutige Lösung in $D(\widetilde{A})$. Dies impliziert auch eine eindeutige Lösung der KGG in $H^2(\Torus^d)$.
 \subsubsection*{Abschätzungen für die generierten Halbgruppen}
@@ -164,7 +164,7 @@ Sei $v=\begin{pmatrix}v_1\\v_2\end{pmatrix}\in H^1\times L^2$. Es gilt
 &=\norm{\begin{pmatrix}v_1\\v_2-t\beta v_1\end{pmatrix}}^2=\norm{v_1}_{H^1_\alpha}^2+\norm{v_2-t\beta v_1}_{L^2}^2\\
 &\le \norm{v_1}_{H^1_\alpha}^2+\left(\norm{v_2}_{L^2}+t\underbrace{\norm{\beta v_1}_{L^2}}_{\le \norm{\beta}_\infty\norm{v_1}_{L^2}}\right)^2\\
 &\le \underbrace{\norm{v_1}_{H^1_\alpha}^2 + \norm{v_2}_{L^2}^2}_{=\norm{v}^2} + 2t\norm{\beta}_\infty \underbrace{\norm{v_1}_{L^2}\norm{v_2}_{L^2}}_{\le \onehalf \left(\norm{v_1}_{L^2}^2+\norm{v_2}_{L^2}^2\right)\le \norm{v}^2} + t^2\norm{\beta}_\infty^2\norm{v_1}_{L^2}^2\\
-&\le (1+t\norm{\beta}_\infty)^2\norm{v}^2
+&\le (1+t\norm{\beta}_\infty)^2\norm{v}^2.
 \end{align*}
 \end{proof}
 Die Teilung des Generators $C$ der KGG wird nicht nur ein Werkzeug für die theoretische Existenztheorie bleiben, sondern die Grundlage für eine numerische Herangehensweise zur Berechnung von Approximationen der Lösung werden. Die gezeigten Abschätzungen bilden dabei die Basis für Konvergenzaussagen dieses \emph{Operatorsplittings}.
@@ -185,13 +185,13 @@ Beispiele für exakte Lösungen ($d=1$) sind
 \begin{align*}
 u(t,x)&=\sin(\lambda x)(c_1 \sin(\mu t) + c_2 \cos(\mu t)), \quad \mu^2=\beta+\alpha \lambda^2,\quad \beta(x)\equiv \text{const}\\ 
 u(t,x)&=(c_1 \sin(\lambda x) + c_2 \cos(\lambda x))\sin(\mu t), \quad \mu^2=\beta+\alpha \lambda^2,\quad \beta(x)\equiv \text{const}\\
-u(t,x)&=\exp(-\cos(x))\sin(\mu t), \quad \beta(x)=\mu^2+\cos(x)+\sin^2(x), \, \mu \in \R
+u(t,x)&=\exp(-\cos(x))\sin(\mu t), \quad \beta(x)=\mu^2+\cos(x)+\sin^2(x), \, \mu \in \R,
 \end{align*}
 wobei $\lambda\in \pi\Z$ um die Periodizität zu gewährleisten und $c_1, c_2 \in \R$ frei wählbare Skalierungsfaktoren sind.\\
 Diese Lösungen lassen sich auch auf höhere Dimensionen erweitern, beispielsweise
 \begin{eqnarray}
 u(t,x)=\exp(-\cos(x_1+\dots+x_d))\sin(\mu t)\\
-\beta(x)=\mu^2+d(\cos(x_1+\dots+x_d)+\sin^2(x_1+\dots+x_d)), \, \mu\in\R \nonumber
+\beta(x)=\mu^2+d(\cos(x_1+\dots+x_d)+\sin^2(x_1+\dots+x_d)), \, \mu\in\R. \nonumber
 \end{eqnarray}
 Um einen kleinen Einblick in die Gestalt einer einfachen expliziten Lösung der KGG zu erhalten, sind in Abbildung \ref{fig:exactsolonedim} und \ref{fig:exactsoltwodim} die Lösungen mit Parametern $\alpha=1$, $\beta(x)=4+d(\cos(\sum_{j=1}^dx_j)+\sin^2(\sum_{j=1}^dx_j))$ zum Zeitpunkt $t=0.5$ dargestellt.
 % Visualize exact solutions by giving two example plots
@@ -308,7 +308,7 @@ Das Lie-Trotter-Splitting $\Phi_{\deltat}=\varphi_{\deltat}^B \circ \varphi_{\de
 Die Taylorreihe von $\varphi_{\deltat}$ lässt sich wegen 
 \[\varphi_{\deltat}(y_0)=y(\deltat)=y(0)+\deltat \underbrace{y^\prime(0)}_{=f(y_0)}
 +\frac{\deltat^2}{2}\underbrace{y^{\prime\prime}(0)}_{=f^\prime(y_0)y^\prime(0)=f^\prime(y_0)f(y_0)}+\mathcal{O}(\deltat^3)\] darstellen als 
-\[\varphi_{\deltat}(y_0)=y_0+\deltat f(y_0)+\frac{\deltat^2}{2}f^\prime(y_0)f(y_0)+\mathcal{O}(\deltat^3)\]
+\[\varphi_{\deltat}(y_0)=y_0+\deltat f(y_0)+\frac{\deltat^2}{2}f^\prime(y_0)f(y_0)+\mathcal{O}(\deltat^3).\]
 Diese vergleichen wir nun mit der Taylorreihe des Splittings:
 \begin{align*}
 \left(\varphi_{\deltat}^B \circ \varphi_{\deltat}^A\right)(y_0)&=
@@ -331,11 +331,11 @@ Ist $\Phi_{\deltat}$ ein Einschrittverfahren von Ordnung $p$ so ist die Zerlegun
 von Ordnung $p+1$, wenn 
 \begin{align*}
 \sum_{j=1}^sa_j+b_j&=1\\
-\sum_{j=1}^sa_j^{p+1}+(-1)^pb_j^{p+1}&=0
+\sum_{j=1}^sa_j^{p+1}+(-1)^pb_j^{p+1}&=0.
 \end{align*}
 \end{maththeorem}
 Um das Lie-Trotter-Splitting zur Ordnung 2 zu erweitern motiviert der Satz die Wahl $\alpha_1=\beta_1=\onehalf$. Wir wollen nun ein Verfahren $\Phi_{\deltat}^S$ mit Ordnung $p=2$ gewinnen. Daher definieren wir
-\[\Phi_{\deltat}^S=\Phi_{\deltathalf}^*\circ\Phi_{\deltathalf}=\left(\Phi_{\deltat}^S\right)^*\]
+\[\Phi_{\deltat}^S=\Phi_{\deltathalf}^*\circ\Phi_{\deltathalf}=\left(\Phi_{\deltat}^S\right)^*.\]
 Wir erkennen sofort, dass es sich hierbei um ein symmetrisches Verfahren handelt. Als Komposition von Verfahren mit Ordnung 1 (siehe Satz \ref{lieorder1}) ist es ebenfalls mindestens von Ordnung 1. Als zusätzlich symmetrisches Verfahren gilt mit Satz \ref{adjfloworder}, dass das Verfahren mindestens von Ordnung 2 ist.\\
 Dieses sogenannte \emph{Strang-Splitting} lässt sich unter Verwendung der aufgeteilten Flüsse (\ref{liesplittings}) auch darstellen als 
 
@@ -358,7 +358,7 @@ y_T&=\underbrace{\Phi_{\deltat}^S\circ\dots\circ\Phi_{\deltat}^S}_{n\text{ mal}}
 \varphi_{\deltathalf}^A\circ\varphi_{\deltat}^B\circ\varphi_{\deltathalf}^A\right)\\
 &=\varphi_{\deltathalf}^A\circ\varphi_{\deltat}^B\circ\left(\varphi_{\deltat}^A\circ\varphi_{\deltat}^B\right)\circ\left(\varphi_{\deltat}^A\circ\varphi_{\deltat}^B\right)\circ\dots\circ\left(\varphi_{\deltat}^A\circ\varphi_{\deltat}^B\right)\circ\varphi_{\deltathalf}^A\\
 &=\varphi_{\deltathalf}^A\circ\varphi_{\deltat}^B\circ
-\underbrace{\Phi_{\deltat}^*\circ\dots\circ\Phi_{\deltat}^*}_{n-1\text{ mal}}\circ\,\varphi_{\deltathalf}^A
+\underbrace{\Phi_{\deltat}^*\circ\dots\circ\Phi_{\deltat}^*}_{n-1\text{ mal}}\circ\,\varphi_{\deltathalf}^A.
 \end{align*}
 Durch das Kombinieren der äußeren Halbschritte bekommt man somit eine Darstellung des Strang-Splittings, die im Vergleich zum Lie-Trotter-Splitting nur einen zusätzlichen Fluss berechnen muss und trotzdem Ordnung $p=2$ besitzt. Man muss hierbei allerdings auf Zwischenergebnisse verzichten, da diese eine weitere Anwendung von $\varphi_{\deltathalf}^A$ benötigen würden.\\[0.5cm]
 Bisher sind wir davon ausgegangen, dass sich die Flüsse $\varphi_{\deltat}^A$ btw. $\varphi_{\deltat}^B$ exakt berechnen lassen. Dies ist in den seltensten Fällen der Fall und man verwendet stattdessen approximative Verfahren $\Phi_{\deltat}^A$ bzw. $\Phi_{\deltat}^B$. 
@@ -384,14 +384,14 @@ nicht garantiert werden können. Basierend auf der Halbgruppentheorie, welche sc
 Sei $R=H^1(\Torus^d)\times L^2(\Torus^d)$ mit zugehöriger Norm
 \[\norm{v}_R^2=\norm{v_1}_{H_1}^2+\norm{v_2}_{L^2}^2.\]
 Wir schreiben die KGG in der Form
-\[\partialdt{u}=\underbrace{\begin{pmatrix}0 & I\\ \alpha\Laplace & 0\end{pmatrix}}_{\eqqcolon A}u+\underbrace{\begin{pmatrix}0 & 0\\ -\beta & 0\end{pmatrix}}_{\eqqcolon B}u\]
+\[\partialdt{u}=\underbrace{\begin{pmatrix}0 & I\\ \alpha\Laplace & 0\end{pmatrix}}_{\eqqcolon A}u+\underbrace{\begin{pmatrix}0 & 0\\ -\beta & 0\end{pmatrix}}_{\eqqcolon B}u, \quad u(0)\in D(A).\]
 Dabei ist $D(A)\coloneqq H^2(\Torus^d)\times H^1(\Torus^d)$ der Definitionsbereich von $A$ und wir können für $\alpha>0$, $0<\beta\in L^\infty(\Torus^d)$ eine Lösung $u\in D(A)$ garantieren. Zu $v\in D(A)$ definieren wir die Graphennorm
-\[\norm{v}_{D(A)}^2=\norm{v}_R^2+\norm{Av}_R^2\]
-Der Operator $A$ erzeugt eine Halbgruppe $e^{tA}$ und erfüllt $\norm{e^{tA}}\le e^t$ (vgl. (\ref{eqn:normgroupofa})). Hierbei ist etwas Vorsicht geboten, da diese Norm zwar äquivalent zur hier verwendeten Norm ist, sich aber um einen Faktor $\alpha$ unterscheidet. Ist $\alpha\le 1$, so gilt ebenfalls $\norm{e^{tA}}_R\le e^t$, ist $\alpha>1$ gilt lediglich $\norm{e^{tA}}_R\le \alpha e^t$. Um diese Fallunterscheidung zu vermeiden definieren wir $\alpha_1\coloneqq \max(1,\alpha)$ und verwenden
+\[\norm{v}_{D(A)}^2=\norm{v}_R^2+\norm{Av}_R^2.\]
+Der Operator $A$ erzeugt eine Halbgruppe $e^{tA}$ und erfüllt $\norm{e^{tA}}\le e^t$ (vgl. (\ref{eqn:normgroupofa})). Hierbei ist etwas Vorsicht geboten, da diese Norm zwar äquivalent zur hier verwendeten Norm ist, sich aber um einen Faktor $\alpha$ unterscheidet. Ist $\alpha\le 1$, so gilt ebenfalls $\norm{e^{tA}}_R\le e^t$, ist $\alpha>1$ gilt lediglich $\norm{e^{tA}}_R\le \sqrt{\alpha} e^t$. Um diese Fallunterscheidung zu vermeiden definieren wir $\alpha_1\coloneqq \max(1,\sqrt{\alpha})$ und verwenden
 \[\norm{e^{tA}}_R\le \alpha_1 e^t, \quad t\ge 0.\]
 Für den Operator $B$ gilt analog zur Abschätzung (\ref{eqn:normgroupofb}) 
 \[\norm{e^{tB}}_R\le 1+\norm{\beta}_\infty t, \quad t\ge 0.\]
-\subsubsection*{Berechnung des lokalen Fehlers}
+\subsubsection*{Abschätzung des lokalen Fehlers}
 Um für einen Zeitpunkt $t$ die exakte Lösung $e^{t(A+B)}u(0)$ der KGG mit der Approximation $e^{tA/2}e^{tB}e^{tA/2}u(0)$ des Splittings vergleichen zu können, verwenden wir eine Darstellung der \emph{Variation der Konstanten Formel} aus \autocite{carassco2007}.
 \begin{maththeorem}[Variation der Konstanten nach Alekseev]
 \label{th:varofconstantsalkeseev}
@@ -410,8 +410,8 @@ die Gleichung (\ref{eqn:varofconsts}).
 \end{maththeorem}
 In unserem Fall ist $f(t,y)=Ay(t)$, $g(t,y)=By(t)$ und es gilt daher
 \begin{align*}
-z(t,t_0,y_0)=e^{(t-t_0)A}y_0\\
-\phi(t,s,\xi)=e^{(t-s)A}
+z(t,t_0,y_0)&=e^{(t-t_0)A}y_0\\
+\phi(t,s,\xi)&=e^{(t-s)A}
 \end{align*}
 und somit insgesamt
 \begin{equation}
@@ -452,7 +452,8 @@ f''(s)&=e^{(\tau -s)A}[[B,A],A]e^{sA}u
 Wir können nun die Komponenten vergleichen:
 \begin{align}
 E_1(\tau,u)-S_1(\tau,u)&=\int_0^\tau f(s)ds-\tau f(\tau/2)\nonumber\\
-&=\underbrace{\int_0^\tau f(\tau/2)ds}_{=\tau f(\tau/2)}+\underbrace{\int_0^\tau (s-\tau/2)f'(\tau/2)ds}_{=0}+\int_0^\tau\int_{\tau/2}^s\int_{\tau/2}^rf''(q)dq\,dr\,ds-\tau f(\tau/2)\nonumber\\
+&=\underbrace{\int_0^\tau f(\tau/2)ds}_{=\tau f(\tau/2)}+\underbrace{\int_0^\tau (s-\tau/2)f'(\tau/2)ds}_{=0}\nonumber\\
+&\qquad+\int_0^\tau\int_{\tau/2}^s\int_{\tau/2}^rf''(q)dq\,dr\,ds-\tau f(\tau/2)\nonumber\\
 &=\int_0^\tau\int_{\tau/2}^s\int_{\tau/2}^r f''(q)dq\,dr\,ds\nonumber\\
 &=\int_0^\tau\int_{\tau/2}^s\int_{\tau/2}^r e^{(\tau -q)A}[[B,A],A]e^{qA}udq\,dr\,ds\label{eqn:order_first_components}
 \end{align}
@@ -483,7 +484,7 @@ Insgesamt folgt nun aus (\ref{eqn:order_first_components}) mit Lemma \ref{lemma:
 &=\tau^3c\alpha_1^2e^\tau\norm{u}_{D(A)}
 \end{align*}
 Zuletzt vergleichen wir die Komponenten $E_2$ und $S_2$. Wiederum definieren wir eine Hilfsfunktion $g$ durch
-\[g(s,r)\coloneqq e^{(\tau-s)A}Be^{(s-r)A}Be^{rA}u,\quad 0\le r\le s\le \tau\]
+\[g(s,r)\coloneqq e^{(\tau-s)A}Be^{(s-r)A}Be^{rA}u,\quad 0\le r\le s\le \tau.\]
 Dann gilt:
 \begin{align*}
 &E_2(\tau,u)-S_2(\tau,u)=\int_0^\tau\int_0^se^{(\tau-s)A}Be^{(s-r)A}Be^{r(A+B)}udr\,ds-\frac{\tau^2}{2}e^{\tau A/2}B^2e^{\tau A/2}u\\
@@ -499,7 +500,7 @@ Der integrierte Summand $Z$ ist dabei bereits von Ordnung drei. Dies erhält man
 Somit gilt für die zweiten Komponenten
 \begin{align*}
 \norm{E_2(\tau,u)-S_2(\tau,u)}_R&\le \norm{\int_0^\tau\int_0^sg(s,r)dr\,ds-\frac{\tau^2}{2}g(\tau/2,\tau/2)}_R+c\tau^3e^\tau\\
-&=\norm{\int_0^\tau\int_0^s\left(g(s,r)-g(\tau/2,\tau/2)\right)dr\,ds}_R+c\tau^3e^\tau
+&=\norm{\int_0^\tau\int_0^s\left(g(s,r)-g(\tau/2,\tau/2)\right)dr\,ds}_R+c\tau^3e^\tau.
 \end{align*}
 Um eine Abschätzung für $g(s,r)-g(\tau/2,\tau/2)$ zu erhalten definieren wir für $0\le r\le s\le\tau$ den Richtungsvektor $\nu\coloneqq (s,r)^T-\frac{\tau}{2}(1,1)^T$ und für $\xi\in[0,1]$ die Strecke $y$ durch $y(\xi)\coloneqq \frac{\tau}{2}(1,1)^T+\xi \nu$.\\
 Es gilt:
@@ -517,7 +518,7 @@ Daraus folgt
 \begin{align*}
 \norm{E_2(\tau,u)-S_2(\tau,u)}_R
 &\le\norm{\int_0^\tau\int_0^s(g(s,r)-g(\tau/2,\tau/2))dr\,ds}_R+c\tau^3e^\tau\\
-&\le c\tau^3\max_{0\le r\le s\le \tau}\norm{\partial_sg(s,r)+\partial_rg(s,r)}_R+c\tau^3e^\tau
+&\le c\tau^3\max_{0\le r\le s\le \tau}\norm{\partial_sg(s,r)+\partial_rg(s,r)}_R+c\tau^3e^\tau.
 \end{align*}
 Für die partiellen Ableitungen von $g$ gilt
 \begin{align*}
@@ -526,10 +527,10 @@ Für die partiellen Ableitungen von $g$ gilt
 \end{align*}
 Da der Kommutator $[B,A]$ beschränkt ist mit
 \[\norm{[B,A]}_R=\norm{\begin{pmatrix}\beta & 0\\0 & -\beta\end{pmatrix}}_R\le \norm{\beta}_\infty\]
-folgt für die partiellen Ableitungen direkt:
+folgt für die partiellen Ableitungen direkt
 \begin{align*}
 \norm{\partial_sg(s,r)}_R&\le \alpha_1^3 e^{\tau-s}\norm{\beta}_\infty e^{s-r}\norm{B}_R e^r\norm{u}_R=\alpha_1^3e^\tau\norm{\beta}_\infty\norm{B}_R\norm{u}_R\\
-\norm{\partial_rg(s,r)}_R&\le ce^\tau \norm{u}_R
+\norm{\partial_rg(s,r)}_R&\le ce^\tau \norm{u}_R.
 \end{align*}
 Zusammengefasst haben wir nun für den lokalen Fehler folgende Abschätzung bewiesen:
 \begin{align*}
@@ -541,7 +542,16 @@ Zusammengefasst haben wir nun für den lokalen Fehler folgende Abschätzung bewi
 &\le c\tau^3e^\tau\norm{u}_{D(A)}+c\tau^3e^\tau\norm{u}_R+c\tau^3e^\tau\norm{u}_R+\mathcal{O}\left(\tau^4\right)\\
 &\le \tilde{c}\tau^3e^\tau \norm{u}_{D(A)}+\mathcal{O}\left(\tau^4\right),\quad \tilde{c}>0
 \end{align*}
-\subsubsection*{Berechnung des globalen Fehlers}
+\subsubsection*{Abschätzung des globalen Fehlers}
+\begin{maththeorem}[Strang-Splitting für die KGG]
+Das Strang-Splitting 
+\[u^n\coloneqq \left(e^{\tau A/2}e^{\tau B}e^{\tau A/2}\right)^nu(0)\]
+für die Klein-Gordon-Gleichung (\ref{kgg}) mit Lösung $u$, $\alpha>0$, $0<\beta\in L^\infty(\Torus^d)\cap C^2(\Torus^d)$ und
+\[A=\begin{pmatrix}0 & I\\ \alpha\Laplace\end{pmatrix}, \quad B=\begin{pmatrix}0 & 0\\ -\beta(x) & 0\end{pmatrix}\]
+ist konvergent von Ordnung 2 bezüglich der Zeitschrittweite $\tau=\frac{t_n}{n}>0$:
+\[u^n-u(t_n)\le \hat{c}\tau^2, \qquad \hat{c}(\alpha,\beta,t_n,\max_{j=0,\dots,n-1}\norm{u(t_j)}_{D(A)})>0\]
+\end{maththeorem}
+\begin{proof}
 Sei der Lösungsoperator $T$ der exakten Lösung der KGG definiert als
 \[T(t)\coloneqq e^{t(A+B)},\quad t\ge 0\]
 und der Splittingoperator $S$ des Strang-Splittings für die KGG als
@@ -558,6 +568,7 @@ Daraus folgt unter der Verwendung der Abschätzung des lokalen Fehlers und wegen
 &\le \tilde{c}\alpha_1\tau^2t_ne^{\norm{\beta}_\infty t_n}e^{t_n}\max_{j=0,\dots,n-1}\norm{u(t_j)}_{D(A)}
 =\mathcal{O}\left(\tau^2\right)
 \end{align*}
+\end{proof}
 \subsection{Numerischer Löser für die Klein-Gordon-Gleichung}
 \label{chapter:solver_kgg}
 Dieser Abschnitt bildet das Fundament, auf dem viele numerische Lösungsverfahren basieren werden. Inhalt und Notation basieren zu Teilen auf \autocite{patrickdiplom}. Um ein Operatorsplitting auf die KGG anwenden zu können muss diese zuerst in eine Gleichung mit Zeitableitung erster Ordnung in der Form von (\ref{orddgl}) umgeschrieben werden. Eine mögliche Darstellung ist
@@ -581,7 +592,7 @@ v
 für ein Gewicht $w\in [0,1]$. Doch bevor wir dies als Grundlage für ein Splitting verwenden, müssen wir den Operator $\Laplace$ genauer untersuchen.
 \subsubsection*{Ortsdiskretisierung durch Fourier-Pseudospektralmethode}
 Um einen numerischen Zugang zum Laplace-Operator $\Laplace$ zu bekommen benötigen wir zuerst eine Diskretisierung des Ortes $x_j=-\pi+2\pi\frac{j}{N}\in [-\pi,\pi)$ für $j=0,\dots,N-1$ und $N\in\N$. Da wir periodische Lösungen $u$ der KGG suchen, bietet es sich an $u$ mithilfe von trigonometrischen Polynomen, d.h. einer Linearkombination der trigonometrischen Funktionen $\sin(k\cdot)$ und $\cos(k\cdot)$ für $k\in\Z$, zu approximieren. In komplexer Darstellung erfüllen diese für $k,\ell\in\Z$ die Orthogonalitätseigenschaft 
-\[\int_{-\pi}^\pi e^{ikx}\cdot e^{i\ell x}dx=\begin{cases}0,\quad k\ne \ell\\ 2\pi,\quad k=\ell\end{cases}\]
+\[\int_{-\pi}^\pi e^{ikx}\cdot e^{i\ell x}dx=\begin{cases}0,\quad k\ne \ell\\ 2\pi,\quad k=\ell.\end{cases}\]
 Diese Approximation mit endlich vielen Basispolynomen $e^{ik\cdot}$ nennt man endliche Fourier-Approximation der Funktion $u$. Wir werden den Ansatz zuerst ausführlich für $d=1$ erläutern und später die Verallgemeinerung auf höhere Dimensionen aufzeigen.\\
 Die Fourier-Approximation ist für jedes $t>0$, $N\in 2\N$ und eine Indexmenge $\mathcal{J}_N=\left\lbrace -\frac{N}{2},\dots,-1,0,1,\dots,\frac{N}{2}-1\right\rbrace$ definiert durch
 \begin{equation}
@@ -624,15 +635,14 @@ Im Folgenden nehmen wir an, die Fourier-Approximation (\ref{eqn:fourier_approx})
 \end{equation}
 Dabei ist wegen $d=1$ der Laplace-Operator $\Laplace$ darstellbar als $\Laplace=\partial^2_x$.\\
 Betrachten wir nun $(\partial^2_x u(t,x_j))_{j=0,\dots,N-1}$ für den Vektor $u_N(t)=(u(t,x_j))_{j=0,\dots,N-1}$ so gilt
-\[(\partial^2_x u(t,x_j))_{j=0,\dots,N-1}\approx \mathcal{F}_N^{-1}\left(\big(-k^2\big)_{k\in\mathcal{J}_N}\odot\mathcal{F}_Nu_N(t)\right)\]
+\[(\partial^2_x u(t,x_j))_{j=0,\dots,N-1}\approx \mathcal{F}_N^{-1}\left(\big(-k^2\big)_{k\in\mathcal{J}_N}\odot\mathcal{F}_Nu_N(t)\right),\]
 wobei $\odot$ die komponentenweise Multiplikation der Vektoren bezeichnet.\\
 Damit erhalten wir für $\beta_N=(\beta(x_j))_{j=0,\dots,N-1}$ die im Ort diskretisierte KGG
 \begin{equation}
 \label{eqn:kgg_discretespace}
-\dtt{u}_N(t)=\alpha \mathcal{F}_N^{-1}\left(\big(-k^2\big)_{k\in\mathcal{J}_N}\odot\mathcal{F}_Nu(t)_N\right) -\beta_N\odot u_N(t)
+\dtt{u}_N(t)=\alpha \mathcal{F}_N^{-1}\left(\big(-k^2\big)_{k\in\mathcal{J}_N}\odot\mathcal{F}_Nu(t)_N\right) -\beta_N\odot u_N(t).
 \end{equation}
-Diese werden wir nun in ein System erster Ordnung umschreiben, um anschließend ein Splitting darauf anzuwenden. 
-
+Diese werden wir nun in ein System erster Ordnung umschreiben, um anschließend ein Splitting darauf anzuwenden.\\
 Es gilt für $t>0$, $v_N(t)\coloneqq \dt u_N(t)$ und ein Gewicht $w\in [0,1]$ die zu (\ref{eqn:kgg_discretespace}) äquivalente Darstellung
 \begin{align}
 \label{eqn:kgg_discrete_first_order_part1}
@@ -657,7 +667,7 @@ Zuerst betrachten wir den ersten Teil der im Ort diskretisierten KGG (\ref{eqn:k
 Damit haben wir nun ein System gewöhnlicher Differentialgleichungen der Größe $2N$ im Fourierraum, welches wir explizit über die Matrixexponentialfunktion lösen können:
 \[\begin{pmatrix}\fourier{u}_N\\\fourier{v}_N\end{pmatrix}(t)=\exp\underbrace{\left(t\begin{pmatrix}0 & wI_N\\ \alpha\diag\big(-k^2\big)_{k\in\mathcal{J}_N} & 0\end{pmatrix}\right)}_{=M}
 \begin{pmatrix}\fourier{u}_N\\\fourier{v}_N\end{pmatrix}(0)\]
-Die Blockmatrix $M$ lässt sich in eine äquivalente Blockdiagonalmatrix umformen, indem zueinander gehörende Einträge der $\fourier{u}_N$ und $\fourier{v}_N$ nebeneinander getauscht werden. Konkret bedeutet dies, dass die $i$-te Komponente des Vektors $\fourier{u}_N$ neben die $i$-te Komponente des Vektors $\fourier{v}_N$ getauscht wird. Die Matrixexponentialfunktion von $M$ lässt sich dann durch die Matrixexponentialfunktion der $2\times 2$ Blöcke $M_k$ berechnen. 
+Die Blockmatrix $M$ lässt sich in eine äquivalente Blockdiagonalmatrix umformen, indem zueinander gehörende Einträge der $\fourier{u}_N$ und $\fourier{v}_N$ nebeneinander getauscht werden. Konkret bedeutet dies, dass die $i$-te Komponente des Vektors $\fourier{u}_N$ neben die $i$-te Komponente des Vektors $\fourier{v}_N$ getauscht wird. Die Matrixexponentialfunktion von $M$ lässt sich dann durch die Matrixexponentialfunktion der $2\times 2$ Blöcke $M_k$ berechnen:
 \[\exp(M_k)=\exp\begin{pmatrix}0 & wt\\ -\alpha k^2t & 0\end{pmatrix}=
 \begin{pmatrix}\cos(t\sqrt{\alpha w}|k|) & \sinc(t\sqrt{\alpha w}|k|)tw\\-\sinc(t\sqrt{\alpha w}|k|)\alpha |k|^2t & \cos(t\sqrt{\alpha w}|k|)\end{pmatrix}\]
 Wir fassen nun die Ergebnisse zum numerischen Fluss des ersten Teil des Splittings (\ref{eqn:kgg_discrete_first_order_part1}) zusammen.\\
@@ -676,14 +686,14 @@ Führt man die Fourier-Transformation in jeder Dimension durch, so ergibt sich f
 \[u(t,x)\approx\sum_{k_1\in\mathcal{J}_N}\fourier{u}_{k_1}(t,x_2)e^{ik_1x_1}=\sum_{k_1\in\mathcal{J}_N}\sum_{k_2\in\mathcal{J}_N}\fourier{u}_{k_1,k_2}(t)e^{i(k_1x_1+k_xx_2)}.\]
 Die Funktion $\fourier{u}_{k_1}$ bezeichnet die Fourier-Koeffizienten für die eindimensionale Fourier-Approximation entlang der Richtung $x_1$. Durch eine wiederholte Fourier"=Approximation dieser Funktion erhalten wir die zweidimensionale Fourier-Approximation mit den Fourier-Koeffizienten $\fourier{u}_{k_1,k_2}$.\\
 Analog zu der Approximation (\ref{eqn:laplace_approxu}) erhält man
-\[\Laplace u(t,x)=\sum_{k_1\in\mathcal{J}_N}-k_1^2\fourier{u}_{k_1}(t,x_2) e^{ik_1x_1}=\sum_{k_1,k_2\in\mathcal{J}_N}-(k_1^2+k_2^2)\fourier{u}_{k_1,k_2}(t)e^{i(k_1x_1+k_2x_2)}\]
-Das Vorgehen im Mehrdimensionalen unterscheidet sich also nur durch eine aufwändigere Indizierung, ist jedoch im Kern dieselbe. Ersetzt man in obigen Ausführungen für $d=1$ sämtliche $|k|$ durch \[\norm{k}_2=\sqrt{k_1^2+\dots+k_d^2}\]so erhält man, bei passender Indizierung der diskreten Fourier-Approximation, eine Darstellung der Lösung für beliebige Dimensionen $d\in\N$.
+\[\Laplace u(t,x)=\sum_{k_1\in\mathcal{J}_N}-k_1^2\fourier{u}_{k_1}(t,x_2) e^{ik_1x_1}=\sum_{k_1,k_2\in\mathcal{J}_N}-(k_1^2+k_2^2)\fourier{u}_{k_1,k_2}(t)e^{i(k_1x_1+k_2x_2)}.\]
+Das Vorgehen im Mehrdimensionalen unterscheidet sich also nur durch eine aufwändigere Indizierung, ist jedoch im Kern dieselbe. Ersetzt man in obigen Ausführungen für $d=1$ sämtliche $|k|$ durch \[\norm{k}_2=\sqrt{k_1^2+\dots+k_d^2},\]so erhält man, bei passender Indizierung der diskreten Fourier-Approximation, eine Darstellung der Lösung für beliebige Dimensionen $d\in\N$.
 \subsubsection*{Method of lines für den zweiten Teil des Splittings}
 Einen numerischen Löser für den zweiten Teil (\ref{eqn:kgg_discrete_first_order_part1}) der im Ort diskretisierten KGG erhält man auf ähnliche Weise. Wir suchen für $t>0$, $\beta(x)>0$ und ein Gewicht $\tilde{w}=1-w\in [0,1]$ die Lösung der Differentialgleichung
 \begin{equation*}
 \dt{\begin{pmatrix}u_N\\v_N\end{pmatrix}}(t)=
 \begin{pmatrix}0 & \tilde{w}I_N\\ -\diag({\beta_N}) & 0\end{pmatrix}
-\begin{pmatrix}u_N\\v_N\end{pmatrix}(t)
+\begin{pmatrix}u_N\\v_N\end{pmatrix}(t).
 \end{equation*}
 Die Struktur der Differentialgleichung zeigt, dass sich ihre Lösung ebenfalls mithilfe der Matrixexponentialfunktion darstellen lässt. Die Matrixexponentialfunktion der Blockmatrix ist wiederum durch nebeneinander Sortieren der $i$-ten Komponenten der Vektoren $u_N$ und $v_N$ äquivalent zu einer Blockdiagonalmatrix mit $2\times 2$ Blöcken auf der Diagonalen. Für diese gelten:
 \[\exp\begin{pmatrix}0 & \tilde{w}t\\ -t\beta(x_j) & 0\end{pmatrix}=
@@ -693,7 +703,7 @@ Daraus erhalten wir zu den Anfangswerten $g$ und $h$ für festes $x\in \Torus^d$
 \[\begin{pmatrix}u\\v\end{pmatrix}(t,x)=
 \begin{pmatrix}\cos(t\sqrt{\beta(x)\tilde{w}}) & \sinc(t\sqrt{\beta(x)\tilde{w}})\tilde{w}t\\
 -\sinc(t\sqrt{\beta(x)\tilde{w}})\beta(x)t & \cos(t\sqrt{\beta(x)\tilde{w}})\end{pmatrix}
-\begin{pmatrix}g\\h\end{pmatrix}(x)\]
+\begin{pmatrix}g\\h\end{pmatrix}(x).\]
 Wir benötigen im Gegensatz zum ersten Teil keine feste Ortsdiskretisierung und bekommen sogar eine exakte Lösung des Teilproblems. Da die Punkte für die verschiedenen Teile des Splittings identisch sein müssen, sind wir jedoch durch die Anforderung festgelegt, die die Fourier-Approximation an die Punkte stellt.\\
 Mithilfe der \emph{method of lines}, d.h. punktweiser Auswertung der Lösung für alle benötigten $x$, bekommt man schlussendlich eine numerische Lösung.
 \subsubsection*{Konkretisierung des Algorithmus}
@@ -775,7 +785,7 @@ u(t,x_N)&=\mathcal{F}_N^{-1}\left(\mathcal{F}_Ng(x_N)\right)=g(x_N)=u(0,x_N)\\
 \dt{u}(t,x_N)&=\mathcal{F}_N^{-1}\left(\mathcal{F}_Ng(x_N)\odot \big(-\alpha |k|^2t\big)_{k\in\mathcal{J}_N}\right)+h(x_N)\\
 &=t \alpha \mathcal{F}_N^{-1}\left(\mathcal{F}_N\odot \big(-|k|^2\big)_{k\in\mathcal{J}_N}\right)+h(x_N)\\
 &=t\alpha \Laplace_N g(x_N)+h(x_N)\\
-&\approx t\dtt{u}(0,x_N)+\dt{u}(0,x_N)
+&\approx t\dtt{u}(0,x_N)+\dt{u}(0,x_N).
 \end{align*}
 Somit wird in diesem Randfall nur die erste Ableitung geändert und dieses Update entspricht einem expliziten Eulerschritt für die erste Ableitung. Das Splittingverfahren ist dann äquivalent zu einem sogenannten Leapfrog-Verfahren, welches schneller zu berechnen ist, da eine Anwendung von $\mathcal{F}_N^{-1}$ entfällt. Wir erhalten für die Stabilität eine \emph{Courant-Friedrichs-Lewy-Bedingung} (CFL-Bedingung) der Form $\tilde{c}\tau\le h=\frac{2\pi}{N}$. Im Fall $k=0$ entspricht die CFL-Zahl $\tilde{c}$ der CFL-Zahl des expliziten Eulers.\\[0.3cm]
 Wir beobachten an Abbildung \ref{fig:splitting_cfl}, dass die CFL-Zahl abhängig von $w$ ist und für $w=1$ ein Minimum annimmt. Die Kurven für verschiedene $N$ weichen dabei voneinander ab, da die Schätzung des kleinsten Zeitpunkts, für welchen die Berechnung instabil ist, heuristisch ist. Wir definieren die Berechnung als instabil, wenn die absolute Steigung im Ordnungsplot kleiner als 1 oder größer als 3 ist oder der beobachtete relative Fehler größer als 1 ist. Diese Instabilitätseffekte beobachtet man für $w\to 1$ erst für große $\tau$, die bei $T=1$ nur sehr wenigen Splittingschritten entsprechen.
@@ -816,7 +826,7 @@ Ein Wahrscheinlichkeitsraum $(\Omega,\mathcal{F},P)$ ist ein Tripel bestehend au
 
 \begin{mathdef}[Verteilungsfunktion]
 Die Verteilungsfunktion $F_Y$ der Zufallsvariablen $Y\colon\Omega\to\R$ ist definiert durch
-\[F_Y(y)\coloneqq P(Y\le y)=P(\left\lbrace \omega\in\Omega |\: Y(\omega)\le y\right\rbrace),\quad y\in\R\]
+\[F_Y(y)\coloneqq P(Y\le y)=P(\left\lbrace \omega\in\Omega |\: Y(\omega)\le y\right\rbrace),\quad y\in\R.\]
 \end{mathdef}
 \begin{mathdef}[Dichte einer Verteilung]
 Existiert zu der Verteilungsfunktion $F_Y$ der Zufallsvariablen $Y\colon\R\to\R$ eine Funktion $\rho_Y\colon\R\to\R_{\ge 0}$ mit
@@ -840,13 +850,13 @@ Folgende Definitionen werden die später hauptsächlich untersuchten Eigenschaft
 Ist $Y\colon\R\to\R$ eine reelle Zufallsvariable mit Dichte $\rho_Y$ so definieren wir den Erwartungswert von $Y$ als
 \[\mu_Y=\E[Y]=\int_{-\infty}^\infty y\rho_Y(y)dy\]
 und die Varianz von $Y$ als 
-\[\sigma_Y^2=\text{var}(Y)=\int_{-\infty}^\infty (y-\mu_Y)^2\rho_Y(y)dy=\E[Y^2]-\E[Y]^2\]
+\[\sigma_Y^2=\text{var}(Y)=\int_{-\infty}^\infty (y-\mu_Y)^2\rho_Y(y)dy=\E[Y^2]-\E[Y]^2.\]
 \end{mathdef}
 Ohne Beweis präsentieren wir die Inversionsmethode. Diese ist nützlich um aus Zufallsvariablen einer bestimmten Verteilung Zufallsvariablen einer anderen Verteilung zu gewinnen. In der Numerik ist dies ist essentiell für die Erzeugung von Pseudozufallszahlen von beliebigen Verteilungen. Die Methode ist aber auch wichtig für die "`stochastische Normierung"' von verschiedenen Zufallsvariablen zu einem gemeinsamen Wahrscheinlichkeitsraum, auf dem dann Erwartungswerte berechnet werden können.
 \begin{maththeorem}[Inversionsmethode]
 \label{thinversionsmethode}
 Ist $Y$ eine reelle Zufallsvariable mit Verteilungsfunktion $F_Y$, so definieren wir deren Quantilfunktion als
-\[F_Y^{-1}(p)\coloneqq \inf\lbrace y\in\R |\: F_Y(y)\ge p\rbrace,\quad p\in\R\]
+\[F_Y^{-1}(p)\coloneqq \inf\lbrace y\in\R |\: F_Y(y)\ge p\rbrace,\quad p\in\R.\]
 Dann gilt
 \begin{itemize}
 \item $z\le F_Y(y)\iff F_Y^{-1}(z)\le y$\\
@@ -858,15 +868,15 @@ Der auch \emph{Gesetz der großen Zahlen} genannte Zentrale Grenzwertsatz bildet
 \label{thzentralgrenzwert}
 Seien $Y_1,Y_2,\dots,Y_n$ unabhängige und identisch verteilte Zufallsvariablen mit $\E[Y_i]=\mu$ und $\text{var}(Y_i)=\sigma^2<\infty$ Der Mittelwert sei definiert als
 \[\overline{Y}\coloneqq \frac{1}{n}\sum_{i=1}^nY_i\]
-und skaliert durch
-\[Z_n=\sqrt{n}\left(\frac{\overline{Y}-\mu}{\sigma}\right)\]
+und linear transformiert durch
+\[Z_n=\sqrt{n}\left(\frac{\overline{Y}-\mu}{\sigma}\right).\]
 Dann konvergiert für $n\to\infty$ die Verteilungsfunktion von $Z_n$ zu einer $\mathcal{N}(0,1)$ verteilten Verteilungsfunktion.
 \end{maththeorem}
 \begin{mathdef}[Zufallsvektoren]
 Wir nennen $Y=(Y_1,\dots,Y_n)$ einen $n$-dimensionalen Zufallsvektor (häufig auch einfach $n$-dimensionale Zufallsvariable), wenn die Komponenten $Y_1,\dots,Y_n\colon\Omega\to\R$ eindimensionale reelle Zufallsvariablen sind. Sind die Komponenten $Y_i$ stochastisch unabhängig und besitzt jede Komponente $Y_i$ eine Dichte $\rho_{Y_i}$, so gilt die wichtige Darstellung der gemeinsamen Dichtefunktion $\rho_Y$
 \[\rho_Y=\prod_{i=1}^n \rho_{Y_i}\]
 und die Verteilungsfunktion lässt sich darstellen als
-\[F_Y(y_1,\dots,y_n)=\int_{-\infty}^{y_1}\dots\int_{-\infty}^{y_n}\rho_Y(z_1,\dots,z_n)dy_1\dots dy_n\]
+\[F_Y(y_1,\dots,y_n)=\int_{-\infty}^{y_1}\dots\int_{-\infty}^{y_n}\rho_Y(z_1,\dots,z_n)dy_1\dots dy_n.\]
 \end{mathdef}
 
 \subsection{Endliche Parametrisierung}
@@ -896,7 +906,7 @@ Sei $\mu_Y(t)$ der Erwartungswert des Prozesses $Y_t$ am Punkt $t$ und sei $C(t,
 sind. Die paarweise unkorrelierten Zufallsvariablen $Z_i(\omega)$ erfüllen
 \[\E[Z_i]=0,\quad \E[Z_iZ_j]=\delta_{ij}\]
 und sind definiert durch
-\[Z_i(\omega)=\frac{1}{\sqrt{\lambda_i}}\int_T (Y_t(\omega)-\mu_Y(t))\Psi_i(t)dt\]
+\[Z_i(\omega)=\frac{1}{\sqrt{\lambda_i}}\int_T (Y_t(\omega)-\mu_Y(t))\Psi_i(t)dt.\]
 Um eine Approximation zu erhalten wird die Reihe bei einem gewissen Index $n\in\N$ abgebrochen.
 \end{mathdef}
 Wiederrum erhält man daraus für normalverteilte Prozesse eine endliche Menge von unabhängigen Zufallsvariablen. Für nicht-normalverteilte Prozesse wird häufig dennoch die Karhunen-Loeve-Darstellung verwendet und zusätzlich angenommen, dass die $Z_i$ unabhängig sind. Diese Vorgehensweise ist nicht sehr zufriedenstellend und ein offenes Forschungsproblem.
@@ -907,7 +917,7 @@ In Analogie zur Klein-Gordon-Gleichung (\ref{kgg}) definieren wir für einen Wah
 \label{skgg}
 \dtt{u}(t,x,y)&=\alpha(y) \Laplace u(t,x,y) - \beta(x,\omega)u(t,x,y), \: t>0, \, x\in \Torus^d\\
 u(0,x,y)&=u_0(x,y), \: x\in \Torus^d\\
-\dt{u}(0,x,y)&=v_0(x,y), \: x\in \Torus^d
+\dt{u}(0,x,y)&=v_0(x,y), \: x\in \Torus^d.
 \end{align}
 Die Lösung \[u(t,x,y)\colon [0,T]\times\Torus^d\times \R^N\to\R\] ist folglich eine zufallsabhängige Größe.\\
 Dabei ist die grundlegende Annahme, dass (\ref{skgg}) $P$-fast-sicher wohl gestellt ist, d.h. die Menge an Punkten $\omega$, für welche die partielle Differentialgleichung mit fixem $y=Y(\omega)$ keine eindeutige Lösung besitzt, ist eine Nullmenge bezüglich des Wahrscheinlichkeitmaßes $P$.\\
@@ -922,12 +932,12 @@ löst die stochastische KGG (\ref{skgg}) für $\alpha(y)=\frac{y}{d}$ und $\beta
 Für den Erwartungswert und die Varianz von $u$ gelten
 \begin{align*}
 \E[u(t,x,Y)]&=\int_2^3u(t,x,y)dy=\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\\
-\text{var}(u(t,x,Y))&=\frac{1}{t}\sin^2(\hat{x})\left(2t + \sin(6t) - \sin(4t)\right)- \left(\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\right)^2
+\text{var}(u(t,x,Y))&=\frac{1}{t}\sin^2(\hat{x})\left(2t + \sin(6t) - \sin(4t)\right)- \left(\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\right)^2.
 \end{align*}
 Um einen potentiellen Denkfehler zu vermeiden, weisen wir an dieser Stelle explizit darauf hin, dass 
-\[\E[u(t,x,Y)]=\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\quad \neq \quad 2\sin(\hat{x})\cos(\frac{5}{2}t)=u(t,x,\E[Y])\]
+\[\E[u(t,x,Y)]=\frac{2}{t}\sin(\hat{x})(\sin(3t) - \sin(2t))\quad \neq \quad 2\sin(\hat{x})\cos(\frac{5}{2}t)=u(t,x,\E[Y]).\]
 Dies erkennt man beispielsweise am Zeitpunkt $t=\frac{\pi}{2}$, wo gilt
-\[\E[u(t,x,Y)]=-\sin(\hat{x})\pi \neq -\sin(\hat{x})\sqrt{2}=u(t,x,\E[Y])\]
+\[\E[u(t,x,Y)]=-\sin(\hat{x})\pi \neq -\sin(\hat{x})\sqrt{2}=u(t,x,\E[Y]).\]
 Der Erwartungswert ist linear, die Abhängigkeiten von $y$ sind es aber nicht. Diese erste fehlgeschlagene Idee, den Erwartungswert durch das Lösen eines deterministischen Systems zu erhalten, ist jedoch nicht vollends vergebens. Wir werden am Beispiel der Monte-Carlo-Methode sehen, dass wir dazu allerdings weit mehr als ein deterministisches System lösen müssen.
 \end{mathbsp}
 

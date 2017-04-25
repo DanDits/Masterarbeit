@@ -7,19 +7,19 @@ Die stochastische Klein-Gordon-Gleichung ist für eine $N$-dimensionale Zufallsv
 \label{eqn:galerkin_skgg}
 \partialdtt{u}(t,x,y)&=\alpha(y) \Laplace u(t,x,y) - \beta(x,\omega)u(t,x,y), \: t>0, \, x\in \Torus^d\\
 u(0,x,y)&=g(x,y), \: x\in \Torus^d\nonumber\\
-\partialdt{u}(0,x,y)&=h(x,y), \: x\in \Torus^d\nonumber
+\partialdt{u}(0,x,y)&=h(x,y), \: x\in \Torus^d.\nonumber
 \end{align}
 Seien $\Phi_m(Y)$ die zu $Y$ gehörenden gPC Basisfunktionen. Diese erfüllen die Orthogonalitätsbedingung 
-\[\E[\Phi_i(Y)\Phi_j(Y)]=\delta_{ij}\] 
+\[\E[\Phi_i(Y)\Phi_j(Y)]=\delta_{ij}.\] 
 Sei $\Poly_P^N$ der Raum aller Polynome mit summiertem Grad kleiner gleich $P$ und Dimension $\binom{N+P}{P}$. Die gPC Projektion der Lösung der sKGG zu einem fixen Zeitpunkt $T>0$ und Ort $x\in\Torus^d$ ist definiert durch
 \begin{align*}
 u_M(T,x,Y)&=\sum_{m=0}^M\hat{u}_m(T,x)\Phi_m(Y)\in\Poly_P^N,\quad  M+1=\binom{N+P}{P}\\
-\hat{u}_m(T,x)&=\E[u(T,x,Y)\Phi_m(Y)]
+\hat{u}_m(T,x)&=\E[u(T,x,Y)\Phi_m(Y)].
 \end{align*}
 Ist $\rho$ die Dichtefunktion von $Y$, so stimmt die gPC Projektion mit der Bestapproximation in $L_\rho^2$ überein. Diese Approximation ist im $L_\rho^2$ Sinne optimal, allerdings benötigen wir zur Berechnung der Koeffizienten $\hat{u}_m$ die unbekannte exakte Lösung $u(T,x,Y)$.\\
 Der stochastische Galerkinansatz ist eine Erweiterung des klassischen Galerkinansatzes. Sei dazu eine weitere Approximation $v_M\in\Poly_P^N$ gegeben durch
 \begin{equation}
-v_M(t,x,Y)=\sum_{m=0}^M\hat{v}_m(t,x)\Phi_m(Y)
+v_M(t,x,Y)=\sum_{m=0}^M\hat{v}_m(t,x)\Phi_m(Y).
 \end{equation}
 Die Forderung an $v_M$ ist dann, dass das Residuum der sKGG (\ref{eqn:galerkin_skgg}) orthogonal zu allen Polynomen aus $\Poly_P^N$ ist. Eine Motivation dafür ist die schwache Lösung der sKGG, welche diese Orthogonalität für alle Polynome $\Poly^N$ erfüllt. Ist die schwache Lösung hinreichend regulär, so stimmt sie mit der Lösung der sKGG überein.
 Konkret lautet die Orthogonalitätsbedingung an das Residuum für $t>0$ und $x\in\Torus^d$
@@ -28,7 +28,7 @@ Konkret lautet die Orthogonalitätsbedingung an das Residuum für $t>0$ und $x\i
 \E\left[\left(\partialdtt{v_M}(t,x,Y)-\alpha(Y)\Laplace v_M(t,x,Y)+\beta(x,Y)v_M(t,x,Y)\right)\Phi_k\right]=0
 \end{equation} 
 für alle $k=0,\dots,M$.\\
-Wir wollen jetzt aus der Orthogonalitätsbedingung (\ref{eqn:galerkinOrtho}) eine Gleichung für die Koeffizienten $\hat{v}_m$ gewinnen. Dazu setzen wir die Definition von $v_M$ in die Gleichung ein und erhalten
+Wir wollen jetzt aus der Orthogonalitätsbedingung (\ref{eqn:galerkinOrtho}) eine Gleichung für die Koeffizienten $\hat{v}_m$ gewinnen. Dazu setzen wir die Definition von $v_M$ in die Gleichung ein und erhalten:
 \begin{align}
 \sum_{m=0}^M\partialdtt{\hat{v}}_m(t,x)\underbrace{\E[\Phi_m(Y)\Phi_k(Y)]}_{=\delta_{mk}}&=\E\left[\alpha(Y)\sum_{m=0}^M\Laplace \hat{v}_m(t,x)\Phi_m(Y)\Phi_k(Y)\right]\nonumber\\
 &\quad -\E\left[\beta(x,Y)\sum_{m=0}^M\hat{v}_m(t,x)\Phi_m(Y)\Phi_k(Y)\right]\nonumber\\

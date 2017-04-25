@@ -10,7 +10,7 @@ Die stochastische KGG (\ref{skgg}) für $d$ räumliche Dimensionen, $N$ stochast
 \begin{align*}
 \partialdtt{u}(t,x,y)&=\alpha(y) \Laplace_x u(t,x,y) - \beta(x,\omega)u(t,x,y), \: t>0, \, x\in \Torus^d\\
 u(0,x,y)&=u_0(x,y), \: x\in \Torus^d\\
-\partialdt{u}(0,x,y)&=v_0(x,y), \: x\in \Torus^d
+\partialdt{u}(0,x,y)&=v_0(x,y), \: x\in \Torus^d.
 \end{align*}
 Im klassischen Sinne bedeutet Kollokation, dass eine Approximation für eine diskrete Knotenmenge $\Theta_Y=\lbrace y_i\in\R^N\mid i=1,\dots,S\rbrace$ exakt ist. Auf die stochastische KGG übertragen muss also für $y=y_i\in\Theta_Y$ die Lösung $u(t,x,y_i)$ für $x\in\Torus^d$ und $t>0$ vorliegen und die Approximation $w$ erfüllt $w(t,x,y_i)=u(t,x,y_i)$ für $i=1,\dots,S$. Da wir die exakte Lösung $u(t,x,y_i)$ nicht kennen, sondern für einen Zeitpunkt $T>0$ und eine Knotenmenge $\lbrace x_j\in\Torus^d\mid j=1,\dots,H\rbrace$ nur eine Approximation $\tilde{u}$ berechnen können (z.B. mithilfe des Strang-Splittings), gilt für festes $x_j$ die Kollokationsbedingung lediglich approximativ:
 \[w(T,x_j,y_i)=u(T,x_j,y_i)\approx \tilde{u}(T,x_j,y_i),\quad i=1,\dots,S\]
@@ -24,7 +24,7 @@ Dann wählen wir als Interpolationspolynom die Funktion
 w_M^{(j)}(Y)=\sum_{m=0}^M\hat{w}_m^{(j)}\Phi_m(Y)\in\Poly_P^N(Y),\quad j=1,\dots,H
 \end{equation}
 und fordern als Interpolationsbedingung
-\[w_M^{(j)}(y_i)=u(T,x_j,y_i),\quad i=1,\dots,S, j=1,\dots,H\]
+\[w_M^{(j)}(y_i)=u(T,x_j,y_i),\quad i=1,\dots,S, j=1,\dots,H.\]
 Die Notation macht klar, dass wir zu einem gegebenen Zeitpunkt $T>0$ und jedem festen Knotenpunkt $x_j$ die stochastische Funktion $u(T,x_j,Y)$ durch ein Polynom in $Y$ approximieren wollen.\\
 Betrachten wir die Gleichung (\ref{eqn:coll_interpol_basic}) in den Knotenpunkten $y_i$ für jedes $i=1,\dots,S$, so können wir das entstehende System kompakt schreiben als
 \begin{equation}
@@ -35,16 +35,16 @@ mit
 \begin{align*}
 A&=(\Phi_m(y_i))_{i=1,\dots,S;m=0,\dots,M}\in\R^{S\times (M+1)}\\
 \hat{w}&=(\hat{w}_m^{(j)})_{m=0,\dots,M;j=1,\dots,H}\in\R^{(M+1)\times H}\\
-u&=(u(T,x_j,y_i))_{i=1,\dots,S;j=1,\dots,H}\in\R^{S\times H}\\
+u&=(u(T,x_j,y_i))_{i=1,\dots,S;j=1,\dots,H}\in\R^{S\times H}.
 \end{align*}
 Für jeden Knotenpunkt $x_j$ ist ein lineares Ausgleichsproblem der Größe $S\times (M+1)$ zu lösen. Ist $S\neq M+1$, so verwenden wir die Moore-Penrose-Inverse $A^+$ von $A$ definiert durch
-\[A^+\coloneqq \lim\limits_{\delta\to 0}(A^TA+\delta I)^{-1}A^T\]
+\[A^+\coloneqq \lim\limits_{\delta\to 0}(A^TA+\delta I)^{-1}A^T.\]
 Dann minimiert $\hat{w}\coloneqq A^+u$ den Ausdruck $\norm{Aw-u}_2$.\\
 Ist $S=M+1$ und $A$ regulär, so gilt $A^+=A^{-1}$ und $\hat{w}$ ist die eindeutige Lösung des linearen Gleichungssystems.\\[0.2cm] 
 Die obige Schreibweise erlaubt es in vielen Programmiersprachen die Systeme gleichzeitig zu lösen und bietet somit einen starken Laufzeitvorteil gegenüber dem Lösen von $H$ separaten Gleichungen. Um sicherzustellen, dass das System nicht unterbestimmt ist, muss gelten $S\ge M+1=\binom{N+P}{P}$. Später werden wir an verschiedenen Beispielen Konsequenzen dieser Bedingung genauer betrachten.
 \begin{mathbem}
 In Gleichung (\ref{eqn:gpc_approx_exp}) wurde gezeigt, dass sich der Erwartungswert an der Stelle $x_j$ approximieren lässt durch
-\[\E[u(t,x_j,Y)]\approx \hat{w}_0^{(j)}\]
+\[\E[u(t,x_j,Y)]\approx \hat{w}_0^{(j)}.\]
 Da die Gleichungen gekoppelt sind, müssen aber trotzdem auch alle anderen $\hat{w}_m$ berechnet werden.
 \end{mathbem}
 \subsection{Wahl der Interpolationspunkte}
@@ -54,7 +54,7 @@ Wir wollen direkt am Anfang darauf hinweisen, dass im Mehrdimensionalen für $N>
 Der Satz von Cauchy ist ein erster Orientierungspunkt um die Abhängigkeit der Interpolationsgüte von der Wahl der Knotenpunkte für den eindimensionalen Fall und einem kompakten Intervall zu untersuchen.
 \begin{maththeorem}[Cauchy]
 Sei $f\in C^{S}[-1,1]$ eine $S$ mal stetig differenzierbare Funktion. Dann gibt es für jede Knotenmenge $\lbrace y_1,\dots,y_{S}\rbrace$ ein $\xi\in [-1,1]$, so dass für $y\in[-1,1]$ der Interpolationsfehler gegeben ist durch
-\[f(y)-\mathcal{Q}_{S}f=\frac{f^{(S)}(\xi)}{S!}\prod_{i=1}^{S}(y-y_i)\]
+\[f(y)-\mathcal{Q}_{S}f=\frac{f^{(S)}(\xi)}{S!}\prod_{i=1}^{S}(y-y_i).\]
 Dabei ist $\mathcal{Q}_Sf\in\Poly_S$ das Interpolationspolynom von $f$ mit $\mathcal{Q}_Sf(y_i)=f(y_i)$ für $i=1,\dots,S$.
 \end{maththeorem}
 
@@ -64,7 +64,7 @@ ist somit das Ziel, den Term $\norm{w(y)}$ abhängig von der Norm zu minimieren.
 \begin{mathbem}[\chebyspace Interpolation]
 \label{bem:cheby}
 Die Nullstellen $y_i=\cos\left(\pi\frac{2i-1}{2S+2}\right)$, für $i=1,\dots,S+1$, der \chebyspace Polynome $T_{S+1}(y)=\cos((S+1)\arccos(y))$ minimieren den Ausdruck $\norm{w(y)}_\infty$ auf $[-1,1]$ und bieten auf $[-1,1]$ optimale Interpolationsgüte. Es gilt 
-\[\norm{f(y)-\mathcal{Q}_{S+1}f}_\infty\le \frac{\norm{f^{(S+1)}}_\infty}{2^S(S+1)!}\]
+\[\norm{f(y)-\mathcal{Q}_{S+1}f}_\infty\le \frac{\norm{f^{(S+1)}}_\infty}{2^S(S+1)!}.\]
 \end{mathbem}
 Die \chebyspace Polynome bilden eine Orthogonalbasis bezüglich $\langle \cdot,\cdot\rangle_{L_w^2[-1,1]}$ mit $w(y)=(1-y^2)^{-\onehalf}$. Eine Idee ist es nun, auch Nullstellen anderer orthogonalen Polynombasen als Knotenpunkte zu verwenden um ähnliche Approximationsergebnisse auf nicht-kompakten Intervallen zu erhalten.
 \begin{maththeorem}
@@ -72,10 +72,10 @@ Die \chebyspace Polynome bilden eine Orthogonalbasis bezüglich $\langle \cdot,\
 Sei $\lbrace \Phi_m\in\Poly_m\mid m=0,\dots,M\rbrace\subset L_w^2(\mathcal{J})$ eine Orthonormalbasis von Polynomen und $(y_i,a_i)_{i=0,\dots,M}$ eine Quadraturformel mit Exaktheitsgrad $2M$ bezüglich $w$ und $y_i\neq y_j,i\neq j$, d.h. alle Polynome $p\in\Poly_{2M}$ vom Grad kleiner gleich $2M$ werden mit dem Gewicht $w$ exakt integriert:
 \[\int_\mathcal{J} p(y)w(y)dy=\sum_{i=0}^M a_ip(y_i)\]
 Sei weiter das Interpolationspolynom  $\mathcal{Q}_Mf$ einer Funktion $f\colon \mathcal{J}\to\R$ bezüglich den Interpolationspunkten $\lbrace y_i\mid i=0,\dots,M\rbrace$ beschrieben durch
-\[\mathcal{Q}_Mf(y)=\sum_{m=0}^M\hat{w}_m\Phi_m(y)\]
+\[\mathcal{Q}_Mf(y)=\sum_{m=0}^M\hat{w}_m\Phi_m(y).\]
 Die Koeffizienten $\hat{w}_m$ werden in Analogie zu (\ref{eqn:interpol_compact}) berechnet durch das Lösen des linearen Gleichungssystems
-\[A\hat{w}=\hat{f}\]
-Dann ist \[\hat{w}_i=\sum_{j=0}^M\Phi_i(y_j)a_jf(y_j)\approx \int_\mathcal{J} \Phi_i(y)f(y)w(y)dy,\quad i=0,\dots,M\]
+\[A\hat{w}=\hat{f}.\]
+Dann ist \[\hat{w}_i=\sum_{j=0}^M\Phi_i(y_j)a_jf(y_j)\approx \int_\mathcal{J} \Phi_i(y)f(y)w(y)dy,\quad i=0,\dots,M.\]
 \end{maththeorem}
 \begin{proof}
 Es ist $A_{ij}=\Phi_j(y_i)$. Da wir uns im eindimensionalen Fall befinden ($N$=1) ist die Vandermonde-artige Matrix $A$ invertierbar, da die $\Phi_i$ eine Basis bilden und die $y_i$ paarweise verschieden sind. Es gilt für $\widetilde{w}_i\coloneqq \sum_{j=0}^M\Phi_i(y_j)a_jf(y_j)$ und $\widetilde{w}\coloneqq (\widetilde{w}_i)^T$
@@ -84,7 +84,7 @@ Es ist $A_{ij}=\Phi_j(y_i)$. Da wir uns im eindimensionalen Fall befinden ($N$=1
 &=\sum_{j=0}^M\Phi_j(y_i)\sum_{k=0}^M\Phi_j(y_k)a_kf(y_k),\quad \text{Interpol.:} f(y_k)=\sum_{\ell=0}^M\hat{w}_\ell\Phi_\ell(y_k)\\
 &=\sum_{\ell=0}^M\hat{w}_\ell \sum_{j=0}^M\Phi_j(y_i)\sum_{k=0}^M\Phi_j(y_k)a_k\Phi_\ell(y_k)\\
 &\stackrel{\text{deg}(\Phi_j\Phi_\ell)\le 2M}{=}\sum_{\ell=0}^M\hat{w}_\ell\sum_{j=0}^M\Phi_j(y_i)\underbrace{\int_\mathcal{J}\Phi_j(y)\Phi_\ell(y)w(y)dy}_{=\delta_{j\ell}}\\
-&=\sum_{\ell=0}^M\hat{w}_\ell\Phi_\ell(y_i)=f(y_i)=\hat{f}_i
+&=\sum_{\ell=0}^M\hat{w}_\ell\Phi_\ell(y_i)=f(y_i)=\hat{f}_i.
 \end{align*}
 Also gilt $A\widetilde{w}=\hat{f}=A\hat{w}$. Da $A$ eine reguläre Matrix ist folgt schlussendlich $\widetilde{w}=\hat{w}$.
 \end{proof}
@@ -130,7 +130,7 @@ Eine Möglichkeit, für $N>1$ die Menge der Interpolationspunkte $\Theta_Y^N$ zu
 Dann gilt für die Anzahl der Interpolationspunkte $S=S_1 \dots S_N$. Ist die Anzahl an Basispolynomen $M+1$ fest, dann ist es schwierig, die Bedingung $S=M+1$ exakt zu erfüllen. Wir fordern daher, dass $S_1=\dots=S_N$ und $S\ge M+1$ minimal gewählt wird. Dieser Ansatz wird in Abbildungen durch \textit{full\_tensor} gekennzeichnet.
 \subsubsection*{Mehrdimensionale Interpolation durch pseudo-dünne Gitter}
 Eine weitere Idee für die mehrdimensionale Interpolation, welche die Gleichung $M+1=\binom{N+P}{P}$ exakt erfüllt, ist mit $S_1=\dots=S_N$ die Wahl
-\[\Theta_Y^N=\lbrace (y_{m_1},\dots,y_{m_N})\in \Theta_{Y_1}\otimes \dots \otimes \Theta_{Y_N} \mid |m|\le P,m\in\N_0^N \rbrace \]
+\[\Theta_Y^N=\lbrace (y_{m_1},\dots,y_{m_N})\in \Theta_{Y_1}\otimes \dots \otimes \Theta_{Y_N} \mid |m|\le P,m\in\N_0^N \rbrace.\]
 Es wird somit jedem Multi-Index $m\in\N_0^N$ genau ein mehrdimensionaler Interpolationspunkt $y$ zugewiesen und es gilt $M+1=S$. Die Matrix im Interpolationsansatz ist dadurch quadratisch und besitzt für kleine $P$ eine geringere Kondition als die Matrix aus dem vollen Tensorproduktansatz.\\[0.1cm]
 Die Wahl der Nummerierung der eindimensionalen Interpolationspunkte ist entscheidend. Für Legendre- oder Hermite-Polynome bietet sich eine betragsmäßig aufsteigende Sortierung der Punkte an, da diese symmetrisch um $0$ verteilt sind. Für Jacobi- und Laguerre-Polynome beobachten wir in Abbildung \ref{fig:poly_roots} keine Symmetrie. Dennoch gilt die Eigenschaft von Orthogonalpolynomen, dass die Nullstellen eines Polynoms höheren Grades zwischen den Nullstellen des vorherigen Polynoms zu finden sind. Wir sortieren die Nullstellen auf- oder absteigend um eine möglichst repräsentative Auswahl der Punkte des vollen Tensorprodukts zu bekommen. Die Idee ist dadurch motiviert, dass so die Struktur der Entwicklung der Nullstellen einer Polynombasis berücksichtigt wird, auch wenn diese keine eindeutige Schachtelung aufweisen.\\
 Dieser Ansatz wird in Abbildungen durch \textit{pseudo\_sparse} gekennzeichnet. Er ist eine Heuristik um den Einfluss der Überbestimmtheit des zu lösenden Systems besser zu verstehen und sollte nicht als robuste Methode für mehrdimensionale Interpolation aufgefasst werden.\\
@@ -211,10 +211,10 @@ Der zweite Ansatz zur stochastischen Kollokation basiert auf der Bestapproximati
 Sei $Y$ ein Zufallsvektor und $\Phi_m(Y)$ für $m=0,\dots,M$ die zugehörigen orthonormalen gPC Basisfunktionen. Dann ist die Bestapproximation der sKGG zu einem Zeitpunkt $T>0$ und für eine Stelle $x_j$ definiert als
 \[P_Mu(T,x_j,Y)=\sum_{m=0}^M\hat{u}_m^{(j)}\Phi_m(Y)\]
 mit Koeffizienten
-\[\hat{u}_m^{(j)}=\E[u(T,x_j,Y)\Phi_m(Y)]=\int_{\mathcal{J}_Y} u(T,x_j,y)\Phi_m(y)\rho_Y(y)dy\]
+\[\hat{u}_m^{(j)}=\E[u(T,x_j,Y)\Phi_m(Y)]=\int_{\mathcal{J}_Y} u(T,x_j,y)\Phi_m(y)\rho_Y(y)dy.\]
 Ist nun $(y_i,a_i)_{i=0,\dots,Q}$ eine Quadraturformel für das Gewicht $\rho_Y$, so ist die diskrete Projektion definiert als
 \[w_{M,Q}(T,x_j,Y)=\sum_{m=0}^M\hat{w}_m^{(j)}\Phi_m(Y)\] wobei für die Koeffizienten gilt
-\[\hat{w}_m^{(j)}=\sum_{i=0}^Qu(T,x_j,y_i)\Phi_m(y_i)a_i\approx \int_{\mathcal{J}_Y} u(T,x_j,y)\Phi_m(y)\rho_Y(y)dy\]
+\[\hat{w}_m^{(j)}=\sum_{i=0}^Qu(T,x_j,y_i)\Phi_m(y_i)a_i\approx \int_{\mathcal{J}_Y} u(T,x_j,y)\Phi_m(y)\rho_Y(y)dy.\]
 \end{mathdef}
 Satz \ref{th:interpol_and_proj} zeigt, dass für $Q=M$ und eine Quadraturformel mit paarweise verschiedenen Quadraturpunkten und Exaktheitsgrad $2M$ die beiden Ansätze im Eindimensionalen äquivalent sind. Aus der Bemerkung nach Satz \ref{th:interpol_and_proj} folgt auch, dass sich der Fehler der diskreten Projektion mithilfe der Dreiecksungleichung durch den Fehler der Bestapproximation und einen Quadraturfehler, den Aliasing-Fehler, abschätzen lässt.
 
@@ -231,12 +231,12 @@ exakt für alle Polynome vom Grad höchstens $2n+1$.
 Sei $f$ ein Polynom vom Grad höchstens $2n+1$ und 
 \[f(y)=Q_{n+1}(y)\underbrace{p(y)}_{deg \le n}+\underbrace{r(y)}_{deg \le n}\]
 eine durch Polynomdivision erhaltene Zerlegung von $f$. Da die $y_i$ Nullstellen von $Q_{n+1}$ sind, gilt
-\[f(y_i)=r(y_i),\quad i=0,\dots n\]
+\[f(y_i)=r(y_i),\quad i=0,\dots n.\]
 Dann ist
 \[\int_\mathcal{J}f(y)\rho(y)dy=\underbrace{\int_\mathcal{J}Q_{n+1}(y)p(y)\rho(y)dy}_{=0}+\int_\mathcal{J}r(y)\rho(y)dy\]
 da $Q_{n+1}$ orthogonal zum Raum aller Polynome vom Grad höchstens $n$ ist.\\
 Die interpolatorischen Quadraturformeln (wie beispielsweise die Newton-Cotes-Formeln) mit den Gewichten $a_i$, die über das gewichtete Integral der Lagrange-Polynome $\ell_i$ definiert werden, sind exakt für Polynome vom Grad höchstens $n$. Somit gilt
-\[\int_\mathcal{J}f(y)\rho(y)dy=\int_\mathcal{J}r(y)\rho(y)dy=\sum_{i=0}^{n}a_ir(y_i)=\sum_{i=0}^{n}a_if(y_i)\]
+\[\int_\mathcal{J}f(y)\rho(y)dy=\int_\mathcal{J}r(y)\rho(y)dy=\sum_{i=0}^{n}a_ir(y_i)=\sum_{i=0}^{n}a_if(y_i).\]
 \end{proof}
 \begin{mathbem}
 \label{bem:gaussquad}
@@ -245,7 +245,7 @@ Wir nennen an dieser Stelle noch einige praktische Hinweise zur Gauss-Quadratur.
 \item Die Gauss-Quadraturformel zur entsprechenden gPC Basis erfüllt die Voraussetzungen an die Quadraturformel von Satz \ref{th:interpol_and_proj}.
 \item Die Nullstellen $y_i$ lassen sich als die Eigenwerte einer symmetrischen Tridiagonalmatrix mithilfe des Golub-Welsch-Algorithmus (siehe Satz \ref{golubwelschalg}) berechnen.
 \item Die Gewichte $a_i$ lassen sich ebenfalls mithilfe des Golub-Welsch-Algorithmus berechnen. Ist $y_i$ ein Eigenwert der symmetrischen Tridiagonalmatrix $J$ mit normalisiertem Eigenvektor $z$, d.h. $Jz=y_iz$ und $\norm{z}=1$, so gilt
-\[a_i=(z_1)^2\]
+\[a_i=(z_1)^2.\]
 Das Gewicht ist somit das Quadrat des ersten Eintrags des Eigenvektors, siehe \autocite{GolubWelsch}.
 \end{itemize}
 \end{mathbem}
@@ -255,19 +255,19 @@ Um den Ansatz der diskreten Projektion für einen mehrdimensionalen Zufallsvekto
 Die numerischen Möglichkeiten der mehrdimensionalen Integration (engl. \emph{cubature}) umfassen unter anderem adaptive Verfahren und Monte-Carlo-Methoden. Da diese auf einer großen Menge an Funktionsauswertungen basieren und in unserem Fall eine Funktionsauswertung das aufwändige Lösen einer Instanz der sKGG bedeutet, benötigen wir somit angepasste Integrationsverfahren.
 \subsubsection*{Tensorkonstruktion}
 Sei $Y$ ein Zufallsvektor und $L_{Y_i}$ ein eindimensionaler Quadraturoperator bezüglich des Gewichts $\rho_{Y_i}$, beispielsweise die Gauss-Quadratur. Dann erhalten wir mithilfe einer Tensorkonstruktion die mehrdimensionale Quadratur
-\[L_Y=L_{Y_1}\otimes\dots\otimes L_{Y_N}\]
+\[L_Y=L_{Y_1}\otimes\dots\otimes L_{Y_N}.\]
 Für die Menge an Quadraturpunkten gilt wie schon bei der Interpolation
-\[\Theta_Y=\Theta_{Y_1}\otimes\dots\otimes \Theta_{Y_N}\]
+\[\Theta_Y=\Theta_{Y_1}\otimes\dots\otimes \Theta_{Y_N}.\]
 Die Anzahl der Quadraturpunkte $Q=Q_1\dots Q_N$ wächst daher wiederum sehr stark. Dies macht den Ansatz bereits für geringe Dimensionen $N$ sehr rechenaufwändig. Andererseits sehen wir sofort, dass sich die polynomiale Exaktheit der Gauss-Quadraturen direkt auf den mehrdimensionalen Fall übertragen lässt. Die Quadratur $L_Y$ ist exakt für alle Polynome in
-\[\Poly_{2Q_1-1}(Y_1)\otimes\dots\otimes\Poly_{2Q_N-1}(Y_N)\]
+\[\Poly_{2Q_1-1}(Y_1)\otimes\dots\otimes\Poly_{2Q_N-1}(Y_N).\]
 \subsubsection*{Smolyaks dünne Gitter}
 Basierend auf \autocite{ConradMarzouk} geben wir eine kurze Einführung in die Konstruktion von Smolyaks dünnen Gittern. Sei $L_{Y_i}^{Q_i}$ ein linearer Operator für die $i$-te Komponente von $Y$. Im Folgenden wird $L_{Y_i}^{Q_i}$ einen Quadraturoperator darstellen, die Konstruktion ist aber beispielsweise auch für Interpolationsoperatoren gültig.\\
 Es sei $L_{Y_i}^{Q_i}\to L_{Y_i}$ für $Q_i\to\infty$ konvergent zum entsprechenden exakten Operator. Im Fall der Quadratur bedeutet dies für glatte integrierbare Funktionen $f\colon \mathcal{J}\to\R$
-\[L^Qf=\sum_{j=0}^Q a_jf(y_j)\xrightarrow[]{Q\to\infty}\int_\mathcal{J}f(y)dy=Lf\]
+\[L^Qf=\sum_{j=0}^Q a_jf(y_j)\xrightarrow[]{Q\to\infty}\int_\mathcal{J}f(y)dy=Lf.\]
 Dann lässt sich der exakte Operator als Teleskopsumme darstellen
 \[L_{Y_i}=\sum_{m=0}^\infty L_{Y_i}^m - L_{Y_i}^{m-1}=\sum_{m=0}^\infty \varDelta_{Y_i}^m\]
 mit $\varDelta_{Y_i}^0=L_{Y_i}^0=0$ und $\varDelta_{Y_i}^m=L_{Y_i}^m-L_{Y_i}^{m-1}$.\\
-Wir können das volle Tensorprodukt der exakten Operatoren mithilfe der Teleskopsummen schreiben und Produkt und Summe tauschen
+Wir können das volle Tensorprodukt der exakten Operatoren mithilfe der Teleskopsummen schreiben und Produkt und Summe tauschen:
 \begin{align*}
 L_{Y_1}\otimes\dots\otimes L_{Y_N}&=\sum_{m_1=0}^\infty \varDelta_{Y_1}^{m_1}\otimes\dots\otimes \sum_{m_N=0}^\infty\varDelta_{Y_N}^{m_N}\\
 &=\sum_{m\in\N_0^N} \varDelta_{Y_1}^{m_1}\otimes\dots\otimes \varDelta_{Y_N}^{m_N}\\
@@ -275,10 +275,10 @@ L_{Y_1}\otimes\dots\otimes L_{Y_N}&=\sum_{m_1=0}^\infty \varDelta_{Y_1}^{m_1}\ot
 Zur Approximation ersetzt man die Summe über alle Multi-Indices $m\in\N_0^N$ durch eine passende Teilmenge. Dazu verwenden wir die Menge aller Indices mit $|m|\le \ell$ und dem Level $\ell$. Schreibt man die Approximation wieder bezüglich der Komponenten $L_{Y_i}^{m_i}$ so gilt nach \autocite{NoTeWe07}
 \begin{align*}
 L_Y^\ell &= \sum_{|m|\le \ell} \varDelta_{Y_1}^{m_1}\otimes\dots\otimes \varDelta_{Y_N}^{m_N}\\
-&= \sum_{\ell - N+1\le |m|\le \ell} (-1)^{\ell - |m|}\binom{N-1}{\ell - |m|}L_{Y_1}^{m_1}\otimes\dots\otimes L_{Y_N}^{m_N}\\
+&= \sum_{\ell - N+1\le |m|\le \ell} (-1)^{\ell - |m|}\binom{N-1}{\ell - |m|}L_{Y_1}^{m_1}\otimes\dots\otimes L_{Y_N}^{m_N}.\\
 \end{align*}
 Die Menge an benötigten Kollokationspunkten ist dann 
-\[\Theta_Y^\ell=\bigcup_{\ell - N+1\le |m|\le \ell} \Theta_{Y_1}^{m_1}\times\dots\times \Theta_{Y_N}^{m_N}\]
+\[\Theta_Y^\ell=\bigcup_{\ell - N+1\le |m|\le \ell} \Theta_{Y_1}^{m_1}\times\dots\times \Theta_{Y_N}^{m_N}.\]
 Die Gestalt und Größe der Menge $\Theta_Y^\ell$ ist abhängig davon, wie die Teilmengen geschachtelt (engl. \emph{nested}) sind. Dies ist eine entscheidende Bedingung für eine eventuelle Reduktion der benötigten Kollokationspunkte. In Abbildung \ref{fig:grids} sehen wir zwei Beispiele für dünne Gitter. Die zugrunde liegenden Knotenmengen $\Theta_{Y_1}^j$ und $\Theta_{Y_2}^j$ sind dabei die Nullstellen der Legendre- bzw. Hermite-Polynome mit Grad $j$.
 \begin{figure}[!htb]
 \minipage{0.5\textwidth}
@@ -313,7 +313,7 @@ Die Glenshaw-Curtis-Quadratur basierend auf den Knotenpunkten
 \[y_i=\cos\left(\frac{(n-1-i)\pi}{n-1}\right)\in[-1,1],\quad n\ge 2, i=0,\dots,n-1\]
 ist eine häufig genutzte Quadraturformel mit vollständig geschachtelten Quadraturpunkten. Die Gewichte lassen sich in $\mathcal{O}(n\log n)$ Schritten berechnen.\\
 Diese Quadratur ist für das kompakte Intervall $[-1,1]$ ausgelegt. Für die Legendre-Polynome und die Jacobi-Polynome mit $\alpha,\beta>0$ stimmt der Träger mit dem Träger der zugehörigen stochastischen Verteilung überein. Es gilt
-\[\\E[Y]=\int_{[-1,1]}f(y)\rho(y)dy\approx\sum_{i=0}^Qf(y_i)\rho(y_i)a_i\]
+\[\\E[Y]=\int_{[-1,1]}f(y)\rho(y)dy\approx\sum_{i=0}^Qf(y_i)\rho(y_i)a_i.\]
 Die Dichte $\rho$ wird hier explizit ausgewertet und ist nicht Teil der Quadraturformel, wie dies bei der Gauss-Quadratur der Fall war.\\
 Für Hermite-Polynome mit zugehörigem Träger $(-\infty,\infty)$ bzw. Laguerre-Polynome mit zugehörigem Träger $(0,\infty)$ ist daher eine Transformation des Integrals nötig. Da $[-1,1]$ kompakt ist, existiert aber keine Bijektion zwischen den Mengen. Heuristische Ansätze wie das Ignorieren der Randpunkte und anschließender Verwendung des Transformationssatzes auf $(-1,1)$ liefert schlechte Approximationen.\\
 Unseren Beobachtungen nach bietet die Glenshaw-Curtis Quadratur keine Vorteile gegenüber der Gauss-Quadratur. Die polynomiale Exaktheit ist lediglich $n$ bei $n$ Quadraturpunkten und verwendet die Dichtefunktion der Verteilung nicht implizit. Die Dichte muss somit ebenfalls durch die Quadratur approximiert werden, was den nötigen Polynomgrad noch weiter erhöht. Schlussendlich erhöhen die Polynome $\Phi_m$, die bei der Approximation der Varianz unter dem Integral auftauchen, die benötigte polynomiale Exaktheit.
@@ -384,7 +384,7 @@ Bei der Interpolation lässt sich die Varianz wegen des überbestimmten Systems 
 Anhand von \nameref{trial:disconttriple} untersuchen wir die Ansätze für Probleme mit in $y$ unstetigen Koeffizienten $\alpha$ und $\beta$. Dabei ist für $y\in[-1,1]$
 \begin{align*}
 \alpha(y)&=\begin{cases}2,\quad y>0\\ 1, \quad y\le 0\end{cases}\\
-\beta(x,y)&=\begin{cases}2+\sin(x+y),\quad y>0\\ 2+\cos(x+y),\quad y\le 0\end{cases}\\
+\beta(x,y)&=\begin{cases}2+\sin(x+y),\quad y>0\\ 2+\cos(x+y),\quad y\le 0.\end{cases}
 \end{align*}
 Wir erkennen in Abbildung \ref{fig:Kollokation_comparison_trialdiscontsimple} ein unterschiedliches Verhalten für eine gerade bzw. ungerade Anzahl an Quadraturpunkten, die im Eindimensionalen einer gerade bzw. ungerade Anzahl an Basispolynomen entsprechen. Für eine gerade Anzahl an Polynomen konvergieren Erwartungswert und Varianz vergleichbar mit bisherigen Beispielen.
 \begin{figure}[!htb]

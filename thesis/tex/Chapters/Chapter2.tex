@@ -44,7 +44,7 @@ n=\sum_{k=0}^{L-1}d_k(n)b^k
 \end{equation*}
 die Darstellung von $n$ zur Basis $b$ ist und
 \begin{equation*}
-c_b(n)=\sum_{k=0}^{L-1}d_k(n)b^{-k-1}
+c_b(n)=\sum_{k=0}^{L-1}d_k(n)b^{-k-1}.
 \end{equation*}
 \end{mathdef}
 \begin{mathdef}[Halton-Folge]
@@ -54,11 +54,11 @@ Die Halton-Folge zu einer Dimension $N\in\N$ ist definiert als die Folge $(c_{p_
 Beispielsweise ist für $p=3$ die $n=5$-te Van-der-Corput-Zahl gegeben durch 
 \begin{align*}
 5&=1\cdot 3^1+2\cdot 3^0=12_3\\
-c_3(5)&=1\cdot 3^{-2}+2\cdot 3^{-1}=0.21_3=\frac{7}{9}
+c_3(5)&=1\cdot 3^{-2}+2\cdot 3^{-1}=0.21_3=\frac{7}{9}.
 \end{align*}
 Die Halton-Folge für $N=2$ Dimensionen beginnt mit den Zahlen
 \begin{equation*}
-(c_2(n),c_3(n))_{n\in\N}=\left(\left(\frac{1}{2},\frac{1}{3}\right),\left(\frac{1}{4},\frac{2}{3}\right),\left(\frac{3}{4},\frac{1}{9}\right),\left(\frac{1}{8},\frac{4}{9}\right),\left(\frac{5}{8},\frac{7}{9}\right),\left(\frac{3}{8},\frac{2}{9}\right),\dots\right)
+(c_2(n),c_3(n))_{n\in\N}=\left(\left(\frac{1}{2},\frac{1}{3}\right),\left(\frac{1}{4},\frac{2}{3}\right),\left(\frac{3}{4},\frac{1}{9}\right),\left(\frac{1}{8},\frac{4}{9}\right),\left(\frac{5}{8},\frac{7}{9}\right),\left(\frac{3}{8},\frac{2}{9}\right),\dots\right).
 \end{equation*}
 \end{mathbsp}
 In höheren Dimensionen (ab ungefähr $N=6$) beobachtet man allerdings stärkere lineare Korrelation zwischen den Komponenten, siehe beispielsweise Folgen für $p=17$ und $p=19$. Die Komponenten sind daher abhängig und somit kein guter Ersatz für Pseudozufallszahlen. Genauere Untersuchungen werden in \autocite{Morokoff1995218} erläutert, wo auch vorgeschlagen wird, für höhere Dimensionen die Sobol-Folge zu verwenden oder ein gewisses Offset für den Startindex der Halton-Folge einzuführen.\\
@@ -76,11 +76,11 @@ Bevor wir den Kern der Schleife betrachten, wollen wir uns zuerst mit den eng mi
 Gegeben sei ein Zeitpunkt $T>0$ und die stochastische KGG (\ref{skgg}) zu einer Zufallsvariablen $Y$ und gesucht seien $\E[u(T,x,Y)]$ und $\text{var}(u(T,x,Y))$. Sind für $i=1,\dots,R$ die deterministischen Lösungen $u(T,x,y_i)$ gespeichert, so verwenden wir als Approximationen
 \begin{align*}
 \E[u(T,x,Y)]&\approx \frac{1}{R}\sum_{i=1}^R u(T,x,y_i)\eqqcolon m_R\\
-\text{var}(u(T,x,Y)) &\approx \frac{1}{R-1}\sum_{i=1}^R(u(T,x,y_i)-m_R)^2
+\text{var}(u(T,x,Y)) &\approx \frac{1}{R-1}\sum_{i=1}^R(u(T,x,y_i)-m_R)^2.
 \end{align*}
 Wieso diese Approximationen sinnvoll sind, zeigt sich teilweise aus dem zentralen Grenzwertsatz \ref{thzentralgrenzwert}. Es folgt für unabhängige Stichproben $y_i$ die Aussage \[\sqrt{R}(m_R-\E[u(T,x,Y)])\xrightarrow{R\to\infty}\mathcal{N}(0,\text{var}(u(T,x,Y)))\]
 und schlussendlich 
-\[m_R=\E[u(T,x,Y)] + \mathcal{O}\left(\frac{1}{\sqrt{R}}\right)\]
+\[m_R=\E[u(T,x,Y)] + \mathcal{O}\left(\frac{1}{\sqrt{R}}\right).\]
 In welchem Konvergenz-Sinne die letzte Aussage zu verstehen ist und welche Faktoren dabei in den letzten Term einfließen, sei an dieser Stelle nicht weiter ausgeführt. Wir werden diese Konvergenzordnung in Beispielen jedoch empirisch bestätigen.\\[0.2cm]
 Die für die Approximation der Varianz verwendete Darstellung nennt man auch \emph{korrigierte Stichprobenvarianz}. Sie ist ein erwartungstreuer Schätzer der Varianz einer Stichprobe und ein Werkzeug aus der Statistik, welches wir hier nicht weiter erläutern werden.
 \subsection*{Fortlaufende Berechnung}
@@ -92,7 +92,7 @@ Die Verarbeitung am Ende besitzt zwei große Nachteile:
 \begin{maththeorem}
 \label{thiterativemk}
 Für $x_1,\dots,x_k\in\R$ und $m_k=\frac{1}{k}\sum_{j=1}^kx_j$ gilt für $k\in\N$ die iterative Darstellung
-\[m_k=m_{k-1}+\frac{x_k-m_{k-1}}{k},\quad \text{mit }\: m_0=0\]
+\[m_k=m_{k-1}+\frac{x_k-m_{k-1}}{k},\quad \text{mit }\: m_0=0.\]
 \end{maththeorem}
 \begin{proof}
 Wir zeigen mithilfe vollständiger Induktion die äquivalente Aussage, dass die Rekursion mit der Darstellung $m_k=\frac{1}{k}\sum_{j=1}^kx_j$ übereinstimmt.\\
@@ -106,13 +106,13 @@ Multiplizieren wir nun mit $k(k+1)$ so erhalten wir
 \begin{align*}
 k(k+1)m_{k+1}&=(k+1)\sum_{j=1}^kx_j+kx_{k+1}-\sum_{j=1}^kx_j\\
 &=k\sum_{j=1}^{k+1}x_j\\
-\implies m_{k+1}&=\frac{1}{k+1}\sum_{j=1}^{k+1}x_j
+\implies m_{k+1}&=\frac{1}{k+1}\sum_{j=1}^{k+1}x_j.
 \end{align*}
 \end{proof}
 Wir haben nun eine iterative Methode zur Berechnung des Mittelwertes gewonnen, die nur den vorherigen Mittelwert, die neue Stichprobe und die Anzahl an Stichproben benötigt. Diese Methode ist robust gegen Überläufe und numerisch stabil. Viel wichtiger ist jedoch die iterative Berechnung des Varianzschätzers, welche auf ähnlichen Ideen basiert. Die Äquivalenz zur ursprünglichen Methode ist dabei allerdings schwieriger zu erkennen.
 \begin{maththeorem}
 Für $x_1,\dots,x_k\in\R$, $m_k$ wie in Satz \ref{thiterativemk} und $s_k=\sum_{j=1}^k(x_j-m_k)^2$ gilt für $k\in\N$ die iterative Darstellung
-\[s_k=s_{k-1}+(x_k-m_k)(x_k-m_{k-1}),\quad\text{mit }s_0=0\]
+\[s_k=s_{k-1}+(x_k-m_k)(x_k-m_{k-1}),\quad\text{mit }s_0=0.\]
 \end{maththeorem}
 \begin{proof}
 Es gilt für $j<k$ wegen $m_k=\frac{k-1}{k}m_{k-1}+\frac{1}{k}x_k$
@@ -121,7 +121,7 @@ x_j-m_k&=x_j-m_{k-1}+\frac{1}{k}m_{k-1}-\frac{1}{k}x_k \nonumber\\
 \label{eqn:mcvar1}
 &=x_j-m_{k-1}-\frac{1}{k}(x_k-m_{k-1})\tag{*}\\
 \label{eqn:mcvar2}
-x_k-m_k&=\frac{k-1}{k}(x_k-m_{k-1})\tag{**}
+x_k-m_k&=\frac{k-1}{k}(x_k-m_{k-1}).\tag{**}
 \end{align}
 Dann gilt für $k\in\N$
 \begin{align*}
@@ -129,7 +129,7 @@ s_k&=\sum_{j=1}^k(x_j-m_k)^2\stackrel{(\ref{eqn:mcvar2})}{=}\sum_{j=1}^{k-1}(x_j
 &\stackrel{(\ref{eqn:mcvar1})}{=}\sum_{j=1}^{k-1}(x_j-m_{k-1})^2-\frac{2}{k}(x_k-m_{k-1})\sum_{j=1}^{k-1}(x_j-m_{k-1})+\frac{k-1}{k^2}(x_k-m_{k-1})^2\\
 &\quad +\frac{(k-1)^2}{k^2}(x_k-m_{k-1})^2\\
 &=s_{k-1}-\frac{2}{k}(x_k-m_{k-1})\underbrace{\left((k-1)m_{k-1}-(k-1)m_{k-1}\right)}_{=0}+\underbrace{\frac{(k-1)^2+k-1}{k^2}}_{=\frac{k-1}{k}}(x_k-m_{k-1})^2\\
-&=s_{k-1}+\frac{k-1}{k}(x_k-m_{k-1})\underbrace{(x_k-m_{k-1})}_{\stackrel{(\ref{eqn:mcvar2})}{=}\frac{k}{k-1}(x_k-m_k)}=s_{k-1}+(x_k-m_{k-1})(x_k-m_k)
+&=s_{k-1}+\frac{k-1}{k}(x_k-m_{k-1})\underbrace{(x_k-m_{k-1})}_{\stackrel{(\ref{eqn:mcvar2})}{=}\frac{k}{k-1}(x_k-m_k)}=s_{k-1}+(x_k-m_{k-1})(x_k-m_k).
 \end{align*}
 \end{proof}
 Teilen wir nun $s_k$ noch durch $k-1$, so erhalten wir wieder die korrigierte Stichprobenvarianz. Wir benötigen dafür nur den vorherigen Wert $s_{k-1}$, die beiden letzten Mittelwerte, die neuste Stichprobe $x_k$ und die Stichprobenanzahl.
