@@ -5,7 +5,13 @@ from numpy.fft import fftfreq
 
 
 class SolverConfig:
-
+    """
+    A SolverConfig holds all required information to solve a differential equation. It supports creation of a spatial
+    grid and the evaluation of the starting values on this grid. Optionally pseudospectral power factors can be
+    calculated if required (e.g. for pseudo derivatives of periodic functions). Once the SolverConfig is properly
+    initialized (that is: it's solver member is set), the solve method can be used to obtain the solution for different
+    times.
+    """
     def __init__(self, intervals, grid_points_list, pseudospectral_power=None):
         self.last_delta_time = 0
         self.param = {}

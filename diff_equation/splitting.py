@@ -2,6 +2,12 @@ from itertools import cycle, islice
 
 
 class Splitting:
+    """
+    A Splitting holds multiple SolverConfigs and applies in a cycle to progress to a stop time using a given amount of
+    steps with a time step size. Supports start and end callbacks to use at the start of the first or at the end of the
+    last cycle. The static methods "make_lie", "make_strang" and "make_fast_strang" offer the most frequently used
+    cases for splittings.
+    """
     def __init__(self, configs, step_fractions, name, on_end_callback=None, on_start_callback=None):
         self.solver_configs = configs
         self.name = name

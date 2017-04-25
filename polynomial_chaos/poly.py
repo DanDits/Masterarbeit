@@ -234,4 +234,4 @@ def make_jacobi(alpha, beta):
 # legendre nodes are the same, weights are off by factor 2 due to our scaling by distribution weight
 # laguerre nodes are the same, weights are off by factor gamma(alpha) due to our scaling by distribution weight
 # hermite nodes are off by a factor sqrt(2) as we use e^(x^2/2) instead of e^(x^2), weights are off by factor sqrt(pi)
-# jacobi nodes are same except for EW 0, because we shifted domain from (0,1) to (-1,1)? # TODO explain this
+# jacobi nodes are same except for EW 0, because we shifted domain from (0,1) to (-1,1)?

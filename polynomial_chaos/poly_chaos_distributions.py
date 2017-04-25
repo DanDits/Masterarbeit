@@ -75,8 +75,6 @@ legendreChaos = PolyChaosDistribution(poly.make_legendre(),
                                       lambda n: 1 / (2 * n + 1))
 
 
-# TODO convergence very zigzac like when using interpolation by matrix inversion as this uses a method that
-# TODO does require some symmetry of the nodes around the middle node which is not fulfilled for laguerre nodes
 # nodes are not symmetric around 0., unstable fast,...
 def make_laguerreChaos(alpha):  # alpha > 0
     assert alpha > 0

@@ -6,6 +6,12 @@ from scipy.integrate import nquad
 
 
 class QuadratureRule:
+    """
+    Defines a QuadratureRule which allows integration of a given function. Implementations decide on the detail such as
+    if multidimensional integration is supported. If the integration is discrete (as in: a traditional quadrature rule)
+    the used nodes and weights can be obtained. Optionally the rule can then support to apply all nodes simultaneously
+    to increase computation speed, this requires the function to be properly vectorized.
+    """
     def apply_to_all_nodes_simultaneously(self, function):
         return self.get_weights().dot(function(self.get_nodes()))
 
@@ -132,7 +138,7 @@ class PseudoSparseDiamond(QuadratureRule):
                 if poly_name in ["Hermite", "Legendre"]:
                     index = centralize_index(index, length)  # important as nodes are symmetric around the center
                 elif poly_name == "Jacobi":
-                    index = length - index - 1  # TODO maybe depending on if alpha > beta ?
+                    index = length - index - 1
                 elif poly_name == "Laguerre":
                     pass  # do not change index
                 else:
