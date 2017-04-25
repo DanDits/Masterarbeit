@@ -1,8 +1,10 @@
-import demo.splitting as ds
-import diff_equation.klein_gordon as kg
-import numpy as np
 from itertools import repeat
+
 import matplotlib.pyplot as plt
+import numpy as np
+
+import demo.chapter1.splitting as ds
+import diff_equation.klein_gordon as kg
 from diff_equation.splitting import Splitting
 from util.analysis import error_l2_relative
 

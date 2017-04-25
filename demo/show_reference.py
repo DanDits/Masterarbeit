@@ -1,7 +1,7 @@
-import demo.splitting as sp
 import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib
+
+import demo.chapter1.splitting as sp
 
 trial = sp.trial_frog
 dim = 2

@@ -1,14 +1,15 @@
 # In correspondence to the instability observed by splitting_orderplot.py for different weights we here test
 # the dependence on the weight by estimating the CFL number. Should be the same for different N, but because estimation
 # is different (and not always equally accurate as these are heuristics) they do not completely fit on top of each oth
-import demo.splitting as ds
-import diff_equation.klein_gordon as kg
-import numpy as np
 from itertools import repeat
+
 import matplotlib.pyplot as plt
+import numpy as np
+
+import demo.chapter1.splitting as ds
+import diff_equation.klein_gordon as kg
 from diff_equation.splitting import Splitting
 from util.analysis import error_l2_relative
-
 
 dimension = 1
 grid_size_Ns = [256, 512, 1024, 2048, 2048*2]
