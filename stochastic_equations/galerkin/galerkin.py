@@ -19,6 +19,22 @@ cache_name_quadrature = "Quad"
 
 def galerkin_approximation(trial, max_poly_degree, domain, grid_size, start_time, steps_list, delta_time, wave_weight,
                            quadrature_method, quadrature_param, retrieve_coeffs=False):
+    """
+    Core routine for the Galerkin approximation of the KGG
+    :param trial: The StochasticTrial to use for KGG's parameters and initial values.
+    :param max_poly_degree: The maximum polynomial degree to use for the polynomial chaos basis.
+    :param domain: The domain (with periodic boundary conditions), a list of tuples defining intervals and the dimension.
+    :param grid_size: How many nodes to use for one spatial dimension.
+    :param start_time: The start time to associate with the initial values, usually 0.
+    :param steps_list: List of positive integer steps to use to progress the galerkin splitting.
+    :param delta_time: The time delta used for the splitting.
+    :param wave_weight: The weight used for the splitting. 1 is most stable and (theoretically) fastest.
+    :param quadrature_method: The quadrature method to use for calculating the matrices A and B.
+    :param quadrature_param: The quadrature param to use for the quadrature method.
+    :param retrieve_coeffs: If all calculated coefficients should be returned after each steps, default=False.
+    :return: A generator that returns the results and optionally all the calculated coefficients after each steps done
+    in the given list of steps.
+    """
     global parameter_validation_for_cache
     if parameter_validation_for_cache is None:
         parameter_validation_for_cache = {"grid_size": grid_size,

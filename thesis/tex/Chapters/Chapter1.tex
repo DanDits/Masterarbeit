@@ -63,7 +63,7 @@ v(0)&=r.
 \end{split}
 \end{equation}
 \end{maththeorem}
-Formulieren wir unsere KGG als ein Cauchy-Problem obiger Gestalt, so ist also nur noch zu zeigen, dass der Generator eine $C_0$-Halbgruppe generiert.\\
+Formulieren wir unsere KGG als ein Cauchy-Problem obiger Gestalt, so ist also nur noch zu zeigen, dass der zugehörige Operator eine $C_0$-Halbgruppe generiert.\\
 Den Generator $C$ der KGG mit $\alpha>0$ und $\beta\in L^\infty(\Torus^d)$ schreiben wir als Summe von zwei Operatoren:
 \[\underbrace{\begin{pmatrix}0 & I\\ \alpha\Laplace -\beta(x) & 0\end{pmatrix}}_{=C}
 =\underbrace{\begin{pmatrix}0 & I\\ \alpha\Laplace-I & 0\end{pmatrix}}_{=\widetilde{A}}
@@ -547,9 +547,9 @@ Zusammengefasst haben wir nun für den lokalen Fehler folgende Abschätzung bewi
 Das Strang-Splitting 
 \[u^n\coloneqq \left(e^{\tau A/2}e^{\tau B}e^{\tau A/2}\right)^nu(0)\]
 für die Klein-Gordon-Gleichung (\ref{kgg}) mit Lösung $u$, $\alpha>0$, $0<\beta\in L^\infty(\Torus^d)\cap C^2(\Torus^d)$ und
-\[A=\begin{pmatrix}0 & I\\ \alpha\Laplace\end{pmatrix}, \quad B=\begin{pmatrix}0 & 0\\ -\beta(x) & 0\end{pmatrix}\]
+\[A=\begin{pmatrix}0 & I\\ \alpha\Laplace & 0\end{pmatrix}, \quad B=\begin{pmatrix}0 & 0\\ -\beta(x) & 0\end{pmatrix}\]
 ist konvergent von Ordnung 2 bezüglich der Zeitschrittweite $\tau=\frac{t_n}{n}>0$:
-\[u^n-u(t_n)\le \hat{c}\tau^2, \qquad \hat{c}(\alpha,\beta,t_n,\max_{j=0,\dots,n-1}\norm{u(t_j)}_{D(A)})>0\]
+\[\norm{u^n-u(t_n)}_{H^1_\alpha\times L^2}\le \hat{c}\tau^2, \qquad \hat{c}(\alpha,\beta,t_n,\max_{j=0,\dots,n-1}\norm{u(t_j)}_{D(A)})>0\]
 \end{maththeorem}
 \begin{proof}
 Sei der Lösungsoperator $T$ der exakten Lösung der KGG definiert als
